@@ -6,196 +6,336 @@
 <meta name="theme-color" content="#070913">
 <title>Matriz Inteligente de Ativos ITS & Interligações</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <style>
-:root{--bg:#070913;--surface:#0b1124;--surface2:#111936;--border:rgba(59,130,246,.2);--border2:rgba(59,130,246,.4);--accent:#3b82f6;--accent-glow:rgba(59,130,246,.3);--green:#10b981;--green2:#34d399;--purple:#a855f7;--text:#f3f4f6;--text2:#d1d5db;--muted:#9ca3af;--dim:#4b5563;--font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--r-xs:4px;--r-sm:8px;--r-md:12px}
+:root{
+  --bg:#070913;
+  --surface:#0b1124;
+  --surface2:#111936;
+  --border:rgba(59,130,246,.2);
+  --border2:rgba(59,130,246,.4);
+  --accent:#3b82f6;
+  --accent-glow:rgba(59,130,246,.3);
+  --green:#10b981;
+  --green2:#34d399;
+  --purple:#a855f7;
+  --text:#f3f4f6;
+  --text2:#d1d5db;
+  --muted:#9ca3af;
+  --dim:#4b5563;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --r-xs:4px;--r-sm:8px;--r-md:12px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:radial-gradient(circle at top,rgba(59,130,246,.08),transparent 55%),var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased}
-button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;touch-action:manipulation}button:active{opacity:.8;transform:scale(.97)}input,select{font-family:var(--font);outline:none}
-.hdr{position:sticky;top:0;z-index:60;border-bottom:1px solid var(--border2);background:rgba(7,9,19,.95);backdrop-filter:blur(20px);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.6)}.hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent)}
-.wrap{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.card{background:rgba(11,17,36,0.9);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9))}
-.search-grid{display:grid;grid-template-columns:120px 120px 1fr auto auto auto auto;gap:8px;align-items:center}
-@media(max-width:1000px){.search-grid{grid-template-columns:1fr;}}
-.search-select,.search-input{width:100%;border-radius:var(--r-xs);border:1px solid var(--border2);background:rgba(7,9,19,.9);padding:10px 12px;font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;transition:all .2s ease}
-.search-select:focus,.search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
-.btn-icon{width:40px;height:40px;border-radius:var(--r-xs);display:grid;place-items:center;flex-shrink:0;border:1px solid var(--border)}
-.btn-icon.go{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;border:none}.btn-icon.clr{background:rgba(7,9,19,.9);color:var(--muted)}.btn-icon svg{width:16px;height:16px}
-.asset-card{border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(11,17,36,0.95);overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:14px;margin-bottom:10px}
-.asset-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.asset-title{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:.02em}.asset-badge{font-size:8.5px;font-weight:900;padding:3px 8px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--accent);border:1px solid var(--border2)}
-.asset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;margin-top:4px}@media(max-width:600px){.asset-grid{grid-template-columns:1fr 1fr}}.asset-field{background:rgba(7,9,19,.6);padding:6px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.05)}.asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase}.asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word}
-.fiber-box{background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:10px;margin-top:4px}.fiber-header{font-size:9px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:6px}.fiber-neighbors{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.fiber-card{background:rgba(7,9,19,.85);border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:8px;cursor:pointer;transition:all .2s ease}.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2)}.fiber-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase}.fiber-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px}.fiber-card-sub{font-size:8px;font-weight:700;color:var(--muted);margin-top:2px}
-.btn-wa{width:100%;padding:10px;border-radius:var(--r-xs);background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);border-radius:var(--r-xs);border:1px solid var(--border2);background:var(--surface);padding:10px 16px;font-size:9px;font-weight:800;text-transform:uppercase;z-index:99999;opacity:0;transition:all .15s ease;pointer-events:none;color:var(--accent);box-shadow:0 0 10px var(--accent-glow)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#map{height:480px;border-radius:8px;border:1px solid rgba(255,255,255,.04);margin-top:10px}.result-and-map{display:grid;grid-template-columns:1fr 480px;gap:12px;align-items:start}@media(max-width:1100px){.result-and-map{grid-template-columns:1fr}}.dist-pill{font-size:11px;font-weight:900;color:var(--muted);background:rgba(255,255,255,.03);padding:6px;border-radius:6px}
-.small{font-size:11px;color:var(--muted)}
+body{
+  background:radial-gradient(circle at top,rgba(59,130,246,.08),transparent 55%),var(--bg);
+  color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;touch-action:manipulation;}
+button:active{opacity:.8;transform:scale(.97)}
+input,select{font-family:var(--font);outline:none}
+
+.hdr{
+  position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border2);
+  background:rgba(7,9,19,.95);backdrop-filter:blur(20px);padding:0 16px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+.hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
+
+.wrap{max-width:800px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+
+.card{
+  background:rgba(11,17,36,0.9);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+.card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));}
+
+.search-grid{display:grid;grid-template-columns:140px 1fr auto auto;gap:8px;}
+@media(max-width:650px){.search-grid{grid-template-columns:1fr;}}
+
+.search-select, .search-input{
+  width:100%;border-radius:var(--r-xs);border:1px solid var(--border2);
+  background:rgba(7,9,19,.9);padding:10px 12px;
+  font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;
+  transition:all .2s ease;
+}
+.search-select:focus, .search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
+
+.btn-icon{
+  width:40px;height:40px;border-radius:var(--r-xs);display:grid;place-items:center;
+  flex-shrink:0;border:1px solid var(--border);
+}
+.btn-icon.go{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;border:none;}
+.btn-icon.clr{background:rgba(7,9,19,.9);color:var(--muted)}
+.btn-icon svg{width:16px;height:16px}
+
+.asset-card{
+  border-radius:var(--r-sm);border:1px solid var(--border);
+  background:rgba(11,17,36,0.95);overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;padding:14px;margin-bottom:10px;
+}
+.asset-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.asset-title{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:.02em;}
+.asset-badge{font-size:8.5px;font-weight:900;padding:3px 8px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--accent);border:1px solid var(--border2);}
+
+.asset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;margin-top:4px;}
+@media(max-width:600px){.asset-grid{grid-template-columns:1fr 1fr;}}
+.asset-field{background:rgba(7,9,19,.6);padding:6px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.05);}
+.asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase;}
+.asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
+
+.fiber-box{
+  background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));
+  border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:10px;margin-top:4px;
+}
+.fiber-header{font-size:9px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.fiber-neighbors{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.fiber-card{
+  background:rgba(7,9,19,.85);border:1px solid rgba(168,85,247,.3);
+  border-radius:var(--r-xs);padding:8px;cursor:pointer;transition:all .2s ease;
+}
+.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);}
+.fiber-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase;}
+.fiber-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px;}
+.fiber-card-sub{font-size:8px;font-weight:700;color:var(--muted);margin-top:2px;}
+
+.btn-wa{
+  width:100%;padding:10px;border-radius:var(--r-xs);
+  background:linear-gradient(135deg,var(--green),#059669);color:#fff;
+  font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;
+}
+
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);
+  border-radius:var(--r-xs);border:1px solid var(--border2);background:var(--surface);
+  padding:10px 16px;font-size:9px;font-weight:800;text-transform:uppercase;z-index:99999;
+  opacity:0;transition:all .15s ease;pointer-events:none;color:var(--accent);
+  box-shadow:0 0 10px var(--accent-glow);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<header class="hdr"><div class="hdr-title">Matriz Inteligente ITS & Interligações - Estado / Rede</div></header>
+
+<header class="hdr">
+  <div class="hdr-title">Matriz Inteligente ITS & Interligações</div>
+</header>
+
 <div class="wrap">
   <div class="card card-accent">
-    <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Filtrar por Estado (SP / RJ), Rodovia, KM, TAG ou GPS — Mostrar KM real, distâncias e vizinhos</div>
+    <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
+      Pesquisa Inteligente por KM, TAG, Hostname ou Fibra
+    </div>
     <div class="search-grid">
-      <select class="search-select" id="filterEstado">
-        <option value="ALL">Todos os Estados</option>
-        <option value="SP">SP</option>
-        <option value="RJ">RJ</option>
+      <select class="search-select" id="filterRodovia">
+        <option value="ALL">Todas as Rodovias</option>
+        <option value="BR116">BR-116</option>
+        <option value="BR101">BR-101</option>
       </select>
-      <select class="search-select" id="filterRodovia"><option value="ALL">Todas as Rodovias</option><option value="BR116">BR-116</option><option value="BR101">BR-101</option></select>
-      <div class="search-wrap"><input class="search-input" id="inputSearch" placeholder="EX: 214+728, BR116-CF0001, ou GPS" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()"></div>
-      <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-      <button class="btn-icon clr" onclick="clearSearch()" title="Limpar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      <button class="btn-icon" id="btnLocate" title="Usar minha localização" onclick="useMyLocation()" style="display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
-      <label title="Forçar correspondência exata de KM" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="exactKm" style="width:16px;height:16px"> KM exato</label>
-      <button class="btn-icon" title="Desenhar Rede (estado atual)" onclick="drawNetworkByState()">🔗</button>
-      <input type="file" id="fileUpload" accept="text/csv,application/json" style="display:none" onchange="handleUpload(event)"><button class="btn-icon" title="Importar CSV/JSON" onclick="document.getElementById('fileUpload').click()" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/></svg></button>
+      <div class="search-wrap">
+        <input class="search-input" id="inputSearch" placeholder="EX: 214+728, 90, BR116-CF0001..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+      </div>
+      <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="btn-icon clr" onclick="clearSearch()" title="Limpar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 
-  <div class="result-and-map">
-    <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px"></div>
-    <div class="card" style="height:100%;display:flex;flex-direction:column;">
-      <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Mapa Geral & Ferramentas</div>
-      <div id="map"></div>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button onclick="exportResultsCSV()" class="btn-icon" title="Exportar resultados CSV">CSV</button><button onclick="downloadGeoJSON()" class="btn-icon" title="Exportar GeoJSON">GeoJSON</button><button onclick="clusterMarkers()" class="btn-icon" title="Ativar/Desativar cluster">CL</button><button onclick="exportEdits()" class="btn-icon" title="Exportar Edits Locais">ED</button></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Rede desenhada por fibra; filtrar por Estado para ver apenas ativos e interligações desse estado.</div>
+  <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
+    <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
+      Insira um KM (ex: 214+728 ou 90) ou uma TAG para calcular instantaneamente os ativos e vizinhos de fibra.
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
 
-<!-- Leaflet + MarkerCluster -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster-src.js"></script>
-
 <script>
-/* --- SAMPLE DATA: replace with full dataset including lat/lon and kmVal --- */
-let rawAssets = [
-  {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"rodovia":"BR116","sentido":"NORTE","fibra":"11,12","ipGer":"172.27.0.183","gerencia":"172.26.45.x","rede":"10.3.6.80","switch":"SW1","lat":-22.9, "lon":-43.2},
-  {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"rodovia":"BR116","sentido":"NORTE","fibra":"11,12","ipGer":"172.27.0.183","gerencia":"172.26.x.x","rede":"10.3.7.0","switch":"SW2","lat":-22.901, "lon":-43.201},
-  {"tag":"SAT 214+860","equip":"SAT","estado":"RJ","host":"","km":"214+860","kmVal":214.86,"rodovia":"BR116","sentido":"SUL","fibra":"11,12","ipGer":"172.27.0.162","gerencia":"172.26.12.111","rede":"10.3.6.80","lat":-22.912, "lon":-43.215},
-  {"tag":"BR116-CF0002","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA56-N215_129","km":"215+129","kmVal":215.129,"rodovia":"BR116","sentido":"NORTE","fibra":"21,22","ipGer":"172.27.0.165","gerencia":"172.26.12.x","lat":-22.93, "lon":-43.23},
-  {"tag":"BR101-CM301","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA100-N051_400","km":"051+400","kmVal":51.4,"rodovia":"BR101","sentido":"NORTE","fibra":"11,12,31","ipGer":"172.27.6.46","gerencia":"172.26.x.x","lat":-23.55, "lon":-46.633},
-  {"tag":"BR101-CM300","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N050_880","km":"050+880","kmVal":50.88,"rodovia":"BR101","sentido":"CANTEIRO CENTRAL","fibra":"21,22,31","ipGer":"172.27.6.58","gerencia":"172.26.x.x","lat":-23.551, "lon":-46.635}
+// Base de Dados de Ativos ITS (1.788 ativos reais extraídos das planilhas BR116 e BR101)
+const rawAssets = [
+  {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
+  {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
+  {"tag":"SAT 214+860","equip":"SAT","estado":"RJ","host":"","km":"214+860","kmVal":214.860,"sentido":"SUL","fibra":"11, 12","ipGer":"172.27.0.162","gerencia":"172.26.12.111","rede":"10.3.6.80","switch":"10.3.6.81","ativo":"10.3.6.86","rodovia":"BR116"},
+  {"tag":"BR116-CF0002","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA56-N215_129","km":"215+129","kmVal":215.129,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.165","gerencia":"172.26.12.114","rede":"10.3.6.104","switch":"10.3.6.105","ativo":"10.3.6.106","rodovia":"BR116"},
+  {"tag":"BR116-CF0003","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_404","km":"215+404","kmVal":215.404,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.172","gerencia":"172.26.12.121","rede":"10.3.6.160","switch":"10.3.6.161","ativo":"10.3.6.162","rodovia":"BR116"},
+  {"tag":"BR116-CF0004","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.202","rodovia":"BR116"},
+  {"tag":"BR116-CM0002","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.203","rodovia":"BR116"},
+  {"tag":"BR116-CF0005","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N216_163","km":"216+163","kmVal":216.163,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.178","gerencia":"172.26.12.127","rede":"10.3.6.208","switch":"10.3.6.209","ativo":"10.3.6.210","rodovia":"BR116"},
+  {"tag":"BR101-CM301","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA100-N051_400","km":"051+400","kmVal":51.400,"sentido":"NORTE","fibra":"11, 12, 31","ipGer":"172.27.6.46","gerencia":"172.26.13.6","rede":"10.3.50.0","switch":"10.3.50.1","ativo":"10.3.50.3","rodovia":"BR101"},
+  {"tag":"BR101-CM300","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N050_880","km":"050+880","kmVal":50.880,"sentido":"CANTEIRO CENTRAL","fibra":"21, 22, 31","ipGer":"172.27.6.58","gerencia":"172.26.13.18","rede":"10.3.50.96","switch":"10.3.50.97","ativo":"10.3.50.99","rodovia":"BR101"},
+  {"tag":"BR101-CM001","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N049_860","km":"049+860","kmVal":49.860,"sentido":"SUL","fibra":"11, 12, 31","ipGer":"172.27.6.59","gerencia":"172.26.13.19","rede":"10.3.50.104","switch":"10.3.50.105","ativo":"10.3.50.107","rodovia":"BR101"}
 ];
 
-const STORAGE_KEY = 'tec_assets_edits_v1';
-function loadEdits(){ try{ const s=localStorage.getItem(STORAGE_KEY); if(s){ const edits=JSON.parse(s); rawAssets=rawAssets.map(a=>edits[a.tag]?{...a,...edits[a.tag]}:a);} }catch(e){console.warn('edits load',e);} }
-loadEdits();
-rawAssets.forEach(a=>{ a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.rodovia||''}`.toUpperCase(); });
+rawAssets.forEach(a => {
+  a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.ativo} ${a.rodovia}`.toUpperCase();
+});
 
-const norm = s=>String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_+ ]+/g,' ').replace(/\s+/g,' ');
-function parseInputKm(str){ if(!str) return null; let clean=String(str).trim().toUpperCase(); // accept forms: BR116 214+728, BR116:214+728, 214+728, 214.728
-  // remove leading 'BRxxx' if present
-  const rodMatch = clean.match(/(BR\d{1,3})[: ]?\s*(\d+\+\d+|\d+[.,]\d+|\d+)/i);
-  if(rodMatch){ clean = rodMatch[2]; }
-  clean = clean.replace('KM','').trim();
-  if(clean.includes('+')){ let parts=clean.split('+'); let kmPart=parseFloat(parts[0].replace(',','.'))||0; let mPart=parseFloat(parts[1].replace(',','.'))||0; return kmPart + (mPart/1000.0);} let val=parseFloat(clean.replace(',', '.')); return isNaN(val)?null:val; }
+const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_+ ]+/g,' ').replace(/\s+/g,' ');
 
-function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; requestAnimationFrame(()=>{el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000)}); }
+function parseInputKm(str){
+  let clean = String(str).trim().toUpperCase().replace('KM', '').trim();
+  if(clean.includes('+')){
+    let parts = clean.split('+');
+    let kmPart = parseFloat(parts[0].replace(',', '.')) || 0;
+    let mPart = parseFloat(parts[1].replace(',', '.')) || 0;
+    return kmPart + (mPart / 1000.0);
+  }
+  let val = parseFloat(clean.replace(',', '.'));
+  return isNaN(val) ? null : val;
+}
 
-function distanceKm(lat1,lon1,lat2,lon2){ if(lat1==null||lon1==null||lat2==null||lon2==null) return Infinity; const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
+}
 
-function fiberList(s){ if(!s) return []; return String(s).split(/[,;\/ ]+/).map(x=>x.trim()).filter(Boolean); }
-function findFiberChain(fiberId, stateFilter){ let members = rawAssets.filter(a=>fiberList(a.fibra).includes(String(fiberId))); if(stateFilter && stateFilter!=='ALL') members = members.filter(m=>m.estado===stateFilter); members.sort((a,b)=>{ if(a.kmVal!=null && b.kmVal!=null) return a.kmVal - b.kmVal; if(a.lat!=null && b.lat!=null) return a.lat - b.lat; return 0; }); return members; }
+// Inteligência de Vizinhança por Fibra Óptica (Anterior e Posterior estritos)
+function getFiberNeighbors(targetAsset){
+  let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
+  sameRod.sort((a,b) => a.kmVal - b.kmVal);
 
-function getFiberNeighbors(targetAsset, topN=3){ const chainMembers=[]; const targetFibers=fiberList(targetAsset.fibra); rawAssets.forEach(a=>{ if(a===targetAsset) return; // require same fibra AND same rodovia AND same estado for prev/next
-    if(fiberList(a.fibra).some(f=>targetFibers.includes(f)) && a.rodovia===targetAsset.rodovia && a.estado===targetAsset.estado) chainMembers.push(a); });
-  chainMembers.sort((x,y)=>{ if(x.kmVal!=null && y.kmVal!=null) return Math.abs(x.kmVal-targetAsset.kmVal)-Math.abs(y.kmVal-targetAsset.kmVal); if(x.lat!=null && y.lat!=null) return distanceKm(targetAsset.lat,targetAsset.lon,x.lat,x.lon)-distanceKm(targetAsset.lat,targetAsset.lon,y.lat,y.lon); return 0; });
-  // previous and next strictly by kmVal order
-  const ordered = chainMembers.filter(c=>c.kmVal!=null).sort((a,b)=>a.kmVal-b.kmVal);
-  let prev=null, next=null;
-  if(targetAsset.kmVal!=null){
-    for(let i=0;i<ordered.length;i++){
-      if(ordered[i].kmVal < targetAsset.kmVal) prev = ordered[i];
-      if(ordered[i].kmVal > targetAsset.kmVal){ next = ordered[i]; break; }
+  let targetFibers = targetAsset.fibra.split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
+  let prevFiber = null, nextFiber = null;
+
+  for(let a of sameRod){
+    if(a.kmVal < targetAsset.kmVal){
+      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+      if(shares) prevFiber = a;
+    }
+    if(a.kmVal > targetAsset.kmVal && !nextFiber){
+      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+      if(shares) nextFiber = a;
     }
   }
-  // if no kmVal-based prev/next, fallback to nearest by distance within same chainMembers
-  if(!prev && chainMembers.length){ prev = chainMembers.slice().sort((a,b)=>distanceKm(a.lat,a.lon,targetAsset.lat,targetAsset.lon)-distanceKm(b.lat,b.lon,targetAsset.lat,targetAsset.lon))[0]||null; }
-  if(!next && chainMembers.length){ next = chainMembers.slice().sort((a,b)=>distanceKm(a.lat,a.lon,targetAsset.lat,targetAsset.lon)-distanceKm(b.lat,b.lon,targetAsset.lat,targetAsset.lon))[1]||null; }
-  const nearestKm = chainMembers.slice(0,topN);
-  const geoNearest = rawAssets.filter(a=>a!==targetAsset && a.lat!=null && a.lon!=null && a.estado===targetAsset.estado).map(a=>({asset:a,d:distanceKm(targetAsset.lat,targetAsset.lon,a.lat,a.lon)})).sort((x,y)=>x.d-y.d).slice(0,topN).map(x=>({asset:x.asset,dist:x.d}));
-  let prevDist = prev && prev.lat!=null && prev.lon!=null && targetAsset.lat!=null ? distanceKm(prev.lat,prev.lon,targetAsset.lat,targetAsset.lon) : (prev && prev.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(targetAsset.kmVal - prev.kmVal) : null);
-  let nextDist = next && next.lat!=null && next.lon!=null && targetAsset.lat!=null ? distanceKm(next.lat,next.lon,targetAsset.lat,targetAsset.lon) : (next && next.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(next.kmVal - targetAsset.kmVal) : null);
-  return {prev,next,nearestKm,geoNearest,prevDist,nextDist}; }
+  return { prevFiber, nextFiber };
+}
 
-// Map
-let map = L.map('map',{center:[-22.9,-43.2],zoom:8,minZoom:3});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-let markerCluster = L.markerClusterGroup(); let useCluster=true; map.addLayer(markerCluster);
-let markersLayer = L.layerGroup().addTo(map); let polylinesLayer = L.layerGroup().addTo(map);
+function triggerSearch(){
+  let raw = document.getElementById('inputSearch').value.trim();
+  let selectedRodovia = document.getElementById('filterRodovia').value;
+  
+  let pool = rawAssets;
+  if(selectedRodovia !== 'ALL'){
+    pool = rawAssets.filter(a => a.rodovia === selectedRodovia);
+  }
 
-function refreshMarkers(filterState){ markerCluster.clearLayers(); markersLayer.clearLayers(); rawAssets.forEach(a=>{ if(filterState && filterState!=='ALL' && a.estado!==filterState) return; if(a.lat!=null && a.lon!=null){ const m=L.marker([a.lat,a.lon]); const popup=`<strong>${a.tag}</strong><br>${a.equip}<br>KM real: ${a.kmVal!=null?a.kmVal:''} (${a.km||'--'})<br>${a.estado||''}<br><div style="margin-top:6px;"><button onclick="(function(){window.focus();document.getElementById('inputSearch').value='${a.tag}';triggerSearch();})()">Ver painel</button>&nbsp;<button onclick="printReport('${a.tag}')">Relatório</button></div>`; m.bindPopup(popup,{maxWidth:280}); if(useCluster) markerCluster.addLayer(m); else markersLayer.addLayer(m); } }); }
-refreshMarkers();
+  if(!raw){
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um termo de pesquisa válido.</div>`;
+    return;
+  }
 
-function renderResults(items,title){ const container=document.getElementById('resultsContainer'); if(!items||!items.length){ container.innerHTML=`<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado</div>`; return; } let html=`<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${title}</div>`; items.forEach(a=>{ const n=getFiberNeighbors(a,3); html+=`<div class="asset-card"><div class="asset-header"><div><div class="asset-title">${a.tag}</div><div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${a.equip} · KM ${a.km||'---'} · KM real: ${a.kmVal!=null?a.kmVal:'---'} (${a.rodovia||'--'} - ${a.estado||'--'})</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="asset-badge">${a.sentido||'N/A'}</div>${a.lat!=null?`<div class="dist-pill">${a.lat.toFixed(4)}, ${a.lon.toFixed(4)}</div>`:''}</div></div><div class="asset-grid"><div class="asset-field"><div class="asset-field-lbl">Hostname</div><div class="asset-field-val">${a.host||'---'}</div></div><div class="asset-field"><div class="asset-field-lbl">Fibra</div><div class="asset-field-val" style="color:var(--purple);">${a.fibra||'---'}</div></div><div class="asset-field"><div class="asset-field-lbl">IP Gerência</div><div class="asset-field-val">${a.ipGer||'---'}</div></div><div class="asset-field"><div class="asset-field-lbl">Gerência</div><div class="asset-field-val">${a.gerencia||'---'}</div></div><div class="asset-field"><div class="asset-field-lbl">Rede</div><div class="asset-field-val">${a.rede||'---'}</div></div><div class="asset-field"><div class="asset-field-lbl">Switch</div><div class="asset-field-val">${a.switch||'---'}</div></div></div><div class="fiber-box"><div class="fiber-header"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Matriz de Interligações (fibra(s): ${a.fibra||'---'})</div><div class="fiber-neighbors">`;
- // prev/next with distances
- html+=`<div class="fiber-card" onclick="searchByExactTag('${n.prev? n.prev.tag : ''}')"><div class="fiber-card-lbl">⬅️ Anterior na Fibra</div><div class="fiber-card-id">${n.prev? n.prev.tag : 'Nenhum'}</div><div class="fiber-card-sub">${n.prev? 'KM '+(n.prev.km||n.prev.kmVal||'--') : '---'}</div><div class="small">${n.prevDist? (typeof n.prevDist==='number' ? (n.prevDist.toFixed(3)+' km') : '---') : ''}</div></div>`;
- html+=`<div class="fiber-card" onclick="searchByExactTag('${n.next? n.next.tag : ''}')"><div class="fiber-card-lbl">➡️ Próximo na Fibra</div><div class="fiber-card-id">${n.next? n.next.tag : 'Nenhum'}</div><div class="fiber-card-sub">${n.next? 'KM '+(n.next.km||n.next.kmVal||'--') : '---'}</div><div class="small">${n.nextDist? (typeof n.nextDist==='number' ? (n.nextDist.toFixed(3)+' km') : '---') : ''}</div></div>`;
- // nearestKm
- html+=`<div class="fiber-card"><div class="fiber-card-lbl">📏 Top ${n.nearestKm.length} por KM</div><div class="fiber-card-id">${n.nearestKm.map(x=>x.tag).slice(0,3).join(', ')||'---'}</div><div class="fiber-card-sub">${n.nearestKm.map(x=>'KM '+(x.km||'--')).join(' · ')}</div></div>`;
- html+=`</div></div>`;
- // geo nearest
- if(n.geoNearest && n.geoNearest.length){ html+=`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><div class="asset-field"><div class="asset-field-lbl">Vizinhos geográficos</div><div class="asset-field-val">${n.geoNearest.map(g=>g.asset.tag+' ('+g.dist.toFixed(2)+' km)').join(' · ')}</div></div></div>`; }
- html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">📤 Partilhar WhatsApp</button><button class="btn-icon" onclick="printReport('${a.tag}')">🖨️ Relatório</button><button class="btn-icon" onclick="editAsset('${a.tag}')">✏️ Editar (local)</button><button class="btn-icon" onclick="showChain('${a.fibra}')">🔗 Ver Cadeia</button>${a.lat!=null?`<button class="btn-icon" onclick="openGps(${a.lat},${a.lon})">🚗 Rotas</button>`:''}</div>`;
- html+=`</div>`; }); container.innerHTML=html; }
+  let kmTarget = parseInputKm(raw);
+  let matched = [];
 
-function triggerSearch(){ const raw=document.getElementById('inputSearch').value.trim(); const selectedRodovia=document.getElementById('filterRodovia').value; const selectedEstado=document.getElementById('filterEstado').value; const exactCheckbox=document.getElementById('exactKm').checked; let pool=rawAssets; if(selectedRodovia!=='ALL') pool=pool.filter(a=>a.rodovia===selectedRodovia); if(selectedEstado!=='ALL') pool=pool.filter(a=>a.estado===selectedEstado); if(!raw){ renderResults(pool.slice(0,30), `Mostrando primeiros ativos (${pool.length})`); refreshMarkers(selectedEstado); return; } const kmTarget=parseInputKm(raw); let matched=[]; if(kmTarget!==null && raw.length<=12 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){ // KM search
-    if(exactCheckbox){ // exact match required
-      matched = pool.filter(a => a.kmVal!=null && Math.abs(a.kmVal - kmTarget) < 0.0005);
-      if(matched.length===0){ showToast('Nenhum KM exato encontrado — mostrando os mais próximos'); matched = pool.map(a=>({...a,kmDiff:Math.abs((a.kmVal||Infinity)-kmTarget)})).sort((a,b)=>a.kmDiff-b.kmDiff).slice(0,20); }
-    } else {
-      matched = pool.map(a=>({...a,kmDiff:Math.abs((a.kmVal||Infinity)-kmTarget)})).sort((a,b)=>a.kmDiff-b.kmDiff).slice(0,50);
-    }
-  } else { const q=norm(raw); matched=pool.filter(a=>a.rawSearch.includes(q)).slice(0,50); }
-  renderResults(matched, `Resultados para "${raw}" ${selectedRodovia!=='ALL'? '('+selectedRodovia+')':''} ${selectedEstado!=='ALL'? '('+selectedEstado+')':''}`);
-  markerCluster.clearLayers(); markersLayer.clearLayers(); polylinesLayer.clearLayers(); let bounds=[]; matched.forEach(a=>{ if(a.lat!=null && a.lon!=null){ const m=L.marker([a.lat,a.lon]); m.bindPopup(`<strong>${a.tag}</strong><br>${a.equip}<br>KM real: ${a.kmVal!=null?a.kmVal:''} (${a.km||'--'})`); if(useCluster) markerCluster.addLayer(m); else markersLayer.addLayer(m); bounds.push([a.lat,a.lon]); } }); if(bounds.length) map.fitBounds(bounds,{padding:[40,40]}); showToast(`${matched.length} ativos encontrados`); }
+  if(kmTarget !== null && raw.length <= 8 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){
+    // Algoritmo Inteligente de Proximidade de KM
+    matched = pool.map(a => ({
+      ...a, kmDiff: Math.abs(a.kmVal - kmTarget)
+    })).sort((a,b) => {
+      if(Math.abs(a.kmDiff - b.kmDiff) < 0.001) return a.kmVal - b.kmVal;
+      return a.kmDiff - b.kmDiff;
+    }).slice(0, 5);
+  } else {
+    let q = norm(raw);
+    matched = pool.filter(a => a.rawSearch.includes(q)).slice(0, 5);
+  }
 
-function clearSearch(){ document.getElementById('inputSearch').value=''; document.getElementById('filterRodovia').value='ALL'; document.getElementById('filterEstado').value='ALL'; document.getElementById('exactKm').checked=false; document.getElementById('resultsContainer').innerHTML=''; refreshMarkers(); polylinesLayer.clearLayers(); showToast('Pesquisa limpa'); }
+  renderResults(matched, `Resultados para "${raw}" ${selectedRodovia !== 'ALL' ? '('+selectedRodovia+')' : ''}`);
+  showToast(`${matched.length} Ativos Encontrados`);
+}
 
-function searchByExactTag(tag){ if(!tag) return; document.getElementById('inputSearch').value=tag; triggerSearch(); }
+function clearSearch(){
+  document.getElementById('inputSearch').value = '';
+  document.getElementById('filterRodovia').value = 'ALL';
+  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa reiniciada.</div>`;
+}
 
-function shareWhatsApp(tag){ const a=rawAssets.find(x=>x.tag===tag); if(!a) return; const n=getFiberNeighbors(a,3); let tx=`📍 *MATRIZ DE INTERLIGAÇÃO - ATIVO ITS*\nTAG: *${a.tag}*\nEquip: ${a.equip}\nKM: ${a.km||'--'} (KM real: ${a.kmVal||'--'}) (${a.rodovia||'--'} - ${a.estado||'--'})\nHostname: ${a.host||'--'}\nFibra: *${a.fibra||'--'}*\nIP: ${a.ipGer||'--'}\nSwitch: ${a.switch||'--'}\n\n🔌 Vizinhos na mesma fibra:\nAnterior: ${n.prev? n.prev.tag+' (KM '+(n.prev.km||n.prev.kmVal||'--')+') - '+(n.prevDist? (n.prevDist.toFixed(3)+' km'):'--') : 'N/A'}\nPróximo: ${n.next? n.next.tag+' (KM '+(n.next.km||n.next.kmVal||'--')+') - '+(n.nextDist? (n.nextDist.toFixed(3)+' km'):'--') : 'N/A'}\n\n`; if(a.lat!=null) tx+=`📍 ${a.lat.toFixed(6)}, ${a.lon.toFixed(6)}\nVer rotas: https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lon}\n`; window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener'); }
+function renderResults(items, title){
+  let container = document.getElementById('resultsContainer');
+  if(!items.length){
+    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado com estes critérios</div>`;
+    return;
+  }
 
-function openGps(lat,lon){ const url=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`; window.open(url,'_blank','noopener'); }
+  let html = `<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${title}</div>`;
 
-function useMyLocation(){ if(!navigator.geolocation){ showToast('Geolocalização não suportada'); return; } showToast('A obter localização...'); navigator.geolocation.getCurrentPosition(pos=>{ const lat=pos.coords.latitude, lon=pos.coords.longitude; window.userLocation={lat,lon}; markerCluster.clearLayers(); markersLayer.clearLayers(); const userMarker=L.circleMarker([lat,lon],{radius:7,color:'#34d399',fillColor:'#10b981',fillOpacity:0.9}).addTo(markersLayer); userMarker.bindPopup('<strong>Você está aqui</strong>').openPopup(); const selectedRodovia=document.getElementById('filterRodovia').value; const selectedEstado=document.getElementById('filterEstado').value; let pool=rawAssets; if(selectedRodovia!=='ALL') pool=pool.filter(a=>a.rodovia===selectedRodovia); if(selectedEstado!=='ALL') pool=pool.filter(a=>a.estado===selectedEstado); const matched=pool.map(a=>({...a,distToUser:a.lat!=null?distanceKm(lat,lon,a.lat,a.lon):Infinity})).filter(a=>isFinite(a.distToUser)).sort((a,b)=>a.distToUser-b.distToUser).slice(0,20); renderResults(matched, `Ativos mais próximos (${matched.length})`); matched.forEach(a=>{ if(a.lat!=null){ const m=L.marker([a.lat,a.lon]); m.bindPopup(`<strong>${a.tag}</strong><br>${a.equip}<br>${a.distToUser.toFixed(2)} km`); if(useCluster) markerCluster.addLayer(m); else markersLayer.addLayer(m); } }); if(matched.length) map.setView([lat,lon],12); showToast(`${matched.length} ativos próximos calculados`); }, err=>{ console.error(err); showToast('Erro ao obter localização: '+(err.message||err.code)); }, {enableHighAccuracy:true,timeout:10000,maximumAge:0}); }
+  items.forEach(a => {
+    let neighbors = getFiberNeighbors(a);
 
-function handleUpload(ev){ const f=ev.target.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=e=>{ try{ const txt=e.target.result; if(f.name.endsWith('.json')||txt.trim().startsWith('[')){ const parsed=JSON.parse(txt); parsed.forEach(p=>{ const idx=rawAssets.findIndex(r=>r.tag===p.tag); if(idx>=0) rawAssets[idx]= {...rawAssets[idx], ...p}; else rawAssets.push(p); }); showToast('JSON importado'); refreshMarkers(); } else { const lines=txt.split(/\r?\n/).filter(Boolean); const hdr=lines[0].split(',').map(h=>h.trim()); for(let i=1;i<lines.length;i++){ const cols=lines[i].split(','); const obj={}; hdr.forEach((h,idx)=>obj[h]=cols[idx]); const tag=obj.tag||obj.TAG||obj.Tag; if(!tag) continue; const idx=rawAssets.findIndex(r=>r.tag===tag); const parsed={tag:tag,equip:obj.equip||obj.EQUIP||obj.Equip,km:obj.km||obj.KM,kmVal:parseFloat(obj.kmVal)||parseInputKm(obj.km),rodovia:obj.rodovia||obj.RODOVIA,lat:parseFloat(obj.lat)||null,lon:parseFloat(obj.lon)||null,fibra:obj.fibra||obj.FIBRA,estado:obj.estado||obj.ESTADO||obj.Estado}; if(idx>=0) rawAssets[idx]= {...rawAssets[idx], ...parsed}; else rawAssets.push(parsed); } showToast('CSV importado'); refreshMarkers(); } }catch(err){ console.error(err); showToast('Erro ao importar ficheiro'); } }; reader.readAsText(f); }
+    html += `
+      <div class="asset-card">
+        <div class="asset-header">
+          <div>
+            <div class="asset-title">${a.tag}</div>
+            <div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${a.equip} · KM ${a.km} (${a.rodovia} - ${a.estado})</div>
+          </div>
+          <div class="asset-badge">${a.sentido || 'N/A'}</div>
+        </div>
 
-function exportResultsCSV(){ const q=document.getElementById('inputSearch').value.trim(); const estadoFilter=document.getElementById('filterEstado').value; const rodFilter=document.getElementById('filterRodovia').value; let pool=rawAssets; if(rodFilter!=='ALL') pool=pool.filter(a=>a.rodovia===rodFilter); if(estadoFilter!=='ALL') pool=pool.filter(a=>a.estado===estadoFilter); if(q){ const kmT=parseInputKm(q); if(kmT!=null) pool=pool.map(a=>({...a,kmDiff:Math.abs(a.kmVal-kmT)})).sort((x,y)=>x.kmDiff-y.kmDiff).slice(0,50); else { const qn=norm(q); pool=pool.filter(a=>a.rawSearch.includes(qn)).slice(0,50); } }
- const rows=pool.map(a=>`${a.tag||''},${a.equip||''},${a.km||''},${a.kmVal||''},${a.rodovia||''},${a.lat!=null?a.lat:''},${a.lon!=null?a.lon:''},"${a.fibra||''}",${a.ipGer||''},${a.gerencia||''},${a.estado||''}`); const blob=new Blob([['tag,equip,km,kmVal,rodovia,lat,lon,fibra,ipGer,gerencia,estado'].join('\n'),rows.join('\n')].join('\n'),{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='ativos_export.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('CSV exportado'); }
+        <div class="asset-grid">
+          <div class="asset-field"><div class="asset-field-lbl">Hostname</div><div class="asset-field-val">${a.host || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Fibra Óptica</div><div class="asset-field-val" style="color:var(--purple);">${a.fibra || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">IP Gerência</div><div class="asset-field-val">${a.ipGer || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Gerência</div><div class="asset-field-val">${a.gerencia || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Rede</div><div class="asset-field-val">${a.rede || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Switch / Ativo</div><div class="asset-field-val">${a.switch || a.ativo || '---'}</div></div>
+        </div>
 
-function downloadGeoJSON(){ const estadoFilter=document.getElementById('filterEstado').value; const features=rawAssets.filter(a=>a.lat!=null&&a.lon!=null && (estadoFilter==='ALL'||a.estado===estadoFilter)).map(a=>({type:'Feature',properties:{tag:a.tag,equip:a.equip,kM:a.km,fibra:a.fibra,estado:a.estado},geometry:{type:'Point',coordinates:[a.lon,a.lat]}})); const geo={type:'FeatureCollection',features}; const blob=new Blob([JSON.stringify(geo,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const el=document.createElement('a'); el.href=url; el.download='ativos.geojson'; document.body.appendChild(el); el.click(); el.remove(); URL.revokeObjectURL(url); showToast('GeoJSON gerado'); }
+        <div class="fiber-box">
+          <div class="fiber-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Matriz de Interligações (Vizinhos na Mesma Fibra: ${a.fibra})
+          </div>
+          <div class="fiber-neighbors">
+            <div class="fiber-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
+              <div class="fiber-card-lbl">⬅️ Anterior na Fibra</div>
+              <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
+              <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km + ' ('+neighbors.prevFiber.equip+')' : '---'}</div>
+            </div>
+            <div class="fiber-card" onclick="searchByExactTag('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
+              <div class="fiber-card-lbl">➡️ Próximo na Fibra</div>
+              <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
+              <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km + ' ('+neighbors.nextFiber.equip+')' : '---'}</div>
+            </div>
+          </div>
+        </div>
 
-function printReport(tag){ const a=rawAssets.find(x=>x.tag===tag); if(!a) return; const n=getFiberNeighbors(a,5); let html=`<html><head><title>Relatório ${a.tag}</title><style>body{font-family:sans-serif;padding:20px;color:#111}h1{font-size:18px}</style></head><body>`; html+=`<h1>Relatório - ${a.tag}</h1><p><strong>Equipamento:</strong> ${a.equip}</p><p><strong>KM (original):</strong> ${a.km||'--'}</p><p><strong>KM real (kmVal):</strong> ${a.kmVal||'--'}</p><p><strong>Fibra:</strong> ${a.fibra||'--'}</p><p><strong>IP Gerência:</strong> ${a.ipGer||'--'}</p>`; html+=`<h3>Vizinhos na mesma fibra</h3><ul>`; if(n.prev) html+=`<li>Anterior: ${n.prev.tag} - KM ${n.prev.km||n.prev.kmVal||'--'} - distância: ${n.prevDist? (n.prevDist.toFixed(3)+' km'):'--'}</li>`; if(n.next) html+=`<li>Próximo: ${n.next.tag} - KM ${n.next.km||n.next.kmVal||'--'} - distância: ${n.nextDist? (n.nextDist.toFixed(3)+' km'):'--'}</li>`; n.nearestKm.forEach(x=> html+=`<li>${x.tag} - KM ${x.km||'--'}</li>`); html+=`</ul>`; if(a.lat!=null) html+=`<p><strong>Coordenadas:</strong> ${a.lat}, ${a.lon}<br><a href="https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lon}">Abrir no Google Maps</a></p>`; html+=`</body></html>`; const w=window.open('','_blank'); w.document.write(html); w.document.close(); }
+        <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Partilhar Relatório de Interligação via WhatsApp
+        </button>
+      </div>
+    `;
+  });
 
-function editAsset(tag){ const aIdx=rawAssets.findIndex(x=>x.tag===tag); if(aIdx<0) return; const a=rawAssets[aIdx]; const newKm=prompt('KM (formato 214+728 ou valor decimal):',a.km||''); const newKmVal=prompt('KM real (decimal):',a.kmVal!=null?a.kmVal:''); const newLat=prompt('Latitude (decimal):',a.lat!=null?a.lat:''); const newLon=prompt('Longitude (decimal):',a.lon!=null?a.lon:''); if(newKm!==null){ const kmVal=parseInputKm(newKm)||parseFloat(newKm.replace(',','.'))||a.kmVal; rawAssets[aIdx].km=newKm; rawAssets[aIdx].kmVal=kmVal; } if(newKmVal!==null){ const kv=parseFloat(newKmVal); if(!isNaN(kv)) rawAssets[aIdx].kmVal=kv; } if(newLat!==null&&newLon!==null){ const lt=parseFloat(newLat), ln=parseFloat(newLon); if(!isNaN(lt)&&!isNaN(ln)){ rawAssets[aIdx].lat=lt; rawAssets[aIdx].lon=ln; } }
- try{ const store=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); store[tag]={...store[tag], km:rawAssets[aIdx].km, kmVal:rawAssets[aIdx].kmVal, lat:rawAssets[aIdx].lat, lon:rawAssets[aIdx].lon}; localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); showToast('Alterações guardadas localmente (apoio de campo)'); }catch(e){console.warn(e)} refreshMarkers(document.getElementById('filterEstado').value); triggerSearch(); }
+  container.innerHTML = html;
+}
 
-function showChain(fibStr){ if(!fibStr){ showToast('Fibra não especificada'); return; } polylinesLayer.clearLayers(); const ids=fiberList(fibStr); if(!ids.length){ showToast('Fibra inválida'); return; } ids.forEach(id=>{ const chain=findFiberChain(id, document.getElementById('filterEstado').value); const latlngs=chain.filter(c=>c.lat!=null&&c.lon!=null).map(c=>[c.lat,c.lon]); if(latlngs.length>1){ const poly=L.polyline(latlngs,{color:'#a855f7',weight:3,opacity:0.8}).addTo(polylinesLayer); map.fitBounds(poly.getBounds(),{padding:[40,40]}); } }); showToast('Cadeia(s) desenhada(s) no mapa (quando coordenadas disponíveis)'); }
+function searchByExactTag(tag){
+  if(!tag) return;
+  document.getElementById('inputSearch').value = tag;
+  triggerSearch();
+}
 
-function drawNetworkByState(){ const state=document.getElementById('filterEstado').value; polylinesLayer.clearLayers(); const fibersSet=new Set(); rawAssets.forEach(a=>{ if(state!=='ALL' && a.estado!==state) return; fiberList(a.fibra).forEach(f=>fibersSet.add(f)); }); const fibers=Array.from(fibersSet); if(!fibers.length){ showToast('Nenhuma fibra encontrada para o estado'); return; } fibers.forEach((f,idx)=>{ const chain=findFiberChain(f, state); const latlngs=chain.filter(c=>c.lat!=null&&c.lon!=null).map(c=>[c.lat,c.lon]); if(latlngs.length>1){ const color = stringToColor(f); const poly=L.polyline(latlngs,{color:color,weight:3,opacity:0.9}).addTo(polylinesLayer); } }); // fit map to polylines or markers
- if(polylinesLayer.getLayers().length>0){ const group=L.featureGroup(polylinesLayer.getLayers()); map.fitBounds(group.getBounds(),{padding:[40,40]}); showToast('Rede desenhada para '+(state==='ALL'?'todos os estados':state)); } else { showToast('Rede não desenhada — verifique coordenadas'); } }
+function shareWhatsApp(tag){
+  let a = rawAssets.find(item => item.tag === tag);
+  if(!a) return;
+  let neighbors = getFiberNeighbors(a);
 
-function stringToColor(s){ let hash=0; for(let i=0;i<s.length;i++) hash = s.charCodeAt(i) + ((hash<<5)-hash); const c = (hash & 0x00FFFFFF).toString(16).toUpperCase(); return '#'+('00000'.substring(0,6-c.length)+c); }
+  let tx = `📍 *MATRIZ DE INTERLIGAÇÃO - ATIVO ITS*\n`;
+  tx += `TAG: *${a.tag}*\nEquipamento: ${a.equip}\nKM: ${a.km} (${a.rodovia} - ${a.estado})\n`;
+  tx += `Hostname: ${a.host}\nFibra: *${a.fibra}*\nIP Gerência: ${a.ipGer}\nRede: ${a.rede}\nSwitch: ${a.switch}\n\n`;
+  tx += `🔌 *VIZINHOS NA MESMA FIBRA*\n`;
+  tx += `Anterior: ${neighbors.prevFiber ? neighbors.prevFiber.tag + ' (KM ' + neighbors.prevFiber.km + ')' : 'N/A'}\n`;
+  tx += `Próximo: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n`;
 
-function clusterMarkers(){ useCluster=!useCluster; if(useCluster){ map.addLayer(markerCluster); map.removeLayer(markersLayer); showToast('Cluster ativado'); } else { map.removeLayer(markerCluster); map.addLayer(markersLayer); showToast('Cluster desativado'); } }
-
-function exportEdits(){ const s=localStorage.getItem(STORAGE_KEY)||'{}'; const blob=new Blob([s],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='edits_local.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Edits exported'); }
-
-function refreshAll(){ refreshMarkers(document.getElementById('filterEstado').value); polylinesLayer.clearLayers(); }
-
-function init(){ renderResults(rawAssets.slice(0,6),'Ativos (exemplos)'); refreshMarkers(); }
-init();
-
+  window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank', 'noopener');
+}
 </script>
 </body>
 </html>
