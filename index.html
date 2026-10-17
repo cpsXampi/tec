@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#070913">
-<title>Sistema de Ativos ITS & Fibra Óptica</title>
+<title>Sistema de Ativos ITS & Apoio Técnico</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
@@ -47,7 +47,7 @@ input,select{font-family:var(--font);outline:none}
   box-shadow:0 4px 20px rgba(0,0,0,.6);
 }
 .hdr-in{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:48px;}
-.hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
+.hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);text-shadow:0 0 10px var(--accent-glow);}
 
 .wrap{max-width:760px;margin:0 auto;padding:12px;padding-bottom:var(--safe-b);display:flex;flex-direction:column;gap:12px;}
 
@@ -57,6 +57,18 @@ input,select{font-family:var(--font);outline:none}
   border-radius:var(--r-md);padding:12px;backdrop-filter:blur(12px);
   box-shadow:0 8px 32px rgba(0,0,0,.4);
 }
+
+.menu-pills-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.menu-pill{
+  width:100%;padding:10px;border-radius:var(--r-xs);
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s ease;
+}
+.menu-pill.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
+
+.collapsible-pane{display:none;flex-direction:column;gap:8px;margin-top:2px;}
+.collapsible-pane.show{display:flex;}
 
 .search-row{display:flex;gap:6px}
 .search-wrap{flex:1;min-width:0;position:relative}
@@ -100,7 +112,7 @@ input,select{font-family:var(--font);outline:none}
 
 .map-box{
   border-radius:var(--r-xs);border:1px solid var(--border2);
-  overflow:hidden;position:relative;height:220px;background:#020617;margin-top:4px;
+  overflow:hidden;position:relative;height:240px;background:#020617;margin-top:4px;
 }
 body.fs-active .hdr, body.fs-active .wrap > .section-block:not(:has(#mapBox)) {display:none !important;}
 body.fs-active .wrap {max-width:100% !important;padding:0 !important;margin:0 !important;}
@@ -127,23 +139,24 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 .asset-card{
   border-radius:var(--r-sm);border:1px solid var(--border);
   background:rgba(11,17,36,0.95);overflow:hidden;
-  display:flex;flex-direction:column;gap:8px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;padding:12px;margin-bottom:8px;
 }
+.asset-card.near{border-color:rgba(16,185,129,.5);background:linear-gradient(145deg,rgba(16,185,129,.1),rgba(11,17,36,.95));}
 .asset-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.asset-title{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:.02em;}
+.asset-title{font-size:12px;font-weight:900;color:var(--accent);letter-spacing:.02em;}
 .asset-badge{font-size:8px;font-weight:900;padding:2px 6px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--accent);border:1px solid var(--border2);}
 
 .asset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;}
 .asset-field{background:rgba(7,9,19,.6);padding:6px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.05);}
 .asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase;}
-.asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
+.asset-field-val{font-size:9px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
 
 /* Seção de Fibra Óptica */
 .fiber-box{
   background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));
   border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:8px;margin-top:4px;
 }
-.fiber-header{font-size:8.5px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:4px;}
+.fiber-header{font-size:8px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:4px;}
 .fiber-neighbors{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
 .fiber-card{
   background:rgba(7,9,19,.8);border:1px solid rgba(168,85,247,.2);
@@ -151,13 +164,13 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 }
 .fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.15);}
 .fiber-card-lbl{font-size:7px;font-weight:900;color:var(--purple);text-transform:uppercase;}
-.fiber-card-id{font-size:9px;font-weight:900;color:#fff;margin-top:1px;}
-.fiber-card-sub{font-size:7.5px;font-weight:700;color:var(--muted);}
+.fiber-card-id{font-size:8.5px;font-weight:900;color:#fff;margin-top:1px;}
+.fiber-card-sub{font-size:7px;font-weight:700;color:var(--muted);}
 
 .btn-wa{
   width:100%;padding:8px;border-radius:var(--r-xs);
   background:linear-gradient(135deg,var(--green),#059669);color:#fff;
-  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+  font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
   display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;
 }
 
@@ -176,7 +189,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 
 <header class="hdr">
   <div class="hdr-in">
-    <div class="hdr-title">Ativos ITS & Fibra Óptica</div>
+    <div class="hdr-title">Ativos ITS & Apoio Campo</div>
     <div style="font-size:9px;font-weight:900;color:var(--accent);" id="topKmLive">—</div>
   </div>
 </header>
@@ -184,25 +197,40 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 <div class="wrap">
 
   <div class="section-block">
-    <div class="search-row">
-      <div class="search-wrap">
-        <input class="search-input" id="inputSearch" placeholder="BUSCAR POR KM, TAG, HOST, IP, FIBRA..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
-      </div>
-      <button class="btn-icon go" onclick="triggerSearch()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      </button>
-      <button class="btn-icon clr" onclick="clearSearch()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
+    <div class="menu-pills-grid">
+      <button class="menu-pill active" id="pillSearch" onclick="switchTab('search')">🔍 Pesquisa Ativos / KM</button>
+      <button class="menu-pill" id="pillMap" onclick="switchTab('map')">🗺️ Mapa Interativo</button>
     </div>
 
-    <div class="map-box" id="mapBox">
-      <div class="map-ctrls">
-        <button class="map-btn active" id="btnLayerSat" onclick="setMapLayer('sat')">Sat</button>
-        <button class="map-btn" id="btnLayerNorm" onclick="setMapLayer('norm')">Norm</button>
-        <button class="map-btn" onclick="toggleFullscreen()">Full</button>
+    <!-- PAINEL PESQUISA -->
+    <div class="collapsible-pane show" id="paneSearch">
+      <div class="card card-accent">
+        <div class="search-row">
+          <div class="search-wrap">
+            <input class="search-input" id="inputSearch" placeholder="DIGITE KM (EX: 115), TAG, HOST, FIBRA..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+          </div>
+          <button class="btn-icon go" onclick="triggerSearch()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+          <button class="btn-icon clr" onclick="clearSearch()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
       </div>
-      <div id="leafletMap" style="width:100%;height:100%;"></div>
+    </div>
+
+    <!-- PAINEL MAPA -->
+    <div class="collapsible-pane" id="paneMap">
+      <div class="card">
+        <div class="map-box" id="mapBox">
+          <div class="map-ctrls">
+            <button class="map-btn active" id="btnLayerSat" onclick="setMapLayer('sat')">Sat</button>
+            <button class="map-btn" id="btnLayerNorm" onclick="setMapLayer('norm')">Norm</button>
+            <button class="map-btn" onclick="toggleFullscreen()">Full</button>
+          </div>
+          <div id="leafletMap" style="width:100%;height:100%;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -223,7 +251,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
       <span id="gpsText">GPS · BUSCANDO SINAL</span>
     </div>
 
-    <div id="assetsContainer" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="assetsContainer" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 
 </div>
@@ -265,6 +293,14 @@ function showToast(msg, type='ok'){
   requestAnimationFrame(() => { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); });
 }
 
+function switchTab(tab){
+  document.getElementById('pillSearch').classList.toggle('active', tab==='search');
+  document.getElementById('pillMap').classList.toggle('active', tab==='map');
+  document.getElementById('paneSearch').classList.toggle('show', tab==='search');
+  document.getElementById('paneMap').classList.toggle('show', tab==='map');
+  if(tab==='map' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 50);
+}
+
 function gpsBadge(p, err){
   const el = document.getElementById('gpsStatus');
   const textEl = document.getElementById('gpsText');
@@ -293,6 +329,7 @@ function parseCSVLine(line, delimiter=';'){
 async function initSystemData(){
   initMap(-22.8512, -43.7744);
 
+  // Carrega ativos ITS
   let tAssets = await fetchCSV(['ITS ATIVOX TESTE.csv', 'its_ativos.csv', 'ATIVOS.csv']);
   if(tAssets){
     let lines = tAssets.split(/\r?\n/).filter(l => l.trim());
@@ -314,6 +351,7 @@ async function initSystemData(){
     }
   }
 
+  // Carrega bases SNV para GPS e KM
   let [t101SP, t101RJ, t116SP, t116RJ] = await Promise.all([
     fetchCSV(['BR101_SP.csv', 'SNVBR101SP.csv']), fetchCSV(['BR101_RJ.csv', 'SNVBR101RJ.csv']),
     fetchCSV(['BR116_SP.csv', 'SNVBR116SP.csv']), fetchCSV(['BR116_RJ.csv', 'SNVBR116SPRJ.csv', 'SNVBR116RJ.csv'])
@@ -343,6 +381,34 @@ function parseKmGeoFile(text){
   }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
 }
 
+function findNearestInAnyDB(lat, lon){
+  let candidates = Object.keys(kmDB).map(name => {
+    let db = kmDB[name];
+    let best = null, bd = Infinity;
+    for(let p of db){
+      if(Math.abs(p.lat - lat) > 0.4 || Math.abs(p.lon - lon) > 0.4) continue;
+      let d = hav(lat, lon, p.lat, p.lon);
+      if(d < bd){ bd = d; best = { ...p, d }; }
+    }
+    return { name, res: best };
+  }).filter(c => c.res !== null);
+
+  if(!candidates.length) return null;
+  candidates.sort((a,b) => a.res.d - b.res.d);
+  return candidates[0];
+}
+
+function updateKmFromGps(){
+  if(!pos) return;
+  let nearest = findNearestInAnyDB(pos.lat, pos.lon);
+  if(!nearest) return;
+  let kmValStr = (Math.round(nearest.res.km*100)/100).toFixed(2).replace('.',',');
+  let fullStr = `KM ${kmValStr}`;
+  document.getElementById('kmVal').textContent = fullStr;
+  document.getElementById('topKmLive').textContent = fullStr;
+  document.getElementById('kmBrBadge').textContent = nearest.name;
+}
+
 function getAssetCoords(asset){
   let dbKey = '';
   if(asset.tag.includes('101') || asset.rod.includes('101')){
@@ -369,17 +435,12 @@ function getFiberNeighbors(targetAsset){
 
   let targetFibers = targetAsset.fibra.split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
 
-  let prevAll = null, nextAll = null;
   let prevFiber = null, nextFiber = null;
 
   for(let a of sameRod){
     if(a.kmVal < targetAsset.kmVal){
-      prevAll = a;
       let sharesFiber = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
       if(sharesFiber) prevFiber = a;
-    }
-    if(a.kmVal > targetAsset.kmVal && !nextAll){
-      nextAll = a;
     }
     if(a.kmVal > targetAsset.kmVal && !nextFiber){
       let sharesFiber = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
@@ -387,13 +448,25 @@ function getFiberNeighbors(targetAsset){
     }
   }
 
-  return { prevAll, nextAll, prevFiber, nextFiber };
+  return { prevFiber, nextFiber };
 }
 
 function triggerSearch(){
   let q = norm(document.getElementById('inputSearch').value);
   if(!q){ renderNearbyAssets(); return; }
-  let matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 15);
+
+  // Se pesquisar por número (ex: 115)
+  let numQ = parseFloat(q.replace(',', '.'));
+  let matched = [];
+  if(!isNaN(numQ) && q.length <= 5){
+    // Pesquisa por proximidade de KM
+    matched = rawAssets.map(a => ({
+      ...a, kmDiff: Math.abs(a.kmVal - numQ)
+    })).sort((a,b) => a.kmDiff - b.kmDiff).slice(0, 15);
+  } else {
+    matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 15);
+  }
+
   renderAssetsList(matched, `Resultados para "${q}"`);
   showToast(`${matched.length} Ativos Encontrados`);
 }
@@ -405,13 +478,14 @@ function clearSearch(){
 
 function renderNearbyAssets(){
   if(!pos || !rawAssets.length) return;
+  updateKmFromGps();
   let items = rawAssets.map(a => {
     let coords = getAssetCoords(a);
     let d = coords ? hav(pos.lat, pos.lon, coords.lat, coords.lon) : 999999;
     return { ...a, coords, d };
   }).sort((a,b) => a.d - b.d).slice(0, 10);
 
-  renderAssetsList(items, 'Ativos Mais Próximos (GPS)');
+  renderAssetsList(items, 'Ativos Mais Próximos da Sua Posição (GPS)');
 }
 
 function renderAssetsList(items, title){
@@ -427,9 +501,10 @@ function renderAssetsList(items, title){
     let coords = a.coords || getAssetCoords(a);
     let distStr = (pos && coords) ? formatDist(hav(pos.lat, pos.lon, coords.lat, coords.lon)) : '---';
     let neighbors = getFiberNeighbors(a);
+    let isNear = idx === 0 && pos;
 
     html += `
-      <div class="asset-card">
+      <div class="asset-card ${isNear ? 'near' : ''}">
         <div class="asset-header">
           <div>
             <div class="asset-title">${a.tag}</div>
@@ -448,25 +523,25 @@ function renderAssetsList(items, title){
         <div class="fiber-box">
           <div class="fiber-header">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Vizinhos de Fibra & Trecho Rodoviário
+            Vizinhos na Mesma Fibra
           </div>
           <div class="fiber-neighbors">
             <div class="fiber-card" onclick="focusAssetByTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
-              <div class="fiber-card-lbl">⬅️ Anterior (Mesma Fibra)</div>
+              <div class="fiber-card-lbl">⬅️ Anterior (Fibra)</div>
               <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
-              <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.kmStr + ' (' + neighbors.prevFiber.fibra + ')' : '---'}</div>
+              <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.kmStr : '---'}</div>
             </div>
             <div class="fiber-card" onclick="focusAssetByTag('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
-              <div class="fiber-card-lbl">➡️ Próximo (Mesma Fibra)</div>
+              <div class="fiber-card-lbl">➡️ Próximo (Fibra)</div>
               <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
-              <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.kmStr + ' (' + neighbors.nextFiber.fibra + ')' : '---'}</div>
+              <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.kmStr : '---'}</div>
             </div>
           </div>
         </div>
 
         <button class="btn-wa" onclick="shareAssetWhatsApp('${a.tag}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Enviar Ficha & Fibra WhatsApp
+          Enviar Ficha Completa WhatsApp
         </button>
       </div>
     `;
@@ -484,7 +559,8 @@ function focusAssetByTag(tag){
     mapInstance.setView([coords.lat, coords.lon], 16);
     mapMarker.setLatLng([coords.lat, coords.lon]);
   }
-  renderAssetsList([found], `Ativo Focado: ${tag}`);
+  renderAssetsList([found], `Ativo Selecionado: ${tag}`);
+  switchTab('map');
   showToast(`Focado em ${tag}`);
 }
 
@@ -542,7 +618,10 @@ function startAutoGps(){
         if(mapInstance && mapMarker){
           mapMarker.setLatLng([pos.lat, pos.lon]);
         }
-        renderNearbyAssets();
+        updateKmFromGps();
+        if(!document.getElementById('inputSearch').value){
+          renderNearbyAssets();
+        }
       },
       err => gpsBadge(null, true),
       { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
