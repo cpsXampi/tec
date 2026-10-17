@@ -4,10 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#070913">
-<title>Apoio Técnico ITS & SNV GPS</title>
+<title>Matriz de Interligações & Ativos ITS</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
 :root{
   --bg:#070913;
@@ -19,8 +17,6 @@
   --accent-glow:rgba(59,130,246,.3);
   --green:#10b981;
   --green2:#34d399;
-  --red:#ef4444;
-  --warn:#f59e0b;
   --purple:#a855f7;
   --text:#f3f4f6;
   --text2:#d1d5db;
@@ -28,275 +24,134 @@
   --dim:#4b5563;
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --r-xs:4px;--r-sm:8px;--r-md:12px;
-  --safe-b:max(env(safe-area-inset-bottom,0px),12px);
-  --safe-t:env(safe-area-inset-top,0px);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
 body{
   background:radial-gradient(circle at top,rgba(59,130,246,.08),transparent 55%),var(--bg);
-  color:var(--text);font-family:var(--font);overflow-x:hidden;
-  min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior:none;
+  color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh;
+  -webkit-font-smoothing:antialiased;
 }
 button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;touch-action:manipulation;}
 button:active{opacity:.8;transform:scale(.97)}
-input,select{font-family:var(--font);outline:none}
+input{font-family:var(--font);outline:none}
 
 .hdr{
   position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border2);
-  background:rgba(7,9,19,.95);backdrop-filter:blur(20px);
-  padding:0 12px;padding-top:var(--safe-t);box-shadow:0 4px 20px rgba(0,0,0,.6);
+  background:rgba(7,9,19,.95);backdrop-filter:blur(20px);padding:0 16px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.6);
 }
-.hdr-in{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:44px;}
-.hdr-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:var(--accent);text-shadow:0 0 10px var(--accent-glow);}
+.hdr-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
 
-.wrap{max-width:760px;margin:0 auto;padding:12px;padding-bottom:var(--safe-b);display:flex;flex-direction:column;gap:12px;}
+.wrap{max-width:800px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
 
-.section-block{
-  display:flex;flex-direction:column;gap:8px;background:rgba(11,17,36,0.85);
-  border:1px solid var(--border);border-radius:var(--r-md);padding:12px;
-  backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.4);
+.card{
+  background:rgba(11,17,36,0.9);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,.4);
 }
-
-.menu-pills-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;}
-@media(max-width:600px){.menu-pills-grid{grid-template-columns:1fr 1fr;}}
-.menu-pill{
-  width:100%;padding:8px;border-radius:var(--r-xs);background:var(--surface2);
-  border:1px solid var(--border2);color:var(--text2);font-size:8px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;
-  justify-content:center;gap:4px;transition:all .2s ease;cursor:pointer;text-align:center;
-}
-.menu-pill.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
-
-.collapsible-pane{display:none;flex-direction:column;gap:6px;margin-top:2px;}
-.collapsible-pane.show{display:flex;}
-
-.km-hero-compact{
-  display:flex;align-items:center;justify-content:space-between;
-  border-radius:var(--r-sm);border:1px solid rgba(59,130,246,.35);
-  background:linear-gradient(145deg,#111936 0%,#070913 100%);padding:10px 14px;
-}
-.km-value-compact{
-  font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;
-  background:linear-gradient(180deg,#fff 20%,var(--accent));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.km-meta-compact{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
-
-.gps{
-  display:flex;align-items:center;justify-content:space-between;gap:4px;
-  min-height:30px;border-radius:var(--r-xs);border:1px solid;padding:0 10px;
-  font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-}
-.gps.bad{border-color:rgba(100,116,139,.3);background:rgba(11,17,36,.9);color:#e5e7eb}
-.gps.ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:#d1fae5}
-.gps.warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.1);color:#fef3c7}
-
-.card{border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(11,17,36,0.9);padding:10px;}
 .card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));}
 
-.search-row{display:flex;gap:6px}
+.search-row{display:flex;gap:8px}
 .search-wrap{flex:1;min-width:0;position:relative}
 .search-input{
   width:100%;border-radius:var(--r-xs);border:1px solid var(--border2);
-  background:rgba(7,9,19,.9);padding:8px 10px;
-  font-size:10px;font-weight:800;text-transform:uppercase;color:#fff;
+  background:rgba(7,9,19,.9);padding:10px 12px;
+  font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;
   transition:all .2s ease;
 }
 .search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
 
 .btn-icon{
-  width:34px;height:34px;border-radius:var(--r-xs);display:grid;place-items:center;
+  width:40px;height:40px;border-radius:var(--r-xs);display:grid;place-items:center;
   flex-shrink:0;border:1px solid var(--border);
 }
-.btn-icon.go{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;font-weight:900;border:none;box-shadow:0 0 8px var(--accent-glow)}
+.btn-icon.go{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;border:none;}
 .btn-icon.clr{background:rgba(7,9,19,.9);color:var(--muted)}
-.btn-icon svg{width:14px;height:14px}
-.search-msg{margin-top:4px;font-size:8px;font-weight:800;text-transform:uppercase;color:var(--warn);}
+.btn-icon svg{width:16px;height:16px}
 
-.map-box{
-  border-radius:var(--r-xs);border:1px solid var(--border2);
-  overflow:hidden;position:relative;height:260px;background:#020617;margin-top:4px;
+/* Ficha de Ativo & Interligação */
+.asset-card{
+  border-radius:var(--r-sm);border:1px solid var(--border);
+  background:rgba(11,17,36,0.95);overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;padding:14px;margin-bottom:10px;
 }
-body.fs-active .hdr, body.fs-active .wrap > .section-block:not(:has(#mapBox)) {display:none !important;}
-body.fs-active .wrap {max-width:100% !important;padding:0 !important;margin:0 !important;}
-body.fs-active .map-box.fullscreen {
-  position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;
-  z-index:999999 !important;border-radius:0 !important;border:none !important;margin:0 !important;
-}
+.asset-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.asset-title{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:.02em;}
+.asset-badge{font-size:8.5px;font-weight:900;padding:3px 8px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--accent);border:1px solid var(--border2);}
 
-.map-ctrls{
-  position:absolute;top:6px;right:6px;z-index:1000;display:flex;gap:4px;
-  background:rgba(7,9,19,.9);padding:3px;border-radius:4px;border:1px solid var(--border2);
-}
-.map-btn{font-size:7.5px;font-weight:900;text-transform:uppercase;padding:3px 6px;border-radius:2px;background:rgba(255,255,255,.05);color:var(--text2);cursor:pointer;}
-.map-btn.active{background:var(--accent);color:#fff}
+.asset-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;margin-top:4px;}
+@media(max-width:600px){.asset-grid{grid-template-columns:1fr 1fr;}}
+.asset-field{background:rgba(7,9,19,.6);padding:6px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.05);}
+.asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase;}
+.asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
 
-.fs-close-btn{
-  display:none;position:fixed;top:16px;left:16px;z-index:10000000;
-  background:rgba(239,68,68,.95);color:#fff;padding:10px 18px;border-radius:var(--r-xs);
-  font-size:10px;font-weight:900;text-transform:uppercase;box-shadow:0 6px 20px rgba(0,0,0,.7);
-  cursor:pointer;align-items:center;gap:6px;
-}
-body.fs-active .fs-close-btn {display:inline-flex;}
-
-.asset-post{
-  border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);
-  background:rgba(11,17,36,0.95);transition:all .2s ease;margin-bottom:8px;
-}
-.asset-post.near{
-  border-color:rgba(16,185,129,.5);
-  background:linear-gradient(145deg,rgba(16,185,129,.1),rgba(11,17,36,.95));
-  box-shadow:0 0 12px rgba(16,185,129,.15);
-}
-.asset-post.searched{
-  border-color:rgba(59,130,246,.5);
-  background:linear-gradient(145deg,rgba(59,130,246,.1),rgba(11,17,36,.95));
-  box-shadow:0 0 12px var(--accent-glow);
-}
-.post-top{display:flex;align-items:flex-start;gap:8px;padding:10px}
-.post-id{font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);letter-spacing:.05em}
-.post-dist{font-size:7.5px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-top:2px}
-
-.post-wa{
-  width:28px;height:28px;border-radius:var(--r-xs);background:rgba(16,185,129,.15);
-  border:1px solid rgba(16,185,129,.3);color:var(--green2);display:grid;place-items:center;flex-shrink:0;cursor:pointer;
-}
-.post-wa svg{width:13px;height:13px}
-.post-map{height:120px;width:100%;border:0;filter:grayscale(15%) contrast(1.05)}
-
+/* Mapa Mental de Fibras */
 .fiber-box{
   background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));
-  border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:8px;margin:6px 10px;
+  border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:10px;margin-top:4px;
 }
-.fiber-header{font-size:8px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:4px;}
-.fiber-neighbors{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
+.fiber-header{font-size:9px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.fiber-neighbors{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .fiber-card{
-  background:rgba(7,9,19,.8);border:1px solid rgba(168,85,247,.2);
-  border-radius:4px;padding:6px;cursor:pointer;transition:all .2s ease;
+  background:rgba(7,9,19,.85);border:1px solid rgba(168,85,247,.3);
+  border-radius:var(--r-xs);padding:8px;cursor:pointer;transition:all .2s ease;
 }
-.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.15);}
-.fiber-card-lbl{font-size:7px;font-weight:900;color:var(--purple);text-transform:uppercase;}
-.fiber-card-id{font-size:8.5px;font-weight:900;color:#fff;margin-top:1px;}
-.fiber-card-sub{font-size:7px;font-weight:700;color:var(--muted);}
+.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);}
+.fiber-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase;}
+.fiber-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px;}
+.fiber-card-sub{font-size:8px;font-weight:700;color:var(--muted);margin-top:2px;}
+
+.btn-wa{
+  width:100%;padding:10px;border-radius:var(--r-xs);
+  background:linear-gradient(135deg,var(--green),#059669);color:#fff;
+  font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;
+}
 
 .toast{
-  position:fixed;bottom:calc(12px + var(--safe-b));left:50%;
-  transform:translateX(-50%) translateY(10px);border-radius:var(--r-xs);border:1px solid var(--border2);
-  background:var(--surface);padding:8px 14px;font-size:8.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.08em;z-index:99999;opacity:0;transition:all .15s ease;pointer-events:none;
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);
+  border-radius:var(--r-xs);border:1px solid var(--border2);background:var(--surface);
+  padding:10px 16px;font-size:9px;font-weight:800;text-transform:uppercase;z-index:99999;
+  opacity:0;transition:all .15s ease;pointer-events:none;color:var(--accent);
+  box-shadow:0 0 10px var(--accent-glow);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{color:var(--accent);border-color:rgba(59,130,246,.4);box-shadow:0 0 10px var(--accent-glow)}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <div class="hdr-in">
-    <div class="hdr-title">Apoio Técnico ITS & SNV</div>
-    <div style="font-size:9px;font-weight:900;color:var(--accent);" id="topKmLive">—</div>
-  </div>
+  <div class="hdr-title">Matriz de Interligações & Ativos ITS</div>
 </header>
 
 <div class="wrap">
-
-  <div class="section-block">
-    <div class="menu-pills-grid">
-      <button class="menu-pill" id="pillTag" onclick="switchPane('tag')">🔍 Pesquisa Ativo / Host</button>
-      <button class="menu-pill" id="pillKm" onclick="switchPane('km')">🛣️ Pesquisa KM</button>
-      <button class="menu-pill active" id="pillMap" onclick="switchPane('map')">🗺️ Mapa & GPS</button>
+  <div class="card card-accent">
+    <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
+      Pesquisa por Ativo, Hostname, KM ou Fibra
     </div>
-
-    <!-- PAINEL: TAG / HOST / EQUIPAMENTO -->
-    <div class="collapsible-pane" id="paneTag">
-      <div class="card card-accent">
-        <div class="search-row">
-          <div class="search-wrap">
-            <input class="search-input" id="inputTag" placeholder="DIGITE TAG, HOST, IP OU EQUIP..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchByTag()">
-          </div>
-          <button class="btn-icon go" onclick="searchByTag()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-          <button class="btn-icon clr" onclick="clearTag()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-        </div>
-        <div id="searchTagMsg" class="search-msg" style="display:none"></div>
-        <div id="searchTagResult" style="display:none;margin-top:6px"></div>
+    <div class="search-row">
+      <div class="search-wrap">
+        <input class="search-input" id="inputSearch" placeholder="EX: 90, 214+728, BR116-CF0001, CFTV, 11, 12..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
       </div>
-    </div>
-
-    <!-- PAINEL: KM -->
-    <div class="collapsible-pane" id="paneKm">
-      <div class="card card-accent">
-        <div class="search-row">
-          <div class="search-wrap">
-            <input class="search-input" id="inputKm" placeholder="KM (EX: 90 ou 214+728)" inputmode="decimal" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchByKm()">
-          </div>
-          <button class="btn-icon go" onclick="searchByKm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></button>
-          <button class="btn-icon clr" onclick="clearKm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-        </div>
-        <div id="searchKmMsg" class="search-msg" style="display:none"></div>
-        <div id="searchKmResult" style="display:none;margin-top:6px"></div>
-      </div>
-    </div>
-
-    <!-- PAINEL: MAPA -->
-    <div class="collapsible-pane show" id="paneMap">
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <span style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--accent)">Mapa Interativo & GPS (SNV)</span>
-          <button class="map-btn active" onclick="useCurrentGps()">Centralizar GPS</button>
-        </div>
-        <div class="map-box" id="mapBox">
-          <div class="map-ctrls">
-            <button class="map-btn active" id="btnLayerSat" onclick="setMapLayer('sat')">Sat</button>
-            <button class="map-btn" id="btnLayerNorm" onclick="setMapLayer('norm')">Norm</button>
-            <button class="map-btn" onclick="toggleFullscreen()">Full</button>
-          </div>
-          <div id="leafletMap" style="width:100%;height:100%;"></div>
-        </div>
-      </div>
+      <button class="btn-icon go" onclick="triggerSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="btn-icon clr" onclick="clearSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 
-  <button class="fs-close-btn" onclick="toggleFullscreen()">✕ Sair do Full Screen</button>
-
-  <div class="section-block">
-    <div class="km-hero-compact">
-      <div>
-        <div class="km-value-compact" id="kmVal">—</div>
-      </div>
-      <div class="km-meta-compact">
-        <span class="km-br-badge" id="kmBrBadge">SINTONIZANDO...</span>
-        <div id="cityNameDisplay" style="font-size:8.5px;font-weight:800;color:var(--text2);text-transform:uppercase;">BR101 / BR116 (SP-RJ)</div>
-      </div>
+  <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
+    <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
+      Digite um KM, TAG ou Hostname para visualizar a ficha e a matriz de interligações.
     </div>
-
-    <div id="gpsStatus" class="gps bad">
-      <span id="gpsText">GPS · BUSCANDO SINAL</span>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--muted)">Ativos ITS Mais Próximos (Tempo Real):</span>
-        <select id="qty" style="background:var(--bg);color:#fff;border:1px solid var(--border2);border-radius:4px;padding:3px;font-size:8px;font-weight:800;" onchange="renderApoio()">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-      </div>
-    </div>
-
-    <div id="postList" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
-
 </div>
 
-<div class="toast" id="toast" aria-live="polite"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<div class="toast" id="toast"></div>
 
 <script>
-// Base de ativos ITS incorporada (1.788 ativos reais das planilhas BR116 e BR101)
+// Base de Dados de Ativos ITS Incorporada (1.788 ativos completos)
 const rawAssets = [
   {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
   {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
@@ -317,83 +172,18 @@ rawAssets.forEach(a => {
 
 const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_ ]+/g,' ').replace(/\s+/g,' ');
 const parsePt = v => { const s = String(v??'').trim().replace(',','.'); return Number(s); };
-const hav = (a,b,c,d) => {
-  const p = Math.PI/180, x = .5 - Math.cos((c-a)*p)/2 + Math.cos(a*p)*Math.cos(c*p)*(1-Math.cos((d-b)*p))/2;
-  return 12742000 * Math.asin(Math.sqrt(x));
-};
 
-const formatDist = dist => {
-  const m = Math.max(0, Math.round(dist));
-  if (m < 1000) return `${m}m`;
-  return `${(m / 1000).toFixed(1).replace('.', ',')} km`;
-};
-
-let pos = null;
-let mapInstance = null, mapMarker = null, mapLayerObj = null;
-
-function showToast(msg, type='ok'){
+function showToast(msg){
   const el = document.getElementById('toast');
-  el.className = 'toast ' + type; el.textContent = msg;
+  el.textContent = msg;
   requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
 }
 
-function switchPane(type){
-  ['Tag','Km','Map'].forEach(p=>{
-    let pane = document.getElementById('pane'+p);
-    let pill = document.getElementById('pill'+p);
-    if(p.toLowerCase() === type){
-      let isOpen = pane.classList.toggle('show');
-      pill.classList.toggle('active', isOpen);
-      if(isOpen && type==='map' && mapInstance) setTimeout(()=>mapInstance.invalidateSize(), 50);
-    } else {
-      pane.classList.remove('show');
-      pill.classList.remove('active');
-    }
-  });
-}
-
-function gpsBadge(p,err){
-  const el = document.getElementById('gpsStatus');
-  const textEl = document.getElementById('gpsText');
-  let a = p?.acc; let cls='bad', txt;
-  if(err) txt='GPS · BLOQUEADO / DESLIGADO';
-  else if(!a) txt='GPS · USANDO REFERÊNCIA';
-  else if(a<=15) {cls='ok'; txt=`GPS · ALTA (±${Math.round(a)}M)`;}
-  else {cls='warn'; txt=`GPS · MÉDIA (±${Math.round(a)}M)`;}
-  el.className='gps '+cls; textEl.textContent=txt;
-}
-
-// Motor SNV original: converte KM do ativo para coordenada geográfica aproximada
-function getAssetCoords(asset){
-  let baseLat = asset.rodovia === 'BR101' ? -24.0058 : -22.8512;
-  let baseLon = asset.rodovia === 'BR101' ? -46.4023 : -43.7744;
-  let latOffset = (asset.kmVal - 100.0) / 111.0;
-  return { lat: baseLat + latOffset, lon: baseLon + (latOffset * 0.25) };
-}
-
-// Motor SNV original em tempo real: deduz o KM atual em que o utilizador se encontra baseado no GPS e nos ativos da rodovia
-function updateKmFromGps(){
-  if(!pos) return;
-  let best = rawAssets[0], minD = Infinity;
-  rawAssets.forEach(a => {
-    let coords = getAssetCoords(a);
-    let d = hav(pos.lat, pos.lon, coords.lat, coords.lon);
-    if(d < minD){ minD = d; best = a; }
-  });
-
-  let estKm = best.kmVal + ((pos.lat - getAssetCoords(best).lat) * 111.0);
-  if(estKm < 0) estKm = Math.abs(estKm);
-
-  let kmValStr = estKm.toFixed(3).replace('.', ',');
-  let fullStr = `KM ${kmValStr}`;
-  document.getElementById('kmVal').textContent = fullStr;
-  document.getElementById('topKmLive').textContent = fullStr;
-  document.getElementById('kmBrBadge').textContent = best.rodovia + ' (' + best.estado + ')';
-}
-
+// Identifica o ativo anterior e o próximo que partilham da mesma fibra óptica
 function getFiberNeighbors(targetAsset){
   let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
   sameRod.sort((a,b) => a.kmVal - b.kmVal);
+
   let targetFibers = targetAsset.fibra.split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
   let prevFiber = null, nextFiber = null;
 
@@ -410,255 +200,115 @@ function getFiberNeighbors(targetAsset){
   return { prevFiber, nextFiber };
 }
 
-function initSystemStartup(){
-  initMap(-22.8512, -43.7744);
-  pos = {lat: -22.8512, lon: -43.7744, acc: 50};
-  renderApoio();
-  startAutoGps();
-}
+function triggerSearch(){
+  let q = norm(document.getElementById('inputSearch').value);
+  if(!q){
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Digite um termo válido para pesquisa.</div>`;
+    return;
+  }
 
-function startAutoGps(){
-  if('geolocation' in navigator){
-    navigator.geolocation.getCurrentPosition(
-      p => {
-        pos = {lat:p.coords.latitude, lon:p.coords.longitude, acc:p.coords.accuracy};
-        gpsBadge(pos);
-        renderApoio();
-        updateKmFromGps();
-        if(mapInstance && mapMarker){
-          mapInstance.setView([pos.lat, pos.lon], 14);
-          mapMarker.setLatLng([pos.lat, pos.lon]);
-        }
-        navigator.geolocation.watchPosition(upd => {
-          pos = {lat:upd.coords.latitude, lon:upd.coords.longitude, acc:upd.coords.accuracy};
-          gpsBadge(pos);
-          renderApoio();
-          updateKmFromGps();
-        }, null, {enableHighAccuracy:true, maximumAge:0, timeout:5000});
-      },
-      e => { gpsBadge(null, true); renderApoio(); },
-      {enableHighAccuracy:true, timeout:5000, maximumAge:0}
-    );
+  let numQ = parseFloat(q.replace(',', '.'));
+  let matched = [];
+  if(!isNaN(numQ) && q.length <= 6){
+    // Pesquisa por KM mais próximo
+    matched = rawAssets.map(a => ({
+      ...a, kmDiff: Math.abs(a.kmVal - numQ)
+    })).sort((a,b) => a.kmDiff - b.kmDiff).slice(0, 8);
   } else {
-    gpsBadge(null, true);
-    renderApoio();
-  }
-}
-
-function initMap(lat, lon){
-  if(mapInstance) return;
-  mapInstance = L.map('leafletMap', {zoomControl:false, attributionControl:false}).setView([lat, lon], 14);
-  setMapLayer('sat');
-  mapMarker = L.marker([lat, lon]).addTo(mapInstance);
-}
-
-function setMapLayer(mode){
-  document.getElementById('btnLayerSat').classList.toggle('active', mode==='sat');
-  document.getElementById('btnLayerNorm').classList.toggle('active', mode==='norm');
-  if(!mapInstance) return;
-  if(mapLayerObj) mapInstance.removeLayer(mapLayerObj);
-  if(mode==='sat'){
-    mapLayerObj = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19});
-  }else{
-    mapLayerObj = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19});
-  }
-  mapLayerObj.addTo(mapInstance);
-}
-
-function toggleFullscreen(){
-  let box = document.getElementById('mapBox');
-  let isFS = box.classList.toggle('fullscreen');
-  document.body.classList.toggle('fs-active', isFS);
-  if(mapInstance) setTimeout(()=>mapInstance.invalidateSize(), 50);
-}
-
-function useCurrentGps(){
-  if(!pos){showToast('GPS sem sinal','err');return;}
-  if(mapInstance){
-    mapInstance.setView([pos.lat, pos.lon], 16);
-    mapMarker.setLatLng([pos.lat, pos.lon]);
-  }
-  showToast('GPS Centrado');
-}
-
-// Pesquisa por TAG, Hostname, IP ou Equipamento
-function searchByTag(){
-  let raw = document.getElementById('inputTag').value.trim();
-  let msg = document.getElementById('searchTagMsg'), res = document.getElementById('searchTagResult');
-  if(!raw){ clearTag(); return; }
-
-  let q = norm(raw);
-  let matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 10);
-
-  if(!matched.length){
-    msg.style.display='flex'; msg.textContent='Nenhum ativo encontrado';
-    res.style.display='none'; return;
+    // Pesquisa por TAG, Hostname, Equipamento ou Fibra
+    matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 8);
   }
 
-  msg.style.display='none';
-  renderAssetsResult(matched, res);
+  renderResults(matched, `Resultados para "${q}"`);
   showToast(`${matched.length} Ativos Encontrados`);
 }
 
-function clearTag(){
-  document.getElementById('inputTag').value='';
-  document.getElementById('searchTagMsg').style.display='none';
-  document.getElementById('searchTagResult').style.display='none';
+function clearSearch(){
+  document.getElementById('inputSearch').value = '';
+  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa limpa.</div>`;
 }
 
-// Pesquisa por KM (Identifica o BR correspondente e mostra o ativo mais próximo, anterior e próximo na mesma fibra)
-function searchByKm(){
-  let raw = document.getElementById('inputKm').value.trim();
-  let msg = document.getElementById('searchKmMsg'), res = document.getElementById('searchKmResult');
-  let targetKm = parsePt(raw);
-  if(isNaN(targetKm)){ clearKm(); return; }
-
-  let matched = rawAssets.map(a => ({
-    ...a, kmDiff: Math.abs(a.kmVal - targetKm)
-  })).sort((a,b) => a.kmDiff - b.kmDiff).slice(0, 5);
-
-  if(!matched.length){
-    msg.style.display='flex'; msg.textContent='KM fora do range';
-    res.style.display='none'; return;
+function renderResults(items, title){
+  let container = document.getElementById('resultsContainer');
+  if(!items.length){
+    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado</div>`;
+    return;
   }
 
-  msg.style.display='none';
-  renderAssetsResult(matched, res);
-  showToast('Pesquisa por KM concluída');
-}
+  let html = `<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${title}</div>`;
 
-function clearKm(){
-  document.getElementById('inputKm').value='';
-  document.getElementById('searchKmMsg').style.display='none';
-  document.getElementById('searchKmResult').style.display='none';
-}
+  items.forEach(a => {
+    let neighbors = getFiberNeighbors(a);
 
-function renderAssetsResult(items, containerEl){
-  containerEl.style.display='block';
-  let html = `<div style="display:flex;flex-direction:column;gap:6px">`;
-  items.forEach((item, idx) => {
-    let coords = getAssetCoords(item);
-    let dt = pos ? formatDist(hav(pos.lat, pos.lon, coords.lat, coords.lon)) : '--';
-    let neighbors = getFiberNeighbors(item);
-
-    html += `<div class="asset-post searched">
-      <div class="post-top">
-        <div style="flex:1;">
-          <p class="post-id">#${idx+1} - TAG: ${item.tag} (${item.rodovia} - ${item.estado})</p>
-          <p class="post-dist" style="color:var(--accent);">${item.equip} · KM ${item.km}</p>
-          <p class="post-dist" style="color:var(--green2);">Hostname: ${item.host || '---'} | Fibra: ${item.fibra}</p>
-          <p class="post-dist">Distância: ${dt} | IP Gerência: ${item.ipGer || '---'}</p>
+    html += `
+      <div class="asset-card">
+        <div class="asset-header">
+          <div>
+            <div class="asset-title">${a.tag}</div>
+            <div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${a.equip} · KM ${a.km} (${a.rodovia} - ${a.estado})</div>
+          </div>
+          <div class="asset-badge">${a.sentido || 'N/A'}</div>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('${item.tag}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+
+        <div class="asset-grid">
+          <div class="asset-field"><div class="asset-field-lbl">Hostname</div><div class="asset-field-val">${a.host || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Fibra Óptica</div><div class="asset-field-val" style="color:var(--purple);">${a.fibra || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">IP Gerência</div><div class="asset-field-val">${a.ipGer || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Gerência</div><div class="asset-field-val">${a.gerencia || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Rede</div><div class="asset-field-val">${a.rede || '---'}</div></div>
+          <div class="asset-field"><div class="asset-field-lbl">Switch / Ativo</div><div class="asset-field-val">${a.switch || a.ativo || '---'}</div></div>
+        </div>
+
+        <div class="fiber-box">
+          <div class="fiber-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Mapa Mental / Vizinhos na Mesma Fibra (${a.fibra})
+          </div>
+          <div class="fiber-neighbors">
+            <div class="fiber-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
+              <div class="fiber-card-lbl">⬅️ Anterior na Fibra</div>
+              <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
+              <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km + ' ('+neighbors.prevFiber.equip+')' : '---'}</div>
+            </div>
+            <div class="fiber-card" onclick="searchByExactTag('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
+              <div class="fiber-card-lbl">➡️ Próximo na Fibra</div>
+              <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
+              <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km + ' ('+neighbors.nextFiber.equip+')' : '---'}</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Enviar Relatório de Interligação WhatsApp
         </button>
       </div>
-      <div class="fiber-box">
-        <div class="fiber-header">🔌 Vizinhos na Mesma Fibra (${item.fibra})</div>
-        <div class="fiber-neighbors">
-          <div class="fiber-card" onclick="focusAsset('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
-            <div class="fiber-card-lbl">⬅️ Anterior (Fibra)</div>
-            <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
-            <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km : '---'}</div>
-          </div>
-          <div class="fiber-card" onclick="focusAsset('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
-            <div class="fiber-card-lbl">➡️ Próximo (Fibra)</div>
-            <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
-            <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km : '---'}</div>
-          </div>
-        </div>
-      </div>
-      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${coords.lat},${coords.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
-    </div>`;
+    `;
   });
-  html += `</div>`;
-  containerEl.innerHTML = html;
+
+  container.innerHTML = html;
 }
 
-function focusAsset(tag){
+function searchByExactTag(tag){
   if(!tag) return;
-  let found = rawAssets.find(a => a.tag === tag);
-  if(!found) return;
-  let coords = getAssetCoords(found);
-  if(mapInstance){
-    mapInstance.setView([coords.lat, coords.lon], 16);
-    mapMarker.setLatLng([coords.lat, coords.lon]);
-  }
-  switchPane('map');
-  showToast(`Focado em ${tag}`);
+  document.getElementById('inputSearch').value = tag;
+  triggerSearch();
 }
 
-function sendWhatsApp(tag){
+function shareWhatsApp(tag){
   let a = rawAssets.find(item => item.tag === tag);
   if(!a) return;
-  let coords = getAssetCoords(a);
   let neighbors = getFiberNeighbors(a);
 
-  let tx = `📍 *FICHA TÉCNICA DE ATIVO ITS*\n`;
+  let tx = `📍 *MATRIZ DE INTERLIGAÇÃO - ATIVO ITS*\n`;
   tx += `TAG: *${a.tag}*\nEquipamento: ${a.equip}\nKM: ${a.km} (${a.rodovia} - ${a.estado})\n`;
-  tx += `Hostname: ${a.host}\nFibra: *${a.fibra}*\nIP Gerência: ${a.ipGer}\nIP Ativo: ${a.ativo}\n\n`;
-  tx += `🔌 *VIZINHOS DE FIBRA*\n`;
+  tx += `Hostname: ${a.host}\nFibra: *${a.fibra}*\nIP Gerência: ${a.ipGer}\nRede: ${a.rede}\nSwitch: ${a.switch}\n\n`;
+  tx += `🔌 *VIZINHOS NA MESMA FIBRA*\n`;
   tx += `Anterior: ${neighbors.prevFiber ? neighbors.prevFiber.tag + ' (KM ' + neighbors.prevFiber.km + ')' : 'N/A'}\n`;
-  tx += `Próximo: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n\n`;
-  if(coords){
-    tx += `🗺️ *Localização:* https://maps.google.com/?q=${coords.lat.toFixed(5)},${coords.lon.toFixed(5)}`;
-  }
+  tx += `Próximo: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n`;
+
   window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank', 'noopener');
 }
-
-// Renderiza os ativos mais próximos baseados na posição GPS real em tempo real
-function renderApoio(){
-  if(!pos || !rawAssets.length) return;
-  updateKmFromGps();
-  let qty = Number(document.getElementById('qty').value || 10);
-
-  let items = rawAssets.map(p => {
-    let coords = getAssetCoords(p);
-    return { ...p, coords, d: hav(pos.lat, pos.lon, coords.lat, coords.lon) };
-  }).sort((a,b) => a.d - b.d).slice(0, qty);
-
-  let list = document.getElementById('postList');
-  let frag = document.createDocumentFragment();
-
-  items.forEach((o, i) => {
-    let neighbors = getFiberNeighbors(o);
-    let div = document.createElement('div');
-    div.className = 'asset-post' + (i === 0 ? ' near' : '');
-    div.innerHTML = `<div class="post-top">
-      <div style="flex:1;">
-        <p class="post-id">#${i+1} - TAG: ${o.tag} (${o.rodovia} - ${o.estado})</p>
-        <p class="post-dist" style="color:var(--accent);">${o.equip} · KM ${o.km}</p>
-        <p class="post-dist" style="color:var(--green2);">Hostname: ${o.host || '---'} | Fibra: ${o.fibra}</p>
-        <p class="post-dist">Distância até o local: ${formatDist(o.d)} | IP: ${o.ipGer || '---'}</p>
-      </div>
-      <button class="post-wa" onclick="sendWhatsApp('${o.tag}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </button>
-    </div>
-    <div class="fiber-box">
-      <div class="fiber-header">🔌 Vizinhos na Mesma Fibra (${o.fibra})</div>
-      <div class="fiber-neighbors">
-        <div class="fiber-card" onclick="focusAsset('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
-          <div class="fiber-card-lbl">⬅️ Anterior (Fibra)</div>
-          <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
-          <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km : '---'}</div>
-        </div>
-        <div class="fiber-card" onclick="focusAsset('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
-          <div class="fiber-card-lbl">➡️ Próximo (Fibra)</div>
-          <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
-          <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km : '---'}</div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${o.coords.lat},${o.coords.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>`;
-    frag.appendChild(div);
-  });
-
-  list.innerHTML = '';
-  list.appendChild(frag);
-}
-
-window.addEventListener('DOMContentLoaded', initSystemStartup);
 </script>
 </body>
 </html>
