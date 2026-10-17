@@ -52,6 +52,7 @@ button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inh
       <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
       <button class="btn-icon clr" onclick="clearSearch()" title="Limpar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       <button class="btn-icon" id="btnLocate" title="Usar minha localização" onclick="useMyLocation()" style="display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+      <label title="Forçar correspondência exata de KM" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="exactKm" style="width:16px;height:16px"> KM exato</label>
       <button class="btn-icon" title="Desenhar Rede (estado atual)" onclick="drawNetworkByState()">🔗</button>
       <input type="file" id="fileUpload" accept="text/csv,application/json" style="display:none" onchange="handleUpload(event)"><button class="btn-icon" title="Importar CSV/JSON" onclick="document.getElementById('fileUpload').click()" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/></svg></button>
     </div>
@@ -90,7 +91,13 @@ loadEdits();
 rawAssets.forEach(a=>{ a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.rodovia||''}`.toUpperCase(); });
 
 const norm = s=>String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_+ ]+/g,' ').replace(/\s+/g,' ');
-function parseInputKm(str){ let clean=String(str).trim().toUpperCase().replace('KM','').trim(); if(clean.includes('+')){ let parts=clean.split('+'); let kmPart=parseFloat(parts[0].replace(',','.'))||0; let mPart=parseFloat(parts[1].replace(',','.'))||0; return kmPart+(mPart/1000.0);} let val=parseFloat(clean.replace(',','.')); return isNaN(val)?null:val; }
+function parseInputKm(str){ if(!str) return null; let clean=String(str).trim().toUpperCase(); // accept forms: BR116 214+728, BR116:214+728, 214+728, 214.728
+  // remove leading 'BRxxx' if present
+  const rodMatch = clean.match(/(BR\d{1,3})[: ]?\s*(\d+\+\d+|\d+[.,]\d+|\d+)/i);
+  if(rodMatch){ clean = rodMatch[2]; }
+  clean = clean.replace('KM','').trim();
+  if(clean.includes('+')){ let parts=clean.split('+'); let kmPart=parseFloat(parts[0].replace(',','.'))||0; let mPart=parseFloat(parts[1].replace(',','.'))||0; return kmPart + (mPart/1000.0);} let val=parseFloat(clean.replace(',', '.')); return isNaN(val)?null:val; }
+
 function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; requestAnimationFrame(()=>{el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),3000)}); }
 
 function distanceKm(lat1,lon1,lat2,lon2){ if(lat1==null||lon1==null||lat2==null||lon2==null) return Infinity; const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
@@ -98,10 +105,26 @@ function distanceKm(lat1,lon1,lat2,lon2){ if(lat1==null||lon1==null||lat2==null|
 function fiberList(s){ if(!s) return []; return String(s).split(/[,;\/ ]+/).map(x=>x.trim()).filter(Boolean); }
 function findFiberChain(fiberId, stateFilter){ let members = rawAssets.filter(a=>fiberList(a.fibra).includes(String(fiberId))); if(stateFilter && stateFilter!=='ALL') members = members.filter(m=>m.estado===stateFilter); members.sort((a,b)=>{ if(a.kmVal!=null && b.kmVal!=null) return a.kmVal - b.kmVal; if(a.lat!=null && b.lat!=null) return a.lat - b.lat; return 0; }); return members; }
 
-function getFiberNeighbors(targetAsset, topN=3){ const chainMembers=[]; const targetFibers=fiberList(targetAsset.fibra); rawAssets.forEach(a=>{ if(a===targetAsset) return; if(fiberList(a.fibra).some(f=>targetFibers.includes(f))) chainMembers.push(a); }); chainMembers.sort((x,y)=>{ if(x.kmVal!=null && y.kmVal!=null) return Math.abs(x.kmVal-targetAsset.kmVal)-Math.abs(y.kmVal-targetAsset.kmVal); if(x.lat!=null && y.lat!=null) return distanceKm(targetAsset.lat,targetAsset.lon,x.lat,x.lon)-distanceKm(targetAsset.lat,targetAsset.lon,y.lat,y.lon); return 0; }); const prev = chainMembers.filter(a=>a.kmVal<targetAsset.kmVal).sort((a,b)=> (targetAsset.kmVal-a.kmVal)-(targetAsset.kmVal-b.kmVal))[0]||null; const next = chainMembers.filter(a=>a.kmVal>targetAsset.kmVal).sort((a,b)=> (a.kmVal-targetAsset.kmVal)-(b.kmVal-targetAsset.kmVal))[0]||null; const nearestKm = chainMembers.slice(0,topN); const geoNearest = rawAssets.filter(a=>a!==targetAsset && a.lat!=null && a.lon!=null).map(a=>({asset:a,d:distanceKm(targetAsset.lat,targetAsset.lon,a.lat,a.lon)})).sort((x,y)=>x.d-y.d).slice(0,topN).map(x=>({asset:x.a,dist:x.d})); // compute distances to prev/next
- let prevDist = prev && prev.lat!=null && prev.lon!=null && targetAsset.lat!=null ? distanceKm(prev.lat,prev.lon,targetAsset.lat,targetAsset.lon) : (prev && prev.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(targetAsset.kmVal - prev.kmVal) : null);
- let nextDist = next && next.lat!=null && next.lon!=null && targetAsset.lat!=null ? distanceKm(next.lat,next.lon,targetAsset.lat,targetAsset.lon) : (next && next.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(next.kmVal - targetAsset.kmVal) : null);
- return {prev,next,nearestKm,geoNearest,prevDist,nextDist}; }
+function getFiberNeighbors(targetAsset, topN=3){ const chainMembers=[]; const targetFibers=fiberList(targetAsset.fibra); rawAssets.forEach(a=>{ if(a===targetAsset) return; // require same fibra AND same rodovia AND same estado for prev/next
+    if(fiberList(a.fibra).some(f=>targetFibers.includes(f)) && a.rodovia===targetAsset.rodovia && a.estado===targetAsset.estado) chainMembers.push(a); });
+  chainMembers.sort((x,y)=>{ if(x.kmVal!=null && y.kmVal!=null) return Math.abs(x.kmVal-targetAsset.kmVal)-Math.abs(y.kmVal-targetAsset.kmVal); if(x.lat!=null && y.lat!=null) return distanceKm(targetAsset.lat,targetAsset.lon,x.lat,x.lon)-distanceKm(targetAsset.lat,targetAsset.lon,y.lat,y.lon); return 0; });
+  // previous and next strictly by kmVal order
+  const ordered = chainMembers.filter(c=>c.kmVal!=null).sort((a,b)=>a.kmVal-b.kmVal);
+  let prev=null, next=null;
+  if(targetAsset.kmVal!=null){
+    for(let i=0;i<ordered.length;i++){
+      if(ordered[i].kmVal < targetAsset.kmVal) prev = ordered[i];
+      if(ordered[i].kmVal > targetAsset.kmVal){ next = ordered[i]; break; }
+    }
+  }
+  // if no kmVal-based prev/next, fallback to nearest by distance within same chainMembers
+  if(!prev && chainMembers.length){ prev = chainMembers.slice().sort((a,b)=>distanceKm(a.lat,a.lon,targetAsset.lat,targetAsset.lon)-distanceKm(b.lat,b.lon,targetAsset.lat,targetAsset.lon))[0]||null; }
+  if(!next && chainMembers.length){ next = chainMembers.slice().sort((a,b)=>distanceKm(a.lat,a.lon,targetAsset.lat,targetAsset.lon)-distanceKm(b.lat,b.lon,targetAsset.lat,targetAsset.lon))[1]||null; }
+  const nearestKm = chainMembers.slice(0,topN);
+  const geoNearest = rawAssets.filter(a=>a!==targetAsset && a.lat!=null && a.lon!=null && a.estado===targetAsset.estado).map(a=>({asset:a,d:distanceKm(targetAsset.lat,targetAsset.lon,a.lat,a.lon)})).sort((x,y)=>x.d-y.d).slice(0,topN).map(x=>({asset:x.asset,dist:x.d}));
+  let prevDist = prev && prev.lat!=null && prev.lon!=null && targetAsset.lat!=null ? distanceKm(prev.lat,prev.lon,targetAsset.lat,targetAsset.lon) : (prev && prev.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(targetAsset.kmVal - prev.kmVal) : null);
+  let nextDist = next && next.lat!=null && next.lon!=null && targetAsset.lat!=null ? distanceKm(next.lat,next.lon,targetAsset.lat,targetAsset.lon) : (next && next.kmVal!=null && targetAsset.kmVal!=null ? Math.abs(next.kmVal - targetAsset.kmVal) : null);
+  return {prev,next,nearestKm,geoNearest,prevDist,nextDist}; }
 
 // Map
 let map = L.map('map',{center:[-22.9,-43.2],zoom:8,minZoom:3});
@@ -124,9 +147,18 @@ function renderResults(items,title){ const container=document.getElementById('re
  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">📤 Partilhar WhatsApp</button><button class="btn-icon" onclick="printReport('${a.tag}')">🖨️ Relatório</button><button class="btn-icon" onclick="editAsset('${a.tag}')">✏️ Editar (local)</button><button class="btn-icon" onclick="showChain('${a.fibra}')">🔗 Ver Cadeia</button>${a.lat!=null?`<button class="btn-icon" onclick="openGps(${a.lat},${a.lon})">🚗 Rotas</button>`:''}</div>`;
  html+=`</div>`; }); container.innerHTML=html; }
 
-function triggerSearch(){ const raw=document.getElementById('inputSearch').value.trim(); const selectedRodovia=document.getElementById('filterRodovia').value; const selectedEstado=document.getElementById('filterEstado').value; let pool=rawAssets; if(selectedRodovia!=='ALL') pool=pool.filter(a=>a.rodovia===selectedRodovia); if(selectedEstado!=='ALL') pool=pool.filter(a=>a.estado===selectedEstado); if(!raw){ renderResults(pool.slice(0,30), `Mostrando primeiros ativos (${pool.length})`); refreshMarkers(selectedEstado); return; } const kmTarget=parseInputKm(raw); let matched=[]; if(kmTarget!==null && raw.length<=8 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){ matched=pool.map(a=>({...a,kmDiff:Math.abs(a.kmVal-kmTarget||Infinity)})).sort((a,b)=>a.kmDiff-b.kmDiff).slice(0,50); } else { const q=norm(raw); matched=pool.filter(a=>a.rawSearch.includes(q)).slice(0,50); } renderResults(matched, `Resultados para "${raw}" ${selectedRodovia!=='ALL'? '('+selectedRodovia+')':''} ${selectedEstado!=='ALL'? '('+selectedEstado+')':''}`); markerCluster.clearLayers(); markersLayer.clearLayers(); polylinesLayer.clearLayers(); let bounds=[]; matched.forEach(a=>{ if(a.lat!=null && a.lon!=null){ const m=L.marker([a.lat,a.lon]); m.bindPopup(`<strong>${a.tag}</strong><br>${a.equip}<br>KM real: ${a.kmVal!=null?a.kmVal:''} (${a.km||'--'})`); if(useCluster) markerCluster.addLayer(m); else markersLayer.addLayer(m); bounds.push([a.lat,a.lon]); } }); if(bounds.length) map.fitBounds(bounds,{padding:[40,40]}); showToast(`${matched.length} ativos encontrados`); }
+function triggerSearch(){ const raw=document.getElementById('inputSearch').value.trim(); const selectedRodovia=document.getElementById('filterRodovia').value; const selectedEstado=document.getElementById('filterEstado').value; const exactCheckbox=document.getElementById('exactKm').checked; let pool=rawAssets; if(selectedRodovia!=='ALL') pool=pool.filter(a=>a.rodovia===selectedRodovia); if(selectedEstado!=='ALL') pool=pool.filter(a=>a.estado===selectedEstado); if(!raw){ renderResults(pool.slice(0,30), `Mostrando primeiros ativos (${pool.length})`); refreshMarkers(selectedEstado); return; } const kmTarget=parseInputKm(raw); let matched=[]; if(kmTarget!==null && raw.length<=12 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){ // KM search
+    if(exactCheckbox){ // exact match required
+      matched = pool.filter(a => a.kmVal!=null && Math.abs(a.kmVal - kmTarget) < 0.0005);
+      if(matched.length===0){ showToast('Nenhum KM exato encontrado — mostrando os mais próximos'); matched = pool.map(a=>({...a,kmDiff:Math.abs((a.kmVal||Infinity)-kmTarget)})).sort((a,b)=>a.kmDiff-b.kmDiff).slice(0,20); }
+    } else {
+      matched = pool.map(a=>({...a,kmDiff:Math.abs((a.kmVal||Infinity)-kmTarget)})).sort((a,b)=>a.kmDiff-b.kmDiff).slice(0,50);
+    }
+  } else { const q=norm(raw); matched=pool.filter(a=>a.rawSearch.includes(q)).slice(0,50); }
+  renderResults(matched, `Resultados para "${raw}" ${selectedRodovia!=='ALL'? '('+selectedRodovia+')':''} ${selectedEstado!=='ALL'? '('+selectedEstado+')':''}`);
+  markerCluster.clearLayers(); markersLayer.clearLayers(); polylinesLayer.clearLayers(); let bounds=[]; matched.forEach(a=>{ if(a.lat!=null && a.lon!=null){ const m=L.marker([a.lat,a.lon]); m.bindPopup(`<strong>${a.tag}</strong><br>${a.equip}<br>KM real: ${a.kmVal!=null?a.kmVal:''} (${a.km||'--'})`); if(useCluster) markerCluster.addLayer(m); else markersLayer.addLayer(m); bounds.push([a.lat,a.lon]); } }); if(bounds.length) map.fitBounds(bounds,{padding:[40,40]}); showToast(`${matched.length} ativos encontrados`); }
 
-function clearSearch(){ document.getElementById('inputSearch').value=''; document.getElementById('filterRodovia').value='ALL'; document.getElementById('filterEstado').value='ALL'; document.getElementById('resultsContainer').innerHTML=''; refreshMarkers(); polylinesLayer.clearLayers(); showToast('Pesquisa limpa'); }
+function clearSearch(){ document.getElementById('inputSearch').value=''; document.getElementById('filterRodovia').value='ALL'; document.getElementById('filterEstado').value='ALL'; document.getElementById('exactKm').checked=false; document.getElementById('resultsContainer').innerHTML=''; refreshMarkers(); polylinesLayer.clearLayers(); showToast('Pesquisa limpa'); }
 
 function searchByExactTag(tag){ if(!tag) return; document.getElementById('inputSearch').value=tag; triggerSearch(); }
 
