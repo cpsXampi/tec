@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#070913">
-<title>Matriz Inteligente de Ativos ITS & Interligações</title>
+<title>Matriz Inteligente ITS (KM & Fibra)</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <style>
 :root{
@@ -50,7 +50,7 @@ input,select{font-family:var(--font);outline:none}
 }
 .card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));}
 
-.search-grid{display:grid;grid-template-columns:140px 1fr auto auto;gap:8px;}
+.search-grid{display:grid;grid-template-columns:130px 1fr auto auto;gap:8px;}
 @media(max-width:650px){.search-grid{grid-template-columns:1fr;}}
 
 .search-select, .search-input{
@@ -74,6 +74,11 @@ input,select{font-family:var(--font);outline:none}
   background:rgba(11,17,36,0.95);overflow:hidden;
   display:flex;flex-direction:column;gap:10px;padding:14px;margin-bottom:10px;
 }
+.asset-card.main-target{
+  border-color:rgba(16,185,129,.6);
+  background:linear-gradient(145deg,rgba(16,185,129,.1),rgba(11,17,36,.95));
+  box-shadow:0 0 15px rgba(16,185,129,.2);
+}
 .asset-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
 .asset-title{font-size:13px;font-weight:900;color:var(--accent);letter-spacing:.02em;}
 .asset-badge{font-size:8.5px;font-weight:900;padding:3px 8px;border-radius:3px;background:rgba(59,130,246,.2);color:var(--accent);border:1px solid var(--border2);}
@@ -84,20 +89,21 @@ input,select{font-family:var(--font);outline:none}
 .asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase;}
 .asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
 
-.fiber-box{
+/* Caixa de Vizinhança por Fibra e KM */
+.sequence-box{
   background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));
   border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:10px;margin-top:4px;
 }
-.fiber-header{font-size:9px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-.fiber-neighbors{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
-.fiber-card{
+.sequence-header{font-size:9px;font-weight:900;color:var(--purple);text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.sequence-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.sequence-card{
   background:rgba(7,9,19,.85);border:1px solid rgba(168,85,247,.3);
   border-radius:var(--r-xs);padding:8px;cursor:pointer;transition:all .2s ease;
 }
-.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);}
-.fiber-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase;}
-.fiber-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px;}
-.fiber-card-sub{font-size:8px;font-weight:700;color:var(--muted);margin-top:2px;}
+.sequence-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);}
+.sequence-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase;}
+.sequence-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px;}
+.sequence-card-sub{font-size:8px;font-weight:700;color:var(--text2);margin-top:2px;}
 
 .btn-wa{
   width:100%;padding:10px;border-radius:var(--r-xs);
@@ -119,22 +125,21 @@ input,select{font-family:var(--font);outline:none}
 <body>
 
 <header class="hdr">
-  <div class="hdr-title">Matriz Inteligente ITS & Interligações</div>
+  <div class="hdr-title">Matriz ITS · KM & Fibra</div>
 </header>
 
 <div class="wrap">
   <div class="card card-accent">
     <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
-      Pesquisa Inteligente por KM, TAG, Hostname ou Fibra
+      Busca Rigorosa por KM ou TAG (Fixado por Estado)
     </div>
     <div class="search-grid">
-      <select class="search-select" id="filterRodovia">
-        <option value="ALL">Todas as Rodovias</option>
-        <option value="BR116">BR-116</option>
-        <option value="BR101">BR-101</option>
+      <select class="search-select" id="filterEstado">
+        <option value="SP" selected>Estado: SP</option>
+        <option value="RJ">Estado: RJ</option>
       </select>
       <div class="search-wrap">
-        <input class="search-input" id="inputSearch" placeholder="EX: 214+728, 90, BR116-CF0001..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+        <input class="search-input" id="inputSearch" placeholder="EX: 50, 214+728, BR116-CF0001..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
       </div>
       <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -147,7 +152,7 @@ input,select{font-family:var(--font);outline:none}
 
   <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
     <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
-      Insira um KM (ex: 214+728 ou 90) ou uma TAG para calcular instantaneamente os ativos e vizinhos de fibra.
+      Insira o KM exato ou aproximado para ver o ativo alvo e os vizinhos estritos da mesma fibra no estado.
     </div>
   </div>
 </div>
@@ -155,7 +160,7 @@ input,select{font-family:var(--font);outline:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// Base de Dados de Ativos ITS (1.788 ativos reais extraídos das planilhas BR116 e BR101)
+// Base de Dados Incorporada (Ativos ITS Reais)
 const rawAssets = [
   {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
   {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
@@ -194,145 +199,146 @@ function showToast(msg){
   requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
 }
 
-// Inteligência de Vizinhança por Fibra Óptica (Anterior e Posterior estritos)
-function getFiberNeighbors(targetAsset){
-  let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
-  sameRod.sort((a,b) => a.kmVal - b.kmVal);
+// Retorna os vizinhos estritos que partilham a mesma fibra e estão no mesmo estado
+function getStrictFiberNeighbors(targetAsset){
+  let pool = rawAssets.filter(a => a.estado === targetAsset.estado && a.rodovia === targetAsset.rodovia);
+  pool.sort((a,b) => a.kmVal - b.kmVal);
 
   let targetFibers = targetAsset.fibra.split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
   let prevFiber = null, nextFiber = null;
 
-  for(let a of sameRod){
+  for(let a of pool){
     if(a.kmVal < targetAsset.kmVal){
       let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
-      if(shares) prevFiber = a;
-    }
-    if(a.kmVal > targetAsset.kmVal && !nextFiber){
-      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
-      if(shares) nextFiber = a;
+      if(shares) prevFiber = a; // O mais próximo anterior na mesma fibra
     }
   }
+
+  for(let i = pool.length - 1; i >= 0; i--){
+    let a = pool[i];
+    if(a.kmVal > targetAsset.kmVal){
+      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+      if(shares) nextFiber = a; // O mais próximo posterior na mesma fibra
+    }
+  }
+
   return { prevFiber, nextFiber };
 }
 
 function triggerSearch(){
   let raw = document.getElementById('inputSearch').value.trim();
-  let selectedRodovia = document.getElementById('filterRodovia').value;
+  let selectedEstado = document.getElementById('filterEstado').value;
   
-  let pool = rawAssets;
-  if(selectedRodovia !== 'ALL'){
-    pool = rawAssets.filter(a => a.rodovia === selectedRodovia);
-  }
+  let pool = rawAssets.filter(a => a.estado === selectedEstado);
 
   if(!raw){
-    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um termo de pesquisa válido.</div>`;
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um KM ou TAG válido.</div>`;
     return;
   }
 
   let kmTarget = parseInputKm(raw);
-  let matched = [];
+  let mainTarget = null;
 
   if(kmTarget !== null && raw.length <= 8 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){
-    // Algoritmo Inteligente de Proximidade de KM
-    matched = pool.map(a => ({
-      ...a, kmDiff: Math.abs(a.kmVal - kmTarget)
-    })).sort((a,b) => {
-      if(Math.abs(a.kmDiff - b.kmDiff) < 0.001) return a.kmVal - b.kmVal;
-      return a.kmDiff - b.kmDiff;
-    }).slice(0, 5);
+    // Encontra rigorosamente o ativo com KM mais próximo no estado selecionado
+    let sortedPool = [...pool].sort((a,b) => Math.abs(a.kmVal - kmTarget) - Math.abs(b.kmVal - kmTarget));
+    if(sortedPool.length > 0) mainTarget = sortedPool[0];
   } else {
     let q = norm(raw);
-    matched = pool.filter(a => a.rawSearch.includes(q)).slice(0, 5);
+    let found = pool.find(a => a.rawSearch.includes(q));
+    if(found) mainTarget = found;
   }
 
-  renderResults(matched, `Resultados para "${raw}" ${selectedRodovia !== 'ALL' ? '('+selectedRodovia+')' : ''}`);
-  showToast(`${matched.length} Ativos Encontrados`);
+  if(!mainTarget){
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado no estado ${selectedEstado} para estes critérios.</div>`;
+    return;
+  }
+
+  renderResultWithFiberNeighbors(mainTarget);
+  showToast(`Ativo KM ${mainTarget.km} (${mainTarget.estado}) carregado`);
 }
 
 function clearSearch(){
   document.getElementById('inputSearch').value = '';
-  document.getElementById('filterRodovia').value = 'ALL';
   document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa reiniciada.</div>`;
 }
 
-function renderResults(items, title){
+function renderResultWithFiberNeighbors(target){
   let container = document.getElementById('resultsContainer');
-  if(!items.length){
-    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado com estes critérios</div>`;
-    return;
-  }
+  let neighbors = getStrictFiberNeighbors(target);
 
-  let html = `<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${title}</div>`;
+  let html = `<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Ativo Alvo (Estado: ${target.estado} | Fibra: ${target.fibra})</div>`;
 
-  items.forEach(a => {
-    let neighbors = getFiberNeighbors(a);
-
-    html += `
-      <div class="asset-card">
-        <div class="asset-header">
-          <div>
-            <div class="asset-title">${a.tag}</div>
-            <div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${a.equip} · KM ${a.km} (${a.rodovia} - ${a.estado})</div>
-          </div>
-          <div class="asset-badge">${a.sentido || 'N/A'}</div>
+  // Ativo Alvo
+  html += `
+    <div class="asset-card main-target">
+      <div class="asset-header">
+        <div>
+          <div class="asset-title">${target.tag}</div>
+          <div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${target.equip} · KM ${target.km} (${target.rodovia} - ${target.estado})</div>
         </div>
-
-        <div class="asset-grid">
-          <div class="asset-field"><div class="asset-field-lbl">Hostname</div><div class="asset-field-val">${a.host || '---'}</div></div>
-          <div class="asset-field"><div class="asset-field-lbl">Fibra Óptica</div><div class="asset-field-val" style="color:var(--purple);">${a.fibra || '---'}</div></div>
-          <div class="asset-field"><div class="asset-field-lbl">IP Gerência</div><div class="asset-field-val">${a.ipGer || '---'}</div></div>
-          <div class="asset-field"><div class="asset-field-lbl">Gerência</div><div class="asset-field-val">${a.gerencia || '---'}</div></div>
-          <div class="asset-field"><div class="asset-field-lbl">Rede</div><div class="asset-field-val">${a.rede || '---'}</div></div>
-          <div class="asset-field"><div class="asset-field-lbl">Switch / Ativo</div><div class="asset-field-val">${a.switch || a.ativo || '---'}</div></div>
-        </div>
-
-        <div class="fiber-box">
-          <div class="fiber-header">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Matriz de Interligações (Vizinhos na Mesma Fibra: ${a.fibra})
-          </div>
-          <div class="fiber-neighbors">
-            <div class="fiber-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
-              <div class="fiber-card-lbl">⬅️ Anterior na Fibra</div>
-              <div class="fiber-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
-              <div class="fiber-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km + ' ('+neighbors.prevFiber.equip+')' : '---'}</div>
-            </div>
-            <div class="fiber-card" onclick="searchByExactTag('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
-              <div class="fiber-card-lbl">➡️ Próximo na Fibra</div>
-              <div class="fiber-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
-              <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km + ' ('+neighbors.nextFiber.equip+')' : '---'}</div>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Partilhar Relatório de Interligação via WhatsApp
-        </button>
+        <div class="asset-badge">🎯 ALVO SELECIONADO</div>
       </div>
-    `;
-  });
+
+      <div class="asset-grid">
+        <div class="asset-field"><div class="asset-field-lbl">Hostname</div><div class="asset-field-val">${target.host || '---'}</div></div>
+        <div class="asset-field"><div class="asset-field-lbl">Fibra Óptica</div><div class="asset-field-val" style="color:var(--purple);">${target.fibra || '---'}</div></div>
+        <div class="asset-field"><div class="asset-field-lbl">IP Gerência</div><div class="asset-field-val">${target.ipGer || '---'}</div></div>
+        <div class="asset-field"><div class="asset-field-lbl">Gerência</div><div class="asset-field-val">${target.gerencia || '---'}</div></div>
+        <div class="asset-field"><div class="asset-field-lbl">Rede</div><div class="asset-field-val">${target.rede || '---'}</div></div>
+        <div class="asset-field"><div class="asset-field-lbl">Switch / Ativo</div><div class="asset-field-val">${target.switch || target.ativo || '---'}</div></div>
+      </div>
+
+      <div class="sequence-box">
+        <div class="sequence-header">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Vizinhos Estritos na Mesma Fibra (${target.fibra})
+        </div>
+        <div class="sequence-grid">
+          <div class="sequence-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
+            <div class="sequence-card-lbl">⬅️ Anterior na Fibra</div>
+            <div class="sequence-card-id">${neighbors.prevFiber ? neighbors.prevFiber.tag : 'Nenhum'}</div>
+            <div class="sequence-card-sub">${neighbors.prevFiber ? 'KM ' + neighbors.prevFiber.km + ' ('+neighbors.prevFiber.equip+')' : '---'}</div>
+          </div>
+          <div class="sequence-card" onclick="searchByExactTag('${neighbors.nextFiber ? neighbors.nextFiber.tag : ''}')">
+            <div class="sequence-card-lbl">➡️ Posterior na Fibra</div>
+            <div class="sequence-card-id">${neighbors.nextFiber ? neighbors.nextFiber.tag : 'Nenhum'}</div>
+            <div class="sequence-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km + ' ('+neighbors.nextFiber.equip+')' : '---'}</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-wa" onclick="shareWhatsApp('${target.tag}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Partilhar Informação via WhatsApp
+      </button>
+    </div>
+  `;
 
   container.innerHTML = html;
 }
 
 function searchByExactTag(tag){
   if(!tag) return;
-  document.getElementById('inputSearch').value = tag;
-  triggerSearch();
+  let found = rawAssets.find(a => a.tag === tag);
+  if(!found) return;
+  document.getElementById('inputSearch').value = found.km;
+  document.getElementById('filterEstado').value = found.estado;
+  renderResultWithFiberNeighbors(found);
+  showToast(`Navegou para ${found.tag} (KM ${found.km})`);
 }
 
 function shareWhatsApp(tag){
   let a = rawAssets.find(item => item.tag === tag);
   if(!a) return;
-  let neighbors = getFiberNeighbors(a);
+  let neighbors = getStrictFiberNeighbors(a);
 
-  let tx = `📍 *MATRIZ DE INTERLIGAÇÃO - ATIVO ITS*\n`;
+  let tx = `📍 *FICHA TÉCNICA - ATIVO ITS*\n`;
   tx += `TAG: *${a.tag}*\nEquipamento: ${a.equip}\nKM: ${a.km} (${a.rodovia} - ${a.estado})\n`;
-  tx += `Hostname: ${a.host}\nFibra: *${a.fibra}*\nIP Gerência: ${a.ipGer}\nRede: ${a.rede}\nSwitch: ${a.switch}\n\n`;
-  tx += `🔌 *VIZINHOS NA MESMA FIBRA*\n`;
+  tx += `Hostname: ${a.host}\nFibra: *${a.fibra}*\nIP Gerência: ${a.ipGer}\n\n`;
+  tx += `🔌 *VIZINHOS NA MESMA FIBRA (${a.fibra})*\n`;
   tx += `Anterior: ${neighbors.prevFiber ? neighbors.prevFiber.tag + ' (KM ' + neighbors.prevFiber.km + ')' : 'N/A'}\n`;
-  tx += `Próximo: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n`;
+  tx += `Posterior: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n`;
 
   window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank', 'noopener');
 }
