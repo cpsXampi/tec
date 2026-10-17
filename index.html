@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#070913">
+<title>Apoio Técnico</title>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+:root{
+  --bg:#070913;
+  --surface:#0b1124;
+  --surface2:#111936;
+  --border:rgba(59,130,246,.2);
+  --border2:rgba(59,130,246,.4);
+  --accent:#3b82f6;
+  --accent-glow:rgba(59,130,246,.3);
+  --green:#10b981;
+  --green2:#34d399;
+  --red:#ef4444;
+  --warn:#f59e0b;
+  --text:#f3f4f6;
+  --text2:#d1d5db;
+  --muted:#9ca3af;
+  --dim:#4b5563;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --r-xs:4px;--r-sm:8px;--r-md:12px;
+  --safe-b:max(env(safe-area-inset-bottom,0px),12px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:radial-gradient(circle at top,rgba(59,130,246,.08),transparent 55%),var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  overflow-x:hidden;
+  min-height:100vh;
+  min-height:100dvh;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+button{
+  font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;
+}
+button:active{opacity:.8;transform:scale(.97)}
+input,select{font-family:var(--font);outline:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
+
+.hdr{
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--border2);
+  background:rgba(7,9,19,.95);
+  backdrop-filter:blur(20px);
+  padding:0 12px;padding-top:var(--safe-t);
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+.hdr-in{
+  max-width:760px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;height:44px;
+}
+.hdr-title{
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;
+  color:var(--accent);text-shadow:0 0 10px var(--accent-glow);
+}
+
+.wrap{
+  max-width:760px;margin:0 auto;
+  padding:12px;padding-bottom:var(--safe-b);
+  display:flex;flex-direction:column;gap:12px;
+}
+
+.section-block{
+  display:flex;flex-direction:column;gap:8px;
+  background:rgba(11,17,36,0.85);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:12px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+}
+
+.menu-pills-grid{
+  display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;
+}
+@media(max-width:600px){
+  .menu-pills-grid{grid-template-columns:1fr 1fr;}
+}
+.menu-pill{
+  width:100%;padding:8px;border-radius:var(--r-xs);
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
+  font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:all .2s ease;cursor:pointer;text-align:center;
+}
+.menu-pill.active{
+  background:var(--accent);color:#fff;border-color:var(--accent);
+  box-shadow:0 0 10px var(--accent-glow);
+}
+
+.collapsible-pane{
+  display:none;flex-direction:column;gap:6px;margin-top:2px;
+}
+.collapsible-pane.show{display:flex;}
+
+.km-hero-compact{
+  display:flex;align-items:center;justify-content:space-between;
+  border-radius:var(--r-sm);
+  border:1px solid rgba(59,130,246,.35);
+  background:linear-gradient(145deg,#111936 0%,#070913 100%);
+  padding:10px 14px;
+}
+.km-value-compact{
+  font-size:22px;font-weight:900;
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff 20%,var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.km-meta-compact{
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+}
+
+.gps{
+  display:flex;align-items:center;justify-content:space-between;gap:4px;
+  min-height:30px;border-radius:var(--r-xs);
+  border:1px solid;padding:0 10px;
+  font-size:8px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.gps.bad{border-color:rgba(100,116,139,.3);background:rgba(11,17,36,.9);color:#e5e7eb}
+.gps.ok{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.1);color:#d1fae5}
+.gps.warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.1);color:#fef3c7}
+
+.card{
+  border-radius:var(--r-sm);
+  border:1px solid var(--border);
+  background:rgba(11,17,36,0.9);
+  padding:10px;
+}
+.card-accent{
+  border-color:rgba(59,130,246,.35);
+  background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));
+}
+
+.search-row{display:flex;gap:6px}
+.search-wrap{flex:1;min-width:0;position:relative}
+.search-input{
+  width:100%;border-radius:var(--r-xs);
+  border:1px solid var(--border2);
+  background:rgba(7,9,19,.9);
+  padding:8px 10px;
+  font-size:10px;font-weight:800;text-transform:uppercase;color:#fff;
+  transition:all .2s ease;
+}
+.search-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 10px var(--accent-glow);
+}
+.btn-icon{
+  width:34px;height:34px;border-radius:var(--r-xs);
+  display:grid;place-items:center;flex-shrink:0;
+  border:1px solid var(--border);
+}
+.btn-icon.go{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;font-weight:900;border:none;box-shadow:0 0 8px var(--accent-glow)}
+.btn-icon.clr{background:rgba(7,9,19,.9);color:var(--muted)}
+.btn-icon svg{width:14px;height:14px}
+.search-msg{
+  margin-top:4px;font-size:8px;font-weight:800;
+  text-transform:uppercase;color:var(--warn);
+}
+
+.modal-box{
+  background:rgba(11,17,36,0.98);
+  border:1px solid var(--border2);
+  border-radius:var(--r-xs);
+  padding:10px;
+  margin-top:6px;
+  display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,.6);
+}
+.modal-box p{font-size:8.5px;font-weight:900;color:var(--accent);text-transform:uppercase;}
+.modal-btns{display:flex;gap:6px}
+.modal-btn{
+  flex:1;padding:8px;border-radius:var(--r-xs);font-size:8px;font-weight:900;text-transform:uppercase;
+  background:var(--accent);color:#fff;cursor:pointer;text-align:center;
+  border:1px solid rgba(255,255,255,.2);
+}
+.modal-btn.rj{background:#2563eb;color:#fff;}
+
+.coord-container{
+  display:flex;flex-direction:column;gap:6px;
+}
+.coord-inputs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.coord-input{
+  width:100%;border-radius:var(--r-xs);border:1px solid var(--border2);
+  background:rgba(7,9,19,.9);padding:8px;font-size:10px;font-weight:800;color:#fff;text-align:center;
+}
+.coord-input::placeholder{
+  font-size:7.5px;font-weight:600;color:var(--muted);text-transform:lowercase;opacity:0.7;
+}
+
+.map-box{
+  border-radius:var(--r-xs);border:1px solid var(--border2);
+  overflow:hidden;position:relative;height:260px;background:#020617;
+  margin-top:4px;
+}
+
+/* Modo Full Screen Absoluto (Oculta todo o resto) */
+body.fs-active .hdr,
+body.fs-active .wrap > .section-block:not(:has(#mapBox)) {
+  display: none !important;
+}
+
+body.fs-active .wrap {
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.fs-active .map-box.fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 999999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+.map-ctrls{
+  position:absolute;top:6px;right:6px;z-index:1000;
+  display:flex;gap:4px;background:rgba(7,9,19,.9);padding:3px;border-radius:4px;border:1px solid var(--border2);
+}
+.map-btn{
+  font-size:7.5px;font-weight:900;text-transform:uppercase;padding:3px 6px;
+  border-radius:2px;background:rgba(255,255,255,.05);color:var(--text2);cursor:pointer;
+}
+.map-btn.active{background:var(--accent);color:#fff}
+
+.fs-close-btn{
+  display:none;
+  position:fixed;top:16px;left:16px;z-index:10000000;
+  background:rgba(239,68,68,.95);color:#fff;padding:10px 18px;
+  border-radius:var(--r-xs);font-size:10px;font-weight:900;text-transform:uppercase;
+  box-shadow:0 6px 20px rgba(0,0,0,.7);cursor:pointer;border:1px solid rgba(255,255,255,.4);
+  align-items:center;gap:6px;
+}
+body.fs-active .fs-close-btn {display:inline-flex;}
+
+.post{
+  border-radius:var(--r-sm);overflow:hidden;
+  border:1px solid var(--border);
+  background:rgba(11,17,36,0.95);
+  transition:all .2s ease;
+}
+.post.near{
+  border-color:rgba(16,185,129,.5);
+  background:linear-gradient(145deg,rgba(16,185,129,.1),rgba(11,17,36,.95));
+  box-shadow:0 0 12px rgba(16,185,129,.15);
+}
+.post.searched{
+  border-color:rgba(59,130,246,.5);
+  background:linear-gradient(145deg,rgba(59,130,246,.1),rgba(11,17,36,.95));
+  box-shadow:0 0 12px var(--accent-glow);
+}
+.post-top{display:flex;align-items:flex-start;gap:8px;padding:10px}
+.post-chk{margin-top:2px;width:14px;height:14px;accent-color:var(--accent);flex-shrink:0}
+.post-id{font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);letter-spacing:.05em}
+.post-dist{font-size:7px;font-weight:600;text-transform:lowercase;color:var(--muted);margin-top:2px}
+.post-coords{font-size:7.5px;color:var(--dim);font-weight:600}
+
+.post-wa{
+  width:28px;height:28px;border-radius:var(--r-xs);
+  background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);
+  color:var(--green2);display:grid;place-items:center;flex-shrink:0;
+}
+.post-wa svg{width:13px;height:13px}
+
+.post-map{height:120px;width:100%;border:0;filter:grayscale(15%) contrast(1.05)}
+
+.ctrl-send{
+  width:auto;min-width:130px;padding:6px 12px;border-radius:var(--r-xs);
+  background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:8.5px;font-weight:900;
+  text-transform:uppercase;letter-spacing:.08em;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  box-shadow:0 2px 8px rgba(16,185,129,.25);
+}
+.ctrl-send:disabled{background:var(--dim);color:var(--muted);box-shadow:none}
+.ctrl-send svg{width:12px;height:12px}
+
+.ctrl-row{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;
+}
+.ctrl-label{
+  font-size:8px;font-weight:800;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:3px;
+}
+.ctrl-select{
+  border-radius:4px;border:1px solid var(--border2);background:var(--bg);color:#fff;
+  padding:3px 16px 3px 6px;font-size:9px;font-weight:800;appearance:none;
+}
+.ctrl-chk{width:14px;height:14px;accent-color:var(--accent)}
+
+/* Pop-up Otimizado */
+.leaflet-popup-content-wrapper{
+  background:rgba(11,17,36,0.98) !important;
+  color:#fff !important;
+  border:1px solid var(--border2) !important;
+  border-radius:var(--r-sm) !important;
+  box-shadow:0 8px 32px rgba(0,0,0,.8) !important;
+  backdrop-filter:blur(12px);
+  z-index:9999999 !important;
+}
+.leaflet-popup-tip{background:rgba(11,17,36,0.98) !important;}
+.leaflet-popup{z-index:9999999 !important;}
+
+.toast{
+  position:fixed;bottom:calc(12px + var(--safe-b));left:50%;
+  transform:translateX(-50%) translateY(10px);
+  border-radius:var(--r-xs);border:1px solid var(--border2);
+  background:var(--surface);padding:8px 14px;font-size:8.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.08em;z-index:99999;opacity:0;transition:all .15s ease;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{color:var(--accent);border-color:rgba(59,130,246,.4);box-shadow:0 0 10px var(--accent-glow)}
+.toast.err{color:#fecaca;border-color:rgba(239,68,68,.4)}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-title">Apoio Técnico</div>
+    <div style="font-size:9px;font-weight:900;color:var(--accent);" id="topKmLive">—</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="section-block">
+    <div class="menu-pills-grid">
+      <button class="menu-pill" id="pillId" onclick="switchPane('id')">🔍 Pesquisa ID</button>
+      <button class="menu-pill" id="pillKm" onclick="switchPane('km')">🛣️ Pesquisa KM</button>
+      <button class="menu-pill" id="pillCoord" onclick="switchPane('coord')">📍 Coordenada</button>
+      <button class="menu-pill" id="pillMap" onclick="switchPane('map')">🗺️ Mapa</button>
+    </div>
+
+    <!-- PAINEL: ID -->
+    <div class="collapsible-pane" id="paneId">
+      <div class="card card-accent">
+        <div class="search-row">
+          <div class="search-wrap">
+            <input class="search-input" id="inputId" placeholder="ID (8 DÍGITOS)" inputmode="numeric" pattern="[0-9]*" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
+          </div>
+          <button class="btn-icon go" onclick="searchId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
+          <button class="btn-icon clr" onclick="clearId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div id="searchMsg" class="search-msg" style="display:none"></div>
+        <div id="searchResult" style="display:none;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- PAINEL: KM -->
+    <div class="collapsible-pane" id="paneKm">
+      <div class="card card-accent">
+        <div class="search-row">
+          <div class="search-wrap">
+            <input class="search-input" id="inputKm" placeholder="KM (EX: 115)" inputmode="decimal" pattern="[0-9]*" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchKm()">
+          </div>
+          <button class="btn-icon go" onclick="searchKm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></button>
+          <button class="btn-icon clr" onclick="clearKm()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div id="searchKmMsg" class="search-msg" style="display:none"></div>
+        <div id="searchKmModal" style="display:none"></div>
+        <div id="searchKmResult" style="display:none;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- PAINEL: COORDENADA -->
+    <div class="collapsible-pane" id="paneCoord">
+      <div class="card card-accent">
+        <div style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
+          <span>Coordenada Manual</span>
+        </div>
+        <div class="coord-container">
+          <div class="coord-inputs">
+            <input class="coord-input" id="inputLat" placeholder="latitude" autocomplete="off" spellcheck="false">
+            <input class="coord-input" id="inputLon" placeholder="longitude" autocomplete="off" spellcheck="false">
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-icon go" style="flex:1;height:32px;border-radius:var(--r-xs);font-size:8.5px;" onclick="searchManualCoord()">Calcular</button>
+            <button class="btn-icon clr" onclick="clearCoordFields()" style="width:32px;height:32px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+          </div>
+        </div>
+        <div id="searchCoordResult" style="display:none;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- PAINEL: MAPA -->
+    <div class="collapsible-pane" id="paneMap">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--accent)">Mapa Interativo</span>
+          <button class="ctrl-select" style="padding:3px 8px;font-size:7.5px;cursor:pointer;" onclick="useCurrentGps()">GPS Atual</button>
+        </div>
+        <div class="map-box" id="mapBox">
+          <div class="map-ctrls">
+            <button class="map-btn active" id="btnLayerSat" onclick="setMapLayer('sat')">Sat</button>
+            <button class="map-btn" id="btnLayerNorm" onclick="setMapLayer('norm')">Norm</button>
+            <button class="map-btn" onclick="toggleFullscreen()">Full</button>
+          </div>
+          <div id="leafletMap" style="width:100%;height:100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="fs-close-btn" onclick="toggleFullscreen()">✕ Sair do Full Screen</button>
+
+  <div class="section-block">
+    <div class="km-hero-compact">
+      <div>
+        <div class="km-value-compact" id="kmVal">—</div>
+      </div>
+      <div class="km-meta-compact">
+        <span class="km-br-badge" id="kmBrBadge">SINTONIZANDO...</span>
+        <div id="cityNameDisplay" style="font-size:8.5px;font-weight:800;color:var(--text2);text-transform:uppercase;">---</div>
+      </div>
+    </div>
+
+    <div id="gpsStatus" class="gps bad">
+      <span id="gpsText">GPS · BUSCANDO SINAL</span>
+    </div>
+
+    <div class="card">
+      <div class="ctrl-row" style="margin-top:0;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label class="ctrl-label">Qtd:</label>
+          <select class="ctrl-select" id="qty">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <label class="ctrl-label" style="margin-left:6px;">
+            <input type="checkbox" class="ctrl-chk" id="chkMaps" checked> Maps
+          </label>
+        </div>
+        <button id="btnSend" class="ctrl-send" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Enviar WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <div id="postList" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast" aria-live="polite"></div>
+
+<!-- Leaflet JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<script>
+const norm=s=>String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_ ]+/g,' ').replace(/\s+/g,' ');
+const parsePt=v=>{const s=String(v??'').trim().replace(',','.');return Number(s)};
+const hav=(a,b,c,d)=>{const p=Math.PI/180,x=.5-Math.cos((c-a)*p)/2+Math.cos(a*p)*Math.cos(c*p)*(1-Math.cos((d-b)*p))/2;return 12742000*Math.asin(Math.sqrt(x))};
+
+const formatDist = dist => {
+  const m = Math.max(0, Math.round(dist));
+  if (m < 1000) return `${m}m`;
+  return `${(m / 1000).toFixed(1).replace('.', ',')} km`;
+};
+
+const nowBR=()=>new Date().toLocaleString('pt-BR').toUpperCase();
+function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}return-1}
+
+let posts=[], postIndex=new Map();
+let kmDB_SP=[], kmDB_RJ=[];
+let pos=null, searchItem=null, searchKmItems=[], searchCoordItems=[], renderedKey='';
+let mapInstance=null, mapMarker=null, mapLayerObj=null, popupInstance=null;
+let activePane = null;
+let cityCache = new Map();
+
+function showToast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.className='toast '+type;el.textContent=msg;
+  requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
+}
+
+function switchPane(type){
+  ['Id','Km','Coord','Map'].forEach(p=>{
+    let pane = document.getElementById('pane'+p);
+    let pill = document.getElementById('pill'+p);
+    if(p.toLowerCase() === type){
+      let isOpen = pane.classList.toggle('show');
+      pill.classList.toggle('active', isOpen);
+      activePane = isOpen ? type : null;
+      if(isOpen && type==='map' && mapInstance) setTimeout(()=>mapInstance.invalidateSize(), 50);
+    } else {
+      pane.classList.remove('show');
+      pill.classList.remove('active');
+    }
+  });
+}
+
+function gpsBadge(p,err){
+  const el=document.getElementById('gpsStatus');
+  const textEl=document.getElementById('gpsText');
+  const a=p?.acc;let cls='bad',txt;
+  if(err)txt='GPS · BLOQUEADO / DESLIGADO';
+  else if(!a)txt='GPS · USANDO REFERÊNCIA';
+  else if(a<=15) {cls='ok';txt=`GPS · ALTA (±${Math.round(a)}M)`;}
+  else {cls='warn';txt=`GPS · MÉDIA (±${Math.round(a)}M)`;}
+  el.className='gps '+cls;textEl.textContent=txt;
+}
+
+async function fetchCityName(lat, lon){
+  const key = `${lat.toFixed(2)},${lon.toFixed(2)}`;
+  if(cityCache.has(key)) return cityCache.get(key);
+  try{
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`, {headers:{'Accept-Language':'pt-BR'}});
+    if(r.ok){
+      const data = await r.json();
+      const addr = data.address || {};
+      const city = addr.city || addr.town || addr.municipality || addr.village || addr.county || 'Localização Desconhecida';
+      const state = addr.state ? `, ${addr.state}` : '';
+      const result = `${city}${state}`.toUpperCase();
+      cityCache.set(key, result);
+      return result;
+    }
+  }catch(e){}
+  return '---';
+}
+
+async function fetchCSV(files){
+  for(const f of files){
+    try{
+      let r=await fetch(f+'?v='+Date.now(),{cache:'force-cache'});
+      if(r?.ok){let t=await r.text();if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);return t;}
+    }catch(e){}
+  }
+  return null;
+}
+
+function initSystemStartup(){
+  initMap(-22.8512, -43.7744);
+  pos = {lat: -22.8512, lon: -43.7744, acc: 500};
+  renderApoio();
+  updateKm();
+  setTimeout(loadSystemDataAsync, 50);
+  startAutoGps();
+
+  window.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      let box = document.getElementById('mapBox');
+      if(box.classList.contains('fullscreen')){
+        toggleFullscreen();
+      }
+    }
+  });
+}
+
+function startAutoGps(){
+  if('geolocation' in navigator){
+    navigator.geolocation.getCurrentPosition(
+      p => {
+        pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};
+        gpsBadge(pos);
+        renderApoio();
+        updateKm();
+        if(mapInstance && mapMarker){
+          mapInstance.setView([pos.lat, pos.lon], 14);
+          mapMarker.setLatLng([pos.lat, pos.lon]);
+        }
+        navigator.geolocation.watchPosition(upd => {
+          pos={lat:upd.coords.latitude,lon:upd.coords.longitude,acc:upd.coords.accuracy};
+          gpsBadge(pos);
+          renderApoio();
+          updateKm();
+        }, null, {enableHighAccuracy:true, maximumAge:0, timeout:5000});
+      },
+      e => {
+        gpsBadge(null, true);
+      },
+      {enableHighAccuracy:true, timeout:5000, maximumAge:0}
+    );
+  } else {
+    gpsBadge(null, true);
+  }
+}
+
+async function loadSystemDataAsync(){
+  try{
+    let t=await fetchCSV(['dados.csv','Dados_Completos_Grupo_2_all.csv']);
+    if(t){
+      let lines=t.split(/\r?\n/).filter(l=>l.trim());
+      let h=lines.shift().split(';');
+      let iId=findCol(h,['id do nox','idnox','id']),iLat=findCol(h,['latitude','lat']),iLon=findCol(h,['longitude','lon','long']);
+      posts=lines.map(l=>{
+        let r=l.split(';');
+        return {id:String(r[iId]||'').trim().toUpperCase(), lat:parsePt(r[iLat]), lon:parsePt(r[iLon])};
+      }).filter(p=>p.id&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+
+      postIndex.clear();
+      posts.forEach(p=>postIndex.set(p.id, p));
+    }
+
+    let [tSP, tRJ] = await Promise.all([
+      fetchCSV(['SNVBR116SPRJ.csv','br116sp.csv','BR116_SP.csv']),
+      fetchCSV(['SNVBR116RJ.csv','br116rj.csv','BR116_RJ.csv'])
+    ]);
+
+    kmDB_SP = await parseKmFile(tSP);
+    kmDB_RJ = await parseKmFile(tRJ);
+    
+    renderApoio();
+    updateKm();
+  }catch(e){}
+}
+
+async function parseKmFile(text){
+  if(!text)return [];
+  let lines=text.split(/\r?\n/).filter(l=>l.trim());
+  let h=lines.shift().split(';');
+  let iKm=findCol(h,['km']),iLat=findCol(h,['lat','latitude']),iLon=findCol(h,['lon','long','longitude']);
+  return lines.map(l=>{
+    let r=l.split(';');
+    return {km:parsePt(r[iKm]),lat:parsePt(r[iLat]),lon:parsePt(r[iLon])};
+  }).filter(p=>Number.isFinite(p.km)&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+}
+
+function findNearestInAnyDB(lat, lon){
+  let candidates=[
+    {name:'BR116/SP', db:kmDB_SP},
+    {name:'BR116/RJ', db:kmDB_RJ}
+  ].map(c=>{
+    let best=null, bd=Infinity;
+    for(let p of c.db){
+      if(Math.abs(p.lat - lat) > 0.4 || Math.abs(p.lon - lon) > 0.4) continue;
+      let d=hav(lat, lon, p.lat, p.lon);
+      if(d<bd){bd=d;best={...p,d};}
+    }
+    return {name:c.name, res:best};
+  }).filter(c=>c.res!==null);
+
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>a.res.d - b.res.d);
+  return candidates[0];
+}
+
+async function updateKm(){
+  if(!pos)return;
+  let best=findNearestInAnyDB(pos.lat, pos.lon);
+  if(!best)return;
+  let kmValStr=(Math.round(best.res.km*100)/100).toFixed(2).replace('.',',');
+  let fullStr = `KM ${kmValStr}`;
+  document.getElementById('kmVal').textContent = fullStr;
+  document.getElementById('topKmLive').textContent = fullStr;
+  document.getElementById('kmBrBadge').textContent = best.name;
+}
+
+function findExactKmForCoords(lat, lon){
+  let nearest = findNearestInAnyDB(lat, lon);
+  if(nearest && nearest.res){
+    return (Math.round(nearest.res.km*1000)/1000).toFixed(3).replace('.',',') + ' ('+nearest.name+')';
+  }
+  return '---';
+}
+
+function findPostExactKm(post){
+  let dbs=[{name:'SP', db:kmDB_SP},{name:'RJ', db:kmDB_RJ}];
+  for(let dbObj of dbs){
+    if(dbObj.db.length){
+      let best=null, bd=Infinity;
+      for(let pt of dbObj.db){
+        if(Math.abs(pt.lat - post.lat) > 0.3 || Math.abs(pt.lon - post.lon) > 0.3) continue;
+        let d=hav(post.lat, post.lon, pt.lat, pt.lon);
+        if(d<bd){bd=d;best=pt;}
+      }
+      if(best && bd < 3000){
+        return (Math.round(best.km*1000)/1000).toFixed(3).replace('.',',') + ' ('+dbObj.name+')';
+      }
+    }
+  }
+  return '---';
+}
+
+function initMap(lat, lon){
+  if(mapInstance) return;
+  mapInstance = L.map('leafletMap', {zoomControl:false, attributionControl:false}).setView([lat, lon], 14);
+  setMapLayer('sat');
+  mapMarker = L.marker([lat, lon]).addTo(mapInstance);
+  
+  mapInstance.on('dblclick', e => {
+    let box = document.getElementById('mapBox');
+    if(box.classList.contains('fullscreen')){
+      toggleFullscreen();
+    }
+  });
+
+  mapInstance.on('click', async e=>{
+    let l = e.latlng;
+    document.getElementById('inputLat').value = l.lat.toFixed(6);
+    document.getElementById('inputLon').value = l.lng.toFixed(6);
+    mapMarker.setLatLng([l.lat, l.lng]);
+
+    const cityName = await fetchCityName(l.lat, l.lng);
+    const nearestKm = findNearestInAnyDB(l.lat, l.lng);
+    let kmStr = '---';
+    if(nearestKm && nearestKm.res){
+      kmStr = `KM ${(Math.round(nearestKm.res.km*100)/100).toFixed(2).replace('.','mö')} (${nearestKm.name})`.replace('mö',',');
+    }
+
+    let nearestPost = null, minPostDist = Infinity;
+    if(posts.length){
+      for(let p of posts){
+        let d = hav(l.lat, l.lng, p.lat, p.lon);
+        if(d < minPostDist){minPostDist = d; nearestPost = p;}
+      }
+    }
+
+    let postIdStr = nearestPost ? nearestPost.id : '---';
+    let distStr = nearestPost ? formatDist(minPostDist) : '---';
+
+    let popupContent = `
+      <div style="font-family:var(--font);color:#fff;padding:4px;min-width:150px;font-size:9px;line-height:1.4;">
+        <div style="font-weight:900;color:#3b82f6;text-transform:uppercase;margin-bottom:2px;">${cityName}</div>
+        <div style="font-weight:800;color:#d1d5db;">Rodovia: ${kmStr}</div>
+        <div style="font-weight:900;color:#34d399;margin-top:2px;">ID Perto: ${postIdStr}</div>
+        <div style="font-size:7.5px;color:var(--muted);margin-top:1px;">dist.: ${distStr}</div>
+        <button style="margin-top:6px;width:100%;background:#10b981;color:#fff;border:0;padding:4px;border-radius:3px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${postIdStr}', ${l.lat}, ${l.lng})">WhatsApp</button>
+      </div>
+    `;
+
+    if(popupInstance){
+      mapInstance.removeLayer(popupInstance);
+    }
+    popupInstance = L.popup({maxWidth:200, className:'custom-leaflet-popup'}).setLatLng([l.lat, l.lng]).setContent(popupContent).openOn(mapInstance);
+  });
+}
+
+function setMapLayer(mode){
+  document.getElementById('btnLayerSat').classList.toggle('active', mode==='sat');
+  document.getElementById('btnLayerNorm').classList.toggle('active', mode==='norm');
+  if(!mapInstance) return;
+  if(mapLayerObj) mapInstance.removeLayer(mapLayerObj);
+  if(mode==='sat'){
+    mapLayerObj = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom:19});
+  }else{
+    mapLayerObj = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19});
+  }
+  mapLayerObj.addTo(mapInstance);
+}
+
+function toggleFullscreen(){
+  let box = document.getElementById('mapBox');
+  let isFS = box.classList.toggle('fullscreen');
+  document.body.classList.toggle('fs-active', isFS);
+  if(mapInstance) {
+    setTimeout(()=>mapInstance.invalidateSize(), 50);
+  }
+}
+
+function useCurrentGps(){
+  if(!pos){showToast('GPS sem sinal','err');return;}
+  document.getElementById('inputLat').value = pos.lat.toFixed(6);
+  document.getElementById('inputLon').value = pos.lon.toFixed(6);
+  mapInstance.setView([pos.lat, pos.lon], 16);
+  mapMarker.setLatLng([pos.lat, pos.lon]);
+  showToast('GPS Posicionado');
+}
+
+function clearCoordFields(){
+  document.getElementById('inputLat').value='';
+  document.getElementById('inputLon').value='';
+  document.getElementById('searchCoordResult').style.display='none';
+  searchCoordItems=[];
+}
+
+async function searchManualCoord(){
+  let lat = parsePt(document.getElementById('inputLat').value);
+  let lon = parsePt(document.getElementById('inputLon').value);
+  if(isNaN(lat)||isNaN(lon)){showToast('Coordenada inválida','err');return;}
+  
+  if(mapInstance){
+    mapInstance.setView([lat, lon], 16);
+    mapMarker.setLatLng([lat, lon]);
+  }
+
+  let sorted = posts.map(p=>({
+    ...p, clickedLat: lat, clickedLon: lon, d: (Math.abs(p.lat - lat) > 0.3 || Math.abs(p.lon - lon) > 0.3) ? 999999 : hav(lat, lon, p.lat, p.lon)
+  })).sort((a,b)=>a.d - b.d).slice(0, 10);
+
+  searchCoordItems = sorted;
+
+  let res = document.getElementById('searchCoordResult');
+  res.style.display='block';
+  
+  const cityName = await fetchCityName(lat, lon);
+  const exactKm = findExactKmForCoords(lat, lon);
+
+  let html = `
+    <div class="post card-accent" style="margin-bottom:6px;">
+      <div class="post-top">
+        <div style="flex:1;">
+          <p class="post-id" style="color:var(--text);font-size:9.5px;">📍 Ponto Selecionado</p>
+          <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
+          <p class="post-dist" style="color:var(--green2);font-weight:900;text-transform:uppercase;">KM APROXIMADO: ${exactKm}</p>
+          <p class="post-coords">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
+        </div>
+        <button class="post-wa" onclick="sendWhatsApp('PONTO SELECIONADO', ${lat}, ${lon})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+      </div>
+      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${lat},${lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+    </div>
+    <div style="font-size:7.5px;font-weight:900;text-transform:uppercase;color:var(--muted);margin:6px 0 2px 2px;">10 Postes Mais Próximos:</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+  `;
+
+  for(let idx = 0; idx < searchCoordItems.length; idx++){
+    let item = searchCoordItems[idx];
+    let dt='distância até o local: '+formatDist(item.d);
+    const itemCity = await fetchCityName(item.lat, item.lon);
+    html+=`<div class="post searched">
+      <div class="post-top">
+        <div style="flex:1;">
+          <p class="post-id">#${idx+1} - ID: ${item.id}</p>
+          <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${itemCity}</p>
+          <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(item)}</p>
+          <p class="post-dist" id="srch-coord-dist-${idx}">${dt}</p>
+          <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
+        </div>
+        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+      </div>
+      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+    </div>`;
+  }
+  html+='</div>';
+  res.innerHTML=html;
+  showToast('Resultados carregados');
+}
+
+async function searchId(){
+  let raw = document.getElementById('inputId').value.trim();
+  let msg = document.getElementById('searchMsg'), res = document.getElementById('searchResult');
+  if(!raw){clearId();return;}
+
+  let digitsOnly = raw.replace(/\D/g, '');
+  if(digitsOnly.length !== 8){
+    searchItem=null;res.style.display='none';msg.style.display='none';return;
+  }
+
+  let found = postIndex.get(norm(raw));
+  if(!found){
+    for(let [k,v] of postIndex.entries()){
+      if(k.includes(norm(raw))){found=v;break;}
+    }
+  }
+
+  if(!found){
+    msg.style.display='flex';msg.textContent='Não encontrado';
+    searchItem=null;res.style.display='none';return;
+  }
+
+  searchItem=found;
+  msg.style.display='none';
+  await renderSearch();
+  showToast('Encontrado');
+}
+
+function clearId(){
+  document.getElementById('inputId').value='';
+  document.getElementById('searchMsg').style.display='none';
+  document.getElementById('searchResult').style.display='none';
+  searchItem=null;
+}
+
+async function renderSearch(){
+  if(!searchItem)return;
+  let res=document.getElementById('searchResult');
+  let dt='Aguardando GPS...';
+  if(pos) dt='distância até o local: '+formatDist(hav(pos.lat,pos.lon,searchItem.lat,searchItem.lon));
+  
+  const cityName = await fetchCityName(searchItem.lat, searchItem.lon);
+
+  res.style.display='block';
+  res.innerHTML=`<div class="post searched">
+    <div class="post-top">
+      <div style="flex:1;">
+        <p class="post-id">ID: ${searchItem.id}</p>
+        <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
+        <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(searchItem)}</p>
+        <p class="post-dist" id="srch-dist">${dt}</p>
+        <p class="post-coords">${searchItem.lat.toFixed(5)}, ${searchItem.lon.toFixed(5)}</p>
+      </div>
+      <button class="post-wa" onclick="sendWhatsApp('${searchItem.id}', ${searchItem.lat}, ${searchItem.lon})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </button>
+    </div>
+    <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${searchItem.lat},${searchItem.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+  </div>`;
+}
+
+function getDbRange(db){
+  if(!db || !db.length) return {min: Infinity, max: -Infinity};
+  let min = Infinity, max = -Infinity;
+  for(let pt of db){
+    if(pt.km < min) min = pt.km;
+    if(pt.km > max) max = pt.km;
+  }
+  return {min, max};
+}
+
+function executeSearchKm(db, label){
+  let rawVal=document.getElementById('inputKm').value;
+  let targetKm=parsePt(rawVal);
+  let msg=document.getElementById('searchKmMsg'),res=document.getElementById('searchKmResult');
+  let modal=document.getElementById('searchKmModal');
+  modal.style.display='none';
+
+  let rangeInfo = getDbRange(db);
+  if(targetKm < (rangeInfo.min - 3) || targetKm > (rangeInfo.max + 3)){
+    msg.style.display='flex';
+    msg.textContent='pesquisa fora do range de localização';
+    searchKmItems=[];res.style.display='none';return;
+  }
+
+  let bestPt=null, minDiff=Infinity;
+  for(let pt of db){
+    let diff=Math.abs(pt.km - targetKm);
+    if(diff<minDiff){minDiff=diff;bestPt=pt;}
+  }
+
+  if(!bestPt || minDiff > 5.0){
+    msg.style.display='flex';
+    msg.textContent='pesquisa fora do range de localização';
+    searchKmItems=[];res.style.display='none';return;
+  }
+
+  let sorted = posts.map(p=>({
+    ...p, d: (Math.abs(p.lat - bestPt.lat) > 0.2 || Math.abs(p.lon - bestPt.lon) > 0.2) ? 999999 : hav(bestPt.lat, bestPt.lon, p.lat, p.lon)
+  })).sort((a,b)=>a.d - b.d).slice(0, 10);
+
+  searchKmItems=sorted;
+  msg.style.display='none';
+  renderSearchKm(label, bestPt);
+  showToast('Resultados carregados ('+label+')');
+}
+
+function searchKm(){
+  let rawVal=document.getElementById('inputKm').value;
+  let targetKm=parsePt(rawVal);
+  let msg=document.getElementById('searchKmMsg'),res=document.getElementById('searchKmResult'),modal=document.getElementById('searchKmModal');
+  
+  if(isNaN(targetKm)){clearKm();return;}
+  if(!posts.length||(!kmDB_SP.length&&!kmDB_RJ.length)){
+    msg.style.display='flex';msg.textContent='Aguardando bases';return;
+  }
+
+  let rangeSP = getDbRange(kmDB_SP);
+  let rangeRJ = getDbRange(kmDB_RJ);
+
+  let inSP = (targetKm >= rangeSP.min - 3 && targetKm <= rangeSP.max + 3);
+  let inRJ = (targetKm >= rangeRJ.min - 3 && targetKm <= rangeRJ.max + 3);
+
+  if(!inSP && !inRJ){
+    msg.style.display='flex';
+    msg.textContent='pesquisa fora do range de localização';
+    res.style.display='none';
+    modal.style.display='none';
+    searchKmItems=[];
+    return;
+  }
+
+  if(inSP && inRJ){
+    msg.style.display='none';
+    res.style.display='none';
+    modal.style.display='block';
+    modal.innerHTML=`<div class="modal-box">
+      <p>KM ${rawVal} presente em SP e RJ. Escolha a base:</p>
+      <div class="modal-btns">
+        <button class="modal-btn" onclick="executeSearchKm(kmDB_SP, 'BR116-SP')">KM São Paulo</button>
+        <button class="modal-btn rj" onclick="executeSearchKm(kmDB_RJ, 'BR116-RJ')">KM Rio</button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  modal.style.display='none';
+  if(inSP){
+    executeSearchKm(kmDB_SP, 'BR116-SP');
+  }else{
+    executeSearchKm(kmDB_RJ, 'BR116-RJ');
+  }
+}
+
+function clearKm(){
+  document.getElementById('inputKm').value='';
+  document.getElementById('searchKmMsg').style.display='none';
+  document.getElementById('searchKmResult').style.display='none';
+  document.getElementById('searchKmModal').style.display='none';
+  searchKmItems=[];
+}
+
+async function renderSearchKm(label, bestPt){
+  if(!searchKmItems.length)return;
+  let res=document.getElementById('searchKmResult');
+  res.style.display='block';
+  
+  let html=`<div style="font-size:7.5px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;display:flex;align-items:center;justify-content:between;">
+    <span>Base Selecionada: ${label}</span>
+    <button style="color:var(--dim);text-decoration:underline;cursor:pointer;font-size:7px;" onclick="searchKm()">Trocar Base</button>
+  </div><div style="display:flex;flex-direction:column;gap:6px">`;
+
+  for(let idx = 0; idx < searchKmItems.length; idx++){
+    let item = searchKmItems[idx];
+    let dt=pos?'distância até o local: '+formatDist(hav(pos.lat,pos.lon,item.lat,item.lon)):'--';
+    const cityName = await fetchCityName(item.lat, item.lon);
+    html+=`<div class="post searched">
+      <div class="post-top">
+        <div style="flex:1;">
+          <p class="post-id">#${idx+1} - ID: ${item.id}</p>
+          <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
+          <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(item)}</p>
+          <p class="post-dist" id="srch-km-dist-${idx}">${dt}</p>
+          <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
+        </div>
+        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+      </div>
+      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+    </div>`;
+  }
+  html+='</div>';
+  res.innerHTML=html;
+}
+
+function sendWhatsApp(id, lat, lon){
+  let tx = `📍 *POSTE*\nID: ${id}\nCoords: ${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}\nhttps://maps.google.com/?q=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
+}
+
+async function renderApoio(){
+  if(!pos||!posts.length)return;
+  let qty=Number(document.getElementById('qty').value||10);
+  let items=posts.map(p=>{
+    if(Math.abs(p.lat - pos.lat) > 0.3 || Math.abs(p.lon - pos.lon) > 0.3) return null;
+    return {id:p.id, lat:p.lat, lon:p.lon, d:hav(pos.lat,pos.lon,p.lat,p.lon)};
+  }).filter(Boolean).sort((a,b)=>a.d-b.d).slice(0,qty);
+
+  let key=items.map(i=>i.id).join(',');
+  let list=document.getElementById('postList');
+
+  if(key===renderedKey){
+    items.forEach((o,i)=>{
+      let el=document.getElementById('dist-'+i);
+      if(el)el.textContent='distância até o local: '+formatDist(o.d);
+    });
+    document.getElementById('btnSend').disabled=false;
+    return;
+  }
+
+  renderedKey=key;
+  let frag=document.createDocumentFragment();
+
+  for(let i=0; i<items.length; i++){
+    let o = items[i];
+    const cityName = await fetchCityName(o.lat, o.lon);
+    let div=document.createElement('div');
+    div.className='post'+(i===0?' near':'');
+    div.innerHTML=`<div class="post-top">
+      <input type="checkbox" class="post-chk" value="${o.id}" data-lat="${o.lat}" data-lon="${o.lon}" checked>
+      <div style="flex:1;">
+        <p class="post-id">ID: ${o.id}</p>
+        <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
+        <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(o)}</p>
+        <p class="post-dist" id="dist-${i}">distância até o local: ${formatDist(o.d)}</p>
+      </div>
+      <button class="post-wa" onclick="sendWhatsApp('${o.id}', ${o.lat}, ${o.lon})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </button>
+    </div>
+    <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${o.lat},${o.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>`;
+    frag.appendChild(div);
+  }
+
+  list.innerHTML='';
+  list.appendChild(frag);
+  document.getElementById('btnSend').disabled=false;
+}
+
+document.getElementById('btnSend').onclick=()=>{
+  if(!pos)return;
+  let chks=document.querySelectorAll('.post-chk:checked');
+  let items=[];
+  if(chks.length){
+    chks.forEach(c=>items.push({id:c.value,lat:parseFloat(c.dataset.lat),lon:parseFloat(c.dataset.lon)}));
+  }else{
+    let qty=Number(document.getElementById('qty').value||10);
+    items=posts.map(p=>({...p,d:hav(pos.lat,pos.lon,p.lat,p.lon)})).sort((a,b)=>a.d-b.d).slice(0,qty);
+  }
+  let tx=`📍 *LISTA*\nData: ${nowBR()}\n\n`;
+  items.forEach((o,i)=>{
+    tx+=`${i+1}. ID: ${o.id} (KM: ${findPostExactKm(o)})\n`;
+    if(document.getElementById('chkMaps').checked) tx+=`   https://maps.google.com/?q=${o.lat.toFixed(5)},${o.lon.toFixed(5)}\n`;
+  });
+  window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
+  showToast('Enviado');
+};
+
+document.getElementById('qty').onchange=()=>{renderedKey='';renderApoio()};
+
+window.addEventListener('DOMContentLoaded', initSystemStartup);
+</script>
+</body>
+</html>
