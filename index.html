@@ -154,7 +154,7 @@ input,select{font-family:var(--font);outline:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// Base de Dados de Ativos ITS Incorporada (Base de 1.788 ativos reais)[cite: 2]
+// Base de Dados de Ativos ITS Incorporada (Base de ativos reais)[cite: 1, 2]
 const rawAssets = [
   {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
   {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
@@ -195,7 +195,6 @@ function getAssetCoords(asset){
   return { lat: baseLat + latOffset, lon: baseLon + (latOffset * 0.25) };
 }
 
-// Retorna estritamente o vizinho anterior e posterior na mesma fibra e no mesmo estado
 function getStrictFiberNeighbors(targetAsset){
   let pool = rawAssets.filter(a => a.estado === targetAsset.estado && a.rodovia === targetAsset.rodovia);
   pool.sort((a,b) => a.kmVal - b.kmVal);
@@ -224,7 +223,6 @@ function getStrictFiberNeighbors(targetAsset){
 function updateLiveGpsAndNearestAsset(){
   if(!pos) return;
   
-  // Encontra o ativo mais próximo geograficamente
   let nearest = rawAssets[0], minD = Infinity;
   rawAssets.forEach(a => {
     let coords = getAssetCoords(a);
@@ -232,7 +230,6 @@ function updateLiveGpsAndNearestAsset(){
     if(d < minD){ minD = d; nearest = a; }
   });
 
-  // Calcula KM real atual
   let estKm = nearest.kmVal + ((pos.lat - getAssetCoords(nearest).lat) * 111.0);
   if(estKm < 0) estKm = Math.abs(estKm);
   let kmStr = estKm.toFixed(3).replace('.', ',');
@@ -244,7 +241,6 @@ function updateLiveGpsAndNearestAsset(){
   document.getElementById('gpsStatus').className = 'gps ok';
   document.getElementById('gpsText').textContent = `GPS ATIVO (±${Math.round(pos.acc)}M)`;
 
-  // Renderiza o ativo mais próximo e a fibra
   let neighbors = getStrictFiberNeighbors(nearest);
   let container = document.getElementById('nearestAssetContainer');
 
@@ -303,7 +299,6 @@ function initGpsWatch(){
         updateLiveGpsAndNearestAsset();
       },
       err => {
-        // Fallback simulado se o GPS demorar ou falhar
         pos = { lat: -22.8512, lon: -43.7744, acc: 10 };
         updateLiveGpsAndNearestAsset();
         showToast('Usando posição de referência GPS', 'err');
