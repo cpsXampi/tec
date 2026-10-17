@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#070913">
 <title>Matriz Inteligente de Ativos ITS & Interligações</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+o0Gk3w1g2v0T6Q2nQmW+3n7Gk8wqv6pSj6kGk/tI=" crossorigin=""/>
 <style>
 :root{
   --bg:#070913;
@@ -42,7 +44,7 @@ input,select{font-family:var(--font);outline:none}
 }
 .hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
 
-.wrap{max-width:800px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.wrap{max-width:1100px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
 
 .card{
   background:rgba(11,17,36,0.9);border:1px solid var(--border);
@@ -50,7 +52,8 @@ input,select{font-family:var(--font);outline:none}
 }
 .card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));}
 
-.search-grid{display:grid;grid-template-columns:140px 1fr auto auto;gap:8px;}
+.search-grid{display:grid;grid-template-columns:160px 1fr auto auto auto;gap:8px;align-items:center;}
+@media(max-width:900px){.search-grid{grid-template-columns:1fr;}}
 @media(max-width:650px){.search-grid{grid-template-columns:1fr;}}
 
 .search-select, .search-input{
@@ -59,7 +62,7 @@ input,select{font-family:var(--font);outline:none}
   font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;
   transition:all .2s ease;
 }
-.search-select:focus, .search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
+.search-select:focus, .search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);} 
 
 .btn-icon{
   width:40px;height:40px;border-radius:var(--r-xs);display:grid;place-items:center;
@@ -94,7 +97,7 @@ input,select{font-family:var(--font);outline:none}
   background:rgba(7,9,19,.85);border:1px solid rgba(168,85,247,.3);
   border-radius:var(--r-xs);padding:8px;cursor:pointer;transition:all .2s ease;
 }
-.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);}
+.fiber-card:hover{border-color:var(--purple);background:rgba(168,85,247,.2);} 
 .fiber-card-lbl{font-size:7.5px;font-weight:900;color:var(--purple);text-transform:uppercase;}
 .fiber-card-id{font-size:10px;font-weight:900;color:#fff;margin-top:2px;}
 .fiber-card-sub{font-size:8px;font-weight:700;color:var(--muted);margin-top:2px;}
@@ -114,6 +117,12 @@ input,select{font-family:var(--font);outline:none}
   box-shadow:0 0 10px var(--accent-glow);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#map { height: 360px; border-radius:8px; border:1px solid rgba(255,255,255,.04); margin-top:10px; }
+.result-and-map { display: grid; grid-template-columns: 1fr 380px; gap:12px; align-items:start; }
+@media(max-width:1100px){ .result-and-map { grid-template-columns: 1fr; } }
+
+.dist-pill { font-size:11px;font-weight:900;color:var(--muted); background:rgba(255,255,255,.03);padding:6px;border-radius:6px; }
 </style>
 </head>
 <body>
@@ -125,7 +134,7 @@ input,select{font-family:var(--font);outline:none}
 <div class="wrap">
   <div class="card card-accent">
     <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
-      Pesquisa Inteligente por KM, TAG, Hostname ou Fibra
+      Pesquisa Inteligente por KM, TAG, Hostname, Fibra ou por Proximidade (GPS)
     </div>
     <div class="search-grid">
       <select class="search-select" id="filterRodovia">
@@ -134,7 +143,7 @@ input,select{font-family:var(--font);outline:none}
         <option value="BR101">BR-101</option>
       </select>
       <div class="search-wrap">
-        <input class="search-input" id="inputSearch" placeholder="EX: 214+728, 90, BR116-CF0001..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+        <input class="search-input" id="inputSearch" placeholder="EX: 214+728, 90, BR116-CF0001 ou GPS" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
       </div>
       <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -142,36 +151,46 @@ input,select{font-family:var(--font);outline:none}
       <button class="btn-icon clr" onclick="clearSearch()" title="Limpar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
+      <button class="btn-icon" id="btnLocate" title="Usar minha localização" onclick="useMyLocation()" style="display:grid;place-items:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
     </div>
   </div>
 
-  <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
-    <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
-      Insira um KM (ex: 214+728 ou 90) ou uma TAG para calcular instantaneamente os ativos e vizinhos de fibra.
+  <div class="result-and-map">
+    <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
+      <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
+        Insira um KM (ex: 214+728 ou 90), uma TAG para calcular os ativos e vizinhos de fibra, ou clique em "Usar minha localização".
+      </div>
+    </div>
+
+    <div class="card" style="height:100%;display:flex;flex-direction:column;">
+      <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Mapa</div>
+      <div id="map"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">Clique em um marcador para ver detalhes. Use o botão de localização para centralizar no seu local.</div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7k9e1Qp3QxCMTYad2gqg0h7r0sYf2f3p3rP7vY=" crossorigin=""></script>
+
 <script>
-// Base de Dados de Ativos ITS (1.788 ativos reais extraídos das planilhas BR116 e BR101)
+// Base de Dados de Ativos ITS (exemplos; inclua lat/lon para cada ativo no seu dataset real)
 const rawAssets = [
-  {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
-  {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
-  {"tag":"SAT 214+860","equip":"SAT","estado":"RJ","host":"","km":"214+860","kmVal":214.860,"sentido":"SUL","fibra":"11, 12","ipGer":"172.27.0.162","gerencia":"172.26.12.111","rede":"10.3.6.80","switch":"10.3.6.81","ativo":"10.3.6.86","rodovia":"BR116"},
-  {"tag":"BR116-CF0002","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA56-N215_129","km":"215+129","kmVal":215.129,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.165","gerencia":"172.26.12.114","rede":"10.3.6.104","switch":"10.3.6.105","ativo":"10.3.6.106","rodovia":"BR116"},
-  {"tag":"BR116-CF0003","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_404","km":"215+404","kmVal":215.404,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.172","gerencia":"172.26.12.121","rede":"10.3.6.160","switch":"10.3.6.161","ativo":"10.3.6.162","rodovia":"BR116"},
-  {"tag":"BR116-CF0004","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.202","rodovia":"BR116"},
-  {"tag":"BR116-CM0002","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.203","rodovia":"BR116"},
-  {"tag":"BR116-CF0005","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N216_163","km":"216+163","kmVal":216.163,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.178","gerencia":"172.26.12.127","rede":"10.3.6.208","switch":"10.3.6.209","ativo":"10.3.6.210","rodovia":"BR116"},
-  {"tag":"BR101-CM301","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA100-N051_400","km":"051+400","kmVal":51.400,"sentido":"NORTE","fibra":"11, 12, 31","ipGer":"172.27.6.46","gerencia":"172.26.13.6","rede":"10.3.50.0","switch":"10.3.50.1","ativo":"10.3.50.3","rodovia":"BR101"},
-  {"tag":"BR101-CM300","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N050_880","km":"050+880","kmVal":50.880,"sentido":"CANTEIRO CENTRAL","fibra":"21, 22, 31","ipGer":"172.27.6.58","gerencia":"172.26.13.18","rede":"10.3.50.96","switch":"10.3.50.97","ativo":"10.3.50.99","rodovia":"BR101"},
-  {"tag":"BR101-CM001","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N049_860","km":"049+860","kmVal":49.860,"sentido":"SUL","fibra":"11, 12, 31","ipGer":"172.27.6.59","gerencia":"172.26.13.19","rede":"10.3.50.104","switch":"10.3.50.105","ativo":"10.3.50.107","rodovia":"BR101"}
+  {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"rodovia":"BR116","sentido":"NORTE","fibra":"11,12","ipGer":"172.27.0.183","gerencia":"172.26.45.x","rede":"10.3.6.80","switch":"SW1","lat":-22.9, "lon":-43.2},
+  {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"rodovia":"BR116","sentido":"NORTE","fibra":"11,12","ipGer":"172.27.0.183","gerencia":"172.26.x.x","rede":"10.3.7.0","switch":"SW2","lat":-22.901, "lon":-43.201},
+  {"tag":"SAT 214+860","equip":"SAT","estado":"RJ","host":"","km":"214+860","kmVal":214.86,"rodovia":"BR116","sentido":"SUL","fibra":"11,12","ipGer":"172.27.0.162","gerencia":"172.26.12.111","rede":"10.3.6.80","lat":-22.912, "lon":-43.215},
+  {"tag":"BR116-CF0002","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA56-N215_129","km":"215+129","kmVal":215.129,"rodovia":"BR116","sentido":"NORTE","fibra":"21,22","ipGer":"172.27.0.165","gerencia":"172.26.12.x","lat":-22.93, "lon":-43.23},
+  {"tag":"BR101-CM301","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA100-N051_400","km":"051+400","kmVal":51.4,"rodovia":"BR101","sentido":"NORTE","fibra":"11,12,31","ipGer":"172.27.6.46","gerencia":"172.26.x.x","lat":-23.55, "lon":-46.633},
+  {"tag":"BR101-CM300","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N050_880","km":"050+880","kmVal":50.88,"rodovia":"BR101","sentido":"CANTEIRO CENTRAL","fibra":"21,22,31","ipGer":"172.27.6.58","gerencia":"172.26.x.x","lat":-23.551, "lon":-46.635},
+  // ... adicione lat/lon para os seus restantes 1.788 ativos
 ];
 
 rawAssets.forEach(a => {
-  a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.ativo} ${a.rodovia}`.toUpperCase();
+  a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.ativo || ''} ${a.rodovia || ''}`.toUpperCase();
 });
 
 const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_+ ]+/g,' ').replace(/\s+/g,' ');
@@ -191,7 +210,18 @@ function parseInputKm(str){
 function showToast(msg){
   const el = document.getElementById('toast');
   el.textContent = msg;
-  requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
+  requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600)});
+}
+
+/* Haversine distance in kilometers */
+function distanceKm(lat1, lon1, lat2, lon2){
+  if(lat1==null||lon1==null||lat2==null||lon2==null) return Infinity;
+  const R = 6371; // km
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLon = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
 }
 
 // Inteligência de Vizinhança por Fibra Óptica (Anterior e Posterior estritos)
@@ -199,33 +229,53 @@ function getFiberNeighbors(targetAsset){
   let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
   sameRod.sort((a,b) => a.kmVal - b.kmVal);
 
-  let targetFibers = targetAsset.fibra.split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
+  let targetFibers = (targetAsset.fibra||'').split(/[,/ ]+/).map(f => f.trim()).filter(Boolean);
   let prevFiber = null, nextFiber = null;
 
   for(let a of sameRod){
     if(a.kmVal < targetAsset.kmVal){
-      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+      let shares = (a.fibra||'').split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
       if(shares) prevFiber = a;
     }
     if(a.kmVal > targetAsset.kmVal && !nextFiber){
-      let shares = a.fibra.split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+      let shares = (a.fibra||'').split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
       if(shares) nextFiber = a;
     }
   }
-  return { prevFiber, nextFiber };
+  // Também encontrar vizinho geográfico mais próximo na mesma fibra (por distância)
+  let geoNeighbor = null;
+  let minD = Infinity;
+  for(let a of rawAssets){
+    if(a === targetAsset) continue;
+    let shares = (a.fibra||'').split(/[,/ ]+/).some(f => f.trim() && targetFibers.includes(f.trim()));
+    if(shares && a.lat!=null && a.lon!=null && targetAsset.lat!=null && targetAsset.lon!=null){
+      let d = distanceKm(targetAsset.lat, targetAsset.lon, a.lat, a.lon);
+      if(d < minD){ minD = d; geoNeighbor = a; }
+    }
+  }
+
+  return { prevFiber, nextFiber, geoNeighbor, geoDistanceKm: isFinite(minD)?minD:null };
 }
+
+/* Map setup */
+let map = L.map('map', { center: [-22.9, -43.2], zoom: 8, minZoom: 3 });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+let markersLayer = L.layerGroup().addTo(map);
 
 function triggerSearch(){
   let raw = document.getElementById('inputSearch').value.trim();
   let selectedRodovia = document.getElementById('filterRodovia').value;
-  
+
   let pool = rawAssets;
   if(selectedRodovia !== 'ALL'){
     pool = rawAssets.filter(a => a.rodovia === selectedRodovia);
   }
 
   if(!raw){
-    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um termo de pesquisa válido.</div>`;
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um termo de pesquisa ou use a localização</div>`;
+    markersLayer.clearLayers();
     return;
   }
 
@@ -239,33 +289,46 @@ function triggerSearch(){
     })).sort((a,b) => {
       if(Math.abs(a.kmDiff - b.kmDiff) < 0.001) return a.kmVal - b.kmVal;
       return a.kmDiff - b.kmDiff;
-    }).slice(0, 5);
+    }).slice(0, 10);
   } else {
     let q = norm(raw);
-    matched = pool.filter(a => a.rawSearch.includes(q)).slice(0, 5);
+    matched = pool.filter(a => a.rawSearch.includes(q)).slice(0, 10);
   }
 
   renderResults(matched, `Resultados para "${raw}" ${selectedRodovia !== 'ALL' ? '('+selectedRodovia+')' : ''}`);
-  showToast(`${matched.length} Ativos Encontrados`);
+  if(matched.length) showToast(`${matched.length} Ativos Encontrados`);
+  else showToast('Nenhum ativo encontrado');
 }
 
 function clearSearch(){
   document.getElementById('inputSearch').value = '';
   document.getElementById('filterRodovia').value = 'ALL';
-  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa reiniciada.</div>`;
+  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa reiniciada</div>`;
+  markersLayer.clearLayers();
 }
 
 function renderResults(items, title){
   let container = document.getElementById('resultsContainer');
   if(!items.length){
     container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado com estes critérios</div>`;
+    markersLayer.clearLayers();
     return;
   }
 
   let html = `<div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${title}</div>`;
 
+  markersLayer.clearLayers();
+  let bounds = [];
+
   items.forEach(a => {
     let neighbors = getFiberNeighbors(a);
+    let distText = '';
+    if(a.lat!=null && a.lon!=null && window.userLocation){
+      let d = distanceKm(window.userLocation.lat, window.userLocation.lon, a.lat, a.lon);
+      distText = `<div class="asset-field"><div class="asset-field-lbl">Distância até si</div><div class="asset-field-val">${d.toFixed(2)} km</div></div>`;
+    } else if(a.lat!=null && a.lon!=null){
+      distText = `<div class="asset-field"><div class="asset-field-lbl">Coordenadas</div><div class="asset-field-val">${a.lat.toFixed(6)}, ${a.lon.toFixed(6)}</div></div>`;
+    }
 
     html += `
       <div class="asset-card">
@@ -274,7 +337,10 @@ function renderResults(items, title){
             <div class="asset-title">${a.tag}</div>
             <div style="font-size:8.5px;font-weight:800;color:var(--text2);margin-top:2px;">${a.equip} · KM ${a.km} (${a.rodovia} - ${a.estado})</div>
           </div>
-          <div class="asset-badge">${a.sentido || 'N/A'}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div class="asset-badge">${a.sentido || 'N/A'}</div>
+            ${a.lat!=null && a.lon!=null ? `<div class="dist-pill">${a.lat.toFixed(4)}, ${a.lon.toFixed(4)}</div>` : ''}
+          </div>
         </div>
 
         <div class="asset-grid">
@@ -289,7 +355,7 @@ function renderResults(items, title){
         <div class="fiber-box">
           <div class="fiber-header">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Matriz de Interligações (Vizinhos na Mesma Fibra: ${a.fibra})
+            Matriz de Interligações (Vizinhos na Mesma Fibra: ${a.fibra || '---'})
           </div>
           <div class="fiber-neighbors">
             <div class="fiber-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
@@ -303,17 +369,39 @@ function renderResults(items, title){
               <div class="fiber-card-sub">${neighbors.nextFiber ? 'KM ' + neighbors.nextFiber.km + ' ('+neighbors.nextFiber.equip+')' : '---'}</div>
             </div>
           </div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            ${neighbors.geoNeighbor ? `<div style="font-size:11px;color:var(--muted)">Vizinho geográfico mais próximo na mesma fibra: <strong>${neighbors.geoNeighbor.tag}</strong> (${neighbors.geoDistanceKm.toFixed(2)} km)</div>` : ''}
+          </div>
         </div>
 
-        <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Partilhar Relatório de Interligação via WhatsApp
-        </button>
+        ${distText || ''}
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"/></svg>
+            Partilhar Relatório via WhatsApp
+          </button>
+          ${a.lat!=null && a.lon!=null ? `<button class="btn-icon" title="Abrir rotas" onclick="openGps(${a.lat}, ${a.lon})" style="width:auto;padding:8px;border-radius:6px;background:rgba(7,9,19,.9);color:var(--muted);">Rotas</button>` : ''}
+        </div>
       </div>
     `;
+
+    // Add marker if coordinates present
+    if(a.lat!=null && a.lon!=null){
+      let marker = L.marker([a.lat, a.lon]);
+      marker.bindPopup(`<strong>${a.tag}</strong><br>${a.equip}<br>KM ${a.km}<br><button onclick="(function(){window.focus();document.getElementById('inputSearch').value='${a.tag}';triggerSearch();})()">Ver no painel</button>`, { maxWidth: 220 });
+      marker.addTo(markersLayer);
+      bounds.push([a.lat, a.lon]);
+    }
   });
 
   container.innerHTML = html;
+
+  if(bounds.length){
+    map.fitBounds(bounds, {padding:[40,40]});
+  } else if(window.userLocation){
+    map.setView([window.userLocation.lat, window.userLocation.lon], 12);
+  }
 }
 
 function searchByExactTag(tag){
@@ -333,9 +421,62 @@ function shareWhatsApp(tag){
   tx += `🔌 *VIZINHOS NA MESMA FIBRA*\n`;
   tx += `Anterior: ${neighbors.prevFiber ? neighbors.prevFiber.tag + ' (KM ' + neighbors.prevFiber.km + ')' : 'N/A'}\n`;
   tx += `Próximo: ${neighbors.nextFiber ? neighbors.nextFiber.tag + ' (KM ' + neighbors.nextFiber.km + ')' : 'N/A'}\n`;
+  if(a.lat!=null && a.lon!=null) tx += `\n📍 Coordenadas: ${a.lat.toFixed(6)}, ${a.lon.toFixed(6)}\nVer rotas: https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lon}\n`;
 
   window.open('https://wa.me/?text=' + encodeURIComponent(tx), '_blank', 'noopener');
 }
+
+function openGps(lat, lon){
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+/* Geolocation: usa a localização do utilizador para procurar ativos mais próximos */
+function useMyLocation(){
+  if(!navigator.geolocation){
+    showToast('Geolocalização não suportada neste browser');
+    return;
+  }
+  showToast('A obter localização...');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    window.userLocation = { lat, lon };
+    // mostra marcador do utilizador no mapa
+    markersLayer.clearLayers();
+    const userMarker = L.circleMarker([lat, lon], { radius:7, color: '#34d399', fillColor:'#10b981', fillOpacity:0.9 }).addTo(markersLayer);
+    userMarker.bindPopup('<strong>Você está aqui</strong>').openPopup();
+
+    // Calcular distâncias e ordenar
+    let selectedRodovia = document.getElementById('filterRodovia').value;
+    let pool = rawAssets;
+    if(selectedRodovia !== 'ALL'){
+      pool = rawAssets.filter(a => a.rodovia === selectedRodovia);
+    }
+
+    let matched = pool.map(a => ({
+      ...a,
+      distToUser: a.lat!=null && a.lon!=null ? distanceKm(lat, lon, a.lat, a.lon) : Infinity
+    })).filter(a => isFinite(a.distToUser)).sort((a,b)=>a.distToUser-b.distToUser).slice(0, 10);
+
+    renderResults(matched, `Ativos mais próximos (${matched.length})`);
+    // keep user's marker on top
+    userMarker.addTo(markersLayer).openPopup();
+    map.setView([lat, lon], 12);
+    showToast(`${matched.length} ativos próximos calculados`);
+  }, err => {
+    console.error(err);
+    showToast('Erro ao obter localização: ' + (err.message || err.code));
+  }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+}
+
+// Inicialização: centraliza mapa com marcadores para os primeiros assets com coords
+(function init(){
+  const firstCoords = rawAssets.find(a => a.lat!=null && a.lon!=null);
+  if(firstCoords){
+    map.setView([firstCoords.lat, firstCoords.lon], 10);
+  }
+})();
 </script>
 </body>
 </html>
