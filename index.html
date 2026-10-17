@@ -68,7 +68,6 @@ input{font-family:var(--font);outline:none}
 .btn-icon.clr{background:rgba(7,9,19,.9);color:var(--muted)}
 .btn-icon svg{width:16px;height:16px}
 
-/* Ficha de Ativo & Interligação */
 .asset-card{
   border-radius:var(--r-sm);border:1px solid var(--border);
   background:rgba(11,17,36,0.95);overflow:hidden;
@@ -84,7 +83,6 @@ input{font-family:var(--font);outline:none}
 .asset-field-lbl{font-size:7px;font-weight:800;color:var(--muted);text-transform:uppercase;}
 .asset-field-val{font-size:9.5px;font-weight:800;color:var(--text);margin-top:2px;word-break:break-word;}
 
-/* Mapa Mental de Fibras */
 .fiber-box{
   background:linear-gradient(145deg,rgba(168,85,247,.1),rgba(11,17,36,.9));
   border:1px solid rgba(168,85,247,.3);border-radius:var(--r-xs);padding:10px;margin-top:4px;
@@ -126,11 +124,11 @@ input{font-family:var(--font);outline:none}
 <div class="wrap">
   <div class="card card-accent">
     <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
-      Pesquisa por Ativo, Hostname, KM ou Fibra
+      Pesquisa por KM Exato/Próximo, TAG, Hostname ou Fibra
     </div>
     <div class="search-row">
       <div class="search-wrap">
-        <input class="search-input" id="inputSearch" placeholder="EX: 90, 214+728, BR116-CF0001, CFTV, 11, 12..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+        <input class="search-input" id="inputSearch" placeholder="EX: 90, 214+728, BR116-CF0001, CFTV..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
       </div>
       <button class="btn-icon go" onclick="triggerSearch()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -143,7 +141,7 @@ input{font-family:var(--font);outline:none}
 
   <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
     <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
-      Digite um KM, TAG ou Hostname para visualizar a ficha e a matriz de interligações.
+      Digite um KM (ex: 90 ou 214+728) ou TAG para encontrar o ativo exato e seus vizinhos de fibra.
     </div>
   </div>
 </div>
@@ -151,7 +149,7 @@ input{font-family:var(--font);outline:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// Base de Dados de Ativos ITS Incorporada (1.788 ativos completos)
+// Base de Dados Completa de Ativos ITS Incorporada (1.788 ativos reais)
 const rawAssets = [
   {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
   {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
@@ -170,8 +168,19 @@ rawAssets.forEach(a => {
   a.rawSearch = `${a.tag} ${a.equip} ${a.km} ${a.estado} ${a.host} ${a.fibra} ${a.ipGer} ${a.ativo} ${a.rodovia}`.toUpperCase();
 });
 
-const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_ ]+/g,' ').replace(/\s+/g,' ');
-const parsePt = v => { const s = String(v??'').trim().replace(',','.'); return Number(s); };
+const norm = s => String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_+ ]+/g,' ').replace(/\s+/g,' ');
+
+function parseInputKm(str){
+  let clean = String(str).trim().toUpperCase().replace('KM', '').trim();
+  if(clean.includes('+')){
+    let parts = clean.split('+');
+    let kmPart = parseFloat(parts[0].replace(',', '.')) || 0;
+    let mPart = parseFloat(parts[1].replace(',', '.')) || 0;
+    return kmPart + (mPart / 1000.0);
+  }
+  let val = parseFloat(clean.replace(',', '.'));
+  return isNaN(val) ? null : val;
+}
 
 function showToast(msg){
   const el = document.getElementById('toast');
@@ -179,7 +188,7 @@ function showToast(msg){
   requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
 }
 
-// Identifica o ativo anterior e o próximo que partilham da mesma fibra óptica
+// Encontra o ativo anterior e o próximo que partilham da mesma fibra óptica
 function getFiberNeighbors(targetAsset){
   let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
   sameRod.sort((a,b) => a.kmVal - b.kmVal);
@@ -201,25 +210,30 @@ function getFiberNeighbors(targetAsset){
 }
 
 function triggerSearch(){
-  let q = norm(document.getElementById('inputSearch').value);
-  if(!q){
+  let raw = document.getElementById('inputSearch').value.trim();
+  if(!raw){
     document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Digite um termo válido para pesquisa.</div>`;
     return;
   }
 
-  let numQ = parseFloat(q.replace(',', '.'));
+  let kmTarget = parseInputKm(raw);
   let matched = [];
-  if(!isNaN(numQ) && q.length <= 6){
-    // Pesquisa por KM mais próximo
+
+  if(kmTarget !== null && raw.length <= 8 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){
+    // Pesquisa rigorosa por KM exato ou o mais próximo possível em ordem coerente
     matched = rawAssets.map(a => ({
-      ...a, kmDiff: Math.abs(a.kmVal - numQ)
-    })).sort((a,b) => a.kmDiff - b.kmDiff).slice(0, 8);
+      ...a, kmDiff: Math.abs(a.kmVal - kmTarget)
+    })).sort((a,b) => {
+      if(Math.abs(a.kmDiff - b.kmDiff) < 0.001) return a.kmVal - b.kmVal;
+      return a.kmDiff - b.kmDiff;
+    }).slice(0, 5);
   } else {
     // Pesquisa por TAG, Hostname, Equipamento ou Fibra
-    matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 8);
+    let q = norm(raw);
+    matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 5);
   }
 
-  renderResults(matched, `Resultados para "${q}"`);
+  renderResults(matched, `Resultados para "${raw}"`);
   showToast(`${matched.length} Ativos Encontrados`);
 }
 
@@ -231,7 +245,7 @@ function clearSearch(){
 function renderResults(items, title){
   let container = document.getElementById('resultsContainer');
   if(!items.length){
-    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado</div>`;
+    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado para esta pesquisa</div>`;
     return;
   }
 
