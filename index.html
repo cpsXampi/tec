@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#070913">
-<title>Matriz de Interligações & Ativos ITS</title>
+<title>Matriz Inteligente de Ativos ITS & Interligações</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <style>
 :root{
@@ -33,14 +33,14 @@ body{
 }
 button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;touch-action:manipulation;}
 button:active{opacity:.8;transform:scale(.97)}
-input{font-family:var(--font);outline:none}
+input,select{font-family:var(--font);outline:none}
 
 .hdr{
   position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border2);
   background:rgba(7,9,19,.95);backdrop-filter:blur(20px);padding:0 16px;height:52px;
   display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.6);
 }
-.hdr-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
+.hdr-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);}
 
 .wrap{max-width:800px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
 
@@ -50,15 +50,16 @@ input{font-family:var(--font);outline:none}
 }
 .card-accent{border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,rgba(59,130,246,.05),rgba(11,17,36,.9));}
 
-.search-row{display:flex;gap:8px}
-.search-wrap{flex:1;min-width:0;position:relative}
-.search-input{
+.search-grid{display:grid;grid-template-columns:140px 1fr auto auto;gap:8px;}
+@media(max-width:650px){.search-grid{grid-template-columns:1fr;}}
+
+.search-select, .search-input{
   width:100%;border-radius:var(--r-xs);border:1px solid var(--border2);
   background:rgba(7,9,19,.9);padding:10px 12px;
   font-size:11px;font-weight:800;text-transform:uppercase;color:#fff;
   transition:all .2s ease;
 }
-.search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
+.search-select:focus, .search-input:focus{border-color:var(--accent);box-shadow:0 0 10px var(--accent-glow);}
 
 .btn-icon{
   width:40px;height:40px;border-radius:var(--r-xs);display:grid;place-items:center;
@@ -118,22 +119,27 @@ input{font-family:var(--font);outline:none}
 <body>
 
 <header class="hdr">
-  <div class="hdr-title">Matriz de Interligações & Ativos ITS</div>
+  <div class="hdr-title">Matriz Inteligente ITS & Interligações</div>
 </header>
 
 <div class="wrap">
   <div class="card card-accent">
     <div style="font-size:9px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
-      Pesquisa por KM Exato/Próximo, TAG, Hostname ou Fibra
+      Pesquisa Inteligente por KM, TAG, Hostname ou Fibra
     </div>
-    <div class="search-row">
+    <div class="search-grid">
+      <select class="search-select" id="filterRodovia">
+        <option value="ALL">Todas as Rodovias</option>
+        <option value="BR116">BR-116</option>
+        <option value="BR101">BR-101</option>
+      </select>
       <div class="search-wrap">
-        <input class="search-input" id="inputSearch" placeholder="EX: 90, 214+728, BR116-CF0001, CFTV..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
+        <input class="search-input" id="inputSearch" placeholder="EX: 214+728, 90, BR116-CF0001..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')triggerSearch()">
       </div>
-      <button class="btn-icon go" onclick="triggerSearch()">
+      <button class="btn-icon go" onclick="triggerSearch()" title="Pesquisar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
-      <button class="btn-icon clr" onclick="clearSearch()">
+      <button class="btn-icon clr" onclick="clearSearch()" title="Limpar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
     </div>
@@ -141,7 +147,7 @@ input{font-family:var(--font);outline:none}
 
   <div id="resultsContainer" style="display:flex;flex-direction:column;gap:10px">
     <div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">
-      Digite um KM (ex: 90 ou 214+728) ou TAG para encontrar o ativo exato e seus vizinhos de fibra.
+      Insira um KM (ex: 214+728 ou 90) ou uma TAG para calcular instantaneamente os ativos e vizinhos de fibra.
     </div>
   </div>
 </div>
@@ -149,7 +155,7 @@ input{font-family:var(--font);outline:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// Base de Dados Completa de Ativos ITS Incorporada (1.788 ativos reais)
+// Base de Dados de Ativos ITS (1.788 ativos reais extraídos das planilhas BR116 e BR101)
 const rawAssets = [
   {"tag":"BR116-CF0001","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.138","rodovia":"BR116"},
   {"tag":"BR116-CM0001","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA58-N214_728","km":"214+728","kmVal":214.728,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.183","gerencia":"172.26.45.0","rede":"10.3.37.136","switch":"10.3.37.137","ativo":"10.3.37.139","rodovia":"BR116"},
@@ -158,7 +164,7 @@ const rawAssets = [
   {"tag":"BR116-CF0003","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_404","km":"215+404","kmVal":215.404,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.172","gerencia":"172.26.12.121","rede":"10.3.6.160","switch":"10.3.6.161","ativo":"10.3.6.162","rodovia":"BR116"},
   {"tag":"BR116-CF0004","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.202","rodovia":"BR116"},
   {"tag":"BR116-CM0002","equip":"CFTV MÓVEL","estado":"RJ","host":"RSP-SA57-N215_758","km":"215+758","kmVal":215.758,"sentido":"NORTE","fibra":"21, 22","ipGer":"172.27.0.177","gerencia":"172.26.12.126","rede":"10.3.6.200","switch":"10.3.6.201","ativo":"10.3.6.203","rodovia":"BR116"},
-  {"tag":"BR116-CF0005","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA57-N216_163","km":"216+163","kmVal":216.163,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.178","gerencia":"172.26.12.127","rede":"10.3.6.208","switch":"10.3.6.209","ativo":"10.3.6.210","rodovia":"BR116"},
+  {"tag":"BR116-CF0005","equip":"CFTV DAI","estado":"RJ","host":"RSP-SA58-N216_163","km":"216+163","kmVal":216.163,"sentido":"NORTE","fibra":"11, 12","ipGer":"172.27.0.178","gerencia":"172.26.12.127","rede":"10.3.6.208","switch":"10.3.6.209","ativo":"10.3.6.210","rodovia":"BR116"},
   {"tag":"BR101-CM301","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA100-N051_400","km":"051+400","kmVal":51.400,"sentido":"NORTE","fibra":"11, 12, 31","ipGer":"172.27.6.46","gerencia":"172.26.13.6","rede":"10.3.50.0","switch":"10.3.50.1","ativo":"10.3.50.3","rodovia":"BR101"},
   {"tag":"BR101-CM300","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N050_880","km":"050+880","kmVal":50.880,"sentido":"CANTEIRO CENTRAL","fibra":"21, 22, 31","ipGer":"172.27.6.58","gerencia":"172.26.13.18","rede":"10.3.50.96","switch":"10.3.50.97","ativo":"10.3.50.99","rodovia":"BR101"},
   {"tag":"BR101-CM001","equip":"CFTV MÓVEL","estado":"SP","host":"RSP-SA101-N049_860","km":"049+860","kmVal":49.860,"sentido":"SUL","fibra":"11, 12, 31","ipGer":"172.27.6.59","gerencia":"172.26.13.19","rede":"10.3.50.104","switch":"10.3.50.105","ativo":"10.3.50.107","rodovia":"BR101"}
@@ -188,7 +194,7 @@ function showToast(msg){
   requestAnimationFrame(()=>{el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000)});
 }
 
-// Encontra o ativo anterior e o próximo que partilham da mesma fibra óptica
+// Inteligência de Vizinhança por Fibra Óptica (Anterior e Posterior estritos)
 function getFiberNeighbors(targetAsset){
   let sameRod = rawAssets.filter(a => a.rodovia === targetAsset.rodovia);
   sameRod.sort((a,b) => a.kmVal - b.kmVal);
@@ -211,8 +217,15 @@ function getFiberNeighbors(targetAsset){
 
 function triggerSearch(){
   let raw = document.getElementById('inputSearch').value.trim();
+  let selectedRodovia = document.getElementById('filterRodovia').value;
+  
+  let pool = rawAssets;
+  if(selectedRodovia !== 'ALL'){
+    pool = rawAssets.filter(a => a.rodovia === selectedRodovia);
+  }
+
   if(!raw){
-    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Digite um termo válido para pesquisa.</div>`;
+    document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Introduza um termo de pesquisa válido.</div>`;
     return;
   }
 
@@ -220,32 +233,32 @@ function triggerSearch(){
   let matched = [];
 
   if(kmTarget !== null && raw.length <= 8 && !raw.toUpperCase().includes('BR') && !raw.toUpperCase().includes('CF') && !raw.toUpperCase().includes('CM') && !raw.toUpperCase().includes('SAT')){
-    // Pesquisa rigorosa por KM exato ou o mais próximo possível em ordem coerente
-    matched = rawAssets.map(a => ({
+    // Algoritmo Inteligente de Proximidade de KM
+    matched = pool.map(a => ({
       ...a, kmDiff: Math.abs(a.kmVal - kmTarget)
     })).sort((a,b) => {
       if(Math.abs(a.kmDiff - b.kmDiff) < 0.001) return a.kmVal - b.kmVal;
       return a.kmDiff - b.kmDiff;
     }).slice(0, 5);
   } else {
-    // Pesquisa por TAG, Hostname, Equipamento ou Fibra
     let q = norm(raw);
-    matched = rawAssets.filter(a => a.rawSearch.includes(q)).slice(0, 5);
+    matched = pool.filter(a => a.rawSearch.includes(q)).slice(0, 5);
   }
 
-  renderResults(matched, `Resultados para "${raw}"`);
+  renderResults(matched, `Resultados para "${raw}" ${selectedRodovia !== 'ALL' ? '('+selectedRodovia+')' : ''}`);
   showToast(`${matched.length} Ativos Encontrados`);
 }
 
 function clearSearch(){
   document.getElementById('inputSearch').value = '';
-  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa limpa.</div>`;
+  document.getElementById('filterRodovia').value = 'ALL';
+  document.getElementById('resultsContainer').innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Pesquisa reiniciada.</div>`;
 }
 
 function renderResults(items, title){
   let container = document.getElementById('resultsContainer');
   if(!items.length){
-    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado para esta pesquisa</div>`;
+    container.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;">Nenhum ativo encontrado com estes critérios</div>`;
     return;
   }
 
@@ -276,7 +289,7 @@ function renderResults(items, title){
         <div class="fiber-box">
           <div class="fiber-header">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Mapa Mental / Vizinhos na Mesma Fibra (${a.fibra})
+            Matriz de Interligações (Vizinhos na Mesma Fibra: ${a.fibra})
           </div>
           <div class="fiber-neighbors">
             <div class="fiber-card" onclick="searchByExactTag('${neighbors.prevFiber ? neighbors.prevFiber.tag : ''}')">
@@ -294,7 +307,7 @@ function renderResults(items, title){
 
         <button class="btn-wa" onclick="shareWhatsApp('${a.tag}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Enviar Relatório de Interligação WhatsApp
+          Partilhar Relatório de Interligação via WhatsApp
         </button>
       </div>
     `;
