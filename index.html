@@ -155,50 +155,29 @@ canvas#c, canvas#cUnica{display:none}
 .s-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
 
 
-/* ===== LOCAL DE SALVAMENTO DISCRETO ===== */
+/* ===== CAPTURA CONTINUA, AVISOS DISCRETOS E AREA LIVRE ===== */
 .folder-chip{
-  top:auto !important;
-  left:50% !important;
-  bottom:calc(5px + var(--safe-b)) !important;
-  transform:translateX(-50%);
-  z-index:230;
-  width:auto;
-  max-width:min(78vw,420px);
-  padding:2px 8px;
-  border-color:rgba(255,255,255,.07);
-  border-radius:8px;
-  background:rgba(0,0,0,.30);
-  color:rgba(255,255,255,.48);
-  font-size:8px;
-  font-weight:650;
-  letter-spacing:.01em;
-  line-height:1.3;
-  text-align:center;
-  box-shadow:none;
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
-  pointer-events:none;
+  top:auto!important;left:50%!important;bottom:calc(5px + var(--safe-b))!important;
+  transform:translateX(-50%);max-width:min(76vw,420px);padding:2px 8px;
+  border-color:rgba(255,255,255,.06);border-radius:7px;background:rgba(0,0,0,.28);
+  color:rgba(255,255,255,.46);font-size:8px;line-height:1.25;text-align:center;
+  box-shadow:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)
 }
-#ui-ctrl{
-  padding-bottom:calc(38px + var(--safe-b));
+#ui-ctrl{padding-bottom:calc(38px + var(--safe-b))}
+#mod-foto-unica>div[style*="inset:auto 0 0 0"]{padding-bottom:calc(38px + var(--safe-b))!important}
+.toast{
+  top:calc(72px + var(--safe-t));right:10px;bottom:auto;left:auto;
+  max-width:min(72vw,330px);padding:7px 10px;font-size:9px;line-height:1.25;
+  text-transform:none;letter-spacing:.01em;transform:translateY(-8px);opacity:0;
+  background:rgba(10,13,17,.82);pointer-events:none
 }
-#mod-foto-unica > div[style*="inset:auto 0 0 0"]{
-  padding-bottom:calc(38px + var(--safe-b)) !important;
-}
-@media (orientation:landscape) and (max-height:600px){
-  .folder-chip{
-    bottom:calc(2px + env(safe-area-inset-bottom,0px)) !important;
-    max-width:55vw;
-    padding:1px 7px;
-    font-size:7px;
-    opacity:.82;
-  }
-  #ui-ctrl{
-    padding-bottom:calc(25px + env(safe-area-inset-bottom,0px));
-  }
-  #mod-foto-unica > div[style*="inset:auto 0 0 0"]{
-    padding-bottom:calc(25px + env(safe-area-inset-bottom,0px)) !important;
-  }
+.toast.show{opacity:.92;transform:translateY(0)}
+.capture-count{max-width:min(72vw,390px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#btn-start:disabled,#btn-stop:disabled{opacity:.55;cursor:wait}
+@media(orientation:landscape) and (max-height:620px){
+  .folder-chip{left:auto!important;right:8px!important;bottom:calc(3px + env(safe-area-inset-bottom,0px))!important;transform:none;max-width:36vw}
+  .toast{top:calc(52px + var(--safe-t));right:8px}
+  #ui-ctrl{padding-bottom:calc(26px + env(safe-area-inset-bottom,0px))}
 }
 
 </style>
@@ -246,7 +225,7 @@ canvas#c, canvas#cUnica{display:none}
 <!-- FOTO E VÍDEO -->
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
-  <div class="folder-chip" id="folderChipUnica">Destino não selecionado</div>
+  <div class="folder-chip" id="folderChipUnica">Pasta não selecionada</div>
   <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
     <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)">KM atual</span>
     <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
@@ -316,13 +295,13 @@ canvas#c, canvas#cUnica{display:none}
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
       <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="200" step="100"></div>
-      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"></div>
+      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"><p class="s-note">Ao completar o lote, o PDF é processado em segundo plano e a captura continua imediatamente no lote seguinte.</p></div>
     </div>
   </div>
 
   <div id="app-shell">
-    <div class="folder-chip" id="folderChipInspecao">Destino não selecionado</div>
-    <div class="capture-count" id="captureCount">0 / 150</div>
+    <div class="folder-chip" id="folderChipInspecao">Pasta não selecionada</div>
+    <div class="capture-count" id="captureCount" aria-live="polite">Total 0 · Lote 1: 0 / 150</div>
     <!-- Clicar na tela durante a inspeção tira foto manual instantânea -->
     <video id="vid" autoplay playsinline muted onclick="manualPhoto()"></video>
     <div id="km-hud"><span class="h-l">KM atual</span><p class="h-v" id="kmTxt">KM ---</p></div>
@@ -378,6 +357,22 @@ let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
 
+/* Estado da sessão contínua */
+let totalCaptured = 0;
+let currentBatchNumber = 1;
+let savedBatchCount = 0;
+let captureBusy = false;
+let sessionEnding = false;
+let nextCaptureAt = 0;
+let reportQueue = [];
+let reportWorker = null;
+let reportWorkerBusy = false;
+let reportWorkerCurrent = null;
+let sessionCode = '';
+const REPORT_JPEG_QUALITY = 0.86; // qualidade boa e otimizada para velocidade
+const REPORT_MAX_SIDE = 1600;    // equilíbrio entre nitidez, memória e captura rápida
+
+
 /* ===== PASTA OBRIGATÓRIA POR SESSÃO DE MÓDULO ===== */
 async function chooseDirectoryForModule() {
   dirHandle = null;
@@ -391,7 +386,7 @@ async function chooseDirectoryForModule() {
     if (perm !== 'granted') perm = await chosen.requestPermission({ mode: 'readwrite' });
     if (perm !== 'granted') throw new Error('Permissão de gravação negada');
     dirHandle = chosen;
-    document.querySelectorAll('.folder-chip').forEach(el => el.textContent = 'Salvar em: ' + chosen.name);
+    document.querySelectorAll('.folder-chip').forEach(el => el.textContent = 'Pasta: ' + chosen.name);
     showToast('Pasta selecionada: ' + chosen.name);
     return chosen;
   } catch (e) {
@@ -400,29 +395,24 @@ async function chooseDirectoryForModule() {
   }
 }
 
-async function saveFileToDirectory(blob, filename) {
-  if (dirHandle) {
-    try {
-      const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      showToast('Salvo na pasta: ' + filename);
-      return;
-    } catch (e) {
-      console.error(e);
-    }
+async function saveFileToDirectory(blob, filename, options = {}) {
+  const { silent = false, quick = false } = options;
+  if (!dirHandle) {
+    showToast('Selecione uma pasta antes de salvar', 'err', 1000);
+    throw new Error('Pasta não selecionada');
   }
-  if (!dirHandle) { showToast('Selecione uma pasta antes de salvar', 'err'); return; }
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Baixado: ' + filename);
+  try {
+    const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    if (!silent) showToast('Salvo: ' + filename, 'ok', quick ? 650 : 1100);
+    return true;
+  } catch (e) {
+    console.error(e);
+    showToast('Falha ao salvar: ' + filename, 'err', 1800);
+    throw e;
+  }
 }
 
 /* ===== FULLSCREEN HELPER ===== */
@@ -437,20 +427,20 @@ function triggerFullscreen() {
 
 /* ===== TOAST ===== */
 let _tt = null;
-function showToast(msg, type = 'ok') {
+function showToast(msg, type = 'ok', duration = 1100) {
   const el = document.getElementById('toast');
   const icons = { ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>', err: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' };
   el.className = 'toast ' + type;
   el.innerHTML = (icons[type] || '') + msg;
   clearTimeout(_tt);
-  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 3000); });
+  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), duration); });
 }
 
 /* ===== NAVIGATION ===== */
 async function openMod(id) {
   const menu = document.getElementById('main-menu');
   if (id === 'menu') {
-    if (capturing) { capturing = false; clearTimeout(captureTimer); }
+    if (capturing || sessionEnding || reportWorkerBusy || reportQueue.length) { showToast('Finalize a sessão e aguarde os lotes serem salvos', 'err', 1800); return; }
     if (isRecordingVideo) stopVideoRecording();
     [streamUnica, stream].forEach(st => st?.getTracks().forEach(t => t.stop()));
     streamUnica = null; stream = null;
@@ -608,12 +598,15 @@ async function initFotoUnica() {
 
 function takeSinglePhoto() {
   const c = document.getElementById('cUnica');
-  if (!c.width) return;
+  if (!c.width || !dirHandle) return;
 
-  c.toBlob(blob => {
-    const filename = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`.replace(/[,/]/g, '_');
-    saveFileToDirectory(blob, filename);
-  }, 'image/jpeg', 0.95);
+  const filename = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`.replace(/[,/]/g, '_');
+  c.toBlob(async blob => {
+    if (!blob) { showToast('Falha ao gerar a foto', 'err', 900); return; }
+    try {
+      await saveFileToDirectory(blob, filename, { quick: true });
+    } catch (_) {}
+  }, 'image/jpeg', 0.92);
 }
 
 /* ===== GRAVAÇÃO DE VÍDEO SEM ÁUDIO ===== */
@@ -735,101 +728,232 @@ function toggleSet() {
   document.getElementById('settings').classList.toggle('open');
 }
 
-function startCap() {
-  if (!dirHandle) { showToast('Pasta de destino não selecionada', 'err'); return; }
-  capturing = true;
-  buffer = [];
+function createReportWorker() {
+  if (reportWorker) return reportWorker;
+  const workerSource = `
+    importScripts('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    self.onmessage = function(event) {
+      const job = event.data;
+      try {
+        const jsPDF = self.jspdf.jsPDF;
+        let doc = null;
+        job.items.forEach((item, index) => {
+          /* Página com a mesma proporção da foto: preenchimento total, sem margem, corte ou deformação. */
+          const base = 210;
+          const pageW = item.w >= item.h ? base : base * (item.w / item.h);
+          const pageH = item.w >= item.h ? base * (item.h / item.w) : base;
+          const orientation = pageW >= pageH ? 'landscape' : 'portrait';
+          if (!doc) {
+            doc = new jsPDF({ orientation, unit: 'mm', format: [pageW, pageH], compress: true });
+          } else {
+            doc.addPage([pageW, pageH], orientation);
+          }
+          doc.addImage(item.img, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
+        });
+        const arrayBuffer = doc.output('arraybuffer');
+        self.postMessage({ ok: true, id: job.id, filename: job.filename, arrayBuffer }, [arrayBuffer]);
+      } catch (error) {
+        self.postMessage({ ok: false, id: job.id, filename: job.filename, error: error.message || String(error) });
+      }
+    };
+  `;
+  const url = URL.createObjectURL(new Blob([workerSource], { type: 'application/javascript' }));
+  reportWorker = new Worker(url);
+  URL.revokeObjectURL(url);
+
+  reportWorker.onmessage = async event => {
+    const result = event.data;
+    const current = reportWorkerCurrent;
+    try {
+      if (!result.ok) throw new Error(result.error || 'Falha ao gerar PDF');
+      await saveFileToDirectory(new Blob([result.arrayBuffer], { type: 'application/pdf' }), result.filename, { silent: true });
+      savedBatchCount++;
+      showToast(`Lote ${String(current?.batchNumber || savedBatchCount).padStart(3, '0')} salvo`, 'ok', 700);
+      current?.resolve?.();
+    } catch (error) {
+      console.error(error);
+      showToast('Falha ao salvar um lote do relatório', 'err', 2200);
+      current?.reject?.(error);
+    } finally {
+      reportWorkerBusy = false;
+      reportWorkerCurrent = null;
+      processReportQueue();
+      updateCaptureCount();
+    }
+  };
+  reportWorker.onerror = error => {
+    console.error(error);
+    const current = reportWorkerCurrent;
+    current?.reject?.(new Error('Processador de PDF indisponível'));
+    reportWorkerBusy = false;
+    reportWorkerCurrent = null;
+    reportWorker?.terminate();
+    reportWorker = null;
+    showToast('Falha no processador de PDF', 'err', 2200);
+    processReportQueue();
+  };
+  return reportWorker;
+}
+
+function processReportQueue() {
+  if (reportWorkerBusy || !reportQueue.length) return;
+  const worker = createReportWorker();
+  reportWorkerCurrent = reportQueue.shift();
+  reportWorkerBusy = true;
+  worker.postMessage({
+    id: reportWorkerCurrent.id,
+    filename: reportWorkerCurrent.filename,
+    items: reportWorkerCurrent.items
+  });
   updateCaptureCount();
+}
+
+function enqueueCompletedBatch(items, batchNumber, finalBatch = false) {
+  if (!items.length) return Promise.resolve();
+  const firstKm = items[0]?.km || '0';
+  const lastKm = items[items.length - 1]?.km || '0';
+  const tag = finalBatch ? 'FINAL' : `LOTE_${String(batchNumber).padStart(3, '0')}`;
+  const filename = `INSPECAO_${sessionCode}_${tag}_KM_${firstKm}_A_${lastKm}.pdf`.replace(/[,/:]/g, '_');
+
+  return new Promise((resolve, reject) => {
+    reportQueue.push({
+      id: `${sessionCode}-${batchNumber}-${Date.now()}`,
+      batchNumber, filename, items, resolve, reject
+    });
+    processReportQueue();
+    updateCaptureCount();
+  });
+}
+
+function startCap() {
+  if (!dirHandle) { showToast('Pasta de destino não selecionada', 'err', 1200); return; }
+  if (capturing || sessionEnding) return;
+
+  capturing = true;
+  sessionEnding = false;
+  captureBusy = false;
+  buffer = [];
+  reportQueue = [];
+  totalCaptured = 0;
+  currentBatchNumber = 1;
+  savedBatchCount = 0;
+  sessionCode = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '_');
+  nextCaptureAt = performance.now();
+
   document.getElementById('btn-start').style.display = 'none';
   document.getElementById('btn-stop').style.display = 'flex';
+  document.getElementById('btn-gear').disabled = true;
   document.getElementById('rec-tag').classList.add('on');
-  showToast('Gravação do relatório iniciada');
+  showToast('Captura contínua iniciada', 'ok', 800);
+  updateCaptureCount();
   captureLoop();
 }
 
 function captureLoop() {
   if (!capturing) return;
-  manualPhoto();
   const interval = Math.max(parseInt(document.getElementById('cfgInt').value) || 200, 200);
-  captureTimer = setTimeout(captureLoop, interval);
-}
+  const now = performance.now();
 
-function manualPhoto() {
-  const vid = document.getElementById('vid');
-  const c = document.getElementById('c');
-  const ctx = c.getContext('2d');
-  if (!vid.videoWidth) return;
-
-  c.width = vid.videoWidth;
-  c.height = vid.videoHeight;
-
-  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabel').value.trim());
-  
-  buffer.push({
-    img: c.toDataURL('image/jpeg', 0.82),
-    km: currentKm,
-    time: new Date().toLocaleTimeString('pt-BR')
-  });
-  updateCaptureCount();
-  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
-  if (capturing && buffer.length >= limit) { clearTimeout(captureTimer); stopCap(); }
-  else if (!capturing) showToast('Foto capturada');
-}
-
-function updateCaptureCount(){
-  const limit=Math.max(parseInt(document.getElementById('cfgLote').value)||150,1);
-  const el=document.getElementById('captureCount');
-  if(el) el.textContent=`${buffer.length} / ${limit}`;
-}
-document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount);
-
-function stopCap() {
-  clearTimeout(captureTimer);
-  capturing = false;
-  document.getElementById('btn-start').style.display = 'flex';
-  document.getElementById('btn-stop').style.display = 'none';
-  document.getElementById('rec-tag').classList.remove('on');
-
-  if (buffer.length === 0) {
-    showToast('Nenhuma foto capturada', 'err');
-    return;
+  if (!captureBusy && now >= nextCaptureAt - 4) {
+    captureBusy = true;
+    try { manualPhoto(true); } finally { captureBusy = false; }
+    nextCaptureAt += interval;
+    if (nextCaptureAt < performance.now() - interval) nextCaptureAt = performance.now() + interval;
   }
 
-  generatePDF();
+  captureTimer = setTimeout(captureLoop, Math.max(0, nextCaptureAt - performance.now()));
 }
 
-async function generatePDF() {
-  showToast('Gerando PDF, aguarde...');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p', 'mm', 'a4');
-  
-  const label = document.getElementById('fotoLabel').value || 'Relatório de Inspeção';
-  
-  doc.setFontSize(16);
-  doc.text(label, 14, 15);
-  doc.setFontSize(10);
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} | Total de Fotos: ${buffer.length}`, 14, 22);
+function manualPhoto(automatic = false) {
+  const vid = document.getElementById('vid');
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d', { alpha: false });
+  if (!vid.videoWidth || !dirHandle || sessionEnding) return false;
 
-  let y = 30;
-  buffer.forEach((item, index) => {
-    if (y > 230) {
-      doc.addPage();
-      y = 20;
-    }
-    doc.addImage(item.img, 'JPEG', 14, y, 80, 50);
-    doc.setFontSize(9);
-    doc.text(`Foto #${index + 1}`, 100, y + 10);
-    doc.text(`KM: ${item.km}`, 100, y + 18);
-    doc.text(`Horário: ${item.time}`, 100, y + 26);
-    y += 58;
-  });
+  /* Redução controlada acelera JPEG e mantém ótima leitura no relatório. */
+  const scale = Math.min(1, REPORT_MAX_SIDE / Math.max(vid.videoWidth, vid.videoHeight));
+  c.width = Math.max(2, Math.round(vid.videoWidth * scale));
+  c.height = Math.max(2, Math.round(vid.videoHeight * scale));
 
-  const pdfBlob = doc.output('blob');
-  const filename = `Relatorio_Inspecao_KM_${buffer[0]?.km || '0'}_a_${buffer[buffer.length - 1]?.km || '0'}.pdf`.replace(/[,/]/g, '_');
-  await saveFileToDirectory(pdfBlob, filename);
-  showToast('PDF gerado e salvo com sucesso!');
-  buffer = [];
+  const stamp = new Date();
+  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm,
+    stamp.toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`,
+    document.getElementById('fotoLabel').value.trim());
+
+  const image = c.toDataURL('image/jpeg', REPORT_JPEG_QUALITY);
+  buffer.push({ img: image, km: currentKm, time: stamp.toLocaleTimeString('pt-BR'), w: c.width, h: c.height });
+  totalCaptured++;
+
+  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
+  if (buffer.length >= limit) {
+    /* Troca imediata de buffer: a captura seguinte não espera geração nem salvamento do PDF. */
+    const completedItems = buffer;
+    const completedNumber = currentBatchNumber;
+    buffer = [];
+    currentBatchNumber++;
+    enqueueCompletedBatch(completedItems, completedNumber, false).catch(() => {});
+  }
+
   updateCaptureCount();
+  if (!automatic && !capturing) showToast('Foto incluída no relatório', 'ok', 550);
+  return true;
+}
+
+function updateCaptureCount() {
+  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
+  const pending = reportQueue.length + (reportWorkerBusy ? 1 : 0);
+  const el = document.getElementById('captureCount');
+  if (el) el.textContent = `Total ${totalCaptured} · Lote ${currentBatchNumber}: ${buffer.length} / ${limit}${pending ? ` · Fila ${pending}` : ''}`;
+}
+document.getElementById('cfgLote')?.addEventListener('input', updateCaptureCount);
+
+async function stopCap() {
+  if (sessionEnding) return;
+  clearTimeout(captureTimer);
+  capturing = false;
+  sessionEnding = true;
+
+  const stopButton = document.getElementById('btn-stop');
+  stopButton.disabled = true;
+  stopButton.lastChild.textContent = ' Salvando...';
+  document.getElementById('rec-tag').classList.remove('on');
+
+  const finalItems = buffer;
+  const finalNumber = currentBatchNumber;
+  buffer = [];
+  if (finalItems.length) enqueueCompletedBatch(finalItems, finalNumber, true).catch(() => {});
+  updateCaptureCount();
+
+  showToast('Finalizando lotes pendentes...', 'ok', 1200);
+  await waitForReports();
+
+  sessionEnding = false;
+  stopButton.disabled = false;
+  stopButton.style.display = 'none';
+  stopButton.lastChild.textContent = ' Finalizar sessão';
+  document.getElementById('btn-start').style.display = 'flex';
+  document.getElementById('btn-gear').disabled = false;
+  showToast(`Sessão finalizada · ${totalCaptured} fotos · ${savedBatchCount} lotes`, 'ok', 2200);
+  updateCaptureCount();
+}
+
+function waitForReports() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (!reportQueue.length && !reportWorkerBusy) resolve();
+      else setTimeout(check, 120);
+    };
+    check();
+  });
+}
+
+/* Mantida para compatibilidade com chamadas antigas; o fluxo atual usa a fila contínua. */
+async function generatePDF() {
+  if (!buffer.length) return;
+  const items = buffer;
+  const number = currentBatchNumber++;
+  buffer = [];
+  await enqueueCompletedBatch(items, number, false);
 }
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
@@ -850,17 +974,18 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.fillStyle = 'rgba(255,255,255,.7)';
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 }
-</script>
-<script>
+
+
 window.addEventListener('beforeunload', e => {
-  if (capturing || isRecordingVideo) {
+  if (capturing || sessionEnding || reportWorkerBusy || reportQueue.length || isRecordingVideo) {
     e.preventDefault();
     e.returnValue = '';
   }
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano');
+  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano', 'ok', 900);
 });
+
 </script>
 </body>
 </html>
