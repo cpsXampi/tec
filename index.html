@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Inspeção Móvel</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 /* ===== DESIGN TOKENS ===== */
 :root{
@@ -153,6 +153,61 @@ canvas#c, canvas#cUnica{display:none}
 .icon-settings{width:52px;height:52px;border-radius:16px!important;border:1px solid rgba(255,255,255,.15)!important;background:rgba(8,10,13,.72)!important;box-shadow:0 8px 24px rgba(0,0,0,.35);display:grid!important;place-items:center!important}
 .icon-settings svg{width:23px!important;height:23px!important}
 .s-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
+
+
+/* ===== RESPONSIVIDADE TOTAL E ÁREA VISUAL PROTEGIDA ===== */
+:root{--control-h:92px;--edge:clamp(8px,2vw,16px)}
+.module video{background:#000}
+.folder-chip,.capture-count,#km-hud,#km-hud-unica,#label-hud,#rec-tag{transition:opacity .2s ease,transform .2s ease}
+.folder-chip{top:auto;bottom:calc(var(--control-h) + var(--safe-b) + 10px);left:var(--edge);max-width:min(42vw,280px);padding:6px 9px;font-size:9px;opacity:.82}
+.capture-count{top:calc(10px + var(--safe-t));padding:6px 11px;font-size:9px;background:rgba(0,0,0,.56)}
+#captureProgress{position:absolute;z-index:121;top:0;left:0;width:0;height:3px;background:linear-gradient(90deg,var(--green),var(--accent));box-shadow:0 0 9px rgba(16,185,129,.35);transition:width .2s ease;pointer-events:none}
+#km-hud{top:calc(10px + var(--safe-t));left:var(--edge);min-width:112px;padding:7px 11px;border-radius:12px;background:rgba(4,120,87,.64)}
+#km-hud .h-l{font-size:7px}.capture-count+#captureProgress{}
+#km-hud .h-v{font-size:18px}
+#km-hud-unica{top:calc(10px + var(--safe-t))!important;left:var(--edge)!important;min-width:112px!important;padding:7px 11px!important;border-radius:12px!important;background:rgba(4,120,87,.64)!important}
+#km-hud-unica span{font-size:7px!important}#kmTxtUnica{font-size:18px!important}
+#rec-tag{top:calc(10px + var(--safe-t));right:var(--edge);padding:6px 10px}
+#label-hud{top:auto!important;right:var(--edge)!important;bottom:calc(var(--control-h) + var(--safe-b) + 10px);max-width:min(48vw,260px)!important;padding:6px 10px!important;background:rgba(0,0,0,.58)!important;border-color:rgba(255,214,0,.22)!important}
+#label-hud p{font-size:7px!important;margin-bottom:2px!important}#fotoLabelLive{font-size:10px!important}
+#ui-ctrl{min-height:var(--control-h);padding:12px var(--edge) calc(12px + var(--safe-b));gap:8px;background:linear-gradient(to top,rgba(0,0,0,.86),rgba(0,0,0,.25) 72%,transparent)}
+.ui-btn{height:46px}.icon-settings{width:46px!important;height:46px!important;border-radius:14px!important}
+#btn-menu{height:46px;padding:0 12px}
+#mod-foto-unica>div[style*="inset:auto 0 0 0"]{min-height:var(--control-h);padding:12px var(--edge) calc(12px + var(--safe-b))!important;gap:14px!important}
+#mod-foto-unica>div[style*="top:calc(18px"]{top:calc(10px + var(--safe-t))!important;right:var(--edge)!important}
+#mod-foto-unica>div[style*="top:calc(18px"] button{height:36px!important;padding:0 12px!important;font-size:9px!important}
+
+/* Modal adapta-se a telas pequenas, teclado e rotação */
+#settings,#settingsUnica{padding:max(10px,var(--safe-t)) 12px max(10px,var(--safe-b));align-items:flex-end}
+.settings-content{width:min(100%,440px);max-height:min(86dvh,720px);padding:20px;border-radius:22px}
+.s-group{margin-top:17px}.s-inp{min-height:46px}
+
+/* Paisagem: controles viram trilho lateral e liberam a imagem */
+@media (orientation:landscape) and (max-height:600px){
+  :root{--control-h:0px}
+  #ui-ctrl{left:auto;top:0;bottom:0;width:82px;min-height:100%;padding:calc(58px + var(--safe-t)) 10px calc(10px + var(--safe-b));flex-direction:column;align-items:center;justify-content:flex-end;background:linear-gradient(to left,rgba(0,0,0,.82),rgba(0,0,0,.18),transparent)}
+  #ui-ctrl .ui-btn{width:56px!important;flex:none!important;height:48px;padding:0;font-size:0}
+  #ui-ctrl .ui-btn svg{margin:0}
+  #btn-menu{font-size:8px!important;padding:0 4px!important}
+  .folder-chip{left:var(--edge);bottom:10px;max-width:34vw}
+  #label-hud{right:92px!important;bottom:10px;max-width:32vw!important}
+  #rec-tag{right:92px}
+  #mod-foto-unica>div[style*="inset:auto 0 0 0"]{inset:0 0 0 auto!important;width:84px;min-height:100%;padding:calc(58px + var(--safe-t)) 10px calc(10px + var(--safe-b))!important;flex-direction:column;background:linear-gradient(to left,rgba(0,0,0,.82),rgba(0,0,0,.18),transparent)!important}
+  #mod-foto-unica .folder-chip{bottom:10px;right:auto}
+  #mod-foto-unica>div[style*="top:calc(18px"]{right:12px!important}
+  .settings-content{width:min(430px,76vw);max-height:94dvh}
+}
+
+/* Telas estreitas */
+@media (max-width:390px){
+  #btn-menu{padding:0 9px;font-size:8px}.ui-btn{font-size:9px}
+  #label-hud{max-width:46vw!important}.folder-chip{max-width:38vw}
+}
+
+/* Acessibilidade e redução de movimento */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
 </style>
 </head>
 <body>
@@ -267,14 +322,16 @@ canvas#c, canvas#cUnica{display:none}
       <button class="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="200" step="100"></div>
+      <div class="s-group"><label class="s-lbl">Intervalo de captura — mínimo 500 ms</label><input type="number" class="s-inp" id="cfgInt" value="800" min="500" step="100"></div>
       <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"></div>
+      <div class="s-group"><label class="s-lbl">Qualidade do relatório</label><select class="s-inp" id="cfgQuality"><option value="0.72">Econômica</option><option value="0.82" selected>Equilibrada</option><option value="0.92">Alta</option></select><p class="s-note">Cada foto ocupa uma página e a orientação é ajustada automaticamente.</p></div>
     </div>
   </div>
 
   <div id="app-shell">
     <div class="folder-chip" id="folderChipInspecao">Pasta não selecionada</div>
-    <div class="capture-count" id="captureCount">0 / 150</div>
+    <div class="capture-count" id="captureCount" aria-live="polite">0 / 150 • 0%</div>
+    <div id="captureProgress" aria-hidden="true"></div>
     <!-- Clicar na tela durante a inspeção tira foto manual instantânea -->
     <video id="vid" autoplay playsinline muted onclick="manualPhoto()"></video>
     <div id="km-hud"><span class="h-l">KM atual</span><p class="h-v" id="kmTxt">KM ---</p></div>
@@ -303,16 +360,6 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-window.addEventListener('beforeunload', e => {
-  if (capturing || isRecordingVideo) {
-    e.preventDefault();
-    e.returnValue = '';
-  }
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano');
-});
-
 /* ===== SPLASH GARANTIDO E REMOÇÃO AUTOMÁTICA ===== */
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
@@ -339,6 +386,20 @@ let renderIntervalUnica = null;
 let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
+let wakeLock = null;
+let captureBusy = false;
+
+async function requestWakeLock(){
+  try { if ('wakeLock' in navigator && !wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+async function releaseWakeLock(){
+  try { await wakeLock?.release(); } catch(e) {}
+  wakeLock = null;
+}
+window.addEventListener('beforeunload', e => { if(capturing || isRecordingVideo){ e.preventDefault(); e.returnValue=''; } });
+document.addEventListener('visibilitychange', async () => {
+  if (!document.hidden && (capturing || isRecordingVideo)) await requestWakeLock();
+});
 
 /* ===== PASTA OBRIGATÓRIA POR SESSÃO DE MÓDULO ===== */
 async function chooseDirectoryForModule() {
@@ -417,6 +478,7 @@ async function openMod(id) {
     [streamUnica, stream].forEach(st => st?.getTracks().forEach(t => t.stop()));
     streamUnica = null; stream = null;
     if (renderIntervalUnica) clearInterval(renderIntervalUnica);
+    releaseWakeLock();
     document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
     document.getElementById('settings').classList.remove('open');
     document.getElementById('settingsUnica').classList.remove('open');
@@ -528,9 +590,10 @@ async function initFotoUnica() {
     if (renderIntervalUnica) clearInterval(renderIntervalUnica);
     renderIntervalUnica = setInterval(() => {
       if (vid.videoWidth) {
-        if (c.width !== vid.videoWidth || c.height !== vid.videoHeight) {
+        const metaH = Math.max(54, Math.round(vid.videoHeight * 0.075));
+        if (c.width !== vid.videoWidth || c.height !== vid.videoHeight + metaH) {
           c.width = vid.videoWidth;
-          c.height = vid.videoHeight;
+          c.height = vid.videoHeight + metaH;
         }
         drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabelUnica').value.trim());
       }
@@ -600,13 +663,14 @@ async function startVideoRecording() {
     const blob = new Blob(recordedChunks,{type:mediaRecorder.mimeType || 'video/webm'});
     await saveFileToDirectory(blob, `VIDEO_KM_${currentKm}_INICIO_${ini}_FIM_${end}.webm`.replace(/[,/]/g,'_'));
   };
-  mediaRecorder.start(1000); isRecordingVideo = true;
+  mediaRecorder.start(1000); isRecordingVideo = true; requestWakeLock();
   const b=document.getElementById('btnRecVideoUnica'); b.style.background='#ef4444'; b.style.borderColor='#fca5a5';
   showToast('Gravação de vídeo iniciada — sem áudio');
 }
 function stopVideoRecording() {
   if(mediaRecorder && isRecordingVideo){ mediaRecorder.stop(); isRecordingVideo=false;
     const b=document.getElementById('btnRecVideoUnica'); b.style.background='rgba(0,0,0,0.5)'; b.style.borderColor='rgba(255,255,255,0.4)';
+    releaseWakeLock();
     showToast('Finalizando e salvando vídeo...');
   }
 }
@@ -700,6 +764,7 @@ function toggleSet() {
 function startCap() {
   if (!dirHandle) { showToast('Pasta de destino não selecionada', 'err'); return; }
   capturing = true;
+  requestWakeLock();
   buffer = [];
   updateCaptureCount();
   document.getElementById('btn-start').style.display = 'none';
@@ -712,42 +777,51 @@ function startCap() {
 function captureLoop() {
   if (!capturing) return;
   manualPhoto();
-  const interval = Math.max(parseInt(document.getElementById('cfgInt').value) || 200, 200);
+  const interval = Math.max(parseInt(document.getElementById('cfgInt').value) || 800, 500);
   captureTimer = setTimeout(captureLoop, interval);
 }
 
 function manualPhoto() {
+  if (captureBusy) return;
+  captureBusy = true;
   const vid = document.getElementById('vid');
   const c = document.getElementById('c');
   const ctx = c.getContext('2d');
-  if (!vid.videoWidth) return;
+  if (!vid.videoWidth) { captureBusy = false; return; }
 
+  const metaH = Math.max(54, Math.round(vid.videoHeight * 0.075));
   c.width = vid.videoWidth;
-  c.height = vid.videoHeight;
+  c.height = vid.videoHeight + metaH;
 
   drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabel').value.trim());
-  
+  const quality = Math.min(.95, Math.max(.60, parseFloat(document.getElementById('cfgQuality')?.value || .82)));
   buffer.push({
-    img: c.toDataURL('image/jpeg', 0.82),
+    img: c.toDataURL('image/jpeg', quality),
     km: currentKm,
     time: new Date().toLocaleTimeString('pt-BR')
   });
   updateCaptureCount();
+  captureBusy = false;
   const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
   if (capturing && buffer.length >= limit) { clearTimeout(captureTimer); stopCap(); }
   else if (!capturing) showToast('Foto capturada');
 }
 
 function updateCaptureCount(){
-  const limit=Math.max(parseInt(document.getElementById('cfgLote').value)||150,1);
-  const el=document.getElementById('captureCount');
-  if(el) el.textContent=`${buffer.length} / ${limit}`;
+  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
+  const count = buffer.length;
+  const pct = Math.min(100, Math.round((count / limit) * 100));
+  const el = document.getElementById('captureCount');
+  const bar = document.getElementById('captureProgress');
+  if (el) el.textContent = `${count} / ${limit} • ${pct}%`;
+  if (bar) bar.style.width = pct + '%';
 }
 document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount);
 
 function stopCap() {
   clearTimeout(captureTimer);
   capturing = false;
+  releaseWakeLock();
   document.getElementById('btn-start').style.display = 'flex';
   document.getElementById('btn-stop').style.display = 'none';
   document.getElementById('rec-tag').classList.remove('on');
@@ -762,83 +836,78 @@ function stopCap() {
 
 async function generatePDF() {
   showToast('Gerando PDF, aguarde...');
-
-  if (!window.jspdf?.jsPDF) {
-    showToast('Biblioteca de PDF não carregada', 'err');
-    return;
-  }
-
-  if (!buffer.length) {
-    showToast('Nenhuma foto capturada', 'err');
-    return;
-  }
+  if (!window.jspdf?.jsPDF) { showToast('Biblioteca de PDF não carregada', 'err'); return; }
+  if (!buffer.length) { showToast('Nenhuma foto capturada', 'err'); return; }
 
   try {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 8;
-    const availableWidth = pageWidth - margin * 2;
-    const availableHeight = pageHeight - margin * 2;
+    const firstOrientation = 'portrait';
+    let doc = null;
 
     buffer.forEach((item, index) => {
-      if (index > 0) doc.addPage('a4', 'portrait');
+      const probe = doc || new jsPDF({orientation:firstOrientation,unit:'mm',format:'a4',compress:true});
+      const props = probe.getImageProperties(item.img);
+      const orientation = props.width > props.height ? 'landscape' : 'portrait';
 
-      const imageProperties = doc.getImageProperties(item.img);
-      const imageRatio = imageProperties.width / imageProperties.height;
-      const pageRatio = availableWidth / availableHeight;
+      if (!doc) doc = new jsPDF({ orientation, unit:'mm', format:'a4', compress:true });
+      else doc.addPage('a4', orientation);
 
-      let imageWidth;
-      let imageHeight;
-
-      if (imageRatio > pageRatio) {
-        imageWidth = availableWidth;
-        imageHeight = imageWidth / imageRatio;
-      } else {
-        imageHeight = availableHeight;
-        imageWidth = imageHeight * imageRatio;
-      }
-
-      const x = (pageWidth - imageWidth) / 2;
-      const y = (pageHeight - imageHeight) / 2;
-
-      doc.addImage(item.img, 'JPEG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 5;
+      const maxW = pageWidth - margin * 2;
+      const maxH = pageHeight - margin * 2;
+      const ratio = props.width / props.height;
+      let drawW = maxW;
+      let drawH = drawW / ratio;
+      if (drawH > maxH) { drawH = maxH; drawW = drawH * ratio; }
+      const x = (pageWidth - drawW) / 2;
+      const y = (pageHeight - drawH) / 2;
+      doc.addImage(item.img, 'JPEG', x, y, drawW, drawH, undefined, 'FAST');
     });
 
     const firstKm = buffer[0]?.km || '0';
     const lastKm = buffer[buffer.length - 1]?.km || '0';
     const filename = `Relatorio_Inspecao_KM_${firstKm}_a_${lastKm}.pdf`.replace(/[,/]/g, '_');
-    const pdfBlob = doc.output('blob');
-
-    await saveFileToDirectory(pdfBlob, filename);
+    await saveFileToDirectory(doc.output('blob'), filename);
     showToast('PDF sequencial salvo com sucesso!');
     buffer = [];
     updateCaptureCount();
-  } catch (error) {
-    console.error(error);
+  } catch (e) {
+    console.error(e);
     showToast('Não foi possível gerar o PDF', 'err');
   }
 }
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
-  ctx.drawImage(videoEl, 0, 0, w, h);
-  const bh = h * .13;
-  const grad = ctx.createLinearGradient(0, h - bh, 0, h);
-  grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(.25, 'rgba(0,0,0,.55)');
-  grad.addColorStop(1, 'rgba(0,0,0,.9)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, h - bh, w, bh);
+  const sourceH = videoEl.videoHeight || h;
+  const imageH = Math.min(sourceH, h);
+  const bandH = Math.max(0, h - imageH);
 
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+  ctx.drawImage(videoEl, 0, 0, w, imageH);
 
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
-  ctx.fillText('KM ' + kmVal + (label ? ' - ' + label : ''), 20, h - bh * .55);
-  ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.7)';
-  ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
+  if (bandH > 0) {
+    ctx.fillStyle = '#090b0f';
+    ctx.fillRect(0, imageH, w, bandH);
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(0, imageH, Math.max(5, w * .006), bandH);
+
+    const pad = Math.max(14, Math.round(w * .014));
+    const titleSize = Math.max(14, Math.round(bandH * .34));
+    const detailSize = Math.max(11, Math.round(bandH * .22));
+    const main = `KM ${kmVal}${label ? '  •  ' + label : ''}`;
+
+    ctx.textBaseline = 'middle';
+    ctx.font = `700 ${titleSize}px Arial,sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(main, pad, imageH + bandH * .36, w - pad * 2);
+
+    ctx.font = `500 ${detailSize}px Arial,sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,.68)';
+    ctx.fillText(`${ts}  •  GPS ${gpsStr}`, pad, imageH + bandH * .73, w - pad * 2);
+  }
 }
 </script>
 </body>
