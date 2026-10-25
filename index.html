@@ -211,7 +211,7 @@ img,video{display:block;max-width:100%}
 /* ===== SKELETON ===== */
 .skel{height:100px;border-radius:var(--r-lg);background:linear-gradient(110deg,var(--surface) 30%,var(--surface2) 50%,var(--surface) 70%);background-size:200% 100%;animation:shimmer 2s infinite linear}
 @keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
-/* ===== INSPECTION ===== */
+/* ===== INSPEÇÃO ===== */
 #mod-inspecao{position:fixed;inset:0;overflow:hidden;background:#000}
 #gate{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);overflow-y:auto}
 .gate-box{max-width:400px;width:100%;border-radius:var(--r-xl);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface) 0%,var(--surface2) 100%);padding:36px 24px;text-align:center;box-shadow:var(--shadow-xl);position:relative;overflow:hidden}
@@ -270,8 +270,6 @@ canvas#c{display:none}
 .toast.ok svg{color:var(--green)}
 .toast.err{border-color:rgba(239,68,68,.25);color:#fca5a5}
 .toast.err svg{color:var(--red)}
-#main-menu .menu-grid .mc:nth-child(1),
-#main-menu .menu-grid .mc:nth-child(3){display:none}
 /* ===== RESPONSIVE ===== */
 @media(min-width:480px){
   .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -339,25 +337,52 @@ canvas#c{display:none}
     </div>
     <p class="menu-sub"></p>
     <div class="menu-grid">
-      <button class="mc pri" onclick="openMod('apoio')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span class="mc-b"><h3>Apoio localização</h3><p></p></span>
+      <button class="mc pri" onclick="openMod('foto-unica')">
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
+        <span class="mc-b"><h3>Foto Única</h3><p>Tirar foto avulsa com KM e salvar na galeria</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc pri" onclick="openMod('inspecao')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Inspeção fotográfica</h3><p>Fotos com KM e relatório PDF</p></span>
+        <span class="mc-b"><h3>Inspeção fotográfica (PDF)</h3><p>Relatório completo por lote com pasta</p></span>
+        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+      </button>
+      <button class="mc" onclick="openMod('apoio')">
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span class="mc-b"><h3>Apoio localização</h3><p>Postes e ordens de serviço</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc" onclick="openMod('km')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-        <span class="mc-b"><h3>KM em tempo real</h3><p></p></span>
+        <span class="mc-b"><h3>KM em tempo real</h3><p>Monitoramento contínuo</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
     <p class="menu-footer"></p>
   </div>
 </div>
+
+<!-- FOTO ÚNICA (NOVO MÓDULO) -->
+<div id="mod-foto-unica" class="module">
+  <div style="position:relative;width:100vw;height:100vh;height:100dvh;background:#000;">
+    <video id="vidUnica" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+    <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
+      <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)">KM atual</span>
+      <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
+    </div>
+    <div style="position:absolute;top:calc(18px + var(--safe-t));right:14px;z-index:100;">
+      <button onclick="openMod('menu')" style="height:42px;padding:0 16px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(10px)">Voltar</button>
+    </div>
+    <div style="position:absolute;inset:auto 0 0 0;padding:0 18px calc(24px + var(--safe-b));display:flex;gap:12px;align-items:center;justify-content:center;z-index:200;background:linear-gradient(to top,rgba(0,0,0,.82),transparent)">
+      <button onclick="takeSinglePhoto()" style="flex:1;max-width:400px;height:56px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 24px rgba(255,214,0,.2)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>
+        Disparar Foto
+      </button>
+    </div>
+  </div>
+  <canvas id="cUnica" style="display:none"></canvas>
+</div>
+
 <!-- APOIO -->
 <div id="mod-apoio" class="module">
   <header class="hdr">
@@ -436,7 +461,8 @@ canvas#c{display:none}
     </div>
   </div>
 </div>
-<!-- INSPEÇÃO -->
+
+<!-- INSPEÇÃO (SISTEMA DE RELATÓRIO COM PASTA) -->
 <div id="mod-inspecao" class="module">
   <div id="gate">
     <div class="gate-box">
@@ -491,6 +517,7 @@ canvas#c{display:none}
   </div>
   <canvas id="c"></canvas>
 </div>
+
 <!-- KM -->
 <div id="mod-km" class="module">
   <header class="hdr">
@@ -522,8 +549,8 @@ const fmtAcc=a=>!Number.isFinite(a)?'—':`±${Math.round(a)}M`;
 const nowBR=()=>new Date().toLocaleString('pt-BR').toUpperCase();
 function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}return-1}
 /* ===== STATE ===== */
-let posts=[],postsKm=[],kmDB=[],pos=null,searchItem=null,renderedKey='',apoioInit=false,rtInit=false;
-let cam='',stream=null,hDir=null,capturing=false,buffer=[],kmIniLote='',lat='0.000000',lon='0.000000',wakeLock=null,cameras=[];
+let posts=[],postsKm=[],kmDB=[],pos=null,searchItem=null,renderedKey='',apoioInit=false,rtInit=false,unicaInit=false;
+let cam='',stream=null,streamUnica=null,hDir=null,capturing=false,buffer=[],kmIniLote='',lat='0.000000',lon='0.000000',wakeLock=null,cameras=[];
 /* ===== TOAST ===== */
 let _tt=null;
 function showToast(msg,type='ok'){
@@ -538,9 +565,14 @@ function showToast(msg,type='ok'){
 function openMod(id){
   const menu=document.getElementById('main-menu');
   document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
-  if(id==='menu'){menu.style.display='flex';return}
+  if(id==='menu'){
+    menu.style.display='flex';
+    if(streamUnica){streamUnica.getTracks().forEach(t=>t.stop());streamUnica=null;}
+    return;
+  }
   menu.style.display='none';
   document.getElementById('mod-'+id).classList.add('active');
+  if(id==='foto-unica')initFotoUnica();
   if(id==='apoio')initApoio();
   if(id==='km')initRt();
 }
@@ -653,6 +685,77 @@ function updateKm(){
     if(s)s.textContent=`Referência: ${kmDB.length} pontos`;
   }
 }
+
+/* ===== FOTO ÚNICA (NOVA LÓGICA) ===== */
+async function initFotoUnica(){
+  if(!kmDB.length)loadKm();
+  try{
+    streamUnica = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
+    document.getElementById('vidUnica').srcObject = streamUnica;
+  }catch(e){
+    showToast('Erro ao acessar a câmera', 'err');
+  }
+  if('geolocation' in navigator){
+    navigator.geolocation.watchPosition(p=>{
+      lat = p.coords.latitude.toFixed(6);
+      lon = p.coords.longitude.toFixed(6);
+      if(!kmDB.length)return;
+      let best=null,minD=Infinity;
+      for(const pt of kmDB){
+        const d=Math.hypot(pt.lat-p.coords.latitude,pt.lon-p.coords.longitude);
+        if(d<minD){minD=d;best=pt}
+      }
+      if(best){
+        document.getElementById('kmTxtUnica').textContent='KM '+best.km;
+      }
+    },null,{enableHighAccuracy:true});
+  }
+}
+
+async function takeSinglePhoto(){
+  const vid = document.getElementById('vidUnica');
+  const c = document.getElementById('cUnica');
+  const ctx = c.getContext('2d');
+  if(!vid.videoWidth)return;
+
+  c.width = vid.videoWidth;
+  c.height = vid.videoHeight;
+  const km = document.getElementById('kmTxtUnica').innerText.replace('KM ','');
+  
+  // Desenha vídeo e overlay na imagem
+  drawOverlayCustom(ctx, c.width, c.height, km, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
+
+  c.toBlob(blob=>{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `FOTO_AVULSA_KM_${km}_${Date.now()}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Foto salva com sucesso!');
+  }, 'image/jpeg', 0.95);
+}
+
+function drawOverlayCustom(ctx, w, h, kmVal, ts, gpsStr){
+  ctx.drawImage(document.getElementById('vidUnica'),0,0,w,h);
+  const bh=h*.13;
+  const grad=ctx.createLinearGradient(0,h-bh,0,h);
+  grad.addColorStop(0,'rgba(0,0,0,0)');
+  grad.addColorStop(.25,'rgba(0,0,0,.55)');
+  grad.addColorStop(1,'rgba(0,0,0,.9)');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,h-bh,w,bh);
+
+  ctx.fillStyle='#fff';
+  ctx.font='bold '+Math.round(bh*.30)+'px Arial,sans-serif';
+  ctx.fillText('KM '+kmVal,20,h-bh*.55);
+  ctx.font=Math.round(bh*.18)+'px Arial,sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.7)';
+  ctx.fillText(ts+' | GPS: '+gpsStr,20,h-bh*.22);
+}
+
 /* ===== APOIO ===== */
 function initApoio(){
   if(apoioInit)return;
