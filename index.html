@@ -1,22 +1,4 @@
 
-Conversa com o Gemini
-ajustes cameras sem travar... full scream sempre
-
-Aqui está a versão otimizada do seu aplicativo. Os principais ajustes realizados para resolver os travamentos e garantir o modo tela cheia permanente (full screen) são:
-
-Correção de Travamentos (Performance e Memória):
-
-O intervalo padrão de captura (cfgInt) estava configurado para 200ms (o que gerava 5 fotos por segundo com processamento pesado de canvas e toDataURL na Thread Principal, travando qualquer celular). O padrão foi ajustado para 2000ms (2 segundos) e otimizado para evitar estouro de memória (RAM).   
-TXT
-
-Redução da qualidade do JPEG na exportação de buffer para 0.75 para manter o relatório leve sem perder legibilidade.
-
-Tela Cheia Automática (Full Screen Sempre):
-
-Adicionada a API nativa de Tela Cheia (requestFullscreen) acionada automaticamente ao iniciar a câmera ou a inspeção, ocultando as barras de navegação do navegador móvel e garantindo imersão total.
-
-Código Atualizado e Otimizado
-HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
