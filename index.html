@@ -8,10 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Inspeção Móvel</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-window.addEventListener('beforeunload', e => { if(capturing || isRecordingVideo){ e.preventDefault(); e.returnValue=''; } });
-document.addEventListener('visibilitychange',()=>{ if(document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano'); });
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ===== DESIGN TOKENS ===== */
 :root{
@@ -306,6 +303,16 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
+window.addEventListener('beforeunload', e => {
+  if (capturing || isRecordingVideo) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano');
+});
+
 /* ===== SPLASH GARANTIDO E REMOÇÃO AUTOMÁTICA ===== */
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
@@ -755,36 +762,64 @@ function stopCap() {
 
 async function generatePDF() {
   showToast('Gerando PDF, aguarde...');
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p', 'mm', 'a4');
-  
-  const label = document.getElementById('fotoLabel').value || 'Relatório de Inspeção';
-  
-  doc.setFontSize(16);
-  doc.text(label, 14, 15);
-  doc.setFontSize(10);
-  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} | Total de Fotos: ${buffer.length}`, 14, 22);
 
-  let y = 30;
-  buffer.forEach((item, index) => {
-    if (y > 230) {
-      doc.addPage();
-      y = 20;
-    }
-    doc.addImage(item.img, 'JPEG', 14, y, 80, 50);
-    doc.setFontSize(9);
-    doc.text(`Foto #${index + 1}`, 100, y + 10);
-    doc.text(`KM: ${item.km}`, 100, y + 18);
-    doc.text(`Horário: ${item.time}`, 100, y + 26);
-    y += 58;
-  });
+  if (!window.jspdf?.jsPDF) {
+    showToast('Biblioteca de PDF não carregada', 'err');
+    return;
+  }
 
-  const pdfBlob = doc.output('blob');
-  const filename = `Relatorio_Inspecao_KM_${buffer[0]?.km || '0'}_a_${buffer[buffer.length - 1]?.km || '0'}.pdf`.replace(/[,/]/g, '_');
-  await saveFileToDirectory(pdfBlob, filename);
-  showToast('PDF gerado e salvo com sucesso!');
-  buffer = [];
-  updateCaptureCount();
+  if (!buffer.length) {
+    showToast('Nenhuma foto capturada', 'err');
+    return;
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 8;
+    const availableWidth = pageWidth - margin * 2;
+    const availableHeight = pageHeight - margin * 2;
+
+    buffer.forEach((item, index) => {
+      if (index > 0) doc.addPage('a4', 'portrait');
+
+      const imageProperties = doc.getImageProperties(item.img);
+      const imageRatio = imageProperties.width / imageProperties.height;
+      const pageRatio = availableWidth / availableHeight;
+
+      let imageWidth;
+      let imageHeight;
+
+      if (imageRatio > pageRatio) {
+        imageWidth = availableWidth;
+        imageHeight = imageWidth / imageRatio;
+      } else {
+        imageHeight = availableHeight;
+        imageWidth = imageHeight * imageRatio;
+      }
+
+      const x = (pageWidth - imageWidth) / 2;
+      const y = (pageHeight - imageHeight) / 2;
+
+      doc.addImage(item.img, 'JPEG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+    });
+
+    const firstKm = buffer[0]?.km || '0';
+    const lastKm = buffer[buffer.length - 1]?.km || '0';
+    const filename = `Relatorio_Inspecao_KM_${firstKm}_a_${lastKm}.pdf`.replace(/[,/]/g, '_');
+    const pdfBlob = doc.output('blob');
+
+    await saveFileToDirectory(pdfBlob, filename);
+    showToast('PDF sequencial salvo com sucesso!');
+    buffer = [];
+    updateCaptureCount();
+  } catch (error) {
+    console.error(error);
+    showToast('Não foi possível gerar o PDF', 'err');
+  }
 }
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
