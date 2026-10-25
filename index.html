@@ -45,6 +45,7 @@ img,video{display:block;max-width:100%}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 ::selection{background:rgba(255,214,0,.25);color:#fff}
+
 /* ===== SPLASH ===== */
 #splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
 #splash.done{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .5s ease,visibility .5s ease}
@@ -54,182 +55,53 @@ img,video{display:block;max-width:100%}
 .sp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.01) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 60% 50% at 50% 50%,black 10%,transparent 65%);-webkit-mask-image:radial-gradient(ellipse 60% 50% at 50% 50%,black 10%,transparent 65%)}
 .sp-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,0,.12),transparent);animation:scan 3s linear infinite}
 @keyframes scan{from{top:-2px}to{top:100%}}
-.sp-dots{position:absolute;inset:0}
-.sp-dot{position:absolute;width:2px;height:2px;background:var(--accent);border-radius:50%;opacity:0;animation:dotRise 3.5s ease-in-out infinite}
-.sp-dot:nth-child(1){left:12%;animation-delay:0s;animation-duration:3.2s}
-.sp-dot:nth-child(2){left:30%;animation-delay:.8s;animation-duration:2.8s}
-.sp-dot:nth-child(3){left:50%;animation-delay:1.4s;animation-duration:3s}
-.sp-dot:nth-child(4){left:70%;animation-delay:.3s;animation-duration:3.4s}
-.sp-dot:nth-child(5){left:88%;animation-delay:2s;animation-duration:2.6s}
-@keyframes dotRise{0%{bottom:-4px;opacity:0}15%{opacity:.5}85%{opacity:.5}100%{bottom:105%;opacity:0}}
 .sp-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center}
 .sp-logo-wrap{position:relative;width:104px;height:104px}
 .sp-logo{width:100%;height:100%;border-radius:28px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;box-shadow:0 0 0 1px rgba(255,214,0,.25),0 24px 80px rgba(255,214,0,.22),inset 0 1px 0 rgba(255,255,255,.3);animation:logoIn .7s var(--ease-bounce) .15s both}
 .sp-logo svg{width:56px;height:56px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
-.sp-ring{position:absolute;inset:-14px;border:2px solid rgba(255,214,0,.3);border-radius:32px;animation:ringPulse 2s .5s ease-out infinite}
-.sp-ring2{position:absolute;inset:-28px;border:1px solid rgba(255,214,0,.1);border-radius:38px;animation:ringPulse 2s .9s ease-out infinite}
 @keyframes logoIn{from{transform:scale(0) rotate(-140deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-@keyframes ringPulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}
-.sp-badge{position:absolute;top:-4px;right:-4px;width:30px;height:30px;border-radius:10px;background:var(--green);border:2.5px solid var(--bg);display:grid;place-items:center;animation:badgePop .4s 1.1s var(--ease-bounce) both}
-.sp-badge svg{width:14px;height:14px}
-@keyframes badgePop{from{transform:scale(0)}to{transform:scale(1)}}
-.sp-eyebrow{margin-top:38px;font-size:11px;font-weight:900;letter-spacing:.55em;color:var(--accent);text-transform:uppercase;animation:txtUp .5s .45s both}
 .sp-title{margin-top:16px;font-size:clamp(28px,8vw,36px);font-weight:900;letter-spacing:-.03em;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:txtUp .5s .6s both}
-.sp-sub{margin-top:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);animation:txtUp .5s .75s both}
 .sp-bar{margin-top:48px;width:180px;height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;animation:txtUp .3s .9s both}
 .sp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:barLoad 1.1s 1s ease-in-out both;transform-origin:left}
 @keyframes barLoad{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes txtUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
 /* ===== MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;justify-content:center;padding:24px 20px;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
-.menu-bg{position:fixed;inset:0;pointer-events:none;z-index:0}
-.menu-bg-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:450px;background:radial-gradient(ellipse at center,rgba(255,214,0,.06),transparent 60%);filter:blur(3px)}
-.menu-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.008) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.008) 1px,transparent 1px);background-size:52px 52px}
-.menu-bg-vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 35%,var(--bg) 100%)}
 .menu-inner{position:relative;z-index:1;max-width:460px;width:100%;margin:0 auto}
-.menu-status{display:flex;align-items:center;justify-content:space-between;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);padding:14px 18px;margin-bottom:36px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:border-color .2s var(--ease)}
-.ms-left{display:flex;align-items:center;gap:12px}
-.ms-icon{width:38px;height:38px;border-radius:11px;background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;flex-shrink:0}
-.ms-icon svg{width:18px;height:18px}
-.ms-time-group .ms-clock{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
-.ms-time-group .ms-date{font-size:10px;font-weight:600;color:var(--muted);text-transform:capitalize;margin-top:2px}
-.ms-gps-pill{display:flex;align-items:center;gap:7px;border-radius:20px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);padding:7px 14px}
-.ms-gps-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.5);animation:dotPulse 2s infinite}
-@keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
-.ms-gps-pill span{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--green2)}
-.menu-brand{display:flex;align-items:center;gap:16px;margin-bottom:6px}
-.menu-logo{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;flex-shrink:0;box-shadow:0 8px 28px rgba(255,214,0,.14),inset 0 1px 0 rgba(255,255,255,.25)}
-.menu-logo svg{width:28px;height:28px}
-.menu-brand-text .meb{font-size:10px;font-weight:900;letter-spacing:.4em;color:var(--accent);text-transform:uppercase}
-.menu-brand-text .mt{font-size:clamp(30px,9vw,38px);font-weight:900;letter-spacing:-.03em;margin-top:2px;line-height:1.05}
-.menu-sub{font-size:12px;color:var(--muted);margin-top:14px;font-weight:500;line-height:1.6;padding-bottom:4px}
-.menu-grid{margin-top:32px;display:flex;flex-direction:column;gap:10px}
-.mc{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);transition:all .2s var(--ease);position:relative;overflow:hidden;text-align:left;width:100%}
-.mc::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,214,0,.03),transparent 50%);opacity:0;transition:opacity .2s var(--ease);pointer-events:none}
-.mc:active{transform:scale(.975);transition-duration:80ms}
+.menu-grid{display:flex;flex-direction:column;gap:16px}
+.mc{display:flex;align-items:center;gap:16px;padding:20px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);transition:all .2s var(--ease);position:relative;overflow:hidden;text-align:left;width:100%}
+.mc:active{transform:scale(.975)}
 .mc.pri{border-color:rgba(255,214,0,.3);background:linear-gradient(135deg,rgba(255,214,0,.08),rgba(255,214,0,.02));box-shadow:0 6px 24px rgba(255,214,0,.06)}
-.mc.pri::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,0,.25),transparent)}
-.mc-i{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;background:var(--glass2);color:var(--accent)}
-.mc.pri .mc-i{background:rgba(255,214,0,.12)}
-.mc-i svg{width:22px;height:22px}
+.mc-i{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;background:rgba(255,214,0,.12);color:var(--accent)}
+.mc-i svg{width:24px;height:24px}
 .mc-b{flex:1;min-width:0}
-.mc-b h3{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
-.mc-b p{font-size:11px;font-weight:500;color:var(--muted);margin-top:2px}
-.mc-a{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--glass);color:var(--dim);flex-shrink:0;transition:all .2s var(--ease)}
-.mc.pri .mc-a{background:rgba(0,0,0,.1);color:rgba(0,0,0,.45)}
-.menu-footer{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-top:36px;padding-bottom:var(--safe-b)}
+.mc-b h3{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.mc-b p{font-size:11px;font-weight:500;color:var(--muted);margin-top:3px}
+.mc-a{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--glass);color:var(--dim);flex-shrink:0}
+
 /* ===== MODULE ===== */
 .module{display:none;min-height:100vh;min-height:100dvh;background:var(--bg)}
 .module.active{display:block;animation:modFade .25s var(--ease)}
 @keyframes modFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-/* ===== HEADER ===== */
-.hdr{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border);background:rgba(6,7,10,.82);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4);padding:0 16px;padding-top:var(--safe-t)}
-.hdr-in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px;height:58px}
-.hdr-back{width:38px;height:38px;border-radius:var(--r-xs);border:1px solid var(--border);background:var(--glass);display:grid;place-items:center;flex-shrink:0;transition:all .15s var(--ease)}
-.hdr-back:active{transform:scale(.9);background:var(--glass3)}
-.hdr-back svg{width:18px;height:18px}
-.hdr-title{flex:1;min-width:0}
-.hdr-title h1{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdr-title p{font-size:10px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.hdr-badge{width:36px;height:36px;border-radius:var(--r-xs);background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;flex-shrink:0}
-.hdr-badge svg{width:18px;height:18px}
-/* ===== WRAP ===== */
-.wrap{max-width:680px;margin:0 auto;padding:16px;padding-bottom:var(--safe-b);display:flex;flex-direction:column;gap:10px}
-/* ===== KM DISPLAY ===== */
-.km-hero{border-radius:var(--r-xl);border:1px solid rgba(16,185,129,.22);background:linear-gradient(155deg,#047857 0%,#065f46 45%,#022c22 100%);text-align:center;padding:clamp(24px,5vw,38px) 24px;position:relative;overflow:hidden;box-shadow:0 16px 50px rgba(0,80,55,.18)}
-.km-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(16,185,129,.12),transparent 55%);pointer-events:none}
-.km-hero::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
-.km-hero.compact{padding:18px 20px}
-.km-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:rgba(220,252,231,.55);position:relative}
-.km-value{font-size:clamp(44px,13vw,64px);font-weight:900;line-height:1.05;letter-spacing:-.04em;margin-top:6px;font-variant-numeric:tabular-nums;position:relative;background:linear-gradient(180deg,#fff 25%,#6ee7b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.km-hero.compact .km-value{font-size:clamp(32px,11vw,44px)}
-.km-sub{font-size:10px;font-weight:600;color:rgba(220,252,231,.4);margin-top:8px;position:relative}
-/* ===== GPS ===== */
-.gps{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border-radius:var(--r-sm);border:1px solid;padding:0 14px;font-size:11px;font-weight:800;letter-spacing:.06em;text-align:center;transition:all .2s var(--ease)}
-.gps svg{width:14px;height:14px;flex-shrink:0}
-.gps.bad{border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.05);color:#fca5a5}
-.gps.ok{border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.05);color:#6ee7b7}
-.gps.warn{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.05);color:#fcd34d}
-/* ===== CARDS ===== */
-.card{border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);padding:18px;position:relative;overflow:hidden;transition:border-color .2s var(--ease)}
-.card-accent{border-color:rgba(255,214,0,.2);background:linear-gradient(145deg,rgba(255,214,0,.05),rgba(255,214,0,.015));box-shadow:0 8px 30px rgba(0,0,0,.2)}
-.card-accent::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,0,.15),transparent)}
-.card-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card-label::before{content:"";width:3px;height:11px;border-radius:2px;background:var(--accent)}
-/* ===== SEARCH ===== */
-.search-row{display:flex;gap:8px}
-.search-wrap{flex:1;min-width:0;position:relative}
-.search-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--dim);pointer-events:none;transition:color .2s var(--ease)}
-.search-input{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(0,0,0,.2);padding:13px 14px 13px 38px;font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;transition:all .2s var(--ease)}
-.search-input::placeholder{color:var(--dim);font-weight:700}
-.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,214,0,.08)}
-.search-input:focus~svg{color:var(--accent)}
-.btn-icon{width:46px;height:46px;border-radius:var(--r-sm);display:grid;place-items:center;flex-shrink:0;transition:all .15s var(--ease)}
-.btn-icon:active{transform:scale(.9)}
-.btn-icon.go{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;box-shadow:0 3px 12px rgba(255,214,0,.18)}
-.btn-icon.clr{border:1px solid var(--border);background:var(--glass);color:var(--muted)}
-.btn-icon svg{width:17px;height:17px}
-.search-msg{margin-top:10px;font-size:11px;font-weight:800;text-transform:uppercase;color:var(--warn);display:flex;align-items:center;gap:6px}
-.search-msg svg{width:13px;height:13px}
-/* ===== TARGET LOCK ===== */
-.target-lock{display:none;border-radius:var(--r-lg);border:2px solid var(--green);background:linear-gradient(145deg,rgba(5,150,105,.15),rgba(16,185,129,.06));padding:20px;text-align:center;position:relative;overflow:hidden}
-.target-lock::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(16,185,129,.12),transparent 55%);pointer-events:none}
-.target-lock.on{display:block;animation:lockIn .4s var(--ease-bounce),lockPulse 2.5s infinite}
-@keyframes lockIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-@keyframes lockPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.25)}50%{box-shadow:0 0 0 10px rgba(16,185,129,0)}}
-.target-lock h2{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;position:relative}
-.target-lock p{font-size:11px;font-weight:700;margin-top:6px;opacity:.8;position:relative}
-/* ===== POST ===== */
-.post{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--border);background:var(--glass);transition:all .2s var(--ease)}
-.post.near{border-color:rgba(255,214,0,.45);background:linear-gradient(145deg,rgba(255,214,0,.07),rgba(255,214,0,.02));box-shadow:0 6px 24px rgba(255,214,0,.05)}
-.post.searched{border-color:rgba(255,214,0,.45);background:linear-gradient(145deg,rgba(255,214,0,.07),rgba(255,214,0,.02))}
-.post-top{display:flex;align-items:flex-start;gap:12px;padding:14px}
-.post-chk{margin-top:2px;width:18px;height:18px;accent-color:var(--accent);flex-shrink:0}
-.post-info{flex:1;min-width:0}
-.post-id{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.post-id span{color:var(--accent)}
-.post-dist{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-top:3px}
-.post-coords{font-size:10px;color:var(--dim);font-weight:600;margin-top:2px}
-.post-km{font-size:10px;font-weight:700;color:var(--green2);margin-top:2px;text-transform:uppercase}
-.post-pin{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:var(--accent-dim);color:var(--accent);display:grid;place-items:center}
-.post-pin svg{width:15px;height:15px}
-.post-map-container{padding:0 14px 14px 14px;}
-.btn-toggle-map{width:100%;min-height:36px;border-radius:var(--r-xs);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text2);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s var(--ease)}
-.btn-toggle-map:active{transform:scale(.98);background:rgba(255,214,0,.1);color:var(--accent)}
-.btn-toggle-map svg{width:14px;height:14px}
-.post-map{height:136px;width:100%;border:0;filter:grayscale(12%) contrast(1.04);margin-top:10px;border-radius:var(--r-xs)}
-/* ===== CONTROLS ===== */
-.ctrl-send{width:100%;min-height:48px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--green),var(--green3));color:#fff;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s var(--ease);box-shadow:0 3px 16px rgba(16,185,129,.12);position:relative;overflow:hidden}
-.ctrl-send::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%);pointer-events:none}
-.ctrl-send:disabled{background:linear-gradient(135deg,var(--dimmer),var(--dim));color:var(--dim);cursor:not-allowed;box-shadow:none}
-.ctrl-send:active:not(:disabled){transform:scale(.98)}
-.ctrl-send svg{width:16px;height:16px}
-.ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px}
-.ctrl-label{font-size:10px;font-weight:800;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
-.ctrl-select{border-radius:var(--r-xs);border:1px solid var(--border);background:var(--surface);color:#fff;padding:7px 28px 7px 10px;font-size:12px;font-weight:800;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-.ctrl-chk{width:18px;height:18px;accent-color:var(--accent)}
-/* ===== SKELETON ===== */
-.skel{height:100px;border-radius:var(--r-lg);background:linear-gradient(110deg,var(--surface) 30%,var(--surface2) 50%,var(--surface) 70%);background-size:200% 100%;animation:shimmer 2s infinite linear}
-@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
 /* ===== INSPEÇÃO ===== */
 #mod-inspecao{position:fixed;inset:0;overflow:hidden;background:#000}
 #gate{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);overflow-y:auto}
 .gate-box{max-width:400px;width:100%;border-radius:var(--r-xl);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface) 0%,var(--surface2) 100%);padding:36px 24px;text-align:center;box-shadow:var(--shadow-xl);position:relative;overflow:hidden}
-.gate-box::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(255,214,0,.04),transparent 50%);pointer-events:none}
 .gate-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--accent-dim),rgba(255,214,0,.06));border:1px solid rgba(255,214,0,.12);color:var(--accent);display:grid;place-items:center;margin:0 auto}
 .gate-icon svg{width:36px;height:36px}
-.gate-box h1{font-size:22px;font-weight:900;margin-top:24px;letter-spacing:-.01em;position:relative}
-.gate-box>p{font-size:12px;font-weight:500;color:var(--muted);margin-top:12px;line-height:1.6;position:relative}
-.gate-err{margin-top:16px;border-radius:var(--r-sm);background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);padding:12px;font-size:11px;font-weight:700;color:#fca5a5;text-align:left;position:relative}
-.gate-btn{width:100%;min-height:52px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .15s var(--ease);position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(255,214,0,.12)}
-.gate-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 50%);pointer-events:none}
+.gate-box h1{font-size:22px;font-weight:900;margin-top:24px;letter-spacing:-.01em}
+.gate-box>p{font-size:12px;font-weight:500;color:var(--muted);margin-top:12px;line-height:1.6}
+.gate-err{margin-top:16px;border-radius:var(--r-sm);background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);padding:12px;font-size:11px;font-weight:700;color:#fca5a5;text-align:left}
+.gate-btn{width:100%;min-height:52px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .15s var(--ease);box-shadow:0 4px 20px rgba(255,214,0,.12)}
 .gate-btn:active{transform:scale(.98)}
 .gate-btn svg{width:18px;height:18px}
 .gate-btn.sec{background:var(--glass);border:1px solid var(--border);color:var(--text);margin-top:8px;box-shadow:none}
-.gate-btn.sec::before{display:none}
+
 #app-shell{position:relative;width:100vw;height:100vh;height:100dvh;visibility:hidden}
 #vid{width:100%;height:100%;object-fit:cover}
-#km-hud{position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 6px 28px rgba(0,0,0,.5);pointer-events:none;z-index:100}
+#km-hud{position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 6px 28px rgba(0,0,0,.5);pointer-events:none;z-index:100}
 #km-hud .h-l{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)}
 #km-hud .h-v{font-size:26px;font-weight:900;line-height:1.1;margin-top:2px}
 #rec-tag{position:absolute;top:calc(22px + var(--safe-t));right:14px;display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.6);padding:7px 13px;border-radius:22px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:all .25s var(--ease);z-index:100;pointer-events:none}
@@ -237,8 +109,8 @@ img,video{display:block;max-width:100%}
 #rec-tag .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:blink 1s infinite;box-shadow:0 0 8px rgba(239,68,68,.5)}
 @keyframes blink{50%{opacity:.1}}
 #rec-tag span{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+
 #ui-ctrl{position:absolute;inset:0;bottom:0;top:auto;left:0;right:0;z-index:200;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:0 18px calc(24px + var(--safe-b));background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.35) 55%,transparent);transition:all .25s var(--ease)}
-#ui-ctrl.hide{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(16px)}
 .ui-btn{height:52px;border-radius:var(--r-sm);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s var(--ease);box-shadow:var(--shadow-md)}
 .ui-btn:active{transform:scale(.94)}
 .ui-btn svg{width:18px;height:18px}
@@ -247,21 +119,20 @@ img,video{display:block;max-width:100%}
 #btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
 #btn-menu{flex-shrink:0;padding:0 16px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:10px;color:var(--text2)}
 
-/* ===== SETTINGS (SEM DESFOQUE NO FUNDO) ===== */
-#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.05);backdrop-filter:none;-webkit-backdrop-filter:none;opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
+/* ===== SETTINGS ===== */
+#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.4);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
 #settings.open{opacity:1;visibility:visible;pointer-events:auto}
 .settings-content{width:min(90vw,400px);max-height:85vh;border-radius:var(--r-xl);border:1px solid var(--border2);background:rgba(10,13,17,0.96);padding:24px;overflow-y:auto;box-shadow:var(--shadow-xl);transform:scale(.95);transition:transform .25s var(--ease)}
 #settings.open .settings-content{transform:scale(1)}
-
 #settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
-#settings-close:active{opacity:.5}
 #settings-close svg{width:14px;height:14px}
 #settings h2{font-size:18px;font-weight:900;letter-spacing:-.01em}
 .s-group{margin-top:22px}
 .s-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:7px}
-.s-inp{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:800;transition:border-color .2s var(--ease);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-.s-inp:focus{border-color:var(--accent)}
+.s-inp{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:800;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
 canvas#c{display:none}
+
 /* ===== TOAST ===== */
 .toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;box-shadow:var(--shadow-lg);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none;display:flex;align-items:center;gap:8px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -270,15 +141,6 @@ canvas#c{display:none}
 .toast.ok svg{color:var(--green)}
 .toast.err{border-color:rgba(239,68,68,.25);color:#fca5a5}
 .toast.err svg{color:var(--red)}
-/* ===== RESPONSIVE ===== */
-@media(min-width:480px){
-  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .mc.pri{grid-column:1/-1}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
-}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body>
@@ -288,54 +150,21 @@ canvas#c{display:none}
     <div class="sp-glow"></div>
     <div class="sp-grid"></div>
     <div class="sp-scan"></div>
-    <div class="sp-dots">
-      <span class="sp-dot"></span><span class="sp-dot"></span><span class="sp-dot"></span><span class="sp-dot"></span><span class="sp-dot"></span>
-    </div>
   </div>
   <div class="sp-content">
     <div class="sp-logo-wrap">
       <div class="sp-logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
-      <span class="sp-ring"></span>
-      <span class="sp-ring2"></span>
-      <span class="sp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="m9 12 2 2 4-4"/></svg></span>
     </div>
-    <p class="sp-eyebrow"></p>
-    <h1 class="sp-title">Relatório de Apoio</h1>
+    <h1 class="sp-title">Sistema de Inspeção</h1>
     <div class="sp-bar"><div class="sp-bar-fill"></div></div>
   </div>
 </div>
+
 <!-- MENU -->
 <div id="main-menu">
-  <div class="menu-bg">
-    <div class="menu-bg-glow"></div>
-    <div class="menu-bg-grid"></div>
-    <div class="menu-bg-vig"></div>
-  </div>
   <div class="menu-inner">
-    <div class="menu-status">
-      <div class="ms-left">
-        <div class="ms-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        </div>
-        <div class="ms-time-group">
-          <p class="ms-clock" id="menuClock">--:--:--</p>
-          <p class="ms-date" id="menuDate">—</p>
-        </div>
-      </div>
-      <div class="ms-gps-pill"><span class="ms-gps-dot"></span><span>GPS</span></div>
-    </div>
-    <div class="menu-brand">
-      <div class="menu-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      </div>
-      <div class="menu-brand-text">
-        <p class="meb"></p>
-        <h1 class="mt">Relatório de Apoio<br></h1>
-      </div>
-    </div>
-    <p class="menu-sub"></p>
     <div class="menu-grid">
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
@@ -344,21 +173,10 @@ canvas#c{display:none}
       </button>
       <button class="mc pri" onclick="openMod('inspecao')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Inspeção fotográfica (PDF)</h3><p>Relatório completo por lote com pasta</p></span>
-        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
-      </button>
-      <button class="mc" onclick="openMod('apoio')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span class="mc-b"><h3>Apoio localização</h3><p>Postes e ordens de serviço</p></span>
-        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
-      </button>
-      <button class="mc" onclick="openMod('km')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-        <span class="mc-b"><h3>KM em tempo real</h3><p>Monitoramento contínuo</p></span>
+        <span class="mc-b"><h3>Inspeção Fotográfica PDF</h3><p>Relatório completo em PDF por lote</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
-    <p class="menu-footer"></p>
   </div>
 </div>
 
@@ -383,107 +201,28 @@ canvas#c{display:none}
   <canvas id="cUnica" style="display:none"></canvas>
 </div>
 
-<!-- APOIO -->
-<div id="mod-apoio" class="module">
-  <header class="hdr">
-    <div class="hdr-in">
-      <button class="hdr-back" onclick="openMod('menu')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-      <div class="hdr-title"><h1>Apoio localização</h1><p>Postes e ordens de serviço</p></div>
-      <span class="hdr-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
-    </div>
-  </header>
-  <div class="wrap">
-    <div id="targetLock" class="target-lock"><h2>📍 Você está no poste!</h2><p id="targetLockSub">ID ALVO: --- | DISTÂNCIA &lt; 5M</p></div>
-    <div class="card card-accent">
-      <p class="card-label">Localizador</p>
-      <div style="display:flex;gap:6px;margin-bottom:14px">
-        <button id="tab-id" onclick="setSearchMode('id')" style="flex:1;min-height:34px;border-radius:8px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:1px solid rgba(255,214,0,.45);background:linear-gradient(135deg,rgba(255,214,0,.18),rgba(255,214,0,.06));color:var(--accent);cursor:pointer">Por ID</button>
-        <button id="tab-km" onclick="setSearchMode('km')" style="flex:1;min-height:34px;border-radius:8px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--border);background:var(--glass);color:var(--muted);cursor:pointer">Por KM</button>
-      </div>
-      <div id="panel-id">
-        <div class="search-row">
-          <div class="search-wrap">
-            <input class="search-input" id="inputId" placeholder="EX: 1800  - 1400" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </div>
-          <button class="btn-icon go" onclick="searchId()" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-          <button class="btn-icon clr" onclick="clearId()" aria-label="Limpar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-        </div>
-        <div id="searchMsg" class="search-msg" style="display:none"></div>
-        <div id="searchResult" style="display:none;margin-top:12px"></div>
-      </div>
-      <div id="panel-km" style="display:none">
-        <div class="search-row">
-          <div class="search-wrap">
-            <input class="search-input" id="inputKm" placeholder="EX: 89 OU 89,450" autocomplete="off" spellcheck="false" inputmode="decimal" onkeydown="if(event.key==='Enter')searchByKm()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </div>
-          <button class="btn-icon go" onclick="searchByKm()" aria-label="Buscar KM"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-          <button class="btn-icon clr" onclick="clearKm()" aria-label="Limpar KM"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px">
-          <p style="font-size:10px;color:var(--muted);font-weight:700;line-height:1.35">Digite KM inteiro para buscar faixa inteira. Ex: 89 = 89,00 até 89,99.</p>
-          <label class="ctrl-label" style="margin:0">Qtd.
-            <select class="ctrl-select" id="kmQty">
-              <option value="1">1</option>
-              <option value="3" selected>3</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
-            </select>
-          </label>
-        </div>
-        <div id="kmSearchMsg" class="search-msg" style="display:none"></div>
-        <div id="kmSearchResult" style="display:none;margin-top:12px"></div>
-      </div>
-    </div>
-    <div class="km-hero compact"><p class="km-label"></p><p class="km-value" id="kmVal">—</p><p class="km-sub" id="kmSource"></p></div>
-    <div id="gpsStatus" class="gps bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>GPS · BUSCANDO SINAL</div>
-    <div class="card">
-      <button id="btnSend" class="ctrl-send" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Enviar lista WhatsApp</button>
-      <div class="ctrl-row">
-        <label class="ctrl-label">Proximidade
-          <select class="ctrl-select" id="qty">
-            <option value="1">1</option>
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </label>
-        <label class="ctrl-label">
-          <input type="checkbox" class="ctrl-chk" id="chkMaps"> Maps
-        </label>
-      </div>
-    </div>
-    <div id="postList" style="display:flex;flex-direction:column;gap:10px">
-      <div class="skel"></div><div class="skel"></div>
-    </div>
-  </div>
-</div>
-
-<!-- INSPEÇÃO -->
+<!-- INSPEÇÃO (PDF) -->
 <div id="mod-inspecao" class="module">
   <div id="gate">
     <div class="gate-box">
       <div class="gate-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
-      <h1>Relatório de apoio</h1>
-      <p>Selecione uma pasta segura para registrar fotos com KM inicial e final e salvar o relatório PDF.</p>
+      <h1>Inspeção Fotográfica PDF</h1>
+      <p>Configure e inicie a captura das fotos para a geração automática do relatório em PDF.</p>
       <div id="gateErr" class="gate-err" style="display:none"></div>
       <div style="margin-top:20px;text-align:left">
         <label style="display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px">Etiqueta / Tipo de serviço <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--dim)">(opcional)</span></label>
-        <input id="fotoLabel" type="text" placeholder="Ex: Manutenção , Inspeção , Vistoria,..." autocomplete="off" spellcheck="false" oninput="syncFotoLabel(this.value)" style="width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:600;transition:border-color .2s;outline:none;font-family:var(--font)">
+        <input id="fotoLabel" type="text" placeholder="Ex: Manutenção, Inspeção, Vistoria..." autocomplete="off" spellcheck="false" oninput="syncFotoLabel(this.value)" style="width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:600;outline:none;font-family:var(--font)">
       </div>
       <button class="gate-btn" onclick="startApp()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>Ativar sistema
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>Ativar Câmera
       </button>
       <button class="gate-btn sec" onclick="openMod('menu')">Voltar ao menu</button>
     </div>
   </div>
   
-  <!-- MODAL DE CONFIGURAÇÕES CENTRALIZADO (SEM DESFOQUE NO FUNDO) -->
+  <!-- SETTINGS -->
   <div id="settings">
     <div class="settings-content">
       <button id="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
@@ -504,13 +243,13 @@ canvas#c{display:none}
     <div id="rec-tag"><div class="dot"></div><span>Registrando no PDF</span></div>
     <div id="ui-ctrl">
       <button class="ui-btn" id="btn-gear" onclick="toggleSet()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
       <button class="ui-btn" id="btn-start" onclick="startCap()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>Iniciar
       </button>
       <button class="ui-btn" id="btn-stop" onclick="stopCap()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar PDF
       </button>
       <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">Voltar</button>
     </div>
@@ -518,39 +257,17 @@ canvas#c{display:none}
   <canvas id="c"></canvas>
 </div>
 
-<!-- KM -->
-<div id="mod-km" class="module">
-  <header class="hdr">
-    <div class="hdr-in">
-      <button class="hdr-back" onclick="openMod('menu')" aria-label="Voltar"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-      <div class="hdr-title"><h1>KM em tempo real</h1><p></p></div>
-      <span class="hdr-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-    </div>
-  </header>
-  <div class="wrap" style="min-height:calc(100vh - 58px);min-height:calc(100dvh - 58px);justify-content:center">
-    <div class="km-hero"><p class="km-label"></p><p class="km-value" id="rtKm">—</p><p class="km-sub" id="rtCoords"></p></div>
-    <div id="rtGps" class="gps bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>GPS · BUSCANDO SINAL</div>
-    <div class="card" style="text-align:center"><p style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.6">Mantenha o GPS ativo e permaneça em uma área aberta para maior precisão.</p></div>
-  </div>
-</div>
 <!-- TOAST -->
 <div class="toast" id="toast" aria-live="polite"></div>
+
 <script>
-/* ====================================================================
-   CPS OS v2 — Sistema de Apoio & Inspeção (Otimizado)
-   ==================================================================== */
-/* ===== UTILITIES ===== */
-const ACC_G=15,ACC_Y=35;
-const norm=s=>String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_ ]+/g,' ').replace(/\s+/g,' ');
+/* ===== UTILITIES & STATE ===== */
 const parsePt=v=>{const s=String(v??'').trim();return/,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
-const hav=(a,b,c,d)=>{const p=Math.PI/180,x=.5-Math.cos((c-a)*p)/2+Math.cos(a*p)*Math.cos(c*p)*(1-Math.cos((d-b)*p))/2;return 12742000*Math.asin(Math.sqrt(x))};
-const range=(dist,acc=0)=>{const d=Math.round(dist),e=Number.isFinite(acc)?Math.round(acc):0;return`${Math.max(0,d-e)}M A ${d+e}M`};
-const fmtAcc=a=>!Number.isFinite(a)?'—':`±${Math.round(a)}M`;
-const nowBR=()=>new Date().toLocaleString('pt-BR').toUpperCase();
-function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}return-1}
-/* ===== STATE ===== */
-let posts=[],postsKm=[],kmDB=[],pos=null,searchItem=null,renderedKey='',apoioInit=false,rtInit=false,unicaInit=false;
-let cam='',stream=null,streamUnica=null,hDir=null,capturing=false,buffer=[],kmIniLote='',lat='0.000000',lon='0.000000',wakeLock=null,cameras=[];
+function findCol(h,cs){const m=h.map(s=>String(s||'').trim().toUpperCase());for(const c of cs){const i=m.indexOf(c.toUpperCase());if(i>=0)return i}return-1}
+
+let kmDB=[], stream=null, streamUnica=null, capturing=false, buffer=[], lat='0.000000', lon='0.000000';
+let currentKm = '---';
+
 /* ===== TOAST ===== */
 let _tt=null;
 function showToast(msg,type='ok'){
@@ -561,6 +278,7 @@ function showToast(msg,type='ok'){
   clearTimeout(_tt);
   requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),3000)});
 }
+
 /* ===== NAVIGATION ===== */
 function openMod(id){
   const menu=document.getElementById('main-menu');
@@ -573,65 +291,15 @@ function openMod(id){
   menu.style.display='none';
   document.getElementById('mod-'+id).classList.add('active');
   if(id==='foto-unica')initFotoUnica();
-  if(id==='apoio')initApoio();
-  if(id==='km')initRt();
 }
+
 /* ===== SPLASH ===== */
-setTimeout(()=>document.getElementById('splash').classList.add('done'),2200);
-/* ===== CLOCK ===== */
-function tickClock(){
-  const now=new Date();
-  document.getElementById('menuClock').textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  document.getElementById('menuDate').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
-}
-tickClock();setInterval(tickClock,1000);
-/* ===== GPS BADGE ===== */
-function gpsBadge(el,p,err){
-  const a=p?.acc;let cls='bad',txt;
-  if(err)txt=err;
-  else if(!a)txt='GPS · BUSCANDO SINAL';
-  else if(a<=ACC_G){cls='ok';txt=`GPS · ALTA PRECISÃO ${fmtAcc(a)}`}
-  else if(a<=ACC_Y){cls='warn';txt=`GPS · PRECISÃO MÉDIA ${fmtAcc(a)}`}
-  else txt=`GPS · Sinal Fraco ${fmtAcc(a)}`;
-  el.className='gps '+cls;
-  el.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>${txt}`;
-}
-/* ===== CSV ===== */
-async function loadPosts(){
-  try{
-    let r=await fetch('dados.csv?v='+Date.now(),{cache:'no-store'}).catch(()=>null);
-    if(!r?.ok)r=await fetch('Dados_Completos_Grupo_2_all.csv?v='+Date.now(),{cache:'no-store'});
-    if(!r?.ok)return;
-    let t=await r.text();
-    if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
-    const lines=t.split(/\r?\n/).filter(l=>l.trim());
-    const h=lines.shift().split(';');
-    const iId=findCol(h,['id do nox','idnox','id']),iLat=findCol(h,['latitude','lat']),iLon=findCol(h,['longitude','lon','long']);
-    posts=lines.map(l=>{
-      const r=l.split(';');
-      return {
-        id:String(r[iId]||'').trim().toUpperCase(),
-        lat:parsePt(r[iLat]),
-        lon:parsePt(r[iLon])
-      };
-    }).filter(p=>p.id&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+setTimeout(()=>document.getElementById('splash').classList.add('done'),1500);
 
-    postsKm=posts.map(p=>{
-      const k=kmAt(p.lat,p.lon);
-      return {
-        id:p.id,
-        lat:p.lat,
-        lon:p.lon,
-        km:k?k.km:null
-      };
-    });
-
-    renderApoio();
-  }catch(e){}
-}
+/* ===== BASE DE DADOS KM ===== */
 async function loadKm(){
   try{
-    let r=await fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'});
+    let r=await fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).catch(()=>null);
     if(!r?.ok)return;
     let t=await r.text();
     if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
@@ -640,79 +308,42 @@ async function loadKm(){
     const iKm=findCol(h,['km']),iLat=findCol(h,['lat','latitude']),iLon=findCol(h,['lon','long','longitude']);
     kmDB=lines.map(l=>{
       const r=l.split(';');
-      return {
-        km:parsePt(r[iKm]),
-        lat:parsePt(r[iLat]),
-        lon:parsePt(r[iLon])
-      };
+      return {km:parsePt(r[iKm]),lat:parsePt(r[iLat]),lon:parsePt(r[iLon])};
     }).filter(p=>Number.isFinite(p.km)&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
-    if(posts.length){
-      postsKm=posts.map(p=>{
-        const k=kmAt(p.lat,p.lon);
-        return {id:p.id,lat:p.lat,lon:p.lon,km:k?k.km:null};
-      });
-      renderedKey='';
-      renderApoio();
-    }
-    updateKm();
   }catch(e){}
 }
-/* ===== KM CÁLCULO ===== */
-function nearestKm(){
-  if(!pos||!kmDB.length)return null;
-  let best=null,bd=Infinity;
-  for(const p of kmDB){
-    const d=hav(pos.lat,pos.lon,p.lat,p.lon);
-    if(d<bd){bd=d;best=p}
-  }
-  return best;
-}
-function kmAt(lat,lon){
-  if(!kmDB.length)return null;
-  let best=null,bd=Infinity;
-  for(const p of kmDB){
-    const d=hav(lat,lon,p.lat,p.lon);
-    if(d<bd){bd=d;best=p}
-  }
-  return best;
-}
-function updateKm(){
-  const b=nearestKm();
-  if(b){
-    const v=(Math.round(b.km*100)/100).toFixed(2).replace('.',',');
-    document.getElementById('kmVal').textContent=v;
-    const s=document.getElementById('kmSource');
-    if(s)s.textContent=`Referência: ${kmDB.length} pontos`;
-  }
+loadKm();
+
+/* ===== GPS WATCH ===== */
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(p=>{
+    lat = p.coords.latitude.toFixed(6);
+    lon = p.coords.longitude.toFixed(6);
+    if(!kmDB.length)return;
+    let best=null,minD=Infinity;
+    for(const pt of kmDB){
+      const d=Math.hypot(pt.lat-p.coords.latitude,pt.lon-p.coords.longitude);
+      if(d<minD){minD=d;best=pt}
+    }
+    if(best){
+      currentKm = (Math.round(best.km*100)/100).toFixed(2).replace('.',',');
+      document.getElementById('kmTxtUnica').textContent='KM '+currentKm;
+      document.getElementById('kmTxt').textContent='KM '+currentKm;
+    }
+  },null,{enableHighAccuracy:true});
 }
 
 /* ===== FOTO ÚNICA ===== */
 async function initFotoUnica(){
-  if(!kmDB.length)loadKm();
   try{
     streamUnica = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
     document.getElementById('vidUnica').srcObject = streamUnica;
   }catch(e){
     showToast('Erro ao acessar a câmera', 'err');
   }
-  if('geolocation' in navigator){
-    navigator.geolocation.watchPosition(p=>{
-      lat = p.coords.latitude.toFixed(6);
-      lon = p.coords.longitude.toFixed(6);
-      if(!kmDB.length)return;
-      let best=null,minD=Infinity;
-      for(const pt of kmDB){
-        const d=Math.hypot(pt.lat-p.coords.latitude,pt.lon-p.coords.longitude);
-        if(d<minD){minD=d;best=pt}
-      }
-      if(best){
-        document.getElementById('kmTxtUnica').textContent='KM '+best.km;
-      }
-    },null,{enableHighAccuracy:true});
-  }
 }
 
-async function takeSinglePhoto(){
+function takeSinglePhoto(){
   const vid = document.getElementById('vidUnica');
   const c = document.getElementById('cUnica');
   const ctx = c.getContext('2d');
@@ -720,558 +351,142 @@ async function takeSinglePhoto(){
 
   c.width = vid.videoWidth;
   c.height = vid.videoHeight;
-  const km = document.getElementById('kmTxtUnica').innerText.replace('KM ','');
   
-  drawOverlayCustom(ctx, c.width, c.height, km, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
+  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
 
   c.toBlob(blob=>{
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `FOTO_AVULSA_KM_${km}_${Date.now()}.jpg`;
+    a.download = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('Foto salva com sucesso!');
+    showToast('Foto salva na galeria!');
   }, 'image/jpeg', 0.95);
 }
 
-function drawOverlayCustom(ctx, w, h, kmVal, ts, gpsStr){
-  ctx.drawImage(document.getElementById('vidUnica'),0,0,w,h);
-  const bh=h*.13;
-  const grad=ctx.createLinearGradient(0,h-bh,0,h);
-  grad.addColorStop(0,'rgba(0,0,0,0)');
-  grad.addColorStop(.25,'rgba(0,0,0,.55)');
-  grad.addColorStop(1,'rgba(0,0,0,.9)');
-  ctx.fillStyle=grad;
-  ctx.fillRect(0,h-bh,w,bh);
-
-  ctx.fillStyle='#fff';
-  ctx.font='bold '+Math.round(bh*.30)+'px Arial,sans-serif';
-  ctx.fillText('KM '+kmVal,20,h-bh*.55);
-  ctx.font=Math.round(bh*.18)+'px Arial,sans-serif';
-  ctx.fillStyle='rgba(255,255,255,.7)';
-  ctx.fillText(ts+' | GPS: '+gpsStr,20,h-bh*.22);
-}
-
-/* ===== APOIO ===== */
-function initApoio(){
-  if(apoioInit)return;
-  apoioInit=true;
-  loadPosts();
-  loadKm();
-  if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{
-    pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};
-    gpsBadge(document.getElementById('gpsStatus'),pos);
-    renderApoio();
-    updateKm();
-    updateSearchDist();
-  },null,{enableHighAccuracy:true,maximumAge:0,timeout:10000});
-}
-function searchId(){
-  const term=norm(document.getElementById('inputId').value),
-        msg=document.getElementById('searchMsg'),
-        res=document.getElementById('searchResult');
-  if(!term){clearId();return}
-  if(!posts.length){
-    msg.style.display='flex';
-    msg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Carregando dados, tente novamente...';
-    return;
-  }
-  const found=posts.find(p=>norm(p.id)===term||norm(p.id).includes(term));
-  if(!found){
-    msg.style.display='flex';
-    msg.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>ID "${term}" NÃO ENCONTRADO.`;
-    searchItem=null;res.style.display='none';checkLock();return;
-  }
-  searchItem=found;
-  msg.style.display='none';
-  renderSearch();
-  showToast('Poste encontrado: '+found.id);
-}
-function clearId(){
-  document.getElementById('inputId').value='';
-  document.getElementById('searchMsg').style.display='none';
-  document.getElementById('searchResult').style.display='none';
-  searchItem=null;
-  checkLock();
-}
-function updateSearchDist(){
-  if(!searchItem||!pos)return;
-  const el=document.getElementById('srch-dist');
-  const kmEl=document.getElementById('srch-km');
-  const dist=hav(pos.lat,pos.lon,searchItem.lat,searchItem.lon);
-  if(el)el.textContent='Distância: '+range(dist,pos.acc);
-  if(kmEl){
-    const k=kmAt(searchItem.lat,searchItem.lon);
-    kmEl.textContent=k?('KM aprox: '+(Math.round(k.km*100)/100).toFixed(2).replace('.',',')):'KM aprox: —';
-  }
-  checkLock();
-}
-function renderSearch(){
-  if(!searchItem)return;
-  const res=document.getElementById('searchResult');
-  let dt='Aguardando GPS...';
-  let kmTxt='KM aprox: —';
-  if(pos){
-    const dist=hav(pos.lat,pos.lon,searchItem.lat,searchItem.lon);
-    dt='Distância: '+range(dist,pos.acc);
-    const k=kmAt(searchItem.lat,searchItem.lon);
-    if(k)kmTxt='KM aprox: '+(Math.round(k.km*100)/100).toFixed(2).replace('.',',');
-    checkLock();
-  }
-  res.style.display='block';
-  res.innerHTML=`<div class="post searched">
-    <div class="post-top">
-      <div class="post-info">
-        <p class="post-id">OS / ID: <span>${searchItem.id}</span></p>
-        <p class="post-dist" id="srch-dist">${dt}</p>
-        <p class="post-km" id="srch-km">${kmTxt}</p>
-        <p class="post-coords">Coordenadas: ${searchItem.lat.toFixed(6)}, ${searchItem.lon.toFixed(6)}</p>
-      </div>
-      <span class="post-pin">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-      </span>
-    </div>
-    <div class="post-map-container">
-      <button class="btn-toggle-map" onclick="toggleMap(this, ${searchItem.lat}, ${searchItem.lon})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        Mostrar mapa de satélite
-      </button>
-    </div>
-  </div>`;
-}
-function checkLock(){
-  const b=document.getElementById('targetLock');
-  if(!searchItem||!pos){b.classList.remove('on');return}
-  const d=hav(pos.lat,pos.lon,searchItem.lat,searchItem.lon);
-  if(d<=(5+(pos.acc||10))){
-    b.classList.add('on');
-    document.getElementById('targetLockSub').textContent=`ID ALVO: ${searchItem.id} · DISTÂNCIA EST. ~${Math.round(d)}M`;
-  }else{
-    b.classList.remove('on');
-  }
-}
-function renderApoio(){
-  if(!pos||!postsKm.length)return;
-  if(searchItem)updateSearchDist();
-
-  const qty=Number(document.getElementById('qty').value||10);
-
-  const items=postsKm.map(p=>{
-    const d=hav(pos.lat,pos.lon,p.lat,p.lon);
-    return {id:p.id,lat:p.lat,lon:p.lon,km:p.km,d};
-  }).sort((a,b)=>a.d-b.d).slice(0,qty);
-
-  const key=items.map(i=>i.id).join(',');
-  const list=document.getElementById('postList');
-
-  if(key===renderedKey){
-    items.forEach((o,i)=>{
-      const el=document.getElementById('dist-'+i);
-      const kmEl=document.getElementById('km-'+i);
-      if(el)el.textContent='Distância: '+range(o.d,pos.acc);
-      if(kmEl)kmEl.textContent=o.km!=null?('KM aprox: '+o.km.toFixed(2).replace('.',',')):'KM aprox: —';
-    });
-    document.getElementById('btnSend').disabled=false;
-    return;
-  }
-
-  renderedKey=key;
-  list.innerHTML='';
-
-  items.forEach((o,i)=>{
-    const kmLabel=o.km!=null?('KM aprox: '+o.km.toFixed(2).replace('.',',')):'KM aprox: —';
-    const div=document.createElement('div');
-    div.className='post'+(i===0?' near':'');
-    div.innerHTML=`<div class="post-top">
-      <input type="checkbox" class="post-chk" value="${o.id}" data-lat="${o.lat}" data-lon="${o.lon}" checked>
-      <div class="post-info">
-        <p class="post-id">Poste: <span>${o.id}</span></p>
-        <p class="post-dist" id="dist-${i}">Distância: ${range(o.d,pos.acc)}</p>
-        <p class="post-km" id="km-${i}">${kmLabel}</p>
-      </div>
-      <span class="post-pin">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-      </span>
-    </div>
-    <div class="post-map-container">
-      <button class="btn-toggle-map" onclick="toggleMap(this, ${o.lat}, ${o.lon})">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        Mostrar mapa de satélite
-      </button>
-    </div>`;
-    list.appendChild(div);
-  });
-
-  document.getElementById('btnSend').disabled=false;
-}
-
-/* ===== TOGGLE MAP LATENCY OPTIMIZATION ===== */
-function toggleMap(btn, lat, lon){
-  const container = btn.parentElement;
-  const existingMap = container.querySelector('iframe');
-  if(existingMap){
-    existingMap.remove();
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Mostrar mapa de satélite`;
-  } else {
-    const iframe = document.createElement('iframe');
-    iframe.className = 'post-map';
-    iframe.src = `https://maps.google.com/maps?q=${lat},${lon}&t=k&z=19&ie=UTF8&iwloc=&output=embed`;
-    iframe.loading = 'lazy';
-    container.appendChild(iframe);
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Ocultar mapa`;
-  }
-}
-
-document.getElementById('btnSend').onclick=()=>{
-  if(!pos)return;
-  const chks=document.querySelectorAll('.post-chk:checked');
-  let items=[];
-  if(chks.length){
-    chks.forEach(c=>items.push({id:c.value,lat:parseFloat(c.dataset.lat),lon:parseFloat(c.dataset.lon)}));
-  }else{
-    const qty=Number(document.getElementById('qty').value||10);
-    items=posts.map(p=>({...p,d:hav(pos.lat,pos.lon,p.lat,p.lon)})).sort((a,b)=>a.d-b.d).slice(0,qty).map(o=>({id:o.id,lat:o.lat,lon:o.lon}));
-  }
-  let tx=`📍 *LISTA DE LOCALIZAÇÃO DE POSTES*\nData/Hora: ${nowBR()}\nGPS Atual: ${pos.lat.toFixed(6)}, ${pos.lon.toFixed(6)} (${fmtAcc(pos.acc)})\n\n`;
-  items.forEach((o,i)=>{
-    tx+=`${i+1}. *ID:* ${o.id}\n`;
-    const k=kmAt(o.lat,o.lon);
-    if(k)tx+=`   KM aprox: ${(Math.round(k.km*100)/100).toFixed(2).replace('.',',')}\n`;
-    if(document.getElementById('chkMaps').checked)tx+=`   🗺️ https://maps.google.com/?q=${o.lat.toFixed(6)},${o.lon.toFixed(6)}\n`;
-  });
-  window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
-  showToast(`${items.length} postes enviados`);
-};
-document.getElementById('qty').onchange=()=>{renderedKey='';renderApoio()};
-
-/* ===== BUSCA POR KM NO LOCALIZADOR ===== */
-function setSearchMode(mode){
-  const tabId=document.getElementById('tab-id'),tabKm=document.getElementById('tab-km');
-  const panId=document.getElementById('panel-id'),panKm=document.getElementById('panel-km');
-  if(!tabId||!tabKm||!panId||!panKm)return;
-  if(mode==='km'){
-    tabKm.style.border='1px solid rgba(255,214,0,.45)';
-    tabKm.style.background='linear-gradient(135deg,rgba(255,214,0,.18),rgba(255,214,0,.06))';
-    tabKm.style.color='var(--accent)';
-    tabId.style.border='1px solid var(--border)';
-    tabId.style.background='var(--glass)';
-    tabId.style.color='var(--muted)';
-    panKm.style.display='block';
-    panId.style.display='none';
-    searchItem=null;
-    document.getElementById('targetLock')?.classList.remove('on');
-  }else{
-    tabId.style.border='1px solid rgba(255,214,0,.45)';
-    tabId.style.background='linear-gradient(135deg,rgba(255,214,0,.18),rgba(255,214,0,.06))';
-    tabId.style.color='var(--accent)';
-    tabKm.style.border='1px solid var(--border)';
-    tabKm.style.background='var(--glass)';
-    tabKm.style.color='var(--muted)';
-    panId.style.display='block';
-    panKm.style.display='none';
-  }
-}
-function parseKmInput(raw){
-  const original=String(raw||'').trim();
-  const clean=original.replace(',', '.');
-  const value=Number(clean);
-  if(!original||!Number.isFinite(value))return null;
-  const isFullKm=/^\d+$/.test(original);
-  return {original,value,isFullKm};
-}
-function ensurePostsKmReady(){
-  if(posts.length && kmDB.length && (!postsKm.length || postsKm.every(p=>p.km==null))){
-    postsKm=posts.map(p=>{
-      const k=kmAt(p.lat,p.lon);
-      return {id:p.id,lat:p.lat,lon:p.lon,km:k?k.km:null};
-    });
-  }
-}
-function searchByKm(){
-  const input=document.getElementById('inputKm');
-  const msg=document.getElementById('kmSearchMsg');
-  const res=document.getElementById('kmSearchResult');
-  const qty=Number(document.getElementById('kmQty')?.value||3);
-  const parsed=parseKmInput(input?.value);
-
-  if(!parsed){
-    msg.style.display='flex';
-    msg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>INFORME UM KM VÁLIDO. EX: 89 OU 89,450';
-    res.style.display='none';
-    return;
-  }
-  ensurePostsKmReady();
-  if(!postsKm.length || postsKm.every(p=>p.km==null)){
-    msg.style.display='flex';
-    msg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>DADOS DE KM AINDA CARREGANDO. TENTE NOVAMENTE.';
-    res.style.display='none';
-    return;
-  }
-
-  const valid=postsKm.filter(p=>p.km!=null);
-  let items=[], title='';
-  if(parsed.isFullKm){
-    const kmMin=parsed.value, kmMax=parsed.value+0.999999;
-    items=valid.filter(p=>p.km>=kmMin && p.km<=kmMax)
-      .map(p=>({...p,delta:Math.abs(p.km-parsed.value)}))
-      .sort((a,b)=>a.km-b.km)
-      .slice(0,qty);
-    title=`Faixa KM ${parsed.value.toFixed(0)},00 até ${parsed.value.toFixed(0)},99`;
-    if(!items.length){
-      items=valid.map(p=>({...p,delta:Math.abs(p.km-parsed.value)})).sort((a,b)=>a.delta-b.delta).slice(0,qty);
-      title=`Nenhum poste na faixa. Mais próximos do KM ${parsed.value.toFixed(0)}`;
-    }
-  }else{
-    items=valid.map(p=>({...p,delta:Math.abs(p.km-parsed.value)})).sort((a,b)=>a.delta-b.delta).slice(0,qty);
-    title=`Mais próximos do KM ${parsed.value.toFixed(3).replace('.',',')}`;
-  }
-
-  if(!items.length){
-    msg.style.display='flex';
-    msg.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>NENHUM RESULTADO ENCONTRADO.';
-    res.style.display='none';
-    return;
-  }
-
-  msg.style.display='none';
-  res.style.display='block';
-  res.innerHTML=`<p style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:10px">${title}</p>`+
-    items.map((o,i)=>{
-      const dTxt=pos?('Distância: '+range(hav(pos.lat,pos.lon,o.lat,o.lon),pos.acc)):'Distância: aguardando GPS...';
-      const deltaM=Math.round(o.delta*1000);
-      return `<div class="post searched" style="margin-bottom:10px">
-        <div class="post-top">
-          <div class="post-info">
-            <p class="post-id">Poste / ID: <span>${o.id}</span></p>
-            <p class="post-km">KM: ${o.km.toFixed(3).replace('.',',')} · Δ ${deltaM}M</p>
-            <p class="post-dist">${dTxt}</p>
-            <p class="post-coords">Coordenadas: ${o.lat.toFixed(6)}, ${o.lon.toFixed(6)}</p>
-          </div>
-          <span class="post-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        </div>
-        <div class="post-map-container">
-          <button class="btn-toggle-map" onclick="toggleMap(this, ${o.lat}, ${o.lon})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            Mostrar mapa de satélite
-          </button>
-        </div>
-      </div>`;
-    }).join('');
-  showToast(`${items.length} resultado(s) por KM`);
-}
-function clearKm(){
-  const i=document.getElementById('inputKm'),m=document.getElementById('kmSearchMsg'),r=document.getElementById('kmSearchResult');
-  if(i)i.value='';
-  if(m)m.style.display='none';
-  if(r){r.style.display='none';r.innerHTML='';}
-}
-
-/* ===== KM RT ===== */
-function initRt(){
-  if(!kmDB.length)loadKm();
-  if(rtInit)return;
-  rtInit=true;
-  if(!('geolocation'in navigator)){
-    gpsBadge(document.getElementById('rtGps'),null,'GPS não suportado');
-    return;
-  }
-  navigator.geolocation.watchPosition(p=>{
-    pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};
-    gpsBadge(document.getElementById('rtGps'),pos);
-    const co=document.getElementById('rtCoords');
-    if(co)co.textContent=`${p.coords.latitude.toFixed(6)}, ${p.coords.longitude.toFixed(6)}`;
-    if(kmDB.length){
-      let best=null,bd=Infinity;
-      for(const pt of kmDB){
-        const d=hav(pos.lat,pos.lon,pt.lat,pt.lon);
-        if(d<bd){bd=d;best=pt}
-      }
-      if(best)document.getElementById('rtKm').textContent=(Math.round(best.km*100)/100).toFixed(2).replace('.',',');
-    }
-  },()=>gpsBadge(document.getElementById('rtGps'),null,'Erro ao obter localização'),{enableHighAccuracy:true,maximumAge:0,timeout:10000});
-}
-/* ===== INSPEÇÃO ===== */
+/* ===== INSPEÇÃO FOTOGRÁFICA (PDF) ===== */
 async function startApp(){
-  const err=document.getElementById('gateErr');
   try{
-    if(!window.showDirectoryPicker)throw new Error('Este navegador não permite selecionar pasta. Use Chrome ou Edge.');
-    hDir=await window.showDirectoryPicker({mode:'readwrite'});
-    document.getElementById('gate').style.display='none';
-    document.getElementById('app-shell').style.visibility='visible';
-    if('wakeLock'in navigator)wakeLock=await navigator.wakeLock.request('screen').catch(()=>null);
-    await listCams();
-    loadKm();
-    initGpsInspecao();
-    document.documentElement.requestFullscreen?.().catch(()=>null);
-    showToast('Sistema de inspeção ativado');
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
+    document.getElementById('vid').srcObject = stream;
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app-shell').style.visibility = 'visible';
   }catch(e){
-    err.style.display='block';
-    err.textContent=e.message||'Permissão de câmera e pasta necessária.';
+    document.getElementById('gateErr').style.display='block';
+    document.getElementById('gateErr').textContent='Erro ao acessar câmera: '+e.message;
   }
-}
-async function listCams(){
-  const devices=await navigator.mediaDevices.enumerateDevices();
-  cameras=devices.filter(d=>d.kind==='videoinput');
-  const sel=document.getElementById('camSel');
-  sel.innerHTML=cameras.map((d,i)=>`<option value="${d.deviceId}">CÂMERA ${i+1}</option>`).join('');
-  if(cameras.length)await switchCam(cameras[cameras.length-1].deviceId);
-}
-async function switchCam(id){
-  if(stream)stream.getTracks().forEach(t=>t.stop());
-  stream=await navigator.mediaDevices.getUserMedia({video:{deviceId:id?{exact:id}:undefined,width:{ideal:1920},height:{ideal:1080}},audio:false});
-  document.getElementById('vid').srcObject=stream;
-  cam=id;
-}
-function initGpsInspecao(){
-  navigator.geolocation.watchPosition(p=>{
-    lat=p.coords.latitude.toFixed(6);
-    lon=p.coords.longitude.toFixed(6);
-    if(!kmDB.length)return;
-    let best=null,minD=Infinity;
-    for(const pt of kmDB){
-      const d=Math.hypot(pt.lat-p.coords.latitude,pt.lon-p.coords.longitude);
-      if(d<minD){minD=d;best=pt}
-    }
-    if(best)document.getElementById('kmTxt').textContent='KM '+best.km;
-  },null,{enableHighAccuracy:true});
-}
-function drawOverlay(ctx,w,h,kmVal,ts,gpsStr){
-  ctx.drawImage(document.getElementById('vid'),0,0,w,h);
-  const bh=h*.13;
-  const grad=ctx.createLinearGradient(0,h-bh,0,h);
-  grad.addColorStop(0,'rgba(0,0,0,0)');
-  grad.addColorStop(.25,'rgba(0,0,0,.55)');
-  grad.addColorStop(1,'rgba(0,0,0,.9)');
-  ctx.fillStyle=grad;
-  ctx.fillRect(0,h-bh,w,bh);
-
-  ctx.fillStyle='#fff';
-  ctx.font='bold '+Math.round(bh*.30)+'px Arial,sans-serif';
-  ctx.fillText('KM '+kmVal,20,h-bh*.55);
-  ctx.font=Math.round(bh*.18)+'px Arial,sans-serif';
-  ctx.fillStyle='rgba(255,255,255,.7)';
-  ctx.fillText(ts+' | GPS: '+gpsStr,20,h-bh*.22);
-
-  const lbl=(window._fotoLabel||'').trim();
-  if(lbl){
-    const fs=Math.max(18,Math.round(h*.028));
-    ctx.font='bold '+fs+'px Arial,sans-serif';
-    const text=lbl.length>34?lbl.slice(0,34)+'…':lbl;
-    const tw=ctx.measureText(text).width;
-    const padX=18,padY=10,rr=10;
-    const rw=tw+padX*2,rh=fs+padY*2;
-    const rx=w-rw-22,ry=22;
-    ctx.save();
-    ctx.shadowColor='rgba(0,0,0,.55)';
-    ctx.shadowBlur=10;
-    ctx.fillStyle='rgba(255,214,0,.94)';
-    ctx.beginPath();
-    ctx.moveTo(rx+rr,ry);
-    ctx.lineTo(rx+rw-rr,ry);
-    ctx.arcTo(rx+rw,ry,rx+rw,ry+rr,rr);
-    ctx.lineTo(rx+rw,ry+rh-rr);
-    ctx.arcTo(rx+rw,ry+rh,rx+rw-rr,ry+rh,rr);
-    ctx.lineTo(rx+rr,ry+rh);
-    ctx.arcTo(rx,ry+rh,rx,ry+rh-rr,rr);
-    ctx.lineTo(rx,ry+rr);
-    ctx.arcTo(rx,ry,rx+rr,ry,rr);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-    ctx.fillStyle='#111';
-    ctx.font='bold '+fs+'px Arial,sans-serif';
-    ctx.fillText(text,rx+padX,ry+padY+fs*.82);
-  }
-}
-async function manualPhoto(){
-  if(!hDir)return;
-  const vid=document.getElementById('vid'),c=document.getElementById('c'),ctx=c.getContext('2d');
-  c.width=vid.videoWidth;
-  c.height=vid.videoHeight;
-  const km=document.getElementById('kmTxt').innerText.replace('KM ','');
-  drawOverlay(ctx,c.width,c.height,km,new Date().toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`);
-  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.95));
-  const fh=await hDir.getFileHandle(`MANUAL_${safeFotoLabel()||'KM'}_${km}_${Date.now()}.jpg`,{create:true});
-  const w=await fh.createWritable();
-  await w.write(blob);
-  await w.close();
-  document.getElementById('ui-ctrl').classList.remove('hide');
-  showToast('Foto manual salva');
-}
-function startCap(){
-  capturing=true;
-  buffer=[];
-  kmIniLote=document.getElementById('kmTxt').innerText.replace('KM ','');
-  document.getElementById('btn-start').style.display='none';
-  document.getElementById('btn-stop').style.display='flex';
-  document.getElementById('rec-tag').classList.add('on');
-  document.getElementById('ui-ctrl').classList.add('hide');
-  capLoop();
-}
-async function stopCap(){
-  capturing=false;
-  if(buffer.length){
-    const kmF=document.getElementById('kmTxt').innerText.replace('KM ','');
-    await savePDF([...buffer],kmIniLote,kmF);
-  }
-  buffer=[];
-  document.getElementById('btn-start').style.display='flex';
-  document.getElementById('btn-stop').style.display='none';
-  document.getElementById('rec-tag').classList.remove('on');
-  document.getElementById('ui-ctrl').classList.remove('hide');
-}
-function capLoop(){
-  if(!capturing)return;
-  const vid=document.getElementById('vid'),c=document.getElementById('c'),ctx=c.getContext('2d');
-  if(!vid.videoWidth){setTimeout(capLoop,100);return}
-  c.width=vid.videoWidth;
-  c.height=vid.videoHeight;
-  const km=document.getElementById('kmTxt').innerText.replace('KM ','');
-  drawOverlay(ctx,c.width,c.height,km,new Date().toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`);
-  buffer.push(c.toDataURL('image/jpeg',.58));
-  const lote=parseInt(document.getElementById('cfgLote').value)||50;
-  if(buffer.length>=lote){
-    const kmNow=km;
-    savePDF([...buffer],kmIniLote,kmNow);
-    buffer=[];
-    kmIniLote=kmNow;
-  }
-  setTimeout(capLoop,parseInt(document.getElementById('cfgInt').value)||200);
-}
-async function savePDF(data,kmI,kmF){
-  if(!data.length)return;
-  const vid=document.getElementById('vid');
-  const doc=new jspdf.jsPDF(vid.videoWidth>=vid.videoHeight?'l':'p','mm','a4');
-  const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
-  for(let i=0;i<data.length;i++){
-    if(i)doc.addPage();
-    doc.addImage(data[i],'JPEG',0,0,pw,ph);
-  }
-  const fh=await hDir.getFileHandle(`RELATORIO_${safeFotoLabel()||'KM'}_${kmI}_AO_${kmF}_${Date.now()}.pdf`,{create:true});
-  const w=await fh.createWritable();
-  await w.write(doc.output('blob'));
-  await w.close();
-  showToast(`PDF salvo: KM ${kmI} → ${kmF}`);
 }
 
-/* ===== ETIQUETA DAS FOTOS ===== */
-window._fotoLabel='';
-function syncFotoLabel(v){
-  window._fotoLabel=String(v||'');
-  const a=document.getElementById('fotoLabel');
-  const b=document.getElementById('fotoLabelLive');
-  if(a && a.value!==window._fotoLabel)a.value=window._fotoLabel;
-  if(b && b.value!==window._fotoLabel)b.value=window._fotoLabel;
-}
-function safeFotoLabel(){
-  return String(window._fotoLabel||'').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]+/gi,'_').replace(/^_+|_+$/g,'').toUpperCase();
+function syncFotoLabel(val){
+  document.getElementById('fotoLabel').value = val;
+  document.getElementById('fotoLabelLive').value = val;
 }
 
 function toggleSet(){
   document.getElementById('settings').classList.toggle('open');
+}
+
+function startCap(){
+  capturing = true;
+  buffer = [];
+  document.getElementById('btn-start').style.display = 'none';
+  document.getElementById('btn-stop').style.display = 'flex';
+  document.getElementById('rec-tag').classList.add('on');
+  showToast('Gravação do relatório iniciada');
+  captureLoop();
+}
+
+function captureLoop(){
+  if(!capturing) return;
+  manualPhoto();
+  const interval = parseInt(document.getElementById('cfgInt').value) || 2000;
+  setTimeout(captureLoop, interval);
+}
+
+function manualPhoto(){
+  const vid = document.getElementById('vid');
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  if(!vid.videoWidth) return;
+
+  c.width = vid.videoWidth;
+  c.height = vid.videoHeight;
+
+  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
+  
+  buffer.push({
+    img: c.toDataURL('image/jpeg', 0.8),
+    km: currentKm,
+    time: new Date().toLocaleTimeString('pt-BR')
+  });
+}
+
+function stopCap(){
+  capturing = false;
+  document.getElementById('btn-start').style.display = 'flex';
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('rec-tag').classList.remove('on');
+
+  if(buffer.length === 0){
+    showToast('Nenhuma foto capturada', 'err');
+    return;
+  }
+
+  generatePDF();
+}
+
+function generatePDF(){
+  showToast('Gerando PDF, aguarde...');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  
+  const label = document.getElementById('fotoLabel').value || 'Relatório de Inspeção';
+  
+  doc.setFontSize(16);
+  doc.text(label, 14, 15);
+  doc.setFontSize(10);
+  doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} | Total de Fotos: ${buffer.length}`, 14, 22);
+
+  let y = 30;
+  buffer.forEach((item, index)=>{
+    if(y > 230){
+      doc.addPage();
+      y = 20;
+    }
+    doc.addImage(item.img, 'JPEG', 14, y, 80, 50);
+    doc.setFontSize(9);
+    doc.text(`Foto #${index + 1}`, 100, y + 10);
+    doc.text(`KM: ${item.km}`, 100, y + 18);
+    doc.text(`Horário: ${item.time}`, 100, y + 26);
+    y += 58;
+  });
+
+  doc.save(`Relatorio_Inspecao_KM_${buffer[0]?.km||'0'}_a_${buffer[buffer.length-1]?.km||'0'}.pdf`);
+  showToast('PDF gerado com sucesso!');
+  buffer = [];
+}
+
+function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr){
+  ctx.drawImage(videoEl, 0, 0, w, h);
+  const bh = h * .13;
+  const grad = ctx.createLinearGradient(0, h - bh, 0, h);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(.25, 'rgba(0,0,0,.55)');
+  grad.addColorStop(1, 'rgba(0,0,0,.9)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, h - bh, w, bh);
+
+  const label = document.getElementById('fotoLabel').value;
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
+  ctx.fillText('KM ' + kmVal + (label ? ' - ' + label : ''), 20, h - bh * .55);
+  ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.7)';
+  ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 }
 </script>
 </body>
