@@ -58,7 +58,7 @@ img,video{display:block;max-width:100%}
 @keyframes logoIn{from{transform:scale(0) rotate(-140deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .sp-title{margin-top:16px;font-size:clamp(28px,8vw,36px);font-weight:900;letter-spacing:-.03em;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .sp-bar{margin-top:48px;width:180px;height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
-.sp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:barLoad .6s .2s ease-in-out both;transform-origin:left}
+.sp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:barLoad .4s .1s ease-in-out both;transform-origin:left}
 @keyframes barLoad{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 /* ===== MENU ===== */
@@ -159,7 +159,7 @@ canvas#c, canvas#cUnica{display:none}
     <div class="menu-grid">
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Foto e Vídeo com Áudio</h3><p>Tirar foto ou gravar vídeo avulso com áudio, zoom e KM</p></span>
+        <span class="mc-b"><h3>Foto e Vídeo com Áudio</h3><p>Tirar foto ou gravar vídeo avulso com áudio estável, zoom acumulativo e KM</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc pri" onclick="openMod('inspecao')">
@@ -197,7 +197,7 @@ canvas#c, canvas#cUnica{display:none}
   <div style="position:absolute;inset:auto 0 0 0;padding:0 18px calc(24px + var(--safe-b));display:flex;gap:16px;align-items:center;justify-content:center;z-index:200;background:linear-gradient(to top,rgba(0,0,0,.82),transparent)">
     <!-- Engrenagem Câmera -->
     <button onclick="toggleSetUnica()" style="width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;flex-shrink:0;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l-.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
 
     <!-- Botão Disparar Foto (Câmera Nativa) -->
@@ -255,7 +255,7 @@ canvas#c, canvas#cUnica{display:none}
     <div id="rec-tag"><div class="dot"></div><span>Registrando no PDF</span></div>
     <div id="ui-ctrl">
       <button class="ui-btn" id="btn-gear" onclick="toggleSet()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l-.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
       <button class="ui-btn" id="btn-start" onclick="startCap()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>Iniciar
@@ -277,7 +277,7 @@ canvas#c, canvas#cUnica{display:none}
 setTimeout(() => {
   const sp = document.getElementById('splash');
   if(sp) sp.classList.add('done');
-}, 400);
+}, 300);
 
 /* ===== UTILITIES & STATE ===== */
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
@@ -294,34 +294,13 @@ let renderIntervalUnica = null;
 let micStream = null;
 let recordingStartTimeStr = '';
 
-/* ===== FULLSCREEN HELPER ===== */
-function triggerFullscreen() {
-  const elem = document.documentElement;
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen().catch(() => {});
-  } else if (elem.webkitRequestFullscreen) {
-    elem.webkitRequestFullscreen();
-  }
-}
-
-/* ===== TOAST ===== */
-let _tt = null;
-function showToast(msg, type = 'ok') {
-  const el = document.getElementById('toast');
-  const icons = { ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>', err: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' };
-  el.className = 'toast ' + type;
-  el.innerHTML = (icons[type] || '') + msg;
-  clearTimeout(_tt);
-  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 3000); });
-}
-
-/* ===== SELEÇÃO DE PASTA ===== */
+/* ===== SELEÇÃO DE PASTA ANTECIPADA (AO INICIAR O APP) ===== */
 async function ensureDirectory() {
   if (dirHandle) return dirHandle;
   if ('showDirectoryPicker' in window) {
     try {
       dirHandle = await window.showDirectoryPicker();
-      showToast('Pasta selecionada com sucesso!');
+      showToast('Pasta padrão selecionada com sucesso!');
       return dirHandle;
     } catch (e) {
       showToast('Seleção de pasta cancelada', 'err');
@@ -332,6 +311,13 @@ async function ensureDirectory() {
     return null;
   }
 }
+
+// Disparar seleção de pasta logo na inicialização ao primeiro toque/clique ou automáticas
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    ensureDirectory();
+  }, 500);
+});
 
 async function saveFileToDirectory(blob, filename) {
   const dir = await ensureDirectory();
@@ -355,7 +341,28 @@ async function saveFileToDirectory(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Ficheiro descarregado: ' + filename);
+  showToast('Baixado: ' + filename);
+}
+
+/* ===== FULLSCREEN HELPER ===== */
+function triggerFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen().catch(() => {});
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  }
+}
+
+/* ===== TOAST ===== */
+let _tt = null;
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  const icons = { ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>', err: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>' };
+  el.className = 'toast ' + type;
+  el.innerHTML = (icons[type] || '') + msg;
+  clearTimeout(_tt);
+  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 3000); });
 }
 
 /* ===== NAVIGATION ===== */
@@ -454,7 +461,7 @@ function toggleSetUnica() {
   document.getElementById('settingsUnica').classList.toggle('open');
 }
 
-/* ===== FOTO ÚNICA & VÍDEO COM ÁUDIO E ZOOM ===== */
+/* ===== ZOOM ACUMULATIVO PERFEITO (FOTO E VÍDEO) ===== */
 async function initFotoUnica() {
   try {
     triggerFullscreen();
@@ -477,6 +484,7 @@ async function initFotoUnica() {
     }, 100);
 
     let initialDist = null;
+    let baseZoom = 1;
     let track = streamUnica.getVideoTracks()[0];
     let capabilities = track?.getCapabilities?.() || {};
 
@@ -486,6 +494,7 @@ async function initFotoUnica() {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
+        baseZoom = track.getSettings().zoom || capabilities.min || 1;
       }
     });
 
@@ -495,14 +504,14 @@ async function initFotoUnica() {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        const zoomFactor = currentDist / initialDist;
-        let newZoom = Math.min(Math.max(capabilities.zoom.min || 1, (track.getSettings().zoom || 1) * zoomFactor), capabilities.zoom.max || 5);
-        track.applyConstraints({ advanced: [{ zoom: newZoom }] }).catch(() => {});
+        const scaleFactor = currentDist / initialDist;
+        let targetZoom = Math.min(Math.max(capabilities.zoom.min || 1, baseZoom * scaleFactor), capabilities.zoom.max || 5);
+        track.applyConstraints({ advanced: [{ zoom: targetZoom }] }).catch(() => {});
       }
     });
 
   } catch (e) {
-    showToast('Erro ao aceder à câmara', 'err');
+    showToast('Erro ao acessar a câmera', 'err');
   }
 }
 
@@ -516,7 +525,7 @@ function takeSinglePhoto() {
   }, 'image/jpeg', 0.95);
 }
 
-/* ===== GRAVAÇÃO DE VÍDEO COM ÁUDIO E ZOOM ===== */
+/* ===== GRAVAÇÃO DE VÍDEO COM ÁUDIO ESTÁVEL E ZOOM ACUMULATIVO ===== */
 async function toggleVideoRecording() {
   if (!isRecordingVideo) {
     await startVideoRecording();
@@ -533,9 +542,12 @@ async function startVideoRecording() {
   }
 
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    micStream = await navigator.mediaDevices.getUserMedia({ 
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
+      video: false 
+    });
   } catch (e) {
-    showToast('Microfone indisponível (a gravar sem áudio)', 'err');
+    showToast('Microfone indisponível (gravando sem áudio)', 'err');
   }
 
   const streamCanvas = c.captureStream(30);
@@ -591,7 +603,7 @@ async function startVideoRecording() {
   const btnVid = document.getElementById('btnRecVideoUnica');
   btnVid.style.background = '#ef4444';
   btnVid.style.borderColor = '#fca5a5';
-  showToast('Gravação de vídeo iniciada...');
+  showToast('Gravação de vídeo com áudio iniciada...');
 }
 
 function stopVideoRecording() {
@@ -601,7 +613,7 @@ function stopVideoRecording() {
     const btnVid = document.getElementById('btnRecVideoUnica');
     btnVid.style.background = 'rgba(0,0,0,0.5)';
     btnVid.style.borderColor = 'rgba(255,255,255,0.4)';
-    showToast('Vídeo finalizado e a guardar...');
+    showToast('Vídeo finalizado e salvando...');
   }
 }
 
@@ -633,7 +645,7 @@ async function switchCam(deviceId) {
     toggleSet();
     showToast('Câmera alterada');
   } catch (e) {
-    showToast('Erro ao trocar câmara', 'err');
+    showToast('Erro ao trocar câmera', 'err');
   }
 }
 
@@ -648,6 +660,7 @@ async function startApp() {
     loadCameras();
 
     let initialDist = null;
+    let baseZoom = 1;
     let track = stream.getVideoTracks()[0];
     let capabilities = track?.getCapabilities?.() || {};
 
@@ -657,6 +670,7 @@ async function startApp() {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
+        baseZoom = track.getSettings().zoom || capabilities.min || 1;
       }
     });
 
@@ -666,15 +680,15 @@ async function startApp() {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        const zoomFactor = currentDist / initialDist;
-        let newZoom = Math.min(Math.max(capabilities.zoom.min || 1, (track.getSettings().zoom || 1) * zoomFactor), capabilities.zoom.max || 5);
-        track.applyConstraints({ advanced: [{ zoom: newZoom }] }).catch(() => {});
+        const scaleFactor = currentDist / initialDist;
+        let targetZoom = Math.min(Math.max(capabilities.zoom.min || 1, baseZoom * scaleFactor), capabilities.zoom.max || 5);
+        track.applyConstraints({ advanced: [{ zoom: targetZoom }] }).catch(() => {});
       }
     });
 
   } catch (e) {
     document.getElementById('gateErr').style.display = 'block';
-    document.getElementById('gateErr').textContent = 'Erro ao aceder à câmara: ' + e.message;
+    document.getElementById('gateErr').textContent = 'Erro ao acessar câmera: ' + e.message;
   }
 }
 
@@ -737,7 +751,7 @@ function stopCap() {
 }
 
 function generatePDF() {
-  showToast('A gerar PDF, aguarde...');
+  showToast('Gerando PDF, aguarde...');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
   
