@@ -179,7 +179,7 @@ canvas#c, canvas#cUnica{display:none}
       <!-- Foto e Vídeo Principal -->
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Foto e Vídeo com Áudio</h3><p>Tirar foto ou gravar vídeo com áudio estável, zoom acumulativo e KM</p></span>
+        <span class="mc-b"><h3>Foto e Vídeo</h3><p>Tirar foto ou gravar vídeo, com zoom acumulativo e KM</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
@@ -193,7 +193,7 @@ canvas#c, canvas#cUnica{display:none}
   </div>
 </div>
 
-<!-- FOTO E VÍDEO COM ÁUDIO -->
+<!-- FOTO E VÍDEO -->
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
   <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
@@ -227,7 +227,7 @@ canvas#c, canvas#cUnica{display:none}
       <div style="width:56px;height:56px;border-radius:50%;background:#fff;"></div>
     </button>
 
-    <!-- Botão Gravar Vídeo com Áudio -->
+    <!-- Botão Gravar Vídeo -->
     <button id="btnRecVideoUnica" onclick="toggleVideoRecording()" style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;flex-shrink:0;transition:all 0.2s">
       <svg id="iconVideoUnica" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
     </button>
@@ -320,23 +320,33 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let isRecordingVideo = false;
 let renderIntervalUnica = null;
-let micStream = null;
 let recordingStartTimeStr = '';
 
-/* ===== SELEÇÃO DE PASTA AUTOMÁTICA (UMA ÚNICA VEZ AO ENTRAR NO SISTEMA) ===== */
-async function ensureDirectory() {
-  if (dirHandle) return dirHandle;
-  if ('showDirectoryPicker' in window) {
-    try {
-      dirHandle = await window.showDirectoryPicker();
-      showToast('Pasta padrão definida com sucesso!');
-      return dirHandle;
-    } catch (e) {
-      showToast('Seleção de pasta cancelada', 'err');
+/* ===== SELEÇÃO OBRIGATÓRIA DE PASTA A CADA ABERTURA DE MÓDULO ===== */
+async function chooseDirectoryForSession() {
+  dirHandle = null;
+
+  if (!('showDirectoryPicker' in window)) {
+    showToast('Use Chrome ou Edge para selecionar a pasta de destino', 'err');
+    return null;
+  }
+
+  try {
+    const selected = await window.showDirectoryPicker({ mode: 'readwrite' });
+    let permission = await selected.queryPermission({ mode: 'readwrite' });
+    if (permission !== 'granted') {
+      permission = await selected.requestPermission({ mode: 'readwrite' });
+    }
+    if (permission !== 'granted') {
+      showToast('Permissão de gravação não concedida', 'err');
       return null;
     }
-  } else {
-    showToast('Navegador não suporta seleção de pasta. Usando download padrão.', 'err');
+
+    dirHandle = selected;
+    showToast('Pasta selecionada: ' + (selected.name || 'destino definido'));
+    return selected;
+  } catch (e) {
+    showToast('Seleção de pasta cancelada', 'err');
     return null;
   }
 }
@@ -398,16 +408,19 @@ async function openMod(id) {
     if (renderIntervalUnica) clearInterval(renderIntervalUnica);
     capturing = false;
     if (isRecordingVideo) stopVideoRecording();
+    dirHandle = null;
     return;
   }
   
+  // Sempre solicita uma pasta nova ou existente antes de entrar no sistema.
+  // Se o usuário cancelar, o menu permanece aberto e nenhuma câmera é iniciada.
+  const selectedDirectory = await chooseDirectoryForSession();
+  if (!selectedDirectory) return;
+
   menu.style.display = 'none';
   document.getElementById('mod-' + id).classList.add('active');
   triggerFullscreen();
-  
-  // Pede para selecionar a pasta padrão exatamente aqui, uma única vez ao entrar no sistema escolhido
-  await ensureDirectory();
-  
+
   if (id === 'foto-unica') initFotoUnica();
 }
 
@@ -548,7 +561,7 @@ function takeSinglePhoto() {
   }, 'image/jpeg', 0.95);
 }
 
-/* ===== GRAVAÇÃO DE VÍDEO COM ÁUDIO ESTÁVEL E ZOOM ACUMULATIVO ===== */
+/* ===== GRAVAÇÃO DE VÍDEO SEM ÁUDIO E ZOOM ACUMULATIVO ===== */
 async function toggleVideoRecording() {
   if (!isRecordingVideo) {
     await startVideoRecording();
@@ -564,26 +577,13 @@ async function startVideoRecording() {
     return;
   }
 
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({ 
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
-      video: false 
-    });
-  } catch (e) {
-    showToast('Microfone indisponível (gravando sem áudio)', 'err');
-  }
-
-  const streamCanvas = c.captureStream(30);
-  const tracks = [streamCanvas.getVideoTracks()[0]];
-  if (micStream && micStream.getAudioTracks().length > 0) {
-    tracks.push(micStream.getAudioTracks()[0]);
-  }
-  const combinedStream = new MediaStream(tracks);
+  // O vídeo é gravado sem áudio; nenhuma permissão de microfone é solicitada.
+  const combinedStream = c.captureStream(30);
 
   recordedChunks = [];
   recordingStartTimeStr = new Date().toLocaleTimeString('pt-BR');
 
-  let options = { mimeType: 'video/webm; codecs=vp9,opus' };
+  let options = { mimeType: 'video/webm; codecs=vp9', videoBitsPerSecond: 8000000 };
   if (!MediaRecorder.isTypeSupported(options.mimeType)) {
     options = { mimeType: 'video/webm' };
   }
@@ -614,10 +614,6 @@ async function startVideoRecording() {
     
     saveFileToDirectory(blob, filename);
 
-    if (micStream) {
-      micStream.getTracks().forEach(t => t.stop());
-      micStream = null;
-    }
   };
 
   mediaRecorder.start(1000);
@@ -626,7 +622,7 @@ async function startVideoRecording() {
   const btnVid = document.getElementById('btnRecVideoUnica');
   btnVid.style.background = '#ef4444';
   btnVid.style.borderColor = '#fca5a5';
-  showToast('Gravação de vídeo com áudio iniciada...');
+  showToast('Gravação de vídeo iniciada');
 }
 
 function stopVideoRecording() {
