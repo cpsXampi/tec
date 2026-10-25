@@ -246,10 +246,14 @@ img,video{display:block;max-width:100%}
 #btn-start{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;box-shadow:0 6px 24px rgba(255,214,0,.16)}
 #btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
 #btn-menu{flex-shrink:0;padding:0 16px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:10px;color:var(--text2)}
-/* ===== SETTINGS ===== */
-#settings{position:fixed;inset:0 0 0 auto;width:min(88vw,350px);z-index:50;border-left:1px solid var(--border);background:rgba(10,13,17,.96);backdrop-filter:blur(32px) saturate(1.4);-webkit-backdrop-filter:blur(32px) saturate(1.4);padding:calc(18px + var(--safe-t)) 24px 40px;transform:translateX(100%);transition:transform .25s var(--ease);overflow-y:auto;box-shadow:-10px 0 50px rgba(0,0,0,.7)}
-#settings.open{transform:translateX(0)}
-#settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:28px}
+
+/* ===== SETTINGS (MODAL CENTRALIZADO) ===== */
+#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
+#settings.open{opacity:1;visibility:visible;pointer-events:auto}
+.settings-content{width:min(90vw,400px);max-height:85vh;border-radius:var(--r-xl);border:1px solid var(--border2);background:rgba(14,18,24,.98);backdrop-filter:blur(32px) saturate(1.4);-webkit-backdrop-filter:blur(32px) saturate(1.4);padding:24px;overflow-y:auto;box-shadow:var(--shadow-xl);transform:scale(.95);transition:transform .25s var(--ease)}
+#settings.open .settings-content{transform:scale(1)}
+
+#settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
 #settings-close:active{opacity:.5}
 #settings-close svg{width:14px;height:14px}
 #settings h2{font-size:18px;font-weight:900;letter-spacing:-.01em}
@@ -452,13 +456,18 @@ canvas#c{display:none}
       <button class="gate-btn sec" onclick="openMod('menu')">Voltar ao menu</button>
     </div>
   </div>
+  
+  <!-- MODAL DE CONFIGURAÇÕES CENTRALIZADO -->
   <div id="settings">
-    <button id="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
-    <h2>Configurações</h2>
-    <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-    <div class="s-group"><label class="s-lbl">Intervalo (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200"></div>
-    <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
+    <div class="settings-content">
+      <button id="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
+      <h2>Configurações</h2>
+      <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
+      <div class="s-group"><label class="s-lbl">Intervalo (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200"></div>
+      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
+    </div>
   </div>
+
   <div id="app-shell">
     <video id="vid" autoplay playsinline muted onclick="manualPhoto()"></video>
     <div id="km-hud"><span class="h-l">KM atual</span><p class="h-v" id="kmTxt">KM ---</p></div>
@@ -477,7 +486,7 @@ canvas#c{display:none}
       <button class="ui-btn" id="btn-stop" onclick="stopCap()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar
       </button>
-      <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">Menu</button>
+      <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">Voltar</button>
     </div>
   </div>
   <canvas id="c"></canvas>
