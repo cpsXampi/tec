@@ -34,7 +34,7 @@
   --glass:rgba(255,255,255,.03);--glass2:rgba(255,255,255,.05);--glass3:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none;touch-action:none}
 button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;-webkit-user-select:none;user-select:none}
 input,select{font-family:var(--font);outline:none}
 img,video{display:block;max-width:100%}
@@ -80,7 +80,7 @@ img,video{display:block;max-width:100%}
 .module.active{display:block}
 
 /* ===== INSPEÇÃO & FOTO ÚNICA ===== */
-#mod-inspecao{position:fixed;inset:0;overflow:hidden;background:#000}
+#mod-inspecao, #mod-foto-unica{position:fixed;inset:0;overflow:hidden;background:#000}
 #gate{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);overflow-y:auto}
 .gate-box{max-width:400px;width:100%;border-radius:var(--r-xl);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface) 0%,var(--surface2) 100%);padding:36px 24px;text-align:center;box-shadow:var(--shadow-xl)}
 .gate-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--accent-dim),rgba(255,214,0,.06));border:1px solid rgba(255,214,0,.12);color:var(--accent);display:grid;place-items:center;margin:0 auto}
@@ -94,32 +94,41 @@ img,video{display:block;max-width:100%}
 
 #app-shell{position:relative;width:100vw;height:100vh;height:100dvh;visibility:hidden;overflow:hidden}
 #vid, #vidUnica{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-#km-hud{position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 6px 28px rgba(0,0,0,.5);pointer-events:none;z-index:100}
-#km-hud .h-l{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)}
-#km-hud .h-v{font-size:26px;font-weight:900;line-height:1.1;margin-top:2px}
+#km-hud, #km-hud-unica{position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 6px 28px rgba(0,0,0,.5);pointer-events:none;z-index:100}
+#km-hud .h-l, #km-hud-unica .h-l{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)}
+#km-hud .h-v, #km-hud-unica .h-v{font-size:26px;font-weight:900;line-height:1.1;margin-top:2px}
 #rec-tag{position:absolute;top:calc(22px + var(--safe-t));right:14px;display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.6);padding:7px 13px;border-radius:22px;backdrop-filter:blur(12px);opacity:0;transition:all .25s var(--ease);z-index:100;pointer-events:none}
 #rec-tag.on{opacity:1}
 #rec-tag .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:blink 1s infinite;box-shadow:0 0 8px rgba(239,68,68,.5)}
 @keyframes blink{50%{opacity:.1}}
 #rec-tag span{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
 
-#ui-ctrl{position:absolute;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:0 18px calc(24px + var(--safe-b));background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.35) 55%,transparent)}
+#ui-ctrl{position:absolute;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 24px calc(24px + var(--safe-b));background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.35) 55%,transparent)}
 .ui-btn{height:52px;border-radius:var(--r-sm);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s var(--ease);box-shadow:var(--shadow-md)}
 .ui-btn:active{transform:scale(.94)}
 .ui-btn svg{width:18px;height:18px}
-#btn-gear{width:52px;flex-shrink:0;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4);backdrop-filter:blur(10px);color:var(--text2)}
-#btn-start{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;box-shadow:0 6px 24px rgba(255,214,0,.16)}
-#btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
-#btn-menu{flex-shrink:0;padding:0 16px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4);backdrop-filter:blur(10px);font-size:10px;color:var(--text2)}
+#btn-gear, .btn-gear-unica{width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.45);backdrop-filter:blur(10px);color:var(--text2);display:grid;place-items:center}
+#btn-start{flex:1;margin:0 12px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;box-shadow:0 6px 24px rgba(255,214,0,.16)}
+#btn-stop{flex:1;margin:0 12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
+#btn-menu, .btn-menu-unica{width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.45);backdrop-filter:blur(10px);color:var(--text2);display:grid;place-items:center}
+
+/* BOTÃO DE CÂMERA NATIVA (BOLA) */
+.shutter-btn{width:76px;height:76px;border-radius:50%;border:4px solid #fff;background:transparent;padding:4px;display:grid;place-items:center;transition:transform .1s var(--ease);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.shutter-btn:active{transform:scale(.92)}
+.shutter-btn-inner{width:100%;height:100%;border-radius:50%;background:#fff;transition:background .15s var(--ease)}
+.shutter-btn:active .shutter-btn-inner{background:var(--accent)}
+
+/* ZOOM INDICATOR */
+.zoom-hud{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:900;color:#fff;backdrop-filter:blur(10px);pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:150}
+.zoom-hud.show{opacity:1}
 
 /* ===== SETTINGS ===== */
-#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
-#settings.open{opacity:1;visibility:visible;pointer-events:auto}
+.settings-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
+.settings-modal.open{opacity:1;visibility:visible;pointer-events:auto}
 .settings-content{width:min(90vw,400px);max-height:85vh;border-radius:var(--r-xl);border:1px solid var(--border2);background:rgba(10,13,17,0.96);padding:24px;overflow-y:auto;box-shadow:var(--shadow-xl);transform:scale(.95);transition:transform .25s var(--ease)}
-#settings.open .settings-content{transform:scale(1)}
-#settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
-#settings-close svg{width:14px;height:14px}
-#settings h2{font-size:18px;font-weight:900}
+.settings-modal.open .settings-content{transform:scale(1)}
+.settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.settings-close svg{width:14px;height:14px}
 .s-group{margin-top:22px}
 .s-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:7px}
 .s-inp{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:800;appearance:none;-webkit-appearance:none}
@@ -159,7 +168,7 @@ canvas#c, canvas#cUnica{display:none}
     <div class="menu-grid">
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Foto Única</h3><p>Tirar foto avulsa com KM e salvar na galeria</p></span>
+        <span class="mc-b"><h3>Foto Única</h3><p>Tirar foto avulsa com KM e salvar na pasta</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc pri" onclick="openMod('inspecao')">
@@ -174,17 +183,24 @@ canvas#c, canvas#cUnica{display:none}
 <!-- FOTO ÚNICA -->
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
-  <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
-    <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)">KM atual</span>
-    <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
+  <div id="km-hud-unica">
+    <span class="h-l">KM atual</span>
+    <p class="h-v" style="color:#fff" id="kmTxtUnica">KM ---</p>
   </div>
-  <div style="position:absolute;top:calc(18px + var(--safe-t));right:14px;z-index:100;">
-    <button onclick="openMod('menu')" style="height:42px;padding:0 16px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(10px)">Voltar</button>
-  </div>
-  <div style="position:absolute;inset:auto 0 0 0;padding:0 18px calc(24px + var(--safe-b));display:flex;gap:12px;align-items:center;justify-content:center;z-index:200;background:linear-gradient(to top,rgba(0,0,0,.82),transparent)">
-    <button onclick="takeSinglePhoto()" style="flex:1;max-width:400px;height:56px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 24px rgba(255,214,0,.2)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>
-      Disparar Foto
+  
+  <div class="zoom-hud" id="zoomHudUnica">1.0x</div>
+
+  <div style="position:absolute;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px calc(28px + var(--safe-b));background:linear-gradient(to top,rgba(0,0,0,.82),transparent)">
+    <button class="btn-gear-unica" onclick="toggleSet('settingsUnica')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    
+    <button class="shutter-btn" onclick="takeSinglePhoto()" aria-label="Tirar foto">
+      <div class="shutter-btn-inner"></div>
+    </button>
+    
+    <button class="btn-menu-unica" onclick="openMod('menu')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="m15 18-6-6 6-6"/></svg>
     </button>
   </div>
   <canvas id="cUnica"></canvas>
@@ -198,27 +214,16 @@ canvas#c, canvas#cUnica{display:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
       <h1>Inspeção Fotográfica PDF</h1>
-      <p>Configure e inicie a captura das fotos para a geração automática do relatório em PDF em tela cheia.</p>
+      <p>Configure e inicie a captura das fotos para a geração automática do relatório em PDF.</p>
       <div id="gateErr" class="gate-err" style="display:none"></div>
       <div style="margin-top:20px;text-align:left">
         <label style="display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px">Etiqueta / Tipo de serviço <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--dim)">(opcional)</span></label>
         <input id="fotoLabel" type="text" placeholder="Ex: Manutenção, Inspeção, Vistoria..." autocomplete="off" spellcheck="false" oninput="syncFotoLabel(this.value)" style="width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:600;outline:none;font-family:var(--font)">
       </div>
       <button class="gate-btn" onclick="startApp()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>Ativar Câmera (Tela Cheia)
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>Ativar Câmera
       </button>
       <button class="gate-btn sec" onclick="openMod('menu')">Voltar ao menu</button>
-    </div>
-  </div>
-  
-  <!-- SETTINGS -->
-  <div id="settings">
-    <div class="settings-content">
-      <button id="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
-      <h2>Configurações</h2>
-      <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="2000" min="1000" step="500"></div>
-      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
     </div>
   </div>
 
@@ -230,8 +235,11 @@ canvas#c, canvas#cUnica{display:none}
       <input id="fotoLabelLive" type="text" placeholder="Tipo de serviço..." autocomplete="off" spellcheck="false" oninput="syncFotoLabel(this.value)" style="background:transparent;border:none;outline:none;color:#fff;font-size:11px;font-weight:700;width:100%;caret-color:var(--accent);font-family:var(--font)">
     </div>
     <div id="rec-tag"><div class="dot"></div><span>Registrando no PDF</span></div>
+    
+    <div class="zoom-hud" id="zoomHudInspecao">1.0x</div>
+
     <div id="ui-ctrl">
-      <button class="ui-btn" id="btn-gear" onclick="toggleSet()">
+      <button class="ui-btn" id="btn-gear" onclick="toggleSet('settingsInspecao')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
       <button class="ui-btn" id="btn-start" onclick="startCap()">
@@ -240,10 +248,32 @@ canvas#c, canvas#cUnica{display:none}
       <button class="ui-btn" id="btn-stop" onclick="stopCap()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar PDF
       </button>
-      <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">Voltar</button>
+      <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
     </div>
   </div>
   <canvas id="c"></canvas>
+</div>
+
+<!-- SETTINGS MODAL (FOTO ÚNICA) -->
+<div id="settingsUnica" class="settings-modal">
+  <div class="settings-content">
+    <button class="settings-close" onclick="toggleSet('settingsUnica')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
+    <h2>Configurações de Câmera</h2>
+    <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp camSel" onchange="switchCam(this.value, 'unica')"></select></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL (INSPEÇÃO) -->
+<div id="settingsInspecao" class="settings-modal">
+  <div class="settings-content">
+    <button class="settings-close" onclick="toggleSet('settingsInspecao')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
+    <h2>Configurações</h2>
+    <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp camSel" onchange="switchCam(this.value, 'inspecao')"></select></div>
+    <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="2000" min="1000" step="500"></div>
+    <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -256,6 +286,12 @@ function findCol(h,cs){const m=h.map(s=>String(s||'').trim().toUpperCase());for(
 
 let kmDB=[], stream=null, streamUnica=null, capturing=false, buffer=[], lat='0.000000', lon='0.000000';
 let currentKm = '---';
+let dirHandle = null;
+
+let currentTrack = null;
+let zoomCapabilities = null;
+let currentZoom = 1;
+let initialPinchDistance = null;
 
 /* ===== FULLSCREEN HELPER ===== */
 function triggerFullscreen() {
@@ -265,6 +301,47 @@ function triggerFullscreen() {
   } else if (elem.webkitRequestFullscreen) {
     elem.webkitRequestFullscreen();
   }
+}
+
+/* ===== DIRECTORY SELECTION ===== */
+async function selectDirectory() {
+  if ('showDirectoryPicker' in window) {
+    try {
+      dirHandle = await window.showDirectoryPicker();
+      showToast('Pasta de destino configurada!');
+      return true;
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('Erro ao selecionar pasta', 'err');
+      return false;
+    }
+  } else {
+    showToast('Salvando fotos via downloads nativos');
+    return true;
+  }
+}
+
+async function saveBlobToDirectory(blob, fileName) {
+  if (dirHandle) {
+    try {
+      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  // Fallback tradicional
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  return true;
 }
 
 /* ===== TOAST ===== */
@@ -279,7 +356,7 @@ function showToast(msg,type='ok'){
 }
 
 /* ===== NAVIGATION ===== */
-function openMod(id){
+async function openMod(id){
   const menu=document.getElementById('main-menu');
   document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
   if(id==='menu'){
@@ -289,6 +366,12 @@ function openMod(id){
     capturing=false;
     return;
   }
+  
+  if (id === 'foto-unica' || id === 'inspecao') {
+    const ok = await selectDirectory();
+    if (!ok && 'showDirectoryPicker' in window) return;
+  }
+
   menu.style.display='none';
   document.getElementById('mod-'+id).classList.add('active');
   triggerFullscreen();
@@ -335,18 +418,106 @@ if('geolocation' in navigator){
   },null,{enableHighAccuracy:true});
 }
 
+/* ===== CAMERA & DEVICES ===== */
+async function populateCameraList() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+    document.querySelectorAll('.camSel').forEach(select => {
+      select.innerHTML = '';
+      videoDevices.forEach((d, idx) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `Câmera ${idx + 1}`;
+        select.appendChild(opt);
+      });
+    });
+  } catch (e) {}
+}
+
+async function switchCam(deviceId, type) {
+  const constraints = { video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
+  if (type === 'unica') {
+    if (streamUnica) streamUnica.getTracks().forEach(t => t.stop());
+    streamUnica = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('vidUnica');
+    video.srcObject = streamUnica;
+    setupTrackCapabilities(streamUnica);
+  } else {
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('vid');
+    video.srcObject = stream;
+    setupTrackCapabilities(stream);
+  }
+}
+
+function setupTrackCapabilities(mediaStream) {
+  currentTrack = mediaStream.getVideoTracks()[0];
+  if (currentTrack.getCapabilities) {
+    const capabilities = currentTrack.getCapabilities();
+    if (capabilities.zoom) {
+      zoomCapabilities = capabilities.zoom;
+      currentZoom = currentTrack.getSettings().zoom || zoomCapabilities.min;
+    } else {
+      zoomCapabilities = null;
+    }
+  }
+}
+
+/* ===== PINCH TO ZOOM ===== */
+function initPinchZoom(videoEl, hudEl) {
+  videoEl.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      initialPinchDistance = Math.hypot(
+        e.touches[0].pageX - e.touches[1].pageX,
+        e.touches[0].pageY - e.touches[1].pageY
+      );
+    }
+  });
+
+  videoEl.addEventListener('touchmove', e => {
+    if (e.touches.length === 2 && initialPinchDistance && zoomCapabilities) {
+      const currentDistance = Math.hypot(
+        e.touches[0].pageX - e.touches[1].pageX,
+        e.touches[0].pageY - e.touches[1].pageY
+      );
+      const diff = currentDistance - initialPinchDistance;
+      const step = (zoomCapabilities.max - zoomCapabilities.min) / 100;
+      let newZoom = currentZoom + (diff > 0 ? step : -step);
+      newZoom = Math.min(Math.max(newZoom, zoomCapabilities.min), zoomCapabilities.max);
+      
+      currentTrack.applyConstraints({ advanced: [{ zoom: newZoom }] });
+      currentZoom = newZoom;
+      initialPinchDistance = currentDistance;
+
+      hudEl.textContent = newZoom.toFixed(1) + 'x';
+      hudEl.classList.add('show');
+    }
+  });
+
+  videoEl.addEventListener('touchend', () => {
+    initialPinchDistance = null;
+    setTimeout(() => hudEl.classList.remove('show'), 1000);
+  });
+}
+
 /* ===== FOTO ÚNICA ===== */
 async function initFotoUnica(){
   try{
     triggerFullscreen();
     streamUnica = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},audio:false});
-    document.getElementById('vidUnica').srcObject = streamUnica;
+    const video = document.getElementById('vidUnica');
+    video.srcObject = streamUnica;
+    setupTrackCapabilities(streamUnica);
+    initPinchZoom(video, document.getElementById('zoomHudUnica'));
+    await populateCameraList();
   }catch(e){
     showToast('Erro ao acessar a câmera', 'err');
   }
 }
 
-function takeSinglePhoto(){
+async function takeSinglePhoto(){
   const vid = document.getElementById('vidUnica');
   const c = document.getElementById('cUnica');
   const ctx = c.getContext('2d');
@@ -357,16 +528,10 @@ function takeSinglePhoto(){
   
   drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
 
-  c.toBlob(blob=>{
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Foto salva na galeria!');
+  c.toBlob(async blob => {
+    const fileName = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`;
+    await saveBlobToDirectory(blob, fileName);
+    showToast('Foto salva com sucesso!');
   }, 'image/jpeg', 0.85);
 }
 
@@ -375,7 +540,12 @@ async function startApp(){
   try{
     triggerFullscreen();
     stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},audio:false});
-    document.getElementById('vid').srcObject = stream;
+    const video = document.getElementById('vid');
+    video.srcObject = stream;
+    setupTrackCapabilities(stream);
+    initPinchZoom(video, document.getElementById('zoomHudInspecao'));
+    await populateCameraList();
+    
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app-shell').style.visibility = 'visible';
   }catch(e){
@@ -389,8 +559,8 @@ function syncFotoLabel(val){
   document.getElementById('fotoLabelLive').value = val;
 }
 
-function toggleSet(){
-  document.getElementById('settings').classList.toggle('open');
+function toggleSet(id){
+  document.getElementById(id).classList.toggle('open');
 }
 
 function startCap(){
@@ -410,7 +580,7 @@ function captureLoop(){
   setTimeout(captureLoop, interval);
 }
 
-function manualPhoto(){
+async function manualPhoto(){
   const vid = document.getElementById('vid');
   const c = document.getElementById('c');
   const ctx = c.getContext('2d');
@@ -421,12 +591,18 @@ function manualPhoto(){
 
   drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
   
-  // Utiliza toDataURL comprimido e gerencia buffer leve para evitar travamentos
+  const dataUrl = c.toDataURL('image/jpeg', 0.75);
   buffer.push({
-    img: c.toDataURL('image/jpeg', 0.75),
+    img: dataUrl,
     km: currentKm,
     time: new Date().toLocaleTimeString('pt-BR')
   });
+
+  // Salvar a foto individual em tempo real se a pasta estiver selecionada
+  c.toBlob(async blob => {
+    const fileName = `INSPECAO_KM_${currentKm}_${Date.now()}.jpg`;
+    await saveBlobToDirectory(blob, fileName);
+  }, 'image/jpeg', 0.85);
 }
 
 function stopCap(){
@@ -443,7 +619,7 @@ function stopCap(){
   generatePDF();
 }
 
-function generatePDF(){
+async function generatePDF(){
   showToast('Gerando PDF, aguarde...');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
@@ -469,8 +645,11 @@ function generatePDF(){
     y += 58;
   });
 
-  doc.save(`Relatorio_Inspecao_KM_${buffer[0]?.km||'0'}_a_${buffer[buffer.length-1]?.km||'0'}.pdf`);
-  showToast('PDF gerado com sucesso!');
+  const pdfBlob = doc.output('blob');
+  const pdfName = `Relatorio_Inspecao_KM_${buffer[0]?.km||'0'}_a_${buffer[buffer.length-1]?.km||'0'}.pdf`;
+  await saveBlobToDirectory(pdfBlob, pdfName);
+
+  showToast('PDF salvo com sucesso!');
   buffer = [];
 }
 
@@ -496,4 +675,3 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr){
 </script>
 </body>
 </html>
-```[cite: 1]
