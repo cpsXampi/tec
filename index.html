@@ -323,20 +323,34 @@ let renderIntervalUnica = null;
 let micStream = null;
 let recordingStartTimeStr = '';
 
-/* ===== SELEÇÃO DE PASTA AUTOMÁTICA (UMA ÚNICA VEZ AO ENTRAR NO SISTEMA) ===== */
+/* ===== SELEÇÃO DE PASTA POR SEÇÃO ===== */
 async function ensureDirectory() {
   if (dirHandle) return dirHandle;
-  if ('showDirectoryPicker' in window) {
-    try {
-      dirHandle = await window.showDirectoryPicker();
-      showToast('Pasta padrão definida com sucesso!');
-      return dirHandle;
-    } catch (e) {
-      showToast('Seleção de pasta cancelada', 'err');
+
+  if (!('showDirectoryPicker' in window)) {
+    showToast('Este navegador não permite selecionar pasta. Use Chrome ou Edge.', 'err');
+    return null;
+  }
+
+  try {
+    const selectedHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+
+    // Confirma que a pasta continua com permissão de gravação.
+    let permission = await selectedHandle.queryPermission({ mode: 'readwrite' });
+    if (permission !== 'granted') {
+      permission = await selectedHandle.requestPermission({ mode: 'readwrite' });
+    }
+    if (permission !== 'granted') {
+      showToast('Permissão de gravação não concedida', 'err');
       return null;
     }
-  } else {
-    showToast('Navegador não suporta seleção de pasta. Usando download padrão.', 'err');
+
+    dirHandle = selectedHandle;
+    showToast('Pasta padrão definida: ' + (dirHandle.name || 'pasta selecionada'));
+    return dirHandle;
+  } catch (e) {
+    // AbortError significa que o usuário cancelou o seletor.
+    showToast('Seleção de pasta cancelada', 'err');
     return null;
   }
 }
@@ -352,6 +366,8 @@ async function saveFileToDirectory(blob, filename) {
       return;
     } catch (e) {
       console.error(e);
+      showToast('Não foi possível salvar na pasta selecionada', 'err');
+      return;
     }
   }
   const url = URL.createObjectURL(blob);
@@ -389,25 +405,33 @@ function showToast(msg, type = 'ok') {
 /* ===== NAVIGATION ===== */
 async function openMod(id) {
   const menu = document.getElementById('main-menu');
-  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-  
+
   if (id === 'menu') {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
     menu.style.display = 'flex';
     if (streamUnica) { streamUnica.getTracks().forEach(t => t.stop()); streamUnica = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-    if (renderIntervalUnica) clearInterval(renderIntervalUnica);
+    if (renderIntervalUnica) { clearInterval(renderIntervalUnica); renderIntervalUnica = null; }
     capturing = false;
     if (isRecordingVideo) stopVideoRecording();
+
+    // Ao sair da seção, libera a pasta. Na próxima entrada o sistema perguntará novamente.
+    dirHandle = null;
     return;
   }
-  
+
+  // A pasta é solicitada antes de esconder o menu, ativar a seção ou abrir a câmera.
+  // Se o usuário cancelar, permanece no menu e nenhuma câmera é iniciada.
+  dirHandle = null;
+  const selectedDirectory = await ensureDirectory();
+  if (!selectedDirectory) return;
+
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
   menu.style.display = 'none';
   document.getElementById('mod-' + id).classList.add('active');
   triggerFullscreen();
-  
-  // Pede para selecionar a pasta padrão exatamente aqui, uma única vez ao entrar no sistema escolhido
-  await ensureDirectory();
-  
+
+  // A mesma pasta permanece ativa durante toda a seção.
   if (id === 'foto-unica') initFotoUnica();
 }
 
