@@ -3,274 +3,300 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#040507">
+<meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Sistema Profissional de Inspeção Rodoviária</title>
+<title>Sistema de Relatório e Inspeção Rodoviária</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-/* ===== DESIGN SYSTEM PROFISSIONAL ===== */
+/* ===== DESIGN TOKENS ===== */
 :root{
-  --bg:#040507;--surface:#0b0e14;--surface2:#131822;--surface3:#1c2331;
-  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.16);
-  --accent:#ffd600;--accent-glow:rgba(255,214,0,.15);
-  --green:#10b981;--green-dim:rgba(16,185,129,.12);
-  --red:#ef4444;--warn:#f59e0b;
-  --text:#f4f4f5;--muted:#94a3b8;
-  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --bg:#06070a;--bg2:#0a0d11;--surface:#0f1216;--surface2:#14181d;--surface3:#1a1f25;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--border3:rgba(255,255,255,.16);
+  --accent:#ffd600;--accent2:#ffe44d;--accent3:#c8a800;
+  --accent-dim:rgba(255,214,0,.06);--accent-glow:rgba(255,214,0,.15);
+  --green:#10b981;--green2:#34d399;--green3:#059669;
+  --green-dim:rgba(16,185,129,.08);
+  --red:#ef4444;--red-dim:rgba(239,68,68,.08);
+  --warn:#f59e0b;--warn-dim:rgba(245,158,11,.08);
+  --text:#f0f0f2;--text2:#d4d4d8;--text3:#a1a1aa;--muted:#71717a;--dim:#3f3f46;--dimmer:#27272a;
+  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --r-xs:8px;--r-sm:12px;--r-md:16px;--r-lg:20px;--r-xl:24px;--r-2xl:28px;
+  --shadow-xs:0 1px 3px rgba(0,0,0,.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.6);
+  --shadow-xl:0 24px 80px rgba(0,0,0,.7);
   --safe-b:max(env(safe-area-inset-bottom,0px),20px);
   --safe-t:env(safe-area-inset-top,0px);
   --ease:cubic-bezier(.4,0,.2,1);
+  --glass:rgba(255,255,255,.03);--glass2:rgba(255,255,255,.05);--glass3:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh;min-height:100dvh}
-button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overscroll-behavior:none}
+button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;-webkit-user-select:none;user-select:none}
 input,select{font-family:var(--font);outline:none}
+img,video{display:block;max-width:100%}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH SCREEN ===== */
-#splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);transition:opacity .4s var(--ease)}
-#splash.done{opacity:0;visibility:hidden;pointer-events:none}
-.sp-logo{width:90px;height:90px;border-radius:26px;background:linear-gradient(135deg,var(--accent),#ffa000);display:grid;place-items:center;box-shadow:0 0 50px rgba(255,214,0,.25)}
-.sp-logo svg{width:48px;height:48px}
-.sp-title{margin-top:16px;font-size:18px;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+/* ===== SPLASH ===== */
+#splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
+#splash.done{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .5s ease,visibility .5s ease}
+.sp-bg{position:absolute;inset:0;overflow:hidden}
+.sp-glow{position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 50% 42%,rgba(255,214,0,.09),transparent 70%)}
+.sp-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sp-logo{width:104px;height:104px;border-radius:28px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;box-shadow:0 0 0 1px rgba(255,214,0,.25),0 24px 80px rgba(255,214,0,.22)}
+.sp-logo svg{width:56px;height:56px}
+.sp-title{margin-top:16px;font-size:clamp(28px,8vw,36px);font-weight:900;letter-spacing:-.03em;color:#fff}
+.sp-bar{margin-top:38px;width:180px;height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.sp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:barLoad 1.1s ease-in-out both;transform-origin:left}
+@keyframes barLoad{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
-/* ===== MENU PRINCIPAL ===== */
+/* ===== MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;justify-content:center;padding:24px 20px;background:var(--bg);overflow-y:auto}
-.menu-inner{max-width:480px;width:100%;margin:0 auto}
-.menu-status{display:flex;align-items:center;justify-content:space-between;border-radius:18px;border:1px solid var(--border);background:var(--surface);padding:16px 20px;margin-bottom:24px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-.ms-clock{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
-.ms-date{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.ms-gps{display:flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid rgba(16,185,129,.3);padding:8px 14px;border-radius:20px;font-size:10px;font-weight:800;color:var(--green)}
-.ms-gps-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.menu-inner{position:relative;z-index:1;max-width:460px;width:100%;margin:0 auto}
+.menu-status{display:flex;align-items:center;justify-content:space-between;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);padding:14px 18px;margin-bottom:36px}
+.ms-left{display:flex;align-items:center;gap:12px}
+.ms-icon{width:38px;height:38px;border-radius:11px;background:var(--accent-dim);color:var(--accent);display:grid;place-items:center;flex-shrink:0}
+.ms-time-group .ms-clock{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.ms-time-group .ms-date{font-size:10px;font-weight:600;color:var(--muted);text-transform:capitalize;margin-top:2px}
+.ms-gps-pill{display:flex;align-items:center;gap:7px;border-radius:20px;border:1px solid rgba(16,185,129,.2);background:rgba(16,185,129,.06);padding:7px 14px}
+.ms-gps-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.5);animation:dotPulse 2s infinite}
+@keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.ms-gps-pill span{font-size:10px;font-weight:800;text-transform:uppercase;color:var(--green2)}
+.menu-brand{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+.menu-logo{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;flex-shrink:0}
+.menu-brand-text .mt{font-size:clamp(26px,8vw,36px);font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.menu-grid{margin-top:32px;display:flex;flex-direction:column;gap:10px}
+.mc{display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);transition:all .2s var(--ease);text-align:left;width:100%}
+.mc:active{transform:scale(.975)}
+.mc.pri{border-color:rgba(255,214,0,.3);background:linear-gradient(135deg,rgba(255,214,0,.08),rgba(255,214,0,.02))}
+.mc-i{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;background:var(--glass2);color:var(--accent)}
+.mc.pri .mc-i{background:rgba(255,214,0,.12)}
+.mc-b{flex:1;min-width:0}
+.mc-b h3{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.mc-b p{font-size:11px;font-weight:500;color:var(--muted);margin-top:2px}
+.mc-a{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--glass);color:var(--dim);flex-shrink:0}
 
-.menu-grid{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.mc{display:flex;align-items:center;gap:16px;padding:18px;border-radius:18px;border:1px solid var(--border);background:var(--surface);transition:all .2s var(--ease);text-align:left;width:100%}
-.mc:active{transform:scale(.98)}
-.mc.pri{border-color:rgba(255,214,0,.35);background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(255,214,0,.01))}
-.mc-i{width:48px;height:48px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;color:var(--accent);flex-shrink:0}
-.mc.pri .mc-i{background:var(--accent-glow)}
-.mc-b h3{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
-.mc-b p{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500;line-height:1.4}
-
-/* ===== MODULOS INDEPENDENTES ===== */
-.module{display:none;min-height:100vh;min-height:100dvh;background:#000}
+/* ===== MODULES ===== */
+.module{display:none;min-height:100vh;min-height:100dvh;background:var(--bg)}
 .module.active{display:block}
 
-/* 1. FOTO ÚNICA */
+/* ===== HEADER ===== */
+.hdr{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border);background:rgba(6,7,10,.82);backdrop-filter:blur(28px);padding:0 16px;padding-top:var(--safe-t)}
+.hdr-in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px;height:58px}
+.hdr-back{width:38px;height:38px;border-radius:var(--r-xs);border:1px solid var(--border);background:var(--glass);display:grid;place-items:center;flex-shrink:0}
+.wrap{max-width:680px;margin:0 auto;padding:16px;padding-bottom:var(--safe-b);display:flex;flex-direction:column;gap:10px}
+
+/* ===== CARDS & SEARCH ===== */
+.card{border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);padding:18px;position:relative}
+.card-accent{border-color:rgba(255,214,0,.2);background:linear-gradient(145deg,rgba(255,214,0,.05),rgba(255,214,0,.015))}
+.card-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent);margin-bottom:14px}
+.search-row{display:flex;gap:8px}
+.search-wrap{flex:1;position:relative}
+.search-input{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(0,0,0,.2);padding:12px 14px;font-size:12px;font-weight:800;text-transform:uppercase;color:#fff}
+.post{border-radius:var(--r-lg);border:1px solid var(--border);background:var(--glass);padding:14px;margin-bottom:10px}
+.post.near{border-color:rgba(255,214,0,.45);background:rgba(255,214,0,.07)}
+.post-map{height:130px;width:100%;border:0;border-radius:8px;margin-top:10px}
+
+/* ===== FOTO ÚNICA ===== */
 #mod-foto-unica{position:fixed;inset:0;background:#000}
 #vidUnica{width:100%;height:100%;object-fit:cover}
-.fu-top{position:absolute;top:calc(16px + var(--safe-t));left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;z-index:100;gap:8px}
-.fu-sel{background:rgba(11,14,20,.85);border:1px solid var(--border2);color:#fff;padding:10px 14px;border-radius:12px;font-size:11px;font-weight:800;backdrop-filter:blur(12px)}
-.fu-btn-tool{width:42px;height:42px;border-radius:12px;background:rgba(11,14,20,.85);border:1px solid var(--border2);color:#fff;display:grid;place-items:center;backdrop-filter:blur(12px);font-size:16px}
-.fu-hud{position:absolute;top:calc(76px + var(--safe-t));left:16px;background:rgba(4,120,87,.9);border:1px solid rgba(255,255,255,.2);padding:10px 16px;border-radius:14px;backdrop-filter:blur(12px);pointer-events:none;z-index:100}
-.fu-bot{position:absolute;inset:auto 0 0 0;padding:0 20px calc(24px + var(--safe-b));display:flex;justify-content:center;z-index:200;background:linear-gradient(to top,rgba(4,5,7,.9),transparent)}
-.fu-shoot{width:100%;max-width:420px;height:58px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#ffa000);color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 10px 30px rgba(255,214,0,.3)}
 
-/* 2. RELATÓRIO PDF */
+/* ===== INSPEÇÃO PDF ===== */
 #mod-inspecao{position:fixed;inset:0;background:#000}
 #gate{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
-.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border);background:var(--surface);padding:36px 28px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.85)}
-.gate-btn{width:100%;min-height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ffa000);color:#000;font-size:12px;font-weight:900;text-transform:uppercase;margin-top:18px}
-.gate-btn.sec{background:var(--surface2);border:1px solid var(--border);color:var(--text);margin-top:8px}
+.gate-box{max-width:400px;width:100%;border-radius:var(--r-xl);border:1px solid var(--border);background:var(--surface);padding:36px 24px;text-align:center}
+.gate-btn{width:100%;min-height:52px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:12px;font-weight:900;text-transform:uppercase;margin-top:18px}
+.gate-btn.sec{background:var(--glass);border:1px solid var(--border);color:var(--text);margin-top:8px}
 #app-shell{position:relative;width:100vw;height:100vh;height:100dvh;visibility:hidden}
 #vid{width:100%;height:100%;object-fit:cover}
-#pdf-hud{position:absolute;top:calc(16px + var(--safe-t));left:16px;background:rgba(4,120,87,.9);border:1px solid rgba(255,255,255,.2);padding:10px 16px;border-radius:14px;backdrop-filter:blur(12px);pointer-events:none;z-index:100}
-#rec-tag{position:absolute;top:calc(16px + var(--safe-t));right:16px;display:flex;align-items:center;gap:8px;background:rgba(11,14,20,.85);border:1px solid var(--border2);padding:8px 14px;border-radius:20px;backdrop-filter:blur(12px);opacity:0;transition:opacity .25s;z-index:100}
+#km-hud{position:absolute;top:calc(18px + var(--safe-t));left:14px;border-radius:var(--r-md);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none}
+#rec-tag{position:absolute;top:calc(22px + var(--safe-t));right:14px;display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.6);padding:7px 13px;border-radius:22px;opacity:0;transition:opacity .25s;z-index:100}
 #rec-tag.on{opacity:1}
-#rec-tag .dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse 1s infinite}
-#pdf-ctrl{position:absolute;inset:auto 0 calc(20px + var(--safe-b)) 0;z-index:200;display:flex;gap:10px;padding:0 20px}
-.p-btn{height:52px;border-radius:14px;font-size:11px;font-weight:900;text-transform:uppercase}
+#rec-tag .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.1}}
+#ui-ctrl{position:absolute;inset:auto 0 calc(24px + var(--safe-b)) 0;z-index:200;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 18px}
+#ui-ctrl.hide{opacity:0;pointer-events:none}
+.ui-btn{height:52px;border-radius:var(--r-sm);font-size:11px;font-weight:900;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:7px}
 
-/* Settings Modal */
-#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,5,7,.8);opacity:0;visibility:hidden;transition:all .2s var(--ease)}
-#settings.open{opacity:1;visibility:visible}
-.s-content{width:min(95vw,400px);border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:28px;box-shadow:0 20px 50px rgba(0,0,0,.8)}
-.s-grp{margin-top:16px}
+/* ===== SETTINGS MODAL ===== */
+#settings{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);opacity:0;visibility:hidden;pointer-events:none;transition:all .2s}
+#settings.open{opacity:1;visibility:visible;pointer-events:auto}
+.settings-content{width:min(90vw,400px);border-radius:var(--r-xl);background:rgba(10,13,17,0.96);padding:24px;border:1px solid var(--border2)}
+.s-group{margin-top:16px}
 .s-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.s-inp{width:100%;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:#fff;padding:12px 14px;font-size:12px;font-weight:800}
+.s-inp{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:12px;font-size:12px;font-weight:800}
 
-/* 3. APOIO LOCALIZAÇÃO */
-#mod-apoio{position:fixed;inset:0;background:var(--bg);overflow-y:auto}
-.hdr{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border);background:rgba(4,5,7,.9);backdrop-filter:blur(20px);padding:0 16px;padding-top:var(--safe-t)}
-.hdr-in{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
-.hdr-back{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);display:grid;place-items:center;color:#fff;font-weight:900}
-.wrap{max-width:680px;margin:0 auto;padding:16px;padding-bottom:var(--safe-b);display:flex;flex-direction:column;gap:12px}
-.card{border-radius:18px;border:1px solid var(--border);background:var(--surface);padding:20px}
-.card.accent{border-color:rgba(255,214,0,.3);background:linear-gradient(135deg,rgba(255,214,0,.06),transparent)}
-.post{border-radius:18px;border:1px solid var(--border);background:var(--surface);padding:18px;margin-bottom:10px}
-.post.near{border-color:var(--green);background:linear-gradient(135deg,rgba(16,185,129,.1),transparent)}
-.post-map{height:150px;width:100%;border:0;border-radius:12px;margin-top:12px;filter:grayscale(10%) contrast(1.05)}
-
-/* 4. KM EM TEMPO REAL (PLACA DE TRÂNSITO) */
+/* ===== KM EM TEMPO REAL (ESTILO PLACA DE TRÂNSITO) ===== */
 #mod-km{position:fixed;inset:0;background:#030712;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
-.km-road-sign{background:#047857;border:6px solid #fff;border-radius:32px;padding:40px 56px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.9);max-width:92%;width:460px;position:relative;z-index:2}
-.km-road-lbl{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#d1fae5;margin-bottom:10px}
-.km-road-val{font-size:clamp(68px, 22vw, 130px);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-.km-road-sub{font-size:12px;font-weight:700;color:#a7f3d0;margin-top:16px;letter-spacing:.05em}
+.km-road-sign{background:#047857;border:4px solid #fff;border-radius:24px;padding:32px 48px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-width:90%;width:420px;position:relative;z-index:2}
+.km-road-label{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.3em;color:#d1fae5;margin-bottom:8px}
+.km-road-value{font-size:clamp(56px, 18vw, 110px);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.km-road-coords{font-size:11px;font-weight:700;color:#a7f3d0;margin-top:14px;letter-spacing:.05em}
 
 #km-ui-overlay{position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;flex-direction:column;justify-content:space-between;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b)) 16px;opacity:1;transition:opacity 0.3s ease}
 #km-ui-overlay.hidden{opacity:0;pointer-events:none}
 .km-top-bar{display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
-.km-back-btn{background:rgba(11,14,20,.85);border:1px solid var(--border2);color:#fff;padding:12px 20px;border-radius:14px;font-size:12px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(12px)}
+.km-back-btn{background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:10px 18px;border-radius:var(--r-sm);font-size:12px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(10px)}
 
-/* TOAST NOTIFICATION */
-.toast{position:fixed;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(20px);border-radius:14px;border:1px solid var(--border2);background:var(--surface);padding:14px 22px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:0 15px 40px rgba(0,0,0,.7);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none}
+/* TOAST */
+.toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);z-index:99998;opacity:0;transition:all .25s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:rgba(16,185,129,.4);color:var(--green)}
-.toast.err{border-color:rgba(239,68,68,.4);color:#fca5a5}
+.toast.ok{border-color:rgba(16,185,129,.25);color:var(--green2)}
+.toast.err{border-color:rgba(239,68,68,.25);color:#fca5a5}
 canvas{display:none}
 </style>
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
+<!-- SPLASH -->
 <div id="splash" aria-hidden="true">
-  <div class="sp-logo">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+  <div class="sp-bg"><div class="sp-glow"></div></div>
+  <div class="sp-content">
+    <div class="sp-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    </div>
+    <h1 class="sp-title">Sistema de Inspeção</h1>
+    <div class="sp-bar"><div class="sp-bar-fill"></div></div>
   </div>
-  <h1 class="sp-title">Inspeção Rodoviária Pro</h1>
 </div>
 
 <!-- MENU PRINCIPAL -->
 <div id="main-menu">
   <div class="menu-inner">
     <div class="menu-status">
-      <div>
-        <p class="ms-clock" id="menuClock">--:--:--</p>
-        <p class="ms-date" id="menuDate">—</p>
+      <div class="ms-left">
+        <div class="ms-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="ms-time-group">
+          <p class="ms-clock" id="menuClock">--:--:--</p>
+          <p class="ms-date" id="menuDate">—</p>
+        </div>
       </div>
-      <div class="ms-gps"><span class="ms-gps-dot"></span><span>GPS ATIVO</span></div>
+      <div class="ms-gps-pill"><span class="ms-gps-dot"></span><span>GPS ATIVO</span></div>
     </div>
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
-      <div style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#ffa000);display:grid;place-items:center;box-shadow:0 8px 25px rgba(255,214,0,.25)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" width="26" height="26"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    <div class="menu-brand">
+      <div class="menu-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
-      <div>
-        <h1 style="font-size:20px;font-weight:900;letter-spacing:-.02em">Painel Operacional</h1>
-        <p style="font-size:11px;color:var(--muted);font-weight:500">Selecione o sistema desejado abaixo</p>
+      <div class="menu-brand-text">
+        <h1 class="mt">Painel Rodoviário</h1>
       </div>
     </div>
     <div class="menu-grid">
       <button class="mc pri" onclick="openMod('foto-unica')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>1. Foto Avulsa Pro</h3><p>Captura avulsa com KM dinâmico, seletor de lente e flash</p></span>
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
+        <span class="mc-b"><h3>1. Foto Avulsa Pro</h3><p>Foto com carimbo, troca de câmara e flash/lanterna</p></span>
+        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc pri" onclick="openMod('inspecao')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></span>
-        <span class="mc-b"><h3>2. Relatório Fotográfico PDF</h3><p>Inspeção automática por lote salva diretamente em pasta segura</p></span>
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
+        <span class="mc-b"><h3>2. Relatório Fotográfico (PDF)</h3><p>Captura contínua e exportação automática em lote</p></span>
+        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
       <button class="mc" onclick="openMod('apoio')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span class="mc-b"><h3>3. Apoio & Localização</h3><p>Consulta de postes, distâncias GPS e mapas de satélite</p></span>
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span class="mc-b"><h3>3. Apoio Localização</h3><p>Consulta de postes e ordens de serviço por ID</p></span>
+        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
-      <button class="mc pri" onclick="openMod('km')">
-        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-        <span class="mc-b"><h3>4. KM em Tempo Real</h3><p>Monitor imersivo em tela cheia com visual de placa rodoviária</p></span>
+      <button class="mc" onclick="openMod('km')">
+        <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+        <span class="mc-b"><h3>4. KM em Tempo Real</h3><p>Visor em ecrã inteiro (estilo placa de trânsito)</p></span>
+        <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- SISTEMA 1: FOTO AVULSA INDEPENDENTE -->
-<!-- ========================================== -->
+<!-- MÓDULO 1: FOTO ÚNICA -->
 <div id="mod-foto-unica" class="module">
-  <video id="vidUnica" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
-  <div class="fu-top">
-    <select id="camSelUnica" class="fu-sel" onchange="switchCamUnica(this.value)"><option value="">Câmeras...</option></select>
-    <button class="fu-btn-tool" id="btnTorchUnica" onclick="toggleTorchUnica()" title="Lanterna">⚡</button>
-    <button class="fu-btn-tool" onclick="toggleGridUnica()" title="Grade">#</button>
-    <button class="fu-sel" onclick="openMod('menu')">Voltar</button>
+  <video id="vidUnica" autoplay playsinline muted></video>
+  <div style="position:absolute;top:calc(14px + var(--safe-t));left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:100;gap:8px">
+    <select id="camSelUnica" style="background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 10px;border-radius:12px;font-size:11px;font-weight:800;backdrop-filter:blur(10px)" onchange="switchCamUnica(this.value)"><option value="">Câmeras...</option></select>
+    <button id="btnTorchUnica" onclick="toggleTorchUnica()" style="background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.2);color:#fff;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;backdrop-filter:blur(10px);font-size:16px">⚡</button>
+    <button onclick="openMod('menu')" style="height:38px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.75);color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(10px)">Voltar</button>
   </div>
-  <div class="fu-hud">
+  <div style="position:absolute;top:calc(70px + var(--safe-t));left:14px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.8);padding:8px 16px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
     <span style="font-size:8px;font-weight:900;text-transform:uppercase;color:rgba(220,252,231,.7)">KM Atual</span>
-    <p style="font-size:22px;font-weight:900;color:#fff" id="kmTxtUnica">KM ---</p>
+    <p style="font-size:20px;font-weight:900;color:#fff" id="kmTxtUnica">KM ---</p>
   </div>
-  <div id="gridOverlay" style="position:absolute;inset:0;pointer-events:none;display:none">
-    <div style="position:absolute;top:33%;left:0;right:0;height:1px;background:rgba(255,255,255,.15)"></div>
-    <div style="position:absolute;top:66%;left:0;right:0;height:1px;background:rgba(255,255,255,.15)"></div>
-    <div style="position:absolute;left:33%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.15)"></div>
-    <div style="position:absolute;left:66%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.15)"></div>
-  </div>
-  <div class="fu-bot">
-    <button onclick="takeSinglePhoto()" class="fu-shoot">Disparar Foto Avulsa</button>
+  <div style="position:absolute;inset:auto 0 0 0;padding:0 18px calc(24px + var(--safe-b));display:flex;align-items:center;justify-content:center;z-index:200;background:linear-gradient(to top,rgba(0,0,0,.85),transparent)">
+    <button onclick="takeSinglePhoto()" style="flex:1;max-width:400px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;box-shadow:0 6px 24px rgba(255,214,0,.2)">Disparar Foto Avulsa</button>
   </div>
   <canvas id="cUnica"></canvas>
 </div>
 
-<!-- ========================================== -->
-<!-- SISTEMA 2: RELATÓRIO FOTOGRÁFICO PDF -->
-<!-- ========================================== -->
+<!-- MÓDULO 2: RELATÓRIO PDF -->
 <div id="mod-inspecao" class="module">
   <div id="gate">
     <div class="gate-box">
-      <h1 style="font-size:20px;font-weight:900">Relatório Automático PDF</h1>
-      <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione uma pasta segura no dispositivo para gravação contínua dos relatórios.</p>
+      <h1>Relatório Fotográfico (PDF)</h1>
+      <p>Selecione uma pasta segura para salvar os arquivos de relatório em lote automaticamente.</p>
       <div style="margin-top:16px;text-align:left">
-        <label class="s-lbl">Etiqueta do Serviço (Opcional)</label>
+        <label class="s-lbl">Etiqueta do serviço</label>
         <input id="fotoLabel" type="text" placeholder="Ex: Manutenção, Vistoria..." class="s-inp" oninput="syncFotoLabel(this.value)">
       </div>
-      <button class="gate-btn" onclick="startApp()">Ativar Inspeção em PDF</button>
+      <button class="gate-btn" onclick="startApp()">Ativar Inspeção</button>
       <button class="gate-btn sec" onclick="openMod('menu')">Voltar ao Menu</button>
     </div>
   </div>
 
   <div id="settings">
-    <div class="s-content">
-      <button onclick="toggleSet()" style="color:var(--accent);font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:12px">✕ Fechar</button>
-      <h2 style="font-size:16px;font-weight:900">Configurações do PDF</h2>
-      <div class="s-grp"><label class="s-lbl">Câmera Ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-      <div class="s-grp"><label class="s-lbl">Resolução</label><select class="s-inp" id="resSel"><option value="fhd">Full HD (1920x1080)</option><option value="hd">HD (1280x720)</option></select></div>
-      <div class="s-grp"><label class="s-lbl">Intervalo de Captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200"></div>
-      <div class="s-grp"><label class="s-lbl">Fotos por Lote PDF</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
+    <div class="settings-content">
+      <button onclick="toggleSet()" style="color:var(--accent);font-size:11px;font-weight:900;text-transform:uppercase;margin-bottom:14px">✕ Fechar</button>
+      <h2 style="font-size:16px;font-weight:900;color:#fff">Configurações</h2>
+      <div class="s-group"><label class="s-lbl">Câmera Ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
+      <div class="s-group"><label class="s-lbl">Resolução</label><select class="s-inp" id="resSel"><option value="fhd">Full HD (1920x1080)</option><option value="hd">HD (1280x720)</option></select></div>
+      <div class="s-group"><label class="s-lbl">Intervalo (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200"></div>
+      <div class="s-group"><label class="s-lbl">Fotos por Lote</label><input type="number" class="s-inp" id="cfgLote" value="50"></div>
     </div>
   </div>
 
   <div id="app-shell">
     <video id="vid" autoplay playsinline muted></video>
-    <div id="pdf-hud"><span style="font-size:9px;font-weight:900;color:rgba(220,252,231,.7)">KM Atual</span><p style="font-size:22px;font-weight:900;color:#fff" id="kmTxt">KM ---</p></div>
-    <div id="rec-tag"><div class="dot"></div><span style="font-size:9px;font-weight:900;color:#fff">Gravando Lote PDF</span></div>
-    <div id="pdf-ctrl">
-      <button class="p-btn" id="btn-gear" onclick="toggleSet()" style="width:52px;background:var(--surface);border:1px solid var(--border)">⚙️</button>
-      <button class="p-btn" id="btn-start" onclick="startCap()" style="flex:1;background:linear-gradient(135deg,var(--accent),#ffa000);color:#000">Iniciar Gravação</button>
-      <button class="p-btn" id="btn-stop" onclick="stopCap()" style="flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none">Finalizar e Gerar PDF</button>
-      <button class="p-btn" id="btn-menu" onclick="openMod('menu')" style="padding:0 18px;background:var(--surface);border:1px solid var(--border)">Menu</button>
+    <div id="km-hud"><span style="font-size:9px;color:rgba(220,252,231,.6)">KM atual</span><p style="font-size:24px;font-weight:900;color:#fff" id="kmTxt">KM ---</p></div>
+    <div id="rec-tag"><div class="dot"></div><span style="font-size:9px;font-weight:900;color:#fff">Gravando PDF</span></div>
+    <div id="ui-ctrl">
+      <button class="ui-btn" id="btn-gear" onclick="toggleSet()" style="width:52px;background:rgba(0,0,0,.5);color:#fff">⚙️</button>
+      <button class="ui-btn" id="btn-start" onclick="startCap()" style="flex:1;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000">Iniciar</button>
+      <button class="ui-btn" id="btn-stop" onclick="stopCap()" style="flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none">Finalizar</button>
+      <button class="ui-btn" id="btn-menu" onclick="openMod('menu')" style="padding:0 14px;background:rgba(0,0,0,.5);color:#fff">Menu</button>
     </div>
   </div>
   <canvas id="c"></canvas>
 </div>
 
-<!-- ========================================== -->
-<!-- SISTEMA 3: APOIO & LOCALIZAÇÃO DE POSTES -->
-<!-- ========================================== -->
+<!-- MÓDULO 3: APOIO LOCALIZAÇÃO -->
 <div id="mod-apoio" class="module">
   <header class="hdr">
     <div class="hdr-in">
       <button class="hdr-back" onclick="openMod('menu')">←</button>
-      <div><h1 style="font-size:12px;font-weight:900;text-transform:uppercase">Apoio & Localização</h1><p style="font-size:10px;color:var(--muted)">Consulta inteligente de ativos</p></div>
+      <div style="flex:1"><h1 style="font-size:12px;font-weight:900;text-transform:uppercase">Apoio Localização</h1><p style="font-size:10px;color:var(--muted)">Busca de postes e ordens de serviço</p></div>
     </div>
   </header>
   <div class="wrap">
-    <div class="card accent">
-      <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Pesquisa por ID do Poste</p>
-      <div style="display:flex;gap:8px">
-        <input class="s-inp" id="inputId" placeholder="EX: 1800" onkeydown="if(event.key==='Enter')searchId()" style="flex:1">
-        <button onclick="searchId()" style="background:var(--accent);color:#000;font-weight:900;padding:0 20px;border-radius:12px">Buscar</button>
-        <button onclick="clearId()" style="background:var(--surface2);color:#fff;padding:0 14px;border-radius:12px">✕</button>
+    <div class="card card-accent">
+      <p class="card-label">Localizar por ID</p>
+      <div class="search-row">
+        <div class="search-wrap"><input class="search-input" id="inputId" placeholder="EX: 1800" onkeydown="if(event.key==='Enter')searchId()"></div>
+        <button onclick="searchId()" style="background:var(--accent);color:#000;font-weight:900;padding:0 16px;border-radius:12px">Buscar</button>
+        <button onclick="clearId()" style="background:var(--glass);color:#fff;padding:0 12px;border-radius:12px">Limpar</button>
       </div>
       <div id="searchMsg" style="margin-top:8px;font-size:11px;font-weight:800;color:var(--warn);display:none"></div>
       <div id="searchResult" style="display:none;margin-top:12px"></div>
     </div>
-    <div id="gpsStatus" style="font-size:11px;font-weight:800;color:var(--green);padding:14px;background:var(--green-dim);border:1px solid rgba(16,185,129,.3);border-radius:14px;text-align:center">GPS · BUSCANDO SINAL</div>
+    <div id="gpsStatus" style="font-size:11px;font-weight:800;color:var(--green2);padding:12px;background:rgba(16,185,129,.1);border-radius:12px;text-align:center">GPS · BUSCANDO SINAL</div>
     <div id="postList" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- SISTEMA 4: KM EM TEMPO REAL (PLACA DE TRÂNSITO) -->
-<!-- ========================================== -->
+<!-- MÓDULO 4: KM EM TEMPO REAL -->
 <div id="mod-km" class="module" onclick="handleKmScreenTap()">
   <div id="km-ui-overlay">
     <div class="km-top-bar">
@@ -281,10 +307,11 @@ canvas{display:none}
       <span style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase" id="kmCoordsDisplay">---</span>
     </div>
   </div>
+
   <div class="km-road-sign">
-    <div class="km-road-lbl">KM Atual</div>
-    <div class="km-road-val" id="rtKmDisplay">—</div>
-    <div class="km-road-sub" id="kmSourceSub">Monitoramento Rodoviário</div>
+    <div class="km-road-label">KM Atual</div>
+    <div class="km-road-value" id="rtKmDisplay">—</div>
+    <div class="km-road-coords" id="kmSourceSub">Rodovia Monitorada</div>
   </div>
 </div>
 
@@ -295,9 +322,9 @@ let kmDB=[], posts=[], pos=null;
 let lat='0.000000', lon='0.000000';
 let streamUnica=null, streamIns=null, cameras=[];
 let hDir=null, capturing=false, buffer=[], kmIniLlet='';
-let kmHideTimer=null, torchOnUnica=false, gridOnUnica=false;
+let kmHideTimer=null, torchOnUnica=false;
 
-/* Clock */
+/* Relógio do Menu */
 function tickClock(){
   const now=new Date();
   document.getElementById('menuClock').textContent=now.toLocaleTimeString('pt-BR');
@@ -331,7 +358,7 @@ function openMod(id){
 
 setTimeout(()=>document.getElementById('splash').classList.add('done'), 1500);
 
-/* Carregamento de Bases CSV */
+/* Carregamento de CSVs */
 async function loadKm(){
   if(kmDB.length>0) return;
   try{
@@ -391,7 +418,7 @@ function getNearestKm(currLat, currLon){
   return best;
 }
 
-/* GPS Global Watcher */
+/* Monitor de GPS */
 if('geolocation' in navigator){
   navigator.geolocation.watchPosition(p=>{
     lat=p.coords.latitude.toFixed(6);
@@ -419,9 +446,7 @@ if('geolocation' in navigator){
   }, null, {enableHighAccuracy:true, maximumAge:0});
 }
 
-/* ========================================== */
-/* LOGICA SISTEMA 1: FOTO ÚNICA */
-/* ========================================== */
+/* MÓDULO 1: FOTO ÚNICA */
 async function initFotoUnica(){
   await loadKm();
   try{
@@ -455,14 +480,9 @@ async function toggleTorchUnica(){
   try{
     torchOnUnica=!torchOnUnica;
     await track.applyConstraints({advanced:[{torch:torchOnUnica}]});
-    document.getElementById('btnTorchUnica').style.borderColor=torchOnUnica?'var(--accent)':'var(--border2)';
+    document.getElementById('btnTorchUnica').style.borderColor=torchOnUnica?'var(--accent)':'rgba(255,255,255,0.2)';
     showToast(torchOnUnica?'Lanterna ligada':'Lanterna desligada');
   }catch(e){ showToast('Erro na lanterna','err'); }
-}
-
-function toggleGridUnica(){
-  gridOnUnica=!gridOnUnica;
-  document.getElementById('gridOverlay').style.display=gridOnUnica?'block':'none';
 }
 
 async function takeSinglePhoto(){
@@ -476,13 +496,13 @@ async function takeSinglePhoto(){
   
   ctx.drawImage(vid,0,0,c.width,c.height);
   const bh=c.height*0.12;
-  ctx.fillStyle='rgba(4,5,7,0.85)';
+  ctx.fillStyle='rgba(0,0,0,0.8)';
   ctx.fillRect(0,c.height-bh,c.width,bh);
   ctx.fillStyle='#fff';
   ctx.font='bold '+Math.round(bh*0.35)+'px sans-serif';
   ctx.fillText('KM '+km, 30, c.height-bh*0.5);
   ctx.font=Math.round(bh*0.2)+'px sans-serif';
-  ctx.fillStyle='rgba(255,255,255,0.75)';
+  ctx.fillStyle='rgba(255,255,255,0.7)';
   ctx.fillText(new Date().toLocaleString('pt-BR')+' | GPS: '+lat+', '+lon, 30, c.height-bh*0.2);
 
   c.toBlob(blob=>{
@@ -496,9 +516,7 @@ async function takeSinglePhoto(){
   }, 'image/jpeg', 0.95);
 }
 
-/* ========================================== */
-/* LOGICA SISTEMA 2: RELATÓRIO PDF */
-/* ========================================== */
+/* MÓDULO 2: RELATÓRIO PDF */
 async function startApp(){
   try{
     if(!window.showDirectoryPicker) throw new Error('Navegador não suporta seleção de pastas.');
@@ -508,7 +526,7 @@ async function startApp(){
     await listCamsIns();
     loadKm();
     document.documentElement.requestFullscreen?.().catch(()=>{});
-    showToast('Inspeção ativada com sucesso');
+    showToast('Inspeção ativada');
   }catch(e){ showToast(e.message||'Erro ao iniciar','err'); }
 }
 
@@ -540,7 +558,7 @@ function startCap(){
   document.getElementById('btn-start').style.display='none';
   document.getElementById('btn-stop').style.display='flex';
   document.getElementById('rec-tag').classList.add('on');
-  document.getElementById('pdf-ctrl').style.display='none';
+  document.getElementById('ui-ctrl').classList.add('hide');
   capLoop();
 }
 
@@ -554,7 +572,7 @@ async function stopCap(){
   document.getElementById('btn-start').style.display='flex';
   document.getElementById('btn-stop').style.display='none';
   document.getElementById('rec-tag').classList.remove('on');
-  document.getElementById('pdf-ctrl').style.display='flex';
+  document.getElementById('ui-ctrl').classList.remove('hide');
 }
 
 function capLoop(){
@@ -566,16 +584,16 @@ function capLoop(){
   
   ctx.drawImage(vid,0,0,c.width,c.height);
   const bh=c.height*0.12;
-  ctx.fillStyle='rgba(4,5,7,0.85)';
+  ctx.fillStyle='rgba(0,0,0,0.8)';
   ctx.fillRect(0,c.height-bh,c.width,bh);
   ctx.fillStyle='#fff';
   ctx.font='bold '+Math.round(bh*0.35)+'px sans-serif';
   ctx.fillText('KM '+km, 30, c.height-bh*0.5);
   ctx.font=Math.round(bh*0.2)+'px sans-serif';
-  ctx.fillStyle='rgba(255,255,255,0.75)';
+  ctx.fillStyle='rgba(255,255,255,0.7)';
   ctx.fillText(new Date().toLocaleString('pt-BR')+' | GPS: '+lat+', '+lon, 30, c.height-bh*0.2);
 
-  buffer.push(c.toDataURL('image/jpeg', 0.75));
+  buffer.push(c.toDataURL('image/jpeg', 0.7));
   const lote=parseInt(document.getElementById('cfgLote').value)||50;
   if(buffer.length>=lote){
     const kmNow=km;
@@ -600,9 +618,7 @@ async function savePDF(data, kmI, kmF){
   showToast(`PDF Salvo: KM ${kmI} → ${kmF}`);
 }
 
-/* ========================================== */
-/* LOGICA SISTEMA 3: APOIO & LOCALIZAÇÃO */
-/* ========================================== */
+/* MÓDULO 3: APOIO LOCALIZAÇÃO */
 async function initApoio(){
   await loadPosts(); await loadKm();
   renderApoioList();
@@ -626,7 +642,7 @@ function searchId(){
     <p style="font-size:11px;color:var(--muted);margin-top:2px">Lat/Lon: ${found.lat.toFixed(6)}, ${found.lon.toFixed(6)}</p>
     <iframe class="post-map" src="https://maps.google.com/maps?q=${found.lat},${found.lon}&t=k&z=19&output=embed"></iframe>
   </div>`;
-  showToast('Ativo localizado!');
+  showToast('Poste encontrado!');
 }
 
 function clearId(){
@@ -643,16 +659,14 @@ function renderApoioList(){
   list.innerHTML=sorted.map((o,i)=>{
     const k=kmDB.length? getNearestKm(o.lat, o.lon):null;
     return `<div class="post ${i===0?'near':''}">
-      <p style="font-weight:900;color:${i===0?'var(--green)':'var(--accent)'}">Poste: ${o.id}</p>
+      <p style="font-weight:900;color:${i===0?'var(--green2)':'var(--accent)'}">Poste: ${o.id}</p>
       <p style="font-size:11px;color:var(--muted);margin-top:2px">Distância: ~${Math.round(o.d*111000)}m | KM: ${k?k.km.toFixed(2).replace('.',','):'—'}</p>
       <iframe class="post-map" src="https://maps.google.com/maps?q=${o.lat},${o.lon}&t=k&z=19&output=embed"></iframe>
     </div>`;
   }).join('');
 }
 
-/* ========================================== */
-/* LOGICA SISTEMA 4: KM EM TEMPO REAL */
-/* ========================================== */
+/* MÓDULO 4: KM EM TEMPO REAL */
 function initKmRealtime(){
   loadKm(); resetKmHideTimer();
 }
