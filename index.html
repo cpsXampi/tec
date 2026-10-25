@@ -277,7 +277,7 @@ canvas#c, canvas#cUnica{display:none}
 setTimeout(() => {
   const sp = document.getElementById('splash');
   if(sp) sp.classList.add('done');
-}, 600);
+}, 400);
 
 /* ===== UTILITIES & STATE ===== */
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
@@ -355,7 +355,7 @@ async function saveFileToDirectory(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Arquivo baixado: ' + filename);
+  showToast('Ficheiro descarregado: ' + filename);
 }
 
 /* ===== NAVIGATION ===== */
@@ -388,9 +388,7 @@ async function loadKm() {
     if (!r?.ok) return;
     let t = await r.text();
     if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
-    const lines = t.split(/
-?
-/).filter(l => l.trim());
+    const lines = t.split(/\r?\n/).filter(l => l.trim());
     const h = lines.shift().split(';');
     const iKm = findCol(h, ['km']), iLat = findCol(h, ['lat', 'latitude']), iLon = findCol(h, ['lon', 'long', 'longitude']);
     kmDB = lines.map(l => {
@@ -504,7 +502,7 @@ async function initFotoUnica() {
     });
 
   } catch (e) {
-    showToast('Erro ao acessar a câmera', 'err');
+    showToast('Erro ao aceder à câmara', 'err');
   }
 }
 
@@ -518,7 +516,7 @@ function takeSinglePhoto() {
   }, 'image/jpeg', 0.95);
 }
 
-/* ===== GRAVAÇÃO DE VÍDEO COM ÁUDIO (LONGA OU CURTA) E ZOOM ===== */
+/* ===== GRAVAÇÃO DE VÍDEO COM ÁUDIO E ZOOM ===== */
 async function toggleVideoRecording() {
   if (!isRecordingVideo) {
     await startVideoRecording();
@@ -537,7 +535,7 @@ async function startVideoRecording() {
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
   } catch (e) {
-    showToast('Microfone não autorizado ou indisponível (gravando sem áudio)', 'err');
+    showToast('Microfone indisponível (a gravar sem áudio)', 'err');
   }
 
   const streamCanvas = c.captureStream(30);
@@ -575,7 +573,6 @@ async function startVideoRecording() {
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
     const recordingEndTimeStr = new Date().toLocaleTimeString('pt-BR');
     
-    // Padrão de salvamento com time inicial e final (substituindo : por - para nome de arquivo válido)
     const tStart = recordingStartTimeStr.replace(/:/g, '-');
     const tEnd = recordingEndTimeStr.replace(/:/g, '-');
     const filename = `VIDEO_KM_${currentKm}_INICIO_${tStart}_FIM_${tEnd}.webm`.replace(/[,/]/g, '_');
@@ -588,13 +585,13 @@ async function startVideoRecording() {
     }
   };
 
-  mediaRecorder.start(1000); // coletar dados a cada 1s para suportar vídeos longos estavelmente
+  mediaRecorder.start(1000);
   isRecordingVideo = true;
   
   const btnVid = document.getElementById('btnRecVideoUnica');
   btnVid.style.background = '#ef4444';
   btnVid.style.borderColor = '#fca5a5';
-  showToast('Gravação de vídeo com áudio iniciada...');
+  showToast('Gravação de vídeo iniciada...');
 }
 
 function stopVideoRecording() {
@@ -604,7 +601,7 @@ function stopVideoRecording() {
     const btnVid = document.getElementById('btnRecVideoUnica');
     btnVid.style.background = 'rgba(0,0,0,0.5)';
     btnVid.style.borderColor = 'rgba(255,255,255,0.4)';
-    showToast('Vídeo finalizado e salvando...');
+    showToast('Vídeo finalizado e a guardar...');
   }
 }
 
@@ -636,7 +633,7 @@ async function switchCam(deviceId) {
     toggleSet();
     showToast('Câmera alterada');
   } catch (e) {
-    showToast('Erro ao trocar câmera', 'err');
+    showToast('Erro ao trocar câmara', 'err');
   }
 }
 
@@ -677,7 +674,7 @@ async function startApp() {
 
   } catch (e) {
     document.getElementById('gateErr').style.display = 'block';
-    document.getElementById('gateErr').textContent = 'Erro ao acessar câmera: ' + e.message;
+    document.getElementById('gateErr').textContent = 'Erro ao aceder à câmara: ' + e.message;
   }
 }
 
@@ -740,7 +737,7 @@ function stopCap() {
 }
 
 function generatePDF() {
-  showToast('Gerando PDF, aguarde...');
+  showToast('A gerar PDF, aguarde...');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
   
