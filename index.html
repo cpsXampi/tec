@@ -153,6 +153,10 @@ canvas#c, canvas#cUnica{display:none}
 .icon-settings{width:52px;height:52px;border-radius:16px!important;border:1px solid rgba(255,255,255,.15)!important;background:rgba(8,10,13,.72)!important;box-shadow:0 8px 24px rgba(0,0,0,.35);display:grid!important;place-items:center!important}
 .icon-settings svg{width:23px!important;height:23px!important}
 .s-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
+
+.capture-count{max-width:min(82vw,460px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#btn-stop:disabled{opacity:.65;cursor:wait}
+@media(max-width:520px){.capture-count{font-size:8px;padding:6px 9px;top:calc(14px + var(--safe-t))}}
 </style>
 </head>
 <body>
@@ -268,13 +272,13 @@ canvas#c, canvas#cUnica{display:none}
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
       <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="200" step="100"></div>
-      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"></div>
+      <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"><p class="s-note">Ao completar 150 fotos, o lote entra na fila de geração e a captura seguinte começa imediatamente. A sessão só termina quando você clicar em Finalizar.</p></div>
     </div>
   </div>
 
   <div id="app-shell">
     <div class="folder-chip" id="folderChipInspecao">Pasta não selecionada</div>
-    <div class="capture-count" id="captureCount">0 / 150</div>
+    <div class="capture-count" id="captureCount" aria-live="polite">Total 0 · Lote 1: 0 / 150</div>
     <!-- Clicar na tela durante a inspeção tira foto manual instantânea -->
     <video id="vid" autoplay playsinline muted onclick="manualPhoto()"></video>
     <div id="km-hud"><span class="h-l">KM atual</span><p class="h-v" id="kmTxt">KM ---</p></div>
@@ -291,7 +295,7 @@ canvas#c, canvas#cUnica{display:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>Iniciar
       </button>
       <button class="ui-btn" id="btn-stop" onclick="stopCap()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar PDF
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar sessão
       </button>
       <button class="ui-btn" id="btn-menu" onclick="openMod('menu')">Voltar</button>
     </div>
@@ -303,17 +307,6 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-
-window.addEventListener('beforeunload', e => {
-  if (capturing || isRecordingVideo) {
-    e.preventDefault();
-    e.returnValue = '';
-  }
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano');
-});
-
 /* ===== SPLASH GARANTIDO E REMOÇÃO AUTOMÁTICA ===== */
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
@@ -340,7 +333,18 @@ let renderIntervalUnica = null;
 let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
-const REPORT_JPEG_QUALITY = 0.92; // qualidade boa e fixa
+
+/* Estado da inspeção contínua */
+let totalCaptured = 0;
+let currentBatchNumber = 1;
+let pdfQueue = [];
+let pdfWorkerBusy = false;
+let sessionEnding = false;
+let captureBusy = false;
+let sessionId = '';
+let savedBatchCount = 0;
+const REPORT_JPEG_QUALITY = 0.86; // boa qualidade com alta velocidade de captura
+
 
 /* ===== PASTA OBRIGATÓRIA POR SESSÃO DE MÓDULO ===== */
 async function chooseDirectoryForModule() {
@@ -414,7 +418,7 @@ function showToast(msg, type = 'ok') {
 async function openMod(id) {
   const menu = document.getElementById('main-menu');
   if (id === 'menu') {
-    if (capturing) { capturing = false; clearTimeout(captureTimer); }
+    if (capturing || sessionEnding || pdfWorkerBusy || pdfQueue.length) { showToast('Finalize a sessão antes de voltar ao menu', 'err'); return; }
     if (isRecordingVideo) stopVideoRecording();
     [streamUnica, stream].forEach(st => st?.getTracks().forEach(t => t.stop()));
     streamUnica = null; stream = null;
@@ -699,136 +703,239 @@ function toggleSet() {
   document.getElementById('settings').classList.toggle('open');
 }
 
+function makeSessionId() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+
 function startCap() {
   if (!dirHandle) { showToast('Pasta de destino não selecionada', 'err'); return; }
+  if (!document.getElementById('vid').videoWidth) { showToast('A câmera ainda está iniciando', 'err'); return; }
+
   capturing = true;
+  sessionEnding = false;
+  captureBusy = false;
+  totalCaptured = 0;
+  currentBatchNumber = 1;
+  savedBatchCount = 0;
+  pdfQueue = [];
   buffer = [];
+  sessionId = makeSessionId();
+
   updateCaptureCount();
   document.getElementById('btn-start').style.display = 'none';
   document.getElementById('btn-stop').style.display = 'flex';
+  document.getElementById('btn-stop').disabled = false;
+  document.getElementById('btn-stop').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>Finalizar sessão';
   document.getElementById('rec-tag').classList.add('on');
-  showToast('Gravação do relatório iniciada');
+  showToast('Captura contínua iniciada');
   captureLoop();
 }
 
 function captureLoop() {
   if (!capturing) return;
-  manualPhoto();
+
+  const startedAt = performance.now();
+  manualPhoto(true);
   const interval = Math.max(parseInt(document.getElementById('cfgInt').value) || 200, 200);
-  captureTimer = setTimeout(captureLoop, interval);
+  const elapsed = performance.now() - startedAt;
+  captureTimer = setTimeout(captureLoop, Math.max(0, interval - elapsed));
 }
 
-function manualPhoto() {
+function manualPhoto(fromAutomatic = false) {
   const vid = document.getElementById('vid');
   const c = document.getElementById('c');
-  const ctx = c.getContext('2d');
-  if (!vid.videoWidth) return;
+  const ctx = c.getContext('2d', { alpha: false });
+  if (!vid.videoWidth || captureBusy) return;
 
-  c.width = vid.videoWidth;
-  c.height = vid.videoHeight;
-
-  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabel').value.trim());
-  
-  buffer.push({
-    img: c.toDataURL('image/jpeg', REPORT_JPEG_QUALITY),
-    km: currentKm,
-    time: new Date().toLocaleTimeString('pt-BR')
-  });
-  updateCaptureCount();
-  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
-  if (capturing && buffer.length >= limit) { clearTimeout(captureTimer); stopCap(); }
-  else if (!capturing) showToast('Foto capturada');
-}
-
-function updateCaptureCount(){
-  const limit=Math.max(parseInt(document.getElementById('cfgLote').value)||150,1);
-  const el=document.getElementById('captureCount');
-  if(el) el.textContent=`${buffer.length} / ${limit}`;
-}
-document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount);
-
-function stopCap() {
-  clearTimeout(captureTimer);
-  capturing = false;
-  document.getElementById('btn-start').style.display = 'flex';
-  document.getElementById('btn-stop').style.display = 'none';
-  document.getElementById('rec-tag').classList.remove('on');
-
-  if (buffer.length === 0) {
-    showToast('Nenhuma foto capturada', 'err');
-    return;
-  }
-
-  generatePDF();
-}
-
-async function generatePDF() {
-  showToast('Gerando PDF, aguarde...');
-
-  if (!window.jspdf?.jsPDF) {
-    showToast('Biblioteca de PDF não carregada', 'err');
-    return;
-  }
-  if (!buffer.length) {
-    showToast('Nenhuma foto capturada', 'err');
-    return;
-  }
-
+  captureBusy = true;
   try {
-    const { jsPDF } = window.jspdf;
-    let doc = null;
+    c.width = vid.videoWidth;
+    c.height = vid.videoHeight;
 
-    buffer.forEach((item, index) => {
-      const props = index === 0
-        ? (() => {
-            const temp = new jsPDF({ unit: 'mm', format: 'a4' });
-            return temp.getImageProperties(item.img);
-          })()
-        : doc.getImageProperties(item.img);
+    const capturedAt = new Date();
+    drawOverlayCustom(
+      ctx,
+      vid,
+      c.width,
+      c.height,
+      currentKm,
+      capturedAt.toLocaleString('pt-BR').toUpperCase(),
+      `${lat}, ${lon}`,
+      document.getElementById('fotoLabel').value.trim()
+    );
 
-      const orientation = props.width >= props.height ? 'landscape' : 'portrait';
-
-      if (index === 0) {
-        doc = new jsPDF({ orientation, unit: 'mm', format: 'a4', compress: true });
-      } else {
-        doc.addPage('a4', orientation);
-      }
-
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 6;
-      const availableWidth = pageWidth - margin * 2;
-      const availableHeight = pageHeight - margin * 2;
-      const imageRatio = props.width / props.height;
-      const areaRatio = availableWidth / availableHeight;
-
-      let imageWidth, imageHeight;
-      if (imageRatio > areaRatio) {
-        imageWidth = availableWidth;
-        imageHeight = imageWidth / imageRatio;
-      } else {
-        imageHeight = availableHeight;
-        imageWidth = imageHeight * imageRatio;
-      }
-
-      const x = (pageWidth - imageWidth) / 2;
-      const y = (pageHeight - imageHeight) / 2;
-      doc.addImage(item.img, 'JPEG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+    buffer.push({
+      img: c.toDataURL('image/jpeg', REPORT_JPEG_QUALITY),
+      km: currentKm,
+      time: capturedAt.toLocaleTimeString('pt-BR')
     });
+    totalCaptured++;
 
-    const firstKm = buffer[0]?.km || '0';
-    const lastKm = buffer[buffer.length - 1]?.km || '0';
-    const filename = `Relatorio_Inspecao_KM_${firstKm}_a_${lastKm}.pdf`.replace(/[,/]/g, '_');
-    const pdfBlob = doc.output('blob');
+    const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
+    if (capturing && buffer.length >= limit) {
+      closeCurrentBatch(false);
+    }
 
-    await saveFileToDirectory(pdfBlob, filename);
-    showToast('PDF gerado e salvo com sucesso!');
-    buffer = [];
     updateCaptureCount();
+    if (!fromAutomatic && !capturing) showToast('Foto capturada');
   } catch (e) {
     console.error(e);
-    showToast('Não foi possível gerar o PDF', 'err');
+    showToast('Falha ao capturar foto', 'err');
+  } finally {
+    captureBusy = false;
   }
+}
+
+function closeCurrentBatch(isFinal) {
+  if (!buffer.length) return;
+
+  /* Double buffer: troca o lote imediatamente antes de gerar/salvar o PDF. */
+  const completed = buffer;
+  buffer = [];
+
+  pdfQueue.push({
+    number: currentBatchNumber,
+    photos: completed,
+    final: isFinal,
+    firstKm: completed[0]?.km || '0',
+    lastKm: completed[completed.length - 1]?.km || '0'
+  });
+  currentBatchNumber++;
+  updateCaptureCount();
+  processPdfQueue();
+}
+
+function updateCaptureCount() {
+  const limit = Math.max(parseInt(document.getElementById('cfgLote').value) || 150, 1);
+  const el = document.getElementById('captureCount');
+  if (!el) return;
+
+  const queued = pdfQueue.length + (pdfWorkerBusy ? 1 : 0);
+  el.textContent = `Total ${totalCaptured} · Lote ${currentBatchNumber}: ${buffer.length} / ${limit}${queued ? ` · Salvando ${queued}` : ''}`;
+}
+
+document.getElementById('cfgLote')?.addEventListener('input', updateCaptureCount);
+
+async function stopCap() {
+  if (!capturing || sessionEnding) return;
+
+  /* O clique do usuário é a única condição normal de encerramento. */
+  clearTimeout(captureTimer);
+  capturing = false;
+  sessionEnding = true;
+
+  const stopButton = document.getElementById('btn-stop');
+  stopButton.disabled = true;
+  stopButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Finalizando...';
+  document.getElementById('rec-tag').classList.remove('on');
+
+  if (buffer.length) closeCurrentBatch(true);
+
+  if (!totalCaptured) {
+    resetInspectionControls();
+    showToast('Nenhuma foto capturada', 'err');
+    return;
+  }
+
+  showToast('Finalizando os lotes pendentes...');
+  await waitForPdfQueue();
+  resetInspectionControls();
+  showToast(`Sessão finalizada: ${totalCaptured} fotos em ${savedBatchCount} lote(s)`);
+}
+
+function resetInspectionControls() {
+  sessionEnding = false;
+  document.getElementById('btn-start').style.display = 'flex';
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('btn-stop').disabled = false;
+  updateCaptureCount();
+}
+
+function waitForPdfQueue() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (!pdfWorkerBusy && pdfQueue.length === 0) resolve();
+      else setTimeout(check, 120);
+    };
+    check();
+  });
+}
+
+async function processPdfQueue() {
+  if (pdfWorkerBusy) return;
+  pdfWorkerBusy = true;
+
+  try {
+    while (pdfQueue.length) {
+      const job = pdfQueue.shift();
+      updateCaptureCount();
+      await generateBatchPDF(job);
+      savedBatchCount++;
+      updateCaptureCount();
+      /* Entrega um pequeno intervalo ao navegador antes do próximo PDF. */
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+  } catch (e) {
+    console.error(e);
+    showToast('Falha ao gerar um dos lotes em PDF', 'err');
+  } finally {
+    pdfWorkerBusy = false;
+    updateCaptureCount();
+    if (pdfQueue.length) processPdfQueue();
+  }
+}
+
+async function generateBatchPDF(job) {
+  if (!window.jspdf?.jsPDF) throw new Error('Biblioteca jsPDF não carregada');
+  const { jsPDF } = window.jspdf;
+  let doc = null;
+
+  job.photos.forEach((item, index) => {
+    const probe = doc || new jsPDF({ unit: 'mm', format: 'a4' });
+    const props = probe.getImageProperties(item.img);
+    const orientation = props.width >= props.height ? 'landscape' : 'portrait';
+
+    if (!doc) {
+      doc = new jsPDF({ orientation, unit: 'mm', format: 'a4', compress: true });
+    } else if (index > 0) {
+      doc.addPage('a4', orientation);
+    }
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const imageRatio = props.width / props.height;
+    const pageRatio = pageWidth / pageHeight;
+
+    /* Contain: maior preenchimento possível, sem corte e sem deformação. */
+    let imageWidth, imageHeight;
+    if (imageRatio > pageRatio) {
+      imageWidth = pageWidth;
+      imageHeight = imageWidth / imageRatio;
+    } else {
+      imageHeight = pageHeight;
+      imageWidth = imageHeight * imageRatio;
+    }
+
+    const x = (pageWidth - imageWidth) / 2;
+    const y = (pageHeight - imageHeight) / 2;
+    doc.addImage(item.img, 'JPEG', x, y, imageWidth, imageHeight, undefined, 'FAST');
+  });
+
+  const batch = String(job.number).padStart(3, '0');
+  const suffix = job.final ? '_FINAL' : '';
+  const filename = `Inspecao_${sessionId}_Lote_${batch}${suffix}_KM_${job.firstKm}_a_${job.lastKm}.pdf`.replace(/[,/]/g, '_');
+  const pdfBlob = doc.output('blob');
+  await saveFileToDirectory(pdfBlob, filename);
+
+  /* Libera as imagens do lote após a gravação. */
+  job.photos.length = 0;
+}
+
+/* Compatibilidade com chamadas antigas: fecha o lote atual sem encerrar a sessão. */
+async function generatePDF() {
+  closeCurrentBatch(false);
 }
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
@@ -849,6 +956,18 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.fillStyle = 'rgba(255,255,255,.7)';
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 }
+
+/* Protege uma sessão ativa contra fechamento acidental. */
+window.addEventListener('beforeunload', e => {
+  if (capturing || sessionEnding || pdfWorkerBusy || isRecordingVideo) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isRecordingVideo) showToast('Gravação continua em segundo plano');
+});
+
 </script>
 </body>
 </html>
