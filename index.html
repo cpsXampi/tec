@@ -211,7 +211,16 @@ canvas#c, canvas#cUnica{display:none}
     <div class="settings-content">
       <button class="settings-close" onclick="toggleSetUnica()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
-      <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSelUnica" onchange="switchCamUnica(this.value)"></select></div>
+      <div class="s-group">
+        <label class="s-lbl">Câmera ativa</label>
+        <select class="s-inp" id="camSelUnica" onchange="switchCamUnica(this.value)"></select>
+        <div id="camPreviewNameUnica" style="margin-top:8px;font-size:11px;font-weight:700;color:var(--accent)">Câmera selecionada: aguardando...</div>
+        <p style="margin-top:5px;font-size:10px;line-height:1.5;color:var(--muted)">A imagem ao fundo é a prévia ao vivo da câmera selecionada.</p>
+      </div>
+      <div class="s-group">
+        <label class="s-lbl">Etiqueta da foto e do vídeo <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--dim)">(opcional)</span></label>
+        <input class="s-inp" id="fotoLabelUnica" type="text" placeholder="Ex: Vistoria, Manutenção..." autocomplete="off" spellcheck="false">
+      </div>
     </div>
   </div>
 
@@ -323,34 +332,20 @@ let renderIntervalUnica = null;
 let micStream = null;
 let recordingStartTimeStr = '';
 
-/* ===== SELEÇÃO DE PASTA POR SEÇÃO ===== */
+/* ===== SELEÇÃO DE PASTA AUTOMÁTICA (UMA ÚNICA VEZ AO ENTRAR NO SISTEMA) ===== */
 async function ensureDirectory() {
   if (dirHandle) return dirHandle;
-
-  if (!('showDirectoryPicker' in window)) {
-    showToast('Este navegador não permite selecionar pasta. Use Chrome ou Edge.', 'err');
-    return null;
-  }
-
-  try {
-    const selectedHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-
-    // Confirma que a pasta continua com permissão de gravação.
-    let permission = await selectedHandle.queryPermission({ mode: 'readwrite' });
-    if (permission !== 'granted') {
-      permission = await selectedHandle.requestPermission({ mode: 'readwrite' });
-    }
-    if (permission !== 'granted') {
-      showToast('Permissão de gravação não concedida', 'err');
+  if ('showDirectoryPicker' in window) {
+    try {
+      dirHandle = await window.showDirectoryPicker();
+      showToast('Pasta padrão definida com sucesso!');
+      return dirHandle;
+    } catch (e) {
+      showToast('Seleção de pasta cancelada', 'err');
       return null;
     }
-
-    dirHandle = selectedHandle;
-    showToast('Pasta padrão definida: ' + (dirHandle.name || 'pasta selecionada'));
-    return dirHandle;
-  } catch (e) {
-    // AbortError significa que o usuário cancelou o seletor.
-    showToast('Seleção de pasta cancelada', 'err');
+  } else {
+    showToast('Navegador não suporta seleção de pasta. Usando download padrão.', 'err');
     return null;
   }
 }
@@ -366,8 +361,6 @@ async function saveFileToDirectory(blob, filename) {
       return;
     } catch (e) {
       console.error(e);
-      showToast('Não foi possível salvar na pasta selecionada', 'err');
-      return;
     }
   }
   const url = URL.createObjectURL(blob);
@@ -405,33 +398,25 @@ function showToast(msg, type = 'ok') {
 /* ===== NAVIGATION ===== */
 async function openMod(id) {
   const menu = document.getElementById('main-menu');
-
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  
   if (id === 'menu') {
-    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
     menu.style.display = 'flex';
     if (streamUnica) { streamUnica.getTracks().forEach(t => t.stop()); streamUnica = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-    if (renderIntervalUnica) { clearInterval(renderIntervalUnica); renderIntervalUnica = null; }
+    if (renderIntervalUnica) clearInterval(renderIntervalUnica);
     capturing = false;
     if (isRecordingVideo) stopVideoRecording();
-
-    // Ao sair da seção, libera a pasta. Na próxima entrada o sistema perguntará novamente.
-    dirHandle = null;
     return;
   }
-
-  // A pasta é solicitada antes de esconder o menu, ativar a seção ou abrir a câmera.
-  // Se o usuário cancelar, permanece no menu e nenhuma câmera é iniciada.
-  dirHandle = null;
-  const selectedDirectory = await ensureDirectory();
-  if (!selectedDirectory) return;
-
-  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  
   menu.style.display = 'none';
   document.getElementById('mod-' + id).classList.add('active');
   triggerFullscreen();
-
-  // A mesma pasta permanece ativa durante toda a seção.
+  
+  // Pede para selecionar a pasta padrão exatamente aqui, uma única vez ao entrar no sistema escolhido
+  await ensureDirectory();
+  
   if (id === 'foto-unica') initFotoUnica();
 }
 
@@ -479,12 +464,15 @@ async function loadCamerasUnica() {
     const videoDevices = devices.filter(d => d.kind === 'videoinput');
     const sel = document.getElementById('camSelUnica');
     sel.innerHTML = '';
+    const activeId = streamUnica?.getVideoTracks?.()[0]?.getSettings?.().deviceId || '';
     videoDevices.forEach((dev, idx) => {
       const opt = document.createElement('option');
       opt.value = dev.deviceId;
-      opt.textContent = dev.label || `Câmera ${idx + 1}`;
+      opt.textContent = `Câmera ${idx + 1}`;
+      if (dev.deviceId === activeId) opt.selected = true;
       sel.appendChild(opt);
     });
+    updateSelectedCameraNameUnica();
   } catch (e) {}
 }
 
@@ -497,11 +485,19 @@ async function switchCamUnica(deviceId) {
     };
     streamUnica = await navigator.mediaDevices.getUserMedia(constraints);
     document.getElementById('vidUnica').srcObject = streamUnica;
-    toggleSetUnica();
-    showToast('Câmera alterada');
+    await document.getElementById('vidUnica').play().catch(() => {});
+    updateSelectedCameraNameUnica();
+    showToast((document.getElementById('camSelUnica').selectedOptions[0]?.textContent || 'Câmera') + ' selecionada');
   } catch (e) {
     showToast('Erro ao trocar câmera', 'err');
   }
+}
+
+function updateSelectedCameraNameUnica() {
+  const sel = document.getElementById('camSelUnica');
+  const name = sel?.selectedOptions?.[0]?.textContent || 'Câmera 1';
+  const info = document.getElementById('camPreviewNameUnica');
+  if (info) info.textContent = 'Câmera selecionada: ' + name;
 }
 
 function toggleSetUnica() {
@@ -526,7 +522,7 @@ async function initFotoUnica() {
           c.width = vid.videoWidth;
           c.height = vid.videoHeight;
         }
-        drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
+        drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabelUnica').value.trim());
       }
     }, 100);
 
@@ -589,9 +585,16 @@ async function startVideoRecording() {
   }
 
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({ 
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
-      video: false 
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: { ideal: 2 },
+        sampleRate: { ideal: 48000 },
+        sampleSize: { ideal: 24 },
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      },
+      video: false
     });
   } catch (e) {
     showToast('Microfone indisponível (gravando sem áudio)', 'err');
@@ -607,9 +610,13 @@ async function startVideoRecording() {
   recordedChunks = [];
   recordingStartTimeStr = new Date().toLocaleTimeString('pt-BR');
 
-  let options = { mimeType: 'video/webm; codecs=vp9,opus' };
+  let options = {
+    mimeType: 'video/webm; codecs=vp9,opus',
+    videoBitsPerSecond: 8000000,
+    audioBitsPerSecond: 256000
+  };
   if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-    options = { mimeType: 'video/webm' };
+    options = { mimeType: 'video/webm', videoBitsPerSecond: 8000000, audioBitsPerSecond: 256000 };
   }
   if (!MediaRecorder.isTypeSupported(options.mimeType)) {
     options = {};
@@ -671,10 +678,12 @@ async function loadCameras() {
     const videoDevices = devices.filter(d => d.kind === 'videoinput');
     const sel = document.getElementById('camSel');
     sel.innerHTML = '';
+    const activeId = stream?.getVideoTracks?.()[0]?.getSettings?.().deviceId || '';
     videoDevices.forEach((dev, idx) => {
       const opt = document.createElement('option');
       opt.value = dev.deviceId;
-      opt.textContent = dev.label || `Câmera ${idx + 1}`;
+      opt.textContent = `Câmera ${idx + 1}`;
+      if (dev.deviceId === activeId) opt.selected = true;
       sel.appendChild(opt);
     });
   } catch (e) {}
@@ -774,7 +783,7 @@ function manualPhoto() {
   c.width = vid.videoWidth;
   c.height = vid.videoHeight;
 
-  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`);
+  drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabel').value.trim());
   
   buffer.push({
     img: c.toDataURL('image/jpeg', 0.8),
@@ -831,7 +840,7 @@ function generatePDF() {
   buffer = [];
 }
 
-function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr) {
+function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, customLabel = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
   const bh = h * .13;
   const grad = ctx.createLinearGradient(0, h - bh, 0, h);
@@ -841,7 +850,7 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, h - bh, w, bh);
 
-  const label = document.getElementById('fotoLabel').value;
+  const label = String(customLabel || '').trim();
 
   ctx.fillStyle = '#fff';
   ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
