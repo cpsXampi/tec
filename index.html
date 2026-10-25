@@ -112,13 +112,13 @@ img,video{display:block;max-width:100%}
 #btn-stop{flex:1;margin:0 12px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
 #btn-menu, .btn-menu-unica{width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.45);backdrop-filter:blur(10px);color:var(--text2);display:grid;place-items:center}
 
-/* BOTÃO DE CÂMERA NATIVA (BOLA) */
+/* BOTÃO DE CÂMERA NATIVA (BOLA / OBTURADOR LIMPO) */
 .shutter-btn{width:76px;height:76px;border-radius:50%;border:4px solid #fff;background:transparent;padding:4px;display:grid;place-items:center;transition:transform .1s var(--ease);box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .shutter-btn:active{transform:scale(.92)}
 .shutter-btn-inner{width:100%;height:100%;border-radius:50%;background:#fff;transition:background .15s var(--ease)}
 .shutter-btn:active .shutter-btn-inner{background:var(--accent)}
 
-/* ZOOM INDICATOR */
+/* INDICADOR DE ZOOM */
 .zoom-hud{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:900;color:#fff;backdrop-filter:blur(10px);pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:150}
 .zoom-hud.show{opacity:1}
 
@@ -191,15 +191,16 @@ canvas#c, canvas#cUnica{display:none}
   <div class="zoom-hud" id="zoomHudUnica">1.0x</div>
 
   <div style="position:absolute;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px calc(28px + var(--safe-b));background:linear-gradient(to top,rgba(0,0,0,.82),transparent)">
-    <button class="btn-gear-unica" onclick="toggleSet('settingsUnica')">
+    <button class="btn-gear-unica" onclick="toggleSet('settingsUnica')" aria-label="Configurações">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
     
+    <!-- BOTÃO NATIVO DE CÂMERA (BOLA LIMPA SEM TEXTO) -->
     <button class="shutter-btn" onclick="takeSinglePhoto()" aria-label="Tirar foto">
       <div class="shutter-btn-inner"></div>
     </button>
     
-    <button class="btn-menu-unica" onclick="openMod('menu')">
+    <button class="btn-menu-unica" onclick="openMod('menu')" aria-label="Voltar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="m15 18-6-6 6-6"/></svg>
     </button>
   </div>
@@ -239,7 +240,7 @@ canvas#c, canvas#cUnica{display:none}
     <div class="zoom-hud" id="zoomHudInspecao">1.0x</div>
 
     <div id="ui-ctrl">
-      <button class="ui-btn" id="btn-gear" onclick="toggleSet('settingsInspecao')">
+      <button class="ui-btn" id="btn-gear" onclick="toggleSet('settingsInspecao')" aria-label="Configurações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
       <button class="ui-btn" id="btn-start" onclick="startCap()">
@@ -303,19 +304,19 @@ function triggerFullscreen() {
   }
 }
 
-/* ===== DIRECTORY SELECTION ===== */
+/* ===== SELEÇÃO DE PASTA NATIVA DO DISPOSITIVO ===== */
 async function selectDirectory() {
   if ('showDirectoryPicker' in window) {
     try {
       dirHandle = await window.showDirectoryPicker();
-      showToast('Pasta de destino configurada!');
+      showToast('Pasta selecionada com sucesso!');
       return true;
     } catch (err) {
       if (err.name !== 'AbortError') showToast('Erro ao selecionar pasta', 'err');
       return false;
     }
   } else {
-    showToast('Salvando fotos via downloads nativos');
+    showToast('Modo de salvamento por downloads ativos');
     return true;
   }
 }
@@ -332,7 +333,7 @@ async function saveBlobToDirectory(blob, fileName) {
       console.error(e);
     }
   }
-  // Fallback tradicional
+  // Fallback tradicional se o diretório direto não estiver habilitado
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -355,7 +356,7 @@ function showToast(msg,type='ok'){
   requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),3000)});
 }
 
-/* ===== NAVIGATION ===== */
+/* ===== NAVEGAÇÃO E SOLICITAÇÃO DE PASTA ===== */
 async function openMod(id){
   const menu=document.getElementById('main-menu');
   document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
@@ -367,6 +368,7 @@ async function openMod(id){
     return;
   }
   
+  // Solicita obrigatoriamente a pasta de destino ao acessar qualquer módulo
   if (id === 'foto-unica' || id === 'inspecao') {
     const ok = await selectDirectory();
     if (!ok && 'showDirectoryPicker' in window) return;
@@ -418,7 +420,7 @@ if('geolocation' in navigator){
   },null,{enableHighAccuracy:true});
 }
 
-/* ===== CAMERA & DEVICES ===== */
+/* ===== CÂMERA & DISPOSITIVOS ===== */
 async function populateCameraList() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -465,7 +467,7 @@ function setupTrackCapabilities(mediaStream) {
   }
 }
 
-/* ===== PINCH TO ZOOM ===== */
+/* ===== PINCH TO ZOOM (DOIS DEDOS PINÇANDO A TELA) ===== */
 function initPinchZoom(videoEl, hudEl) {
   videoEl.addEventListener('touchstart', e => {
     if (e.touches.length === 2) {
@@ -531,11 +533,11 @@ async function takeSinglePhoto(){
   c.toBlob(async blob => {
     const fileName = `FOTO_AVULSA_KM_${currentKm}_${Date.now()}.jpg`;
     await saveBlobToDirectory(blob, fileName);
-    showToast('Foto salva com sucesso!');
+    showToast('Foto salva na pasta!');
   }, 'image/jpeg', 0.85);
 }
 
-/* ===== INSPEÇÃO FOTOGRÁFICA (PDF) ===== */
+/* ===== INSPEÇÃO FOTOGRÁFICA (PDF ORIGINAL) ===== */
 async function startApp(){
   try{
     triggerFullscreen();
@@ -598,7 +600,7 @@ async function manualPhoto(){
     time: new Date().toLocaleTimeString('pt-BR')
   });
 
-  // Salvar a foto individual em tempo real se a pasta estiver selecionada
+  // Salva a foto individual na pasta selecionada no momento do disparo
   c.toBlob(async blob => {
     const fileName = `INSPECAO_KM_${currentKm}_${Date.now()}.jpg`;
     await saveBlobToDirectory(blob, fileName);
@@ -653,6 +655,7 @@ async function generatePDF(){
   buffer = [];
 }
 
+/* ===== MANTÉM A ESTAMPA / OVERLAY ORIGINAL DA FOTO ===== */
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr){
   ctx.drawImage(videoEl, 0, 0, w, h);
   const bh = h * .13;
