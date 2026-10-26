@@ -35,112 +35,17 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH LUXURY CAR INTERIOR + SWIPE HAND TRANSITION ===== */
+/* ===== SPLASH SIMPLES E RÁPIDO ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
   display: flex; align-items: center; justify-content: center;
-  background: #06080d; overflow: hidden;
-  transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease-out;
+  background: #050609; overflow: hidden;
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
-#splash.swipe-out {
-  transform: translateX(-100%);
-  opacity: 0.8;
-}
+#splash.done { opacity: 0; transform: scale(1.04); pointer-events: none; }
+#sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* Interior do Carro de Luxo nas Laterais (Cores claras e detalhes sofisticados) */
-.luxury-cabin {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, #1a2232 0%, #080b11 80%);
-}
-
-/* Painel Superior / Teto Solar Iluminado */
-.lux-roof {
-  position: absolute; top: 0; left: 0; right: 0; height: 50px;
-  background: linear-gradient(180deg, #121824, #080b11);
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-  display: flex; justify-content: center; align-items: center;
-}
-.lux-rearview {
-  width: 140px; height: 45px; background: linear-gradient(135deg, #2a3548, #111722);
-  border-radius: 0 0 14px 14px; border: 1px solid rgba(255,214,0,0.3);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-}
-
-/* Painel Frontal Inferior em Couro Pespontado */
-.lux-dashboard {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 140px;
-  background: linear-gradient(0deg, #05070a 0%, #111722 70%, #1a2333 100%);
-  border-top: 2px solid rgba(255,214,0,0.25);
-  box-shadow: inset 0 20px 40px rgba(0,0,0,0.9);
-}
-.lux-dashboard::before {
-  content: ""; position: absolute; top: 10px; left: 15%; right: 15%; height: 3px;
-  background: #ffd600; border-radius: 4px; box-shadow: 0 0 15px rgba(255,214,0,0.6);
-}
-
-/* Suporte de Ventosa de Vidro */
-.lux-mount {
-  position: absolute; top: 25%; left: 50%; transform: translateX(-50%);
-  width: 40px; height: 45px; z-index: 2; display: flex; flex-direction: column; align-items: center;
-}
-.lux-suction {
-  width: 28px; height: 12px; background: rgba(255,255,255,0.2);
-  border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(6px);
-}
-.lux-arm {
-  width: 10px; height: 35px; background: linear-gradient(90deg, #2a3548, #4a5d78, #2a3548);
-  border-radius: 3px; border: 1px solid rgba(255,255,255,0.2); margin-top: -2px;
-}
-
-/* Celular Centralizado no Suporte (Alinhado com a Grade Inicial) */
-.lux-phone-frame {
-  position: absolute; top: calc(25% + 40px); left: 50%; transform: translateX(-50%);
-  width: 320px; height: 180px; background: #000; border-radius: 20px; z-index: 3;
-  border: 4px solid #3a4b66;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(255,214,0,0.25);
-  overflow: hidden; display: flex; align-items: center; justify-content: center;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
-
-.sp-hud-km {
-  position: absolute; top: 10px; left: 10px; min-width: 90px;
-  border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(4,120,87,0.9); padding: 4px 10px; text-align: center;
-  backdrop-filter: blur(8px); z-index: 5; pointer-events: none;
-}
-.sp-hud-km .h-l { font-size: 6px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; color: rgba(220,252,231,0.7); }
-.sp-hud-km .h-v { font-size: 14px; font-weight: 900; line-height: 1.1; margin-top: 1px; color: #fff; }
-
-.sp-rec {
-  position: absolute; top: 10px; right: 10px;
-  display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(0,0,0,0.75); padding: 4px 8px; border-radius: 14px;
-  backdrop-filter: blur(6px); z-index: 5; pointer-events: none;
-}
-.sp-rec .dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; animation: spBlink 0.8s infinite; }
-@keyframes spBlink { 50% { opacity: .1; } }
-.sp-rec span { font-size: 6px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; color: #fff; }
-
-.sp-lbl {
-  position: absolute; top: 44px; right: 10px;
-  border-radius: 6px; border: 1px solid rgba(255,214,0,0.5);
-  background: rgba(0,0,0,0.8); padding: 4px 8px; backdrop-filter: blur(6px); z-index: 5;
-  font-size: 7px; font-weight: 800; color: #ffd600; text-transform: uppercase; letter-spacing: .08em;
-}
-
-/* Efeito da Mão Puxando a Tela no Final */
-.swipe-hand {
-  position: absolute; right: -150px; top: 50%; transform: translateY(-50%);
-  width: 120px; height: 220px; background: linear-gradient(135deg, #e0a96d, #b88650);
-  border-radius: 60px 20px 20px 60px; z-index: 10000; pointer-events: none;
-  box-shadow: -15px 0 40px rgba(0,0,0,0.7);
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.swipe-hand.active { transform: translateY(-50%) translateX(-250vw); }
-
-/* ===== MAIN MENU (Encaixe Coerente de Design) ===== */
+/* ===== MAIN MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:calc(28px + var(--safe-t)) 20px calc(28px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(255,214,0,.08),transparent 35%),linear-gradient(180deg,#090b0f,#050609);overflow-y:auto}
 .menu-inner{max-width:760px;width:100%;margin:auto}
 .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
@@ -260,40 +165,9 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH LUXURY CAR INTERIOR + SWIPE HAND (~6 SEGUNDOS) -->
+<!-- SPLASH SIMPLES E RÁPIDO (~1.2 SEGUNDO) -->
 <div id="splash" aria-hidden="true">
-  <div class="luxury-cabin">
-    <div class="lux-roof">
-      <div class="lux-rearview"></div>
-    </div>
-    <div class="lux-dashboard"></div>
-  </div>
-
-  <div class="lux-mount">
-    <div class="lux-suction"></div>
-    <div class="lux-arm"></div>
-  </div>
-  
-  <div class="lux-phone-frame" id="luxPhoneFrame">
-    <canvas id="sp-canvas"></canvas>
-    
-    <div class="sp-hud-km">
-      <span class="h-l">KM atual</span>
-      <p class="h-v" id="spHudKmTxt">KM 116,40</p>
-    </div>
-    
-    <div class="sp-rec">
-      <div class="dot"></div>
-      <span>Registrando no PDF</span>
-    </div>
-
-    <div class="sp-lbl">
-      VISTORIA ILUMINAÇÃO
-    </div>
-  </div>
-
-  <!-- A Mão que puxa tudo no final -->
-  <div class="swipe-hand" id="swipeHand"></div>
+  <canvas id="sp-canvas"></canvas>
 </div>
 
 <!-- MENU -->
@@ -415,171 +289,96 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH MOTOR: RODOVIA E SWIPE COM A MÃO (6 SEGUNDOS) ===== */
-(function initLuxurySplash() {
+/* ===== SPLASH MOTOR SIMPLES E RÁPIDO (~1.2 SEG) ===== */
+(function initSimpleSplash() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  let w = canvas.width = 320;
-  let h = canvas.height = 180;
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
 
-  const DURATION = 5500; // 5.5 segundos de exibição antes da mão puxar
+  window.addEventListener('resize', () => {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+
+  const DURATION = 1200; // 1.2 segundo ultra rápido
   let startTime = null;
   let animId;
-
-  const signsList = [
-    { text: 'BR-116 DUTRA', sub: 'TRECHO SP-RIO' },
-    { text: 'KM 116.0', sub: 'VISTORIA ILUMINAÇÃO' },
-    { text: 'SÃO PAULO', sub: 'SAÍDA CAPITAL' },
-    { text: 'KM 116.4', sub: 'POSTE #084' },
-    { text: 'GUARULHOS', sub: 'KM 215' },
-    { text: 'KM 117.0', sub: 'INSPEÇÃO AUTOMÁTICA' },
-    { text: 'S. J. DOS CAMPOS', sub: 'KM 148' },
-    { text: 'KM 117.5', sub: 'FOTO REGISTRADA' }
-  ];
-
-  const objectsOnRoad = Array.from({ length: 25 }, (_, idx) => ({
-    x: (Math.random() - 0.5) * w * 3,
-    y: (Math.random() - 0.5) * h * 2,
-    z: Math.random() * w + 25,
-    type: idx % 2 === 0 ? 'sign' : 'pole',
-    data: signsList[Math.floor(Math.random() * signsList.length)],
-    kmMark: (116.0 + Math.random() * 2.0).toFixed(2).replace('.', ',')
-  }));
 
   function render(ts) {
     if (!startTime) startTime = ts;
     const elapsed = ts - startTime;
     const progress = Math.min(elapsed / DURATION, 1);
 
-    const speedFactor = progress < 0.85 
-      ? 1.0 
-      : Math.max(0.05, 1.0 - Math.pow((progress - 0.85) / 0.15, 2) * 0.95);
-
-    ctx.fillStyle = '#020305';
+    ctx.fillStyle = '#06070a';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
-    const cy = h * 0.48;
+    const cy = h / 2;
 
-    // Pista e Iluminação
+    // Linhas rápidas de rodovia cruzando
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(cx - 22, cy);
-    ctx.lineTo(cx + 22, cy);
-    ctx.lineTo(w * 2, h);
-    ctx.lineTo(-w, h);
+    ctx.moveTo(cx - 10, cy);
+    ctx.lineTo(cx + 10, cy);
+    ctx.lineTo(w * 1.5, h);
+    ctx.lineTo(-w * 0.5, h);
     ctx.closePath();
-    ctx.fillStyle = '#06080d';
+    ctx.fillStyle = '#0c1017';
     ctx.fill();
 
-    const travelSpeed = elapsed * 1.8 * speedFactor;
+    const speed = elapsed * 3.5;
     ctx.strokeStyle = '#ffd600';
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 8; i++) {
-      const p1 = ((travelSpeed + i * (h / 4)) % (h - cy));
-      const y1 = cy + p1;
-      const y2 = y1 + 22 * (p1 / (h - cy));
+    ctx.lineWidth = 4;
+    for (let i = 0; i < 6; i++) {
+      const p1 = ((speed + i * (h / 3)) % h);
+      const y1 = p1;
+      const y2 = y1 + 40 * (p1 / h);
       
       ctx.beginPath();
       ctx.moveTo(cx, y1);
       ctx.lineTo(cx, y2);
       ctx.stroke();
     }
-
-    for (let i = 0; i < 4; i++) {
-      const p1 = ((travelSpeed * 1.2 + i * (h / 3)) % (h - cy));
-      const y1 = cy + p1;
-      const scale = (y1 - cy) / (h - cy);
-      const xLeft = cx - (w * 0.65 * scale);
-      const xRight = cx + (w * 0.65 * scale);
-
-      const gradL = ctx.createRadialGradient(xLeft, y1 - 25 * scale, 1, xLeft, y1 - 25 * scale, 40 * scale);
-      gradL.addColorStop(0, 'rgba(255, 214, 0, 0.7)');
-      gradL.addColorStop(1, 'rgba(255, 214, 0, 0)');
-      ctx.fillStyle = gradL;
-      ctx.fillRect(xLeft - 40, y1 - 60, 80, 80);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.lineWidth = Math.max(1, 2 * scale);
-      ctx.beginPath();
-      ctx.moveTo(xLeft, y1);
-      ctx.lineTo(xLeft, y1 - 26 * scale);
-      ctx.lineTo(xLeft + 8 * scale, y1 - 26 * scale);
-      ctx.stroke();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(xLeft + 8 * scale, y1 - 26 * scale, Math.max(1, 3 * scale), 0, Math.PI * 2);
-      ctx.fill();
-    }
     ctx.restore();
 
-    objectsOnRoad.forEach(p => {
-      p.z -= (14 + (progress * 8)) * speedFactor;
-      if (p.z <= 0) {
-        p.z = w + 50;
-        p.x = (Math.random() - 0.5) * w * 2.8;
-        p.y = (Math.random() - 0.5) * h * 2;
-        p.kmMark = (116.0 + progress * 2.0).toFixed(2).replace('.', ',');
-      }
+    // Placa de KM passando rapidamente pelo centro
+    const scale = Math.min(progress * 2.5, 1.2);
+    ctx.save();
+    ctx.translate(cx, cy - 20);
+    ctx.scale(scale, scale);
 
-      const scale = 160 / p.z;
-      const px = p.x * scale + cx;
-      const py = p.y * scale + cy;
+    ctx.fillStyle = 'rgba(4, 115, 62, 0.95)';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(-110, -40, 220, 80, 10);
+    ctx.fill();
+    ctx.stroke();
 
-      if (px >= -80 && px <= w + 80 && py >= -80 && py <= h + 80) {
-        ctx.save();
-        ctx.translate(px, py);
-
-        if (p.type === 'sign') {
-          const bw = 90 * scale;
-          const bh = 34 * scale;
-          ctx.fillStyle = 'rgba(4, 115, 62, 0.9)';
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = Math.max(1, 1.2 * scale);
-          ctx.beginPath();
-          ctx.roundRect(-bw/2, -bh/2, bw, bh, 3 * scale);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(6, 9 * scale)}px Arial, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(p.data.text, 0, -2 * scale);
-          ctx.font = `${Math.max(4, 5.5 * scale)}px Arial, sans-serif`;
-          ctx.fillStyle = '#ffd600';
-          ctx.fillText(p.data.sub, 0, 7 * scale);
-        } else {
-          ctx.font = `900 ${Math.max(10, 18 * scale)}px Arial, sans-serif`;
-          ctx.fillStyle = '#ffd600';
-          ctx.shadowBlur = 8 * scale;
-          ctx.shadowColor = '#ffd600';
-          ctx.fillText(`KM ${p.kmMark}`, 0, 0);
-        }
-        ctx.restore();
-      }
-    });
-
-    const currentKmSim = (116.0 + progress * 1.85).toFixed(2).replace('.', ',');
-    const spHudKmTxt = document.getElementById('spHudKmTxt');
-    if (spHudKmTxt) spHudKmTxt.textContent = `KM ${currentKmSim}`;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 22px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('BR-116 DUTRA', 0, -6);
+    
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillStyle = '#ffd600';
+    ctx.fillText('KM 116,40', 0, 22);
+    ctx.restore();
 
     if (progress < 1) {
       animId = requestAnimationFrame(render);
     } else {
-      // Dispara a mão puxando o cenário
-      const hand = document.getElementById('swipeHand');
-      const splash = document.getElementById('splash');
-      if (hand) hand.classList.add('active');
-      setTimeout(() => {
-        if (splash) splash.classList.add('swipe-out');
+      const sp = document.getElementById('splash');
+      if (sp) {
+        sp.classList.add('done');
         setTimeout(() => {
-          splash.remove();
+          sp.remove();
           cancelAnimationFrame(animId);
-        }, 800);
-      }, 300);
+        }, 400);
+      }
     }
   }
 
