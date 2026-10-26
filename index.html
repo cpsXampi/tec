@@ -140,21 +140,22 @@ canvas#c, canvas#cUnica{display:none}
 #btn-report-snapshot:active{transform:scale(.91)}
 #btn-stop{margin-left:8px}
 
-/* STATUS RÁPIDO NO CANTO SUPERIOR DIREITO SEM COBRIR OS BOTÕES */
+/* STATUS RÁPIDO SUPERIOR DIREITO (MÁXIMA FLUIDEZ E VELOCIDADE) */
 .toast.quick-photo{
   top:calc(18px + var(--safe-t))!important;
   right:14px!important;
   bottom:auto!important;
   left:auto!important;
-  max-width:min(55vw,220px);
-  padding:8px 12px;
+  max-width:min(60vw,240px);
+  padding:7px 11px;
   font-size:9px;
-  transform:translateY(-10px);
+  transform:translateY(-8px);
   z-index:10000;
-  box-shadow:0 4px 20px rgba(0,0,0,.6);
-  border-color:rgba(255,214,0,.4);
-  background:rgba(15,18,22,.92);
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  border-color:rgba(255,214,0,.35);
+  background:rgba(12,15,20,.88);
   color:#fff;
+  transition:transform .12s ease, opacity .12s ease!important;
 }
 .toast.quick-photo.show{transform:translateY(0)}
 
@@ -228,10 +229,10 @@ canvas#c, canvas#cUnica{display:none}
     <button class="icon-settings" aria-label="Abrir configurações" onclick="toggleSetUnica()" style="width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;flex-shrink:0;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
     </button>
-    <button onclick="takeSinglePhoto()" style="width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.2);display:grid;place-items:center;flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.1s ease">
+    <button onclick="takeSinglePhoto()" style="width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.2);display:grid;place-items:center;flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.05s ease">
       <div style="width:56px;height:56px;border-radius:50%;background:#fff;"></div>
     </button>
-    <button id="btnRecVideoUnica" onclick="toggleVideoRecording()" style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;flex-shrink:0;transition:all 0.2s">
+    <button id="btnRecVideoUnica" onclick="toggleVideoRecording()" style="width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center;flex-shrink:0;transition:all 0.1s">
       <svg id="iconVideoUnica" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
     </button>
   </div>
@@ -264,7 +265,7 @@ canvas#c, canvas#cUnica{display:none}
       <button class="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="200" step="100"></div>
+      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="100" step="50"></div>
       <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"></div>
     </div>
   </div>
@@ -326,7 +327,7 @@ let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
 let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, sessionStamp='', savedBatchCount=0;
-const REPORT_JPEG_QUALITY=0.86;
+const REPORT_JPEG_QUALITY=0.82; // Qualidade otimizada para máxima velocidade de salvamento e arquivo leve
 
 async function chooseDirectoryForModule() {
   dirHandle = null;
@@ -355,7 +356,7 @@ async function saveFileToDirectory(blob, filename) {
       const writable = await fileHandle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showQuickPhotoToast('Salvo: ' + filename);
+      showQuickPhotoToast(`Salvo: ${filename}`);
       return;
     } catch (e) { console.error(e); }
   }
@@ -368,7 +369,7 @@ async function saveFileToDirectory(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showQuickPhotoToast('Baixado: ' + filename);
+  showQuickPhotoToast(`Salvo: ${filename}`);
 }
 
 function triggerFullscreen() {
@@ -384,12 +385,12 @@ function showToast(msg, type = 'ok') {
   el.className = 'toast ' + type;
   el.innerHTML = (icons[type] || '') + msg;
   clearTimeout(_tt);
-  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 3000); });
+  requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 2500); });
 }
 
 function showQuickPhotoToast(msg, type='ok'){
  const el=document.getElementById('toast'); clearTimeout(_tt); el.className='toast quick-photo '+type; el.textContent=msg;
- requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),700)});
+ requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),450)});
 }
 
 async function openMod(id) {
@@ -512,9 +513,9 @@ async function initFotoUnica() {
           c.width = vid.videoWidth;
           c.height = vid.videoHeight;
         }
-        drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabelUnica').value.trim());
+        drawOverlayCustom(ctx, vid, c.width, c.height, currentKm, new Date().toLocaleString('pt-BR').toUpperCase(), `${lat}, ${lon}`, document.getElementById('fotoLabelUnica').value);
       }
-    }, 100);
+    }, 80);
 
     let initialDist = null, baseZoom = 1;
     let track = streamUnica.getVideoTracks()[0];
@@ -525,7 +526,7 @@ async function initFotoUnica() {
         initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         baseZoom = track.getSettings().zoom || 1;
       }
-    });
+    }, {passive: true});
 
     vid.addEventListener('touchmove', e => {
       if (e.touches.length === 2 && initialDist && capabilities.zoom) {
@@ -534,7 +535,7 @@ async function initFotoUnica() {
         let targetZoom = Math.min(Math.max(capabilities.zoom.min || 1, baseZoom * scaleFactor), capabilities.zoom.max || 5);
         track.applyConstraints({ advanced: [{ zoom: targetZoom }] }).catch(() => {});
       }
-    });
+    }, {passive: true});
 
   } catch (e) {
     showToast('Erro ao acessar a câmera', 'err');
@@ -550,10 +551,12 @@ function takeSinglePhoto() {
   const c = document.getElementById('cUnica');
   if (!c.width) return;
 
+  const filename = `FOTO_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g, '_');
+  showQuickPhotoToast(`Salvo: ${filename}`);
+
   c.toBlob(blob => {
-    const filename = `FOTO_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g, '_');
     saveFileToDirectory(blob, filename);
-  }, 'image/jpeg', 0.95);
+  }, 'image/jpeg', 0.90);
 }
 
 async function toggleVideoRecording() {
@@ -640,7 +643,7 @@ async function startApp() {
         initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         baseZoom = track.getSettings().zoom || 1;
       }
-    });
+    }, {passive: true});
 
     vid.addEventListener('touchmove', e => {
       if (e.touches.length === 2 && initialDist && capabilities.zoom) {
@@ -649,7 +652,7 @@ async function startApp() {
         let targetZoom = Math.min(Math.max(capabilities.zoom.min || 1, baseZoom * scaleFactor), capabilities.zoom.max || 5);
         track.applyConstraints({ advanced: [{ zoom: targetZoom }] }).catch(() => {});
       }
-    });
+    }, {passive: true});
 
   } catch (e) {
     document.getElementById('gateErr').style.display = 'block';
@@ -672,7 +675,7 @@ function startCap(){
  updateCaptureCount();document.getElementById('btn-start').style.display='none';document.getElementById('btn-stop').style.display='flex';document.getElementById('btn-report-snapshot').style.display='flex';document.getElementById('rec-tag').classList.add('on');showToast('Captura contínua iniciada');captureLoop();
 }
 
-function captureLoop(){if(!capturing)return;const t=performance.now();captureReportFrame();const ms=Math.max(parseInt(document.getElementById('cfgInt').value)||200,200);captureTimer=setTimeout(captureLoop,Math.max(0,ms-(performance.now()-t)))}
+function captureLoop(){if(!capturing)return;const t=performance.now();captureReportFrame();const ms=Math.max(parseInt(document.getElementById('cfgInt').value)||150,100);captureTimer=setTimeout(captureLoop,Math.max(0,ms-(performance.now()-t)))}
 
 function captureReportFrame(){
  if(!capturing||captureBusy)return;const v=document.getElementById('vid');if(!v.videoWidth)return;captureBusy=true;
@@ -686,7 +689,12 @@ document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount)
 
 function takeReportSnapshot(e){
  e?.stopPropagation?.();if(!capturing||!dirHandle){showQuickPhotoToast('Sessão não iniciada','err');return}const v=document.getElementById('vid');if(!v.videoWidth){showQuickPhotoToast('Câmera indisponível','err');return}
- const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value);showQuickPhotoToast('Foto JPG capturada');c.toBlob(async b=>{if(!b)return;try{const f=await dirHandle.getFileHandle(`FOTO_EXTRA_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g,'_'),{create:true}),w=await f.createWritable();await w.write(b);await w.close()}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',.92)
+ 
+ const filename = `FOTO_EXTRA_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g, '_');
+ showQuickPhotoToast(`Salvo: ${filename}`);
+
+ const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value);
+ c.toBlob(async b=>{if(!b)return;try{const f=await dirHandle.getFileHandle(filename,{create:true}),w=await f.createWritable();await w.write(b);await w.close()}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',0.90)
 }
 
 async function stopCap(){
@@ -721,7 +729,7 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 
   if (label && label.trim().length > 0) {
-    const textOriginal = label.trim(); // Preserva exatamente as maiúsculas e minúsculas digitadas
+    const textOriginal = label.trim();
     const fontSize = Math.round(h * 0.035);
     ctx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
     
@@ -737,8 +745,6 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
     const radius = 10;
 
     ctx.save();
-    
-    // Aplicação de transparência geral na etiqueta (fundo e texto)
     ctx.globalAlpha = 0.72; 
 
     ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
