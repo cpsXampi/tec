@@ -35,6 +35,24 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
+/* ===== SPLASH SIMPLES (FUNDO PRETO E BARRINHA) ===== */
+#splash {
+  position: fixed; inset: 0; z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+  background: #000000;
+  overflow: hidden;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#splash.done { opacity: 0; pointer-events: none; }
+
+.sp-bar-container {
+  width: 180px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;
+  overflow: hidden; position: relative;
+}
+#sp-bar {
+  width: 0%; height: 100%; background: var(--accent); border-radius: 2px;
+}
+
 /* ===== MAIN MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:calc(28px + var(--safe-t)) 20px calc(28px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(255,214,0,.08),transparent 35%),linear-gradient(180deg,#090b0f,#050609);overflow-y:auto}
 .menu-inner{max-width:760px;width:100%;margin:auto}
@@ -155,6 +173,13 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
+<!-- SPLASH SIMPLES (FUNDO PRETO E BARRINHA DE 1.5s) -->
+<div id="splash" aria-hidden="true">
+  <div class="sp-bar-container">
+    <div id="sp-bar"></div>
+  </div>
+</div>
+
 <!-- MENU PRINCIPAL -->
 <div id="main-menu">
   <div class="menu-inner">
@@ -272,6 +297,33 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
+/* ===== SPLASH SIMPLES DE 1.5s ===== */
+(function initSplash() {
+  const DURATION = 1500; // 1.5 segundos
+  let startTime = null;
+
+  function render(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    const progress = Math.min(elapsed / DURATION, 1);
+
+    const spBar = document.getElementById('sp-bar');
+    if (spBar) spBar.style.width = (progress * 100) + '%';
+
+    if (progress < 1) {
+      requestAnimationFrame(render);
+    } else {
+      const sp = document.getElementById('splash');
+      if (sp) {
+        sp.classList.add('done');
+        setTimeout(() => sp.remove(), 400);
+      }
+    }
+  }
+
+  requestAnimationFrame(render);
+})();
+
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
 
