@@ -676,7 +676,7 @@ function captureLoop(){if(!capturing)return;const t=performance.now();captureRep
 
 function captureReportFrame(){
  if(!capturing||captureBusy)return;const v=document.getElementById('vid');if(!v.videoWidth)return;captureBusy=true;
- try{const c=document.getElementById('c'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value.trim());buffer.push({img:c.toDataURL('image/jpeg',REPORT_JPEG_QUALITY),km:currentKm,time:now.toLocaleTimeString('pt-BR')});const lim=Math.max(parseInt(document.getElementById('cfgLote').value)||150,1);if(buffer.length>=lim)rotateBatch();updateCaptureCount()}catch(e){console.error(e)}finally{captureBusy=false}
+ try{const c=document.getElementById('c'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value);buffer.push({img:c.toDataURL('image/jpeg',REPORT_JPEG_QUALITY),km:currentKm,time:now.toLocaleTimeString('pt-BR')});const lim=Math.max(parseInt(document.getElementById('cfgLote').value)||150,1);if(buffer.length>=lim)rotateBatch();updateCaptureCount()}catch(e){console.error(e)}finally{captureBusy=false}
 }
 
 function rotateBatch(){if(!buffer.length)return;const photos=buffer,no=currentBatchNumber;buffer=[];currentBatchNumber++;pdfQueue.push({photos,batchNo:no,final:false});updateCaptureCount();processPdfQueue()}
@@ -686,7 +686,7 @@ document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount)
 
 function takeReportSnapshot(e){
  e?.stopPropagation?.();if(!capturing||!dirHandle){showQuickPhotoToast('Sessão não iniciada','err');return}const v=document.getElementById('vid');if(!v.videoWidth){showQuickPhotoToast('Câmera indisponível','err');return}
- const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value.trim());showQuickPhotoToast('Foto JPG capturada');c.toBlob(async b=>{if(!b)return;try{const f=await dirHandle.getFileHandle(`FOTO_EXTRA_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g,'_'),{create:true}),w=await f.createWritable();await w.write(b);await w.close()}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',.92)
+ const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value);showQuickPhotoToast('Foto JPG capturada');c.toBlob(async b=>{if(!b)return;try{const f=await dirHandle.getFileHandle(`FOTO_EXTRA_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g,'_'),{create:true}),w=await f.createWritable();await w.write(b);await w.close()}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',.92)
 }
 
 async function stopCap(){
@@ -721,11 +721,11 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 
   if (label && label.trim().length > 0) {
-    const textUpper = label.trim().toUpperCase();
+    const textOriginal = label.trim(); // Preserva exatamente as maiúsculas e minúsculas digitadas
     const fontSize = Math.round(h * 0.035);
     ctx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
     
-    const textMetrics = ctx.measureText(textUpper);
+    const textMetrics = ctx.measureText(textOriginal);
     const textWidth = textMetrics.width;
     const paddingX = Math.round(fontSize * 0.8);
     const paddingY = Math.round(fontSize * 0.5);
@@ -737,10 +737,14 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
     const radius = 10;
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetX = 3;
-    ctx.shadowOffsetY = 5;
+    
+    // Aplicação de transparência geral na etiqueta (fundo e texto)
+    ctx.globalAlpha = 0.72; 
+
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 3;
 
     ctx.fillStyle = '#ffd600';
     ctx.beginPath();
@@ -748,14 +752,14 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
     ctx.fill();
 
     ctx.shadowColor = 'transparent';
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.08));
     ctx.stroke();
 
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(textUpper, posX + (boxWidth / 2), posY + (boxHeight / 2) + 1);
+    ctx.fillText(textOriginal, posX + (boxWidth / 2), posY + (boxHeight / 2) + 1);
 
     ctx.restore();
   }
