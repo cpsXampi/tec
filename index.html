@@ -727,7 +727,7 @@ function captureReportFrame(){
 
 function rotateBatch(){
   if(!buffer.length)return;
-  const photos=buffer,no=currentBatchNumber;
+  const photos=[...buffer],no=currentBatchNumber;
   buffer=[];
   currentBatchNumber++;
   pdfQueue.push({photos,batchNo:no,final:false});
@@ -748,7 +748,7 @@ function takeReportSnapshot(e){
   if(!v.videoWidth){showQuickPhotoToast('Câmera indisponível','err');return}
  
   const filename = `FOTO_EXTRA_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g, '_');
-  showQuickPhotoToast(`Salvo: ${filename}`);
+  showQuickPhotoToast(`Salvando foto avulsa...`);
 
   const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();
   c.width=v.videoWidth;c.height=v.videoHeight;
@@ -759,6 +759,7 @@ function takeReportSnapshot(e){
       const f=await dirHandle.getFileHandle(filename,{create:true}),w=await f.createWritable();
       await w.write(b);
       await w.close();
+      showQuickPhotoToast(`Salvo: ${filename}`);
     }catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}
   },'image/jpeg',0.90);
 }
@@ -773,19 +774,22 @@ async function stopCap(){
   document.getElementById('btn-report-snapshot').style.display='none';
   document.getElementById('rec-tag').classList.remove('on');
   if(buffer.length){
-    pdfQueue.push({photos:buffer,batchNo:currentBatchNumber,final:true});
+    pdfQueue.push({photos:[...buffer],batchNo:currentBatchNumber,final:true});
     buffer=[];
   }
   updateCaptureCount();
-  showToast('Finalizando e salvando lotes...');
+  showToast('Finalizando e salvando lotes pendentes...');
   processPdfQueue();
-  await new Promise(r=>{const q=()=>!pdfWorkerBusy&&!pdfQueue.length?r():setTimeout(q,100);q()});
+  while(pdfWorkerBusy||pdfQueue.length>0){
+    await new Promise(r=>setTimeout(r,100));
+  }
   sessionEnding=false;
   document.getElementById('btn-stop').disabled=false;
   document.getElementById('btn-stop').style.display='none';
   document.getElementById('btn-start').style.display='flex';
-  showToast(`${savedBatchCount} lote(s) salvo(s)`);
+  showToast(`Sessão finalizada! ${savedBatchCount} lote(s) salvo(s).`);
   currentBatchNumber=1;
+  savedBatchCount=0;
   updateCaptureCount();
 }
 
@@ -794,30 +798,50 @@ async function processPdfQueue(){
   pdfWorkerBusy=true;
   try{
     while(pdfQueue.length){
-      await generateBatchPDF(pdfQueue.shift());
+      const job = pdfQueue.shift();
+      await generateBatchPDF(job);
       savedBatchCount++;
       await new Promise(r=>setTimeout(r,0));
     }
   }catch(e){
     console.error(e);
-    showToast('Falha ao salvar um lote','err');
+    showToast('Falha ao salvar um lote de PDF','err');
   }finally{
     pdfWorkerBusy=false;
   }
 }
 
 async function generateBatchPDF(job){
-  if(!job.photos.length||!window.jspdf?.jsPDF)return;
-  const {jsPDF}=window.jspdf,tmp=new jsPDF(),p0=tmp.getImageProperties(job.photos[0].img);
+  if(!job.photos||!job.photos.length||!window.jspdf?.jsPDF)return;
+  const {jsPDF}=window.jspdf;
+  const tmp=new jsPDF();
+  let p0;
+  try{
+    p0=tmp.getImageProperties(job.photos[0].img);
+  }catch(e){
+    p0={width:1920,height:1080};
+  }
   const orient=p0.width>=p0.height?'landscape':'portrait';
   const d=new jsPDF({orientation:orient,unit:'px',format:[p0.width,p0.height],compress:true,hotfixes:['px_scaling']});
-  job.photos.forEach((it,i)=>{
-    const p=d.getImageProperties(it.img),o=p.width>=p.height?'landscape':'portrait';
+  
+  for(let i=0;i<job.photos.length;i++){
+    const it=job.photos[i];
+    let p;
+    try{
+      p=d.getImageProperties(it.img);
+    }catch(e){
+      p=p0;
+    }
+    const o=p.width>=p.height?'landscape':'portrait';
     if(i)d.addPage([p.width,p.height],o);
     d.addImage(it.img,'JPEG',0,0,p.width,p.height,undefined,'FAST');
-  });
-  const a=job.photos[0]?.km||'0',z=job.photos.at(-1)?.km||'0';
-  await savePdfSilently(d.output('blob'),`Relatorio_KM_${a}_a_${z}.pdf`.replace(/[,/]/g,'_'));
+    it.img=null; // Libera memória da string base64 individual imediatamente
+  }
+  
+  const a=job.photos[0]?.km||'0',z=job.photos[job.photos.length-1]?.km||'0';
+  const blob = d.output('blob');
+  await savePdfSilently(blob,`Relatorio_Lote_${job.batchNo}_KM_${a}_a_${z}.pdf`.replace(/[,/]/g,'_'));
+  job.photos=null; // Libera o array completo do lote
 }
 
 async function savePdfSilently(blob,name){
