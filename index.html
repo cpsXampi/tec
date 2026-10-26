@@ -739,6 +739,8 @@ async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
+  
+  // Barra inferior com as informações de rodovia, data, hora e GPS
   const bh = h * .13;
   const grad = ctx.createLinearGradient(0, h - bh, 0, h);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
@@ -747,13 +749,58 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.fillStyle = grad;
   ctx.fillRect(0, h - bh, w, bh);
 
-
   ctx.fillStyle = '#fff';
   ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
-  ctx.fillText('KM ' + kmVal + (label ? ' - ' + label : ''), 20, h - bh * .55);
+  ctx.fillText('KM ' + kmVal, 20, h - bh * .55);
   ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,.7)';
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
+
+  // Placa Amarela no canto superior direito quando houver texto na etiqueta
+  if (label && label.trim().length > 0) {
+    const textUpper = label.trim().toUpperCase();
+    const fontSize = Math.round(h * 0.035);
+    ctx.font = 'bold ' + fontSize + 'px Arial, sans-serif';
+    
+    const textMetrics = ctx.measureText(textUpper);
+    const textWidth = textMetrics.width;
+    const paddingX = Math.round(fontSize * 0.8);
+    const paddingY = Math.round(fontSize * 0.5);
+    const boxWidth = textWidth + (paddingX * 2);
+    const boxHeight = fontSize + (paddingY * 2);
+    
+    const posX = w - boxWidth - 30;
+    const posY = 30;
+    const radius = 10;
+
+    ctx.save();
+    
+    // Sombra para a placa amarela
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 5;
+
+    // Fundo Amarelo
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.roundRect(posX, posY, boxWidth, boxHeight, radius);
+    ctx.fill();
+
+    // Borda preta da placa
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.08));
+    ctx.stroke();
+
+    // Texto em preto na placa
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(textUpper, posX + (boxWidth / 2), posY + (boxHeight / 2) + 1);
+
+    ctx.restore();
+  }
 }
 </script>
 <script>window.addEventListener('beforeunload',e=>{if(capturing||isRecordingVideo||pdfWorkerBusy||pdfQueue.length||sessionEnding){e.preventDefault();e.returnValue=''}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&isRecordingVideo)showToast('Gravação continua em segundo plano')});</script></body>
