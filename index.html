@@ -731,7 +731,7 @@ async function generateBatchPDF(job){
  if(!job.photos.length||!window.jspdf?.jsPDF)return;const {jsPDF}=window.jspdf,tmp=new jsPDF(),p0=tmp.getImageProperties(job.photos[0].img);const orient=p0.width>=p0.height?'landscape':'portrait';const d=new jsPDF({orientation:orient,unit:'px',format:[p0.width,p0.height],compress:true,hotfixes:['px_scaling']});
  job.photos.forEach((it,i)=>{const p=d.getImageProperties(it.img),o=p.width>=p.height?'landscape':'portrait';if(i)d.addPage([p.width,p.height],o);d.addImage(it.img,'JPEG',0,0,p.width,p.height,undefined,'FAST')});const a=job.photos[0]?.km||'0',z=job.photos.at(-1)?.km||'0',s=job.final?'_FINAL':'';await savePdfSilently(d.output('blob'),`Relatorio_${sessionStamp}_Lote_${String(job.batchNo).padStart(3,'0')}${s}_KM_${a}_a_${z}.pdf`.replace(/[,/]/g,'_'))
 }
-async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(blob);await w.close()}
+async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(blob);await w.close();showQuickPhotoToast('Salvo: '+name)}
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
