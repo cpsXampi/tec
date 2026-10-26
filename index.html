@@ -35,15 +35,52 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH SIMPLES E RÁPIDO ===== */
+/* ===== SPLASH ORIGINAL CINEMÁTICO INTEGRADO ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
   display: flex; align-items: center; justify-content: center;
-  background: #050609; overflow: hidden;
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  background: radial-gradient(circle at 50% 30%, #111622 0%, #030406 70%);
+  overflow: hidden;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#splash.done { opacity: 0; transform: scale(1.04); pointer-events: none; }
-#sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#splash.done { opacity: 0; transform: scale(1.08); pointer-events: none; }
+#sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+
+/* HUD flutuante do splash sincronizado com os ícones */
+.sp-hud-km {
+  position: absolute; top: calc(24px + var(--safe-t)); left: 20px; min-width: 140px;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(4,120,87,0.85); padding: 8px 16px; text-align: center;
+  backdrop-filter: blur(12px); z-index: 5; pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.sp-hud-km .h-l { font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; color: rgba(220,252,231,0.7); }
+.sp-hud-km .h-v { font-size: 22px; font-weight: 900; line-height: 1.1; margin-top: 2px; color: #fff; }
+
+.sp-rec-badge {
+  position: absolute; top: calc(24px + var(--safe-t)); right: 20px;
+  display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.75); padding: 8px 14px; border-radius: 20px;
+  backdrop-filter: blur(10px); z-index: 5; pointer-events: none;
+}
+.sp-rec-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: spBlink 0.8s infinite; }
+@keyframes spBlink { 50% { opacity: .1; } }
+.sp-rec-badge span { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: #fff; }
+
+/* Ícones flutuantes do menu nascendo no final do splash */
+.sp-morph-icons {
+  position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 20px; z-index: 10; pointer-events: none; opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.sp-morph-icons.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.sp-mini-icon {
+  width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+}
+.sp-mini-icon.pri { background: linear-gradient(145deg, #ffd600, #b89500); color: #050608; }
+.sp-mini-icon.sec { background: linear-gradient(145deg, #34d399, #047857); color: #050608; }
+.sp-mini-icon svg { width: 30px; height: 30px; }
 
 /* ===== MAIN MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:calc(28px + var(--safe-t)) 20px calc(28px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(255,214,0,.08),transparent 35%),linear-gradient(180deg,#090b0f,#050609);overflow-y:auto}
@@ -165,9 +202,28 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH SIMPLES E RÁPIDO (~1.2 SEGUNDO) -->
+<!-- SPLASH ORIGINAL CINEMÁTICO COM MORPHING PARA OS ÍCONES -->
 <div id="splash" aria-hidden="true">
   <canvas id="sp-canvas"></canvas>
+  
+  <div class="sp-hud-km">
+    <span class="h-l">KM atual</span>
+    <p class="h-v" id="spHudKmTxt">KM 116,40</p>
+  </div>
+  
+  <div class="sp-rec-badge">
+    <div class="dot"></div>
+    <span>Registrando no PDF</span>
+  </div>
+
+  <div class="sp-morph-icons" id="spMorphIcons">
+    <div class="sp-mini-icon pri">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>
+    </div>
+    <div class="sp-mini-icon sec">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    </div>
+  </div>
 </div>
 
 <!-- MENU -->
@@ -289,8 +345,8 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH MOTOR SIMPLES E RÁPIDO (~1.2 SEG) ===== */
-(function initSimpleSplash() {
+/* ===== SPLASH MOTOR ORIGINAL + MORPHING PARA OS ÍCONES ===== */
+(function initOriginalSplashWithIcons() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -303,70 +359,151 @@ canvas#c, canvas#cUnica{display:none}
     h = canvas.height = window.innerHeight;
   });
 
-  const DURATION = 1200; // 1.2 segundo ultra rápido
+  const DURATION = 3200; // 3.2 segundos de espetáculo na rodovia
   let startTime = null;
   let animId;
+
+  const signsList = [
+    { text: 'BR-116 DUTRA', sub: 'TRECHO SP-RIO' },
+    { text: 'KM 116.0', sub: 'VISTORIA ILUMINAÇÃO' },
+    { text: 'SÃO PAULO', sub: 'SAÍDA CAPITAL' },
+    { text: 'KM 116.4', sub: 'POSTE #084' },
+    { text: 'GUARULHOS', sub: 'KM 215' },
+    { text: 'KM 117.0', sub: 'INSPEÇÃO AUTOMÁTICA' },
+    { text: 'S. J. DOS CAMPOS', sub: 'KM 148' },
+    { text: 'KM 117.5', sub: 'FOTO REGISTRADA' }
+  ];
+
+  const objectsOnRoad = Array.from({ length: 35 }, (_, idx) => ({
+    x: (Math.random() - 0.5) * w * 3,
+    y: (Math.random() - 0.5) * h * 2,
+    z: Math.random() * w + 30,
+    type: idx % 2 === 0 ? 'sign' : 'pole',
+    data: signsList[Math.floor(Math.random() * signsList.length)],
+    kmMark: (116.0 + Math.random() * 2.0).toFixed(2).replace('.', ',')
+  }));
 
   function render(ts) {
     if (!startTime) startTime = ts;
     const elapsed = ts - startTime;
     const progress = Math.min(elapsed / DURATION, 1);
 
+    const speedFactor = progress < 0.75 
+      ? 1.0 
+      : Math.max(0.05, 1.0 - Math.pow((progress - 0.75) / 0.25, 2) * 0.95);
+
     ctx.fillStyle = '#06070a';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
-    const cy = h / 2;
+    const cy = h * 0.48;
 
-    // Linhas rápidas de rodovia cruzando
+    // Pista e Iluminação da Rodovia
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(cx - 10, cy);
-    ctx.lineTo(cx + 10, cy);
-    ctx.lineTo(w * 1.5, h);
-    ctx.lineTo(-w * 0.5, h);
+    ctx.moveTo(cx - 35, cy);
+    ctx.lineTo(cx + 35, cy);
+    ctx.lineTo(w * 2, h);
+    ctx.lineTo(-w, h);
     ctx.closePath();
-    ctx.fillStyle = '#0c1017';
+    ctx.fillStyle = '#0a0e17';
     ctx.fill();
 
-    const speed = elapsed * 3.5;
+    const travelSpeed = elapsed * 2.2 * speedFactor;
     ctx.strokeStyle = '#ffd600';
     ctx.lineWidth = 4;
-    for (let i = 0; i < 6; i++) {
-      const p1 = ((speed + i * (h / 3)) % h);
-      const y1 = p1;
-      const y2 = y1 + 40 * (p1 / h);
+    for (let i = 0; i < 10; i++) {
+      const p1 = ((travelSpeed + i * (h / 4)) % (h - cy));
+      const y1 = cy + p1;
+      const y2 = y1 + 35 * (p1 / (h - cy));
       
       ctx.beginPath();
       ctx.moveTo(cx, y1);
       ctx.lineTo(cx, y2);
       ctx.stroke();
     }
+
+    for (let i = 0; i < 5; i++) {
+      const p1 = ((travelSpeed * 1.2 + i * (h / 3.5)) % (h - cy));
+      const y1 = cy + p1;
+      const scale = (y1 - cy) / (h - cy);
+      const xLeft = cx - (w * 0.7 * scale);
+
+      const gradL = ctx.createRadialGradient(xLeft, y1 - 30 * scale, 1, xLeft, y1 - 30 * scale, 50 * scale);
+      gradL.addColorStop(0, 'rgba(255, 214, 0, 0.7)');
+      gradL.addColorStop(1, 'rgba(255, 214, 0, 0)');
+      ctx.fillStyle = gradL;
+      ctx.fillRect(xLeft - 50, y1 - 80, 100, 100);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = Math.max(1, 2.5 * scale);
+      ctx.beginPath();
+      ctx.moveTo(xLeft, y1);
+      ctx.lineTo(xLeft, y1 - 32 * scale);
+      ctx.lineTo(xLeft + 10 * scale, y1 - 32 * scale);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(xLeft + 10 * scale, y1 - 32 * scale, Math.max(1.5, 3.5 * scale), 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
 
-    // Placa de KM passando rapidamente pelo centro
-    const scale = Math.min(progress * 2.5, 1.2);
-    ctx.save();
-    ctx.translate(cx, cy - 20);
-    ctx.scale(scale, scale);
+    objectsOnRoad.forEach(p => {
+      p.z -= (18 + (progress * 12)) * speedFactor;
+      if (p.z <= 0) {
+        p.z = w + 60;
+        p.x = (Math.random() - 0.5) * w * 3;
+        p.y = (Math.random() - 0.5) * h * 2;
+        p.kmMark = (116.0 + progress * 2.0).toFixed(2).replace('.', ',');
+      }
 
-    ctx.fillStyle = 'rgba(4, 115, 62, 0.95)';
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(-110, -40, 220, 80, 10);
-    ctx.fill();
-    ctx.stroke();
+      const scale = 220 / p.z;
+      const px = p.x * scale + cx;
+      const py = p.y * scale + cy;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 22px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('BR-116 DUTRA', 0, -6);
-    
-    ctx.font = 'bold 16px Arial, sans-serif';
-    ctx.fillStyle = '#ffd600';
-    ctx.fillText('KM 116,40', 0, 22);
-    ctx.restore();
+      if (px >= -100 && px <= w + 100 && py >= -100 && py <= h + 100) {
+        ctx.save();
+        ctx.translate(px, py);
+
+        if (p.type === 'sign') {
+          const bw = 120 * scale;
+          const bh = 46 * scale;
+          ctx.fillStyle = 'rgba(4, 115, 62, 0.9)';
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = Math.max(1, 1.5 * scale);
+          ctx.beginPath();
+          ctx.roundRect(-bw/2, -bh/2, bw, bh, 5 * scale);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `bold ${Math.max(8, 11 * scale)}px Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(p.data.text, 0, -3 * scale);
+          ctx.font = `${Math.max(6, 7.5 * scale)}px Arial, sans-serif`;
+          ctx.fillStyle = '#ffd600';
+          ctx.fillText(p.data.sub, 0, 10 * scale);
+        } else {
+          ctx.font = `900 ${Math.max(14, 24 * scale)}px Arial, sans-serif`;
+          ctx.fillStyle = '#ffd600';
+          ctx.shadowBlur = 12 * scale;
+          ctx.shadowColor = '#ffd600';
+          ctx.fillText(`KM ${p.kmMark}`, 0, 0);
+        }
+        ctx.restore();
+      }
+    });
+
+    const currentKmSim = (116.0 + progress * 1.85).toFixed(2).replace('.', ',');
+    const spHudKmTxt = document.getElementById('spHudKmTxt');
+    if (spHudKmTxt) spHudKmTxt.textContent = `KM ${currentKmSim}`;
+
+    // Mostra os ícones do menu no terço final para fazer a correlação visual
+    if (progress > 0.7) {
+      document.getElementById('spMorphIcons').classList.add('show');
+    }
 
     if (progress < 1) {
       animId = requestAnimationFrame(render);
@@ -377,7 +514,7 @@ canvas#c, canvas#cUnica{display:none}
         setTimeout(() => {
           sp.remove();
           cancelAnimationFrame(animId);
-        }, 400);
+        }, 600);
       }
     }
   }
