@@ -208,7 +208,7 @@ canvas#c, canvas#cUnica{display:none}
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
   <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
-    <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)"></span>
+    <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)">KM atual</span>
     <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
   </div>
   
@@ -265,7 +265,7 @@ canvas#c, canvas#cUnica{display:none}
       <button class="settings-close" onclick="toggleSet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSel" onchange="switchCam(this.value)"></select></div>
-      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="200" min="100" step="50"></div>
+      <div class="s-group"><label class="s-lbl">Intervalo de captura (ms)</label><input type="number" class="s-inp" id="cfgInt" value="150" min="100" step="50"></div>
       <div class="s-group"><label class="s-lbl">Fotos por lote</label><input type="number" class="s-inp" id="cfgLote" value="150" min="1" max="500" step="1"></div>
     </div>
   </div>
@@ -302,6 +302,22 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
+// Registro automático de Service Worker para funcionamento 100% Offline (PWA)
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    self.addEventListener('install', e => { self.skipWaiting(); });
+    self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        fetch(e.request).catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'text/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const sp = document.getElementById('splash');
@@ -327,7 +343,7 @@ let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
 let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, sessionStamp='', savedBatchCount=0;
-const REPORT_JPEG_QUALITY=0.82; // Qualidade otimizada para máxima velocidade de salvamento e arquivo leve
+const REPORT_JPEG_QUALITY=0.82;
 
 async function chooseDirectoryForModule() {
   dirHandle = null;
@@ -423,20 +439,33 @@ async function openMod(id) {
   if (id === 'foto-unica') await initFotoUnica();
 }
 
+// Carregamento e Caching Offline da Base SNV no localStorage
 async function loadKm() {
+  let t = null;
   try {
     let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-    if (!r?.ok) return;
-    let t = await r.text();
-    if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
-    const lines = t.split(/\r?\n/).filter(l => l.trim());
-    const h = lines.shift().split(';');
-    const iKm = findCol(h, ['km']), iLat = findCol(h, ['lat', 'latitude']), iLon = findCol(h, ['lon', 'long', 'longitude']);
-    kmDB = lines.map(l => {
-      const r = l.split(';');
-      return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
-    }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
+    if (r && r.ok) {
+      t = await r.text();
+      if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
+      try { localStorage.setItem('snv_csv_data', t); } catch(e){}
+    }
   } catch (e) { console.error(e); }
+
+  if (!t) {
+    try { t = localStorage.getItem('snv_csv_data'); } catch(e){}
+  }
+
+  if (t) {
+    const lines = t.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length > 0) {
+      const h = lines.shift().split(';');
+      const iKm = findCol(h, ['km']), iLat = findCol(h, ['lat', 'latitude']), iLon = findCol(h, ['lon', 'long', 'longitude']);
+      kmDB = lines.map(l => {
+        const r = l.split(';');
+        return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
+      }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
+    }
+  }
 }
 loadKm();
 
