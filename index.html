@@ -35,29 +35,58 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH HIGH-SPEED HIGHWAY ===== */
+/* ===== SPLASH DRONE FLYOVER HIGHWAY ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #000; overflow: hidden;
-  transition: opacity 0.2s linear, transform 0.2s ease-out;
+  background: #020305; overflow: hidden;
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
-#splash.done { opacity: 0; transform: scale(1.1); pointer-events: none; }
+#splash.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
 #sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
-.sp-hud-overlay {
+.sp-drone-hud {
   position: relative; z-index: 2; pointer-events: none;
   display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 24px 32px; border-radius: 20px;
+  background: rgba(6, 8, 12, 0.62);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,214,0,0.08);
 }
+
+.sp-drone-tag {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  font-family: monospace; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.25em; color: #ffd600; text-transform: uppercase;
+}
+
+.sp-live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
+  box-shadow: 0 0 10px #ef4444; animation: spBlink 0.6s infinite alternate;
+}
+@keyframes spBlink { from { opacity: 0.2; } to { opacity: 1; } }
+
 .sp-title-main {
-  font-size: clamp(28px, 8vw, 44px); font-weight: 950; letter-spacing: -0.03em;
-  color: #fff; text-transform: uppercase;
-  text-shadow: 0 0 20px #ffd600, 0 0 40px rgba(255, 214, 0, 0.6);
-  animation: spPulseTitle 0.15s infinite alternate;
+  font-size: clamp(26px, 7vw, 38px); font-weight: 950; letter-spacing: -0.02em;
+  color: #fff; text-transform: uppercase; line-height: 1; margin-bottom: 16px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.9);
 }
-@keyframes spPulseTitle {
-  from { transform: scale(0.98); }
-  to { transform: scale(1.02); }
+
+.sp-gps-box {
+  display: flex; flex-direction: column; gap: 4px;
+  font-family: monospace; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85);
+  margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.sp-progress-track {
+  width: 220px; height: 4px; background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px; overflow: hidden; position: relative;
+  box-shadow: 0 0 8px rgba(255,214,0,0.2);
+}
+.sp-progress-bar {
+  height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #ffd600);
+  transform-origin: left; transform: scaleX(0);
 }
 
 /* ===== MAIN MENU ===== */
@@ -180,11 +209,22 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH PSICODÉLICO DE HIGH-SPEED HIGHWAY -->
+<!-- SPLASH DRONE FLYOVER HIGHWAY (10 SEGUNDOS) -->
 <div id="splash" aria-hidden="true">
   <canvas id="sp-canvas"></canvas>
-  <div class="sp-hud-overlay">
-    <div class="sp-title-main">INSPEÇÃO MÓVEL</div>
+  <div class="sp-drone-hud">
+    <div class="sp-drone-tag">
+      <div class="sp-live-dot"></div>
+      <span>DRONE FPV · INSPEÇÃO DE CAMPO</span>
+    </div>
+    <div class="sp-title-main">KM REPORT ULTIMATE</div>
+    <div class="sp-gps-box">
+      <span id="spGpsTxt">GPS: -23.184920, -45.882104</span>
+      <span id="spKmTxt" style="color:#ffd600; font-size:14px; font-weight:900;">KM 0.00</span>
+    </div>
+    <div class="sp-progress-track">
+      <div class="sp-progress-bar" id="spProgressBar"></div>
+    </div>
   </div>
 </div>
 
@@ -307,8 +347,8 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH PSICODÉLICO HIPER-RODOVIA (3D SPEED) ===== */
-(function initCrazyHighwaySplash() {
+/* ===== SPLASH MOTOR: DRONE FLYOVER HIGHWAY 3D (10 SEGUNDOS) ===== */
+(function initDroneFlyoverSplash() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -322,102 +362,181 @@ canvas#c, canvas#cUnica{display:none}
     h = canvas.height = window.innerHeight;
   });
 
-  const duration = 1450; // Super rápido (~1.4s)
+  const DURATION = 10000; // 10 Segundos completos de exibição
   let startTime = null;
   let animId;
 
-  // Elementos Voadores
-  const textsPool = ['KM 0', 'KM 116', 'KM 232', 'RIO', 'SÃO PAULO', 'BR-116', 'DUTRA', 'POSTE #84', 'ILUMINAÇÃO', 'PDF GENERATED', 'INSPEÇÃO', 'GPS SYNC'];
-  const particles = Array.from({ length: 120 }, () => ({
-    x: (Math.random() - 0.5) * w * 3,
-    y: (Math.random() - 0.5) * h * 3,
-    z: Math.random() * w,
-    type: Math.random() > 0.4 ? 'text' : (Math.random() > 0.5 ? 'pole' : 'num'),
-    val: textsPool[Math.floor(Math.random() * textsPool.length)],
-    color: ['#ffd600', '#ff0055', '#00f0ff', '#34d399', '#ffffff'][Math.floor(Math.random() * 5)],
-    size: Math.random() * 20 + 14
+  // Cidades, Placas Rodoviárias e Marcos Físicos do Sistema
+  const signPool = [
+    { text: 'BR-116 DUTRA', sub: 'SÃO PAULO / RIO' },
+    { text: 'KM 0.00', sub: 'INÍCIO TRECHO' },
+    { text: 'SÃO PAULO', sub: 'CAPITAL' },
+    { text: 'KM 45.2', sub: 'POSTE ILUMINAÇÃO #102' },
+    { text: 'GUARULHOS', sub: 'KM 215' },
+    { text: 'KM 88.0', sub: 'VISTORIA ILUMINAÇÃO' },
+    { text: 'S. J. DOS CAMPOS', sub: 'KM 148' },
+    { text: 'TAUBATÉ', sub: 'KM 111' },
+    { text: 'KM 130.5', sub: 'INSPEÇÃO FOTOGRÁFICA' },
+    { text: 'PINDAMONHANGABA', sub: 'KM 99' },
+    { text: 'RESENDE', sub: 'KM 30' },
+    { text: 'VOLTA REDONDA', sub: 'KM 12' },
+    { text: 'KM 232.0', sub: 'FIM TRECHO RIO' }
+  ];
+
+  // Partículas 3D (Placas, Postes de Iluminação, Números voando)
+  const elements = Array.from({ length: 90 }, (_, idx) => ({
+    x: (Math.random() - 0.5) * w * 3.5,
+    y: (Math.random() - 0.5) * h * 2.5,
+    z: Math.random() * w + 50,
+    type: idx % 3 === 0 ? 'sign' : (idx % 3 === 1 ? 'pole' : 'num'),
+    val: signPool[Math.floor(Math.random() * signPool.length)],
+    kmNum: (Math.random() * 232).toFixed(1),
+    color: ['#ffd600', '#00f0ff', '#10b981', '#ffffff', '#ff3366'][Math.floor(Math.random() * 5)]
   }));
 
   function render(ts) {
     if (!startTime) startTime = ts;
-    const progress = Math.min((ts - startTime) / duration, 1);
+    const elapsed = ts - startTime;
+    const progress = Math.min(elapsed / DURATION, 1);
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    // Fundo Escuro Cibernético / Noturno
+    ctx.fillStyle = '#020305';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
-    const cy = h / 2;
+    const cy = h * 0.42; // Linha do Horizonte do Drone
 
-    // 1. RODOVIA EM MOVIMENTO (PERSPECTIVA 3D)
+    // 1. RODOVIA EM 3D (VISÃO DO DRONE VISTORIADOR)
     ctx.save();
-    ctx.translate(cx, h);
     
-    // Pistas
+    // Pista Principal
     ctx.beginPath();
-    ctx.moveTo(-w * 1.5, 0);
-    ctx.lineTo(-20, -h);
-    ctx.lineTo(20, -h);
-    ctx.lineTo(w * 1.5, 0);
-    ctx.fillStyle = '#0a0d11';
+    ctx.moveTo(cx - 20, cy);
+    ctx.lineTo(cx + 20, cy);
+    ctx.lineTo(w * 1.8, h);
+    ctx.lineTo(-w * 0.8, h);
+    ctx.closePath();
+    ctx.fillStyle = '#0b0e14';
     ctx.fill();
 
-    // Faixas da Rodovia
-    const roadSpeed = ts * 2.5;
+    // Asfalto / Acostamento
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Faixa Amarela Central Descontinua (Movimento Contínuo)
+    const roadSpeed = elapsed * 1.8;
     ctx.strokeStyle = '#ffd600';
-    ctx.lineWidth = 6;
-    for (let i = 0; i < 10; i++) {
-      const y1 = -((roadSpeed + i * (h / 6)) % h);
-      const y2 = y1 - 40;
+    ctx.lineWidth = 4;
+    for (let i = 0; i < 14; i++) {
+      const p1 = ((roadSpeed + i * (h / 8)) % (h - cy));
+      const y1 = cy + p1;
+      const y2 = y1 + 25 * (p1 / (h - cy));
+      const scaleX = (y1 - cy) / (h - cy);
+      const x1 = cx;
+      
       ctx.beginPath();
-      ctx.moveTo(0, y1);
-      ctx.lineTo(0, y2);
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1, y2);
       ctx.stroke();
+    }
+
+    // 2. POSTES DE ILUMINAÇÃO DUPLOS PASSANDO NAS LATERAIS
+    for (let i = 0; i < 8; i++) {
+      const p1 = ((roadSpeed * 1.2 + i * (h / 5)) % (h - cy));
+      const y1 = cy + p1;
+      const scale = (y1 - cy) / (h - cy);
+      const xLeft = cx - (w * 0.7 * scale);
+      const xRight = cx + (w * 0.7 * scale);
+      
+      // Haste e Lâmpada Esquerda
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = Math.max(1, 3 * scale);
+      ctx.beginPath();
+      ctx.moveTo(xLeft, y1);
+      ctx.lineTo(xLeft, y1 - 40 * scale);
+      ctx.lineTo(xLeft + 15 * scale, y1 - 40 * scale);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffd600';
+      ctx.beginPath();
+      ctx.arc(xLeft + 15 * scale, y1 - 40 * scale, Math.max(2, 5 * scale), 0, Math.PI * 2);
+      ctx.fill();
+
+      // Haste e Lâmpada Direita
+      ctx.beginPath();
+      ctx.moveTo(xRight, y1);
+      ctx.lineTo(xRight, y1 - 40 * scale);
+      ctx.lineTo(xRight - 15 * scale, y1 - 40 * scale);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(xRight - 15 * scale, y1 - 40 * scale, Math.max(2, 5 * scale), 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.restore();
 
-    // 2. TEXTOS, NÚMEROS E POSTES SAINDO DA TELA (EFEITO EXPLOSIVO)
-    particles.forEach(p => {
-      p.z -= 28 + (progress * 30); // Aceleração contínua
+    // 3. ELEMETOS 3D VOANDO EM DIREÇÃO À TELA (PLACAS E KM)
+    elements.forEach(p => {
+      p.z -= 18 + (progress * 15); // Voo do drone se aproximando
       if (p.z <= 0) {
-        p.z = w;
-        p.x = (Math.random() - 0.5) * w * 3;
-        p.y = (Math.random() - 0.5) * h * 3;
-        if (p.type === 'num') p.val = 'KM ' + Math.floor(Math.random() * 232);
+        p.z = w + 100;
+        p.x = (Math.random() - 0.5) * w * 3.5;
+        p.y = (Math.random() - 0.5) * h * 2.5;
+        p.kmNum = (Math.random() * 232).toFixed(1);
       }
 
-      const scale = 300 / p.z;
+      const scale = 250 / p.z;
       const px = p.x * scale + cx;
       const py = p.y * scale + cy;
 
-      if (px >= -100 && px <= w + 100 && py >= -100 && py <= h + 100) {
+      if (px >= -150 && px <= w + 150 && py >= -150 && py <= h + 150) {
         ctx.save();
         ctx.translate(px, py);
-        
-        if (p.type === 'pole') {
-          // Postes de Iluminação Voando nas Laterais
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = 2 * scale;
+
+        if (p.type === 'sign') {
+          // Placa Verde de Rodovia
+          const bw = 140 * scale;
+          const bh = 55 * scale;
+          ctx.fillStyle = 'rgba(5, 120, 70, 0.88)';
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = Math.max(1, 2 * scale);
           ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(0, -60 * scale);
-          ctx.lineTo(30 * scale, -60 * scale);
+          ctx.roundRect(-bw/2, -bh/2, bw, bh, 6 * scale);
+          ctx.fill();
           ctx.stroke();
 
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `bold ${Math.max(8, 12 * scale)}px Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(p.val.text, 0, -5 * scale);
+          ctx.font = `${Math.max(6, 8 * scale)}px Arial, sans-serif`;
           ctx.fillStyle = '#ffd600';
-          ctx.beginPath();
-          ctx.arc(30 * scale, -60 * scale, 8 * scale, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          // Números de KM e Palavras Explodindo
-          ctx.font = `900 ${Math.max(10, p.size * scale)}px Arial, sans-serif`;
+          ctx.fillText(p.val.sub, 0, 12 * scale);
+        } else if (p.type === 'num') {
+          // Números de KM Flutuantes
+          ctx.font = `900 ${Math.max(12, 28 * scale)}px Arial, sans-serif`;
           ctx.fillStyle = p.color;
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = 12 * scale;
           ctx.shadowColor = p.color;
-          ctx.fillText(p.val, 0, 0);
+          ctx.fillText(`KM ${p.kmNum}`, 0, 0);
         }
         ctx.restore();
       }
     });
+
+    // 4. ATUALIZAÇÃO DOS DADOS DO HUD EM TEMPO REAL
+    const kmVal = (progress * 232.0).toFixed(2);
+    const latSim = (-23.1849 - progress * 0.4).toFixed(6);
+    const lonSim = (-45.8821 + progress * 0.5).toFixed(6);
+
+    const spKmTxt = document.getElementById('spKmTxt');
+    const spGpsTxt = document.getElementById('spGpsTxt');
+    const spProgressBar = document.getElementById('spProgressBar');
+
+    if (spKmTxt) spKmTxt.textContent = `KM ${kmVal.replace('.', ',')}`;
+    if (spGpsTxt) spGpsTxt.textContent = `GPS: ${latSim}, ${lonSim}`;
+    if (spProgressBar) spProgressBar.style.transform = `scaleX(${progress})`;
 
     if (progress < 1) {
       animId = requestAnimationFrame(render);
@@ -428,7 +547,7 @@ canvas#c, canvas#cUnica{display:none}
         setTimeout(() => {
           sp.remove();
           cancelAnimationFrame(animId);
-        }, 200);
+        }, 400);
       }
     }
   }
