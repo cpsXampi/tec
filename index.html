@@ -35,56 +35,48 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH DRONE FLYOVER HIGHWAY ===== */
+/* ===== SPLASH CINEMATIC MATRIX (3 SEGUNDOS) ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #020305; overflow: hidden;
-  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  background: #000; overflow: hidden;
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
-#splash.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
+#splash.done { opacity: 0; transform: scale(1.08); pointer-events: none; }
 #sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
-.sp-drone-hud {
+.sp-hud-box {
   position: relative; z-index: 2; pointer-events: none;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  padding: 24px 32px; border-radius: 20px;
-  background: rgba(6, 8, 12, 0.62);
-  border: 1px solid rgba(255, 214, 0, 0.3);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,214,0,0.08);
+  padding: 24px 36px; border-radius: 20px;
+  background: rgba(5, 7, 10, 0.75);
+  border: 1px solid rgba(255, 214, 0, 0.35);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(255,214,0,0.1);
 }
 
-.sp-drone-tag {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
-  font-family: monospace; font-size: 11px; font-weight: 800;
-  letter-spacing: 0.25em; color: #ffd600; text-transform: uppercase;
+.sp-status-tag {
+  font-family: monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.3em;
+  color: #10b981; text-transform: uppercase; margin-bottom: 8px;
 }
-
-.sp-live-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #ef4444;
-  box-shadow: 0 0 10px #ef4444; animation: spBlink 0.6s infinite alternate;
-}
-@keyframes spBlink { from { opacity: 0.2; } to { opacity: 1; } }
 
 .sp-title-main {
-  font-size: clamp(26px, 7vw, 38px); font-weight: 950; letter-spacing: -0.02em;
-  color: #fff; text-transform: uppercase; line-height: 1; margin-bottom: 16px;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+  font-size: clamp(28px, 7vw, 40px); font-weight: 950; letter-spacing: -0.02em;
+  color: #fff; text-transform: uppercase; line-height: 1; margin-bottom: 12px;
+  text-shadow: 0 0 20px rgba(255,214,0,0.5);
 }
 
-.sp-gps-box {
+.sp-data-stream {
   display: flex; flex-direction: column; gap: 4px;
-  font-family: monospace; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85);
-  margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  font-family: monospace; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.8);
+  margin-bottom: 16px;
 }
 
-.sp-progress-track {
-  width: 220px; height: 4px; background: rgba(255, 255, 255, 0.12);
+.sp-bar-track {
+  width: 200px; height: 3px; background: rgba(255, 255, 255, 0.1);
   border-radius: 99px; overflow: hidden; position: relative;
-  box-shadow: 0 0 8px rgba(255,214,0,0.2);
 }
-.sp-progress-bar {
+.sp-bar-fill {
   height: 100%; width: 100%; background: linear-gradient(90deg, #10b981, #ffd600);
   transform-origin: left; transform: scaleX(0);
 }
@@ -209,21 +201,18 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH DRONE FLYOVER HIGHWAY (10 SEGUNDOS) -->
+<!-- SPLASH CINEMATIC MATRIX (3 SEGUNDOS) -->
 <div id="splash" aria-hidden="true">
   <canvas id="sp-canvas"></canvas>
-  <div class="sp-drone-hud">
-    <div class="sp-drone-tag">
-      <div class="sp-live-dot"></div>
-      <span>DRONE FPV · INSPEÇÃO DE CAMPO</span>
+  <div class="sp-hud-box">
+    <div class="sp-status-tag" id="spStatusTag">INICIALIZANDO SISTEMA...</div>
+    <div class="sp-title-main">KM REPORT</div>
+    <div class="sp-data-stream">
+      <span id="spGpsStream">GPS: -23.184920, -45.882104</span>
+      <span id="spKmStream" style="color:#ffd600; font-size:13px; font-weight:900;">KM 0.00</span>
     </div>
-    <div class="sp-title-main">KM REPORT ULTIMATE</div>
-    <div class="sp-gps-box">
-      <span id="spGpsTxt">GPS: -23.184920, -45.882104</span>
-      <span id="spKmTxt" style="color:#ffd600; font-size:14px; font-weight:900;">KM 0.00</span>
-    </div>
-    <div class="sp-progress-track">
-      <div class="sp-progress-bar" id="spProgressBar"></div>
+    <div class="sp-bar-track">
+      <div class="sp-bar-fill" id="spBarFill"></div>
     </div>
   </div>
 </div>
@@ -347,8 +336,8 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH MOTOR: DRONE FLYOVER HIGHWAY 3D (10 SEGUNDOS) ===== */
-(function initDroneFlyoverSplash() {
+/* ===== SPLASH MOTOR: MATRIX CAMERA LENTA & ILUMINAÇÃO DE RODOVIA (3 SEGUNDOS) ===== */
+(function initMatrixHighwaySplash() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -362,36 +351,31 @@ canvas#c, canvas#cUnica{display:none}
     h = canvas.height = window.innerHeight;
   });
 
-  const DURATION = 10000; // 10 Segundos completos de exibição
+  const DURATION = 3000; // Duração exata de 3 segundos
   let startTime = null;
   let animId;
 
-  // Cidades, Placas Rodoviárias e Marcos Físicos do Sistema
-  const signPool = [
-    { text: 'BR-116 DUTRA', sub: 'SÃO PAULO / RIO' },
+  // Placas de Sinalização de Rodovia, Cidades e Postes de Iluminação
+  const itemsPool = [
+    { text: 'BR-116 DUTRA', sub: 'SP - RIO' },
     { text: 'KM 0.00', sub: 'INÍCIO TRECHO' },
     { text: 'SÃO PAULO', sub: 'CAPITAL' },
-    { text: 'KM 45.2', sub: 'POSTE ILUMINAÇÃO #102' },
-    { text: 'GUARULHOS', sub: 'KM 215' },
-    { text: 'KM 88.0', sub: 'VISTORIA ILUMINAÇÃO' },
+    { text: 'ILUMINAÇÃO', sub: 'POSTE #142' },
+    { text: 'GUARULHOS', sub: 'KM 210' },
     { text: 'S. J. DOS CAMPOS', sub: 'KM 148' },
+    { text: 'INSPEÇÃO', sub: 'FOTOGRÁFICA' },
     { text: 'TAUBATÉ', sub: 'KM 111' },
-    { text: 'KM 130.5', sub: 'INSPEÇÃO FOTOGRÁFICA' },
-    { text: 'PINDAMONHANGABA', sub: 'KM 99' },
     { text: 'RESENDE', sub: 'KM 30' },
-    { text: 'VOLTA REDONDA', sub: 'KM 12' },
-    { text: 'KM 232.0', sub: 'FIM TRECHO RIO' }
+    { text: 'KM 232.0', sub: 'FIM DO TRECHO' }
   ];
 
-  // Partículas 3D (Placas, Postes de Iluminação, Números voando)
-  const elements = Array.from({ length: 90 }, (_, idx) => ({
-    x: (Math.random() - 0.5) * w * 3.5,
-    y: (Math.random() - 0.5) * h * 2.5,
-    z: Math.random() * w + 50,
-    type: idx % 3 === 0 ? 'sign' : (idx % 3 === 1 ? 'pole' : 'num'),
-    val: signPool[Math.floor(Math.random() * signPool.length)],
-    kmNum: (Math.random() * 232).toFixed(1),
-    color: ['#ffd600', '#00f0ff', '#10b981', '#ffffff', '#ff3366'][Math.floor(Math.random() * 5)]
+  const particles = Array.from({ length: 50 }, (_, idx) => ({
+    x: (Math.random() - 0.5) * w * 3,
+    y: (Math.random() - 0.5) * h * 2,
+    z: Math.random() * w + 40,
+    type: idx % 2 === 0 ? 'sign' : 'pole',
+    val: itemsPool[Math.floor(Math.random() * itemsPool.length)],
+    kmNum: (Math.random() * 232).toFixed(1)
   }));
 
   function render(ts) {
@@ -399,40 +383,40 @@ canvas#c, canvas#cUnica{display:none}
     const elapsed = ts - startTime;
     const progress = Math.min(elapsed / DURATION, 1);
 
-    // Fundo Escuro Cibernético / Noturno
+    // EFEITO MATRIX DE CÂMERA LENTA NO FINAL:
+    // Começa ultrarrápido e desacelera exponencialmente nos últimos 30% do tempo (Matrix slow-motion)
+    const speedFactor = progress < 0.7 
+      ? 1.0 
+      : Math.max(0.05, 1.0 - Math.pow((progress - 0.7) / 0.3, 2) * 0.95);
+
+    // Fundo Preto Profundo
     ctx.fillStyle = '#020305';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
-    const cy = h * 0.42; // Linha do Horizonte do Drone
+    const cy = h * 0.45;
 
-    // 1. RODOVIA EM 3D (VISÃO DO DRONE VISTORIADOR)
+    // 1. PISTA E ILUMINAÇÃO DE RODOVIA
     ctx.save();
     
-    // Pista Principal
+    // Asfalto
     ctx.beginPath();
-    ctx.moveTo(cx - 20, cy);
-    ctx.lineTo(cx + 20, cy);
+    ctx.moveTo(cx - 30, cy);
+    ctx.lineTo(cx + 30, cy);
     ctx.lineTo(w * 1.8, h);
     ctx.lineTo(-w * 0.8, h);
     ctx.closePath();
-    ctx.fillStyle = '#0b0e14';
+    ctx.fillStyle = '#080a0f';
     ctx.fill();
 
-    // Asfalto / Acostamento
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Faixa Amarela Central Descontinua (Movimento Contínuo)
-    const roadSpeed = elapsed * 1.8;
+    // Faixa central amarela com movimento em câmera lenta dinâmico
+    const roadSpeed = elapsed * 1.5 * speedFactor;
     ctx.strokeStyle = '#ffd600';
     ctx.lineWidth = 4;
-    for (let i = 0; i < 14; i++) {
-      const p1 = ((roadSpeed + i * (h / 8)) % (h - cy));
+    for (let i = 0; i < 12; i++) {
+      const p1 = ((roadSpeed + i * (h / 6)) % (h - cy));
       const y1 = cy + p1;
-      const y2 = y1 + 25 * (p1 / (h - cy));
-      const scaleX = (y1 - cy) / (h - cy);
+      const y2 = y1 + 30 * (p1 / (h - cy));
       const x1 = cx;
       
       ctx.beginPath();
@@ -441,52 +425,49 @@ canvas#c, canvas#cUnica{display:none}
       ctx.stroke();
     }
 
-    // 2. POSTES DE ILUMINAÇÃO DUPLOS PASSANDO NAS LATERAIS
-    for (let i = 0; i < 8; i++) {
-      const p1 = ((roadSpeed * 1.2 + i * (h / 5)) % (h - cy));
+    // Postes de Iluminação Lateral com Focos de Luz Reais
+    for (let i = 0; i < 6; i++) {
+      const p1 = ((roadSpeed * 1.1 + i * (h / 4)) % (h - cy));
       const y1 = cy + p1;
       const scale = (y1 - cy) / (h - cy);
-      const xLeft = cx - (w * 0.7 * scale);
-      const xRight = cx + (w * 0.7 * scale);
-      
-      // Haste e Lâmpada Esquerda
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      const xLeft = cx - (w * 0.65 * scale);
+      const xRight = cx + (w * 0.65 * scale);
+
+      // Glow / Feixe de luz da lâmpada do poste
+      const gradL = ctx.createRadialGradient(xLeft, y1 - 30 * scale, 2, xLeft, y1 - 30 * scale, 60 * scale);
+      gradL.addColorStop(0, 'rgba(255, 214, 0, 0.6)');
+      gradL.addColorStop(1, 'rgba(255, 214, 0, 0)');
+      ctx.fillStyle = gradL;
+      ctx.fillRect(xLeft - 60, y1 - 90, 120, 120);
+
+      // Haste do Poste
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
       ctx.lineWidth = Math.max(1, 3 * scale);
       ctx.beginPath();
       ctx.moveTo(xLeft, y1);
-      ctx.lineTo(xLeft, y1 - 40 * scale);
-      ctx.lineTo(xLeft + 15 * scale, y1 - 40 * scale);
+      ctx.lineTo(xLeft, y1 - 35 * scale);
+      ctx.lineTo(xLeft + 12 * scale, y1 - 35 * scale);
       ctx.stroke();
 
-      ctx.fillStyle = '#ffd600';
+      // Globo de luz
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(xLeft + 15 * scale, y1 - 40 * scale, Math.max(2, 5 * scale), 0, Math.PI * 2);
-      ctx.fill();
-
-      // Haste e Lâmpada Direita
-      ctx.beginPath();
-      ctx.moveTo(xRight, y1);
-      ctx.lineTo(xRight, y1 - 40 * scale);
-      ctx.lineTo(xRight - 15 * scale, y1 - 40 * scale);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(xRight - 15 * scale, y1 - 40 * scale, Math.max(2, 5 * scale), 0, Math.PI * 2);
+      ctx.arc(xLeft + 12 * scale, y1 - 35 * scale, Math.max(2, 4 * scale), 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
 
-    // 3. ELEMETOS 3D VOANDO EM DIREÇÃO À TELA (PLACAS E KM)
-    elements.forEach(p => {
-      p.z -= 18 + (progress * 15); // Voo do drone se aproximando
+    // 2. PLACAS E NÚMEROS VOANDO COM DESACELERAÇÃO MATRIX
+    particles.forEach(p => {
+      p.z -= (16 + (progress * 10)) * speedFactor;
       if (p.z <= 0) {
-        p.z = w + 100;
-        p.x = (Math.random() - 0.5) * w * 3.5;
-        p.y = (Math.random() - 0.5) * h * 2.5;
+        p.z = w + 80;
+        p.x = (Math.random() - 0.5) * w * 3;
+        p.y = (Math.random() - 0.5) * h * 2;
         p.kmNum = (Math.random() * 232).toFixed(1);
       }
 
-      const scale = 250 / p.z;
+      const scale = 220 / p.z;
       const px = p.x * scale + cx;
       const py = p.y * scale + cy;
 
@@ -496,47 +477,53 @@ canvas#c, canvas#cUnica{display:none}
 
         if (p.type === 'sign') {
           // Placa Verde de Rodovia
-          const bw = 140 * scale;
-          const bh = 55 * scale;
-          ctx.fillStyle = 'rgba(5, 120, 70, 0.88)';
+          const bw = 130 * scale;
+          const bh = 50 * scale;
+          ctx.fillStyle = 'rgba(4, 110, 60, 0.9)';
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = Math.max(1, 2 * scale);
           ctx.beginPath();
-          ctx.roundRect(-bw/2, -bh/2, bw, bh, 6 * scale);
+          ctx.roundRect(-bw/2, -bh/2, bw, bh, 5 * scale);
           ctx.fill();
           ctx.stroke();
 
           ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(8, 12 * scale)}px Arial, sans-serif`;
+          ctx.font = `bold ${Math.max(8, 11 * scale)}px Arial, sans-serif`;
           ctx.textAlign = 'center';
-          ctx.fillText(p.val.text, 0, -5 * scale);
-          ctx.font = `${Math.max(6, 8 * scale)}px Arial, sans-serif`;
+          ctx.fillText(p.val.text, 0, -4 * scale);
+          ctx.font = `${Math.max(6, 7 * scale)}px Arial, sans-serif`;
           ctx.fillStyle = '#ffd600';
-          ctx.fillText(p.val.sub, 0, 12 * scale);
-        } else if (p.type === 'num') {
-          // Números de KM Flutuantes
-          ctx.font = `900 ${Math.max(12, 28 * scale)}px Arial, sans-serif`;
-          ctx.fillStyle = p.color;
-          ctx.shadowBlur = 12 * scale;
-          ctx.shadowColor = p.color;
+          ctx.fillText(p.val.sub, 0, 10 * scale);
+        } else {
+          // Marcadores KM Gigantes
+          ctx.font = `900 ${Math.max(14, 26 * scale)}px Arial, sans-serif`;
+          ctx.fillStyle = '#ffd600';
+          ctx.shadowBlur = 10 * scale;
+          ctx.shadowColor = '#ffd600';
           ctx.fillText(`KM ${p.kmNum}`, 0, 0);
         }
         ctx.restore();
       }
     });
 
-    // 4. ATUALIZAÇÃO DOS DADOS DO HUD EM TEMPO REAL
+    // 3. HUD DE DRAMA E INICIALIZAÇÃO DO SISTEMA
     const kmVal = (progress * 232.0).toFixed(2);
-    const latSim = (-23.1849 - progress * 0.4).toFixed(6);
-    const lonSim = (-45.8821 + progress * 0.5).toFixed(6);
+    const latSim = (-23.1849 - progress * 0.2).toFixed(6);
+    const lonSim = (-45.8821 + progress * 0.3).toFixed(6);
 
-    const spKmTxt = document.getElementById('spKmTxt');
-    const spGpsTxt = document.getElementById('spGpsTxt');
-    const spProgressBar = document.getElementById('spProgressBar');
+    const spKmStream = document.getElementById('spKmStream');
+    const spGpsStream = document.getElementById('spGpsStream');
+    const spBarFill = document.getElementById('spBarFill');
+    const spStatusTag = document.getElementById('spStatusTag');
 
-    if (spKmTxt) spKmTxt.textContent = `KM ${kmVal.replace('.', ',')}`;
-    if (spGpsTxt) spGpsTxt.textContent = `GPS: ${latSim}, ${lonSim}`;
-    if (spProgressBar) spProgressBar.style.transform = `scaleX(${progress})`;
+    if (spKmStream) spKmStream.textContent = `KM ${kmVal.replace('.', ',')}`;
+    if (spGpsStream) spGpsStream.textContent = `GPS: ${latSim}, ${lonSim}`;
+    if (spBarFill) spBarFill.style.transform = `scaleX(${progress})`;
+    
+    if (progress > 0.8 && spStatusTag) {
+      spStatusTag.textContent = 'SISTEMA PRONTO ✓';
+      spStatusTag.style.color = '#ffd600';
+    }
 
     if (progress < 1) {
       animId = requestAnimationFrame(render);
@@ -547,7 +534,7 @@ canvas#c, canvas#cUnica{display:none}
         setTimeout(() => {
           sp.remove();
           cancelAnimationFrame(animId);
-        }, 400);
+        }, 500);
       }
     }
   }
