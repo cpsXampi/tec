@@ -480,7 +480,7 @@ if ('geolocation' in navigator) {
   }, null, { enableHighAccuracy: true });
 }
 
-/* ===== CâMERAS E CONFIGURAÇÕES (FOTO ÚNICA) ===== */
+/* ===== CÂMERAS E CONFIGURAÇÕES (FOTO ÚNICA) ===== */
 async function loadCamerasUnica() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -732,21 +732,53 @@ async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
-  const bh = h * .13;
+  
+  // Rodapé padrão (apenas KM, Data/Hora e GPS)
+  const bh = h * .11;
   const grad = ctx.createLinearGradient(0, h - bh, 0, h);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(.25, 'rgba(0,0,0,.55)');
-  grad.addColorStop(1, 'rgba(0,0,0,.9)');
+  grad.addColorStop(.3, 'rgba(0,0,0,.6)');
+  grad.addColorStop(1, 'rgba(0,0,0,.85)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, h - bh, w, bh);
 
-
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
-  ctx.fillText('KM ' + kmVal + (label ? ' - ' + label : ''), 20, h - bh * .55);
-  ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.7)';
-  ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
+  ctx.font = 'bold ' + Math.round(bh * .36) + 'px Arial,sans-serif';
+  ctx.fillText('KM ' + kmVal, 24, h - bh * .48);
+  
+  ctx.font = Math.round(bh * .22) + 'px Arial,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.fillText(ts + ' | GPS: ' + gpsStr, 24, h - bh * .18);
+
+  // Placa destacada da Etiqueta no Topo Superior Esquerdo (caso preenchida)
+  if (label && label.trim() !== '') {
+    const textLabel = 'ETIQUETA: ' + label.trim();
+    ctx.font = 'bold ' + Math.round(h * 0.022) + 'px Arial,sans-serif';
+    const textMetrics = ctx.measureText(textLabel);
+    const paddingX = 16;
+    const paddingY = 10;
+    const boxW = textMetrics.width + (paddingX * 2);
+    const boxH = Math.round(h * 0.045);
+    const boxX = 24;
+    const boxY = 24;
+    const radius = 8;
+
+    // Fundo da Placa com leve transparência e borda amarela de destaque
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.strokeStyle = 'rgba(255, 214, 0, 0.85)';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+    ctx.fill();
+    ctx.stroke();
+
+    // Texto da Etiqueta dentro da Placa
+    ctx.fillStyle = '#ffd600';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(textLabel, boxX + paddingX, boxY + (boxH / 2));
+    ctx.textBaseline = 'alphabetic'; // Reset padrão
+  }
 }
 </script>
 <script>window.addEventListener('beforeunload',e=>{if(capturing||isRecordingVideo||pdfWorkerBusy||pdfQueue.length||sessionEnding){e.preventDefault();e.returnValue=''}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&isRecordingVideo)showToast('Gravação continua em segundo plano')});</script></body>
