@@ -207,7 +207,7 @@ canvas#c, canvas#cUnica{display:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
       <h1>Inspeção Fotográfica</h1>
-      <p>Pasta selecionada. Ative a câmera para capturar fotos JPG a qualquer momento ou iniciar o relatório automático em PDF.</p>
+      <p>Pasta selecionada. Ative a câmera e inicie a captura automática do relatório em PDF.</p>
       <div id="gateErr" class="gate-err" style="display:none"></div>
       <div style="margin-top:20px;text-align:left">
         <label style="display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px">Etiqueta / Tipo de serviço <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--dim)">(opcional)</span></label>
@@ -429,7 +429,7 @@ if ('geolocation' in navigator) {
     }
     if (best) {
       currentKm = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
-      document.getElementById('kmTxtUnica').textContent = 'KM ' + currentKm;
+      document.getElementById('kmTxtUnica')?.textContent = 'KM ' + currentKm;
       document.getElementById('kmTxt').textContent = 'KM ' + currentKm;
     }
   }, null, { enableHighAccuracy: true });
@@ -673,7 +673,7 @@ function updateCaptureCount(){const lim=Math.max(parseInt(document.getElementByI
 document.getElementById('cfgLote')?.addEventListener('input',updateCaptureCount);
 function takeReportSnapshot(e){
  e?.stopPropagation?.();if(!dirHandle){showQuickPhotoToast('Pasta indisponível','err');return}const v=document.getElementById('vid');if(!v.videoWidth){showQuickPhotoToast('Câmera indisponível','err');return}
- const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value.trim());const name=`FOTO_EXTRA_KM_${currentKm}_${Date.now()}.jpg`.replace(/[,/]/g,'_');c.toBlob(async b=>{if(!b)return;try{const f=await dirHandle.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(b);await w.close();showQuickPhotoToast('Salvo: '+name)}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',.92)
+ const c=document.createElement('canvas'),x=c.getContext('2d',{alpha:false}),now=new Date();c.width=v.videoWidth;c.height=v.videoHeight;drawOverlayCustom(x,v,c.width,c.height,currentKm,now.toLocaleString('pt-BR').toUpperCase(),`${lat}, ${lon}`,document.getElementById('fotoLabel').value.trim());c.toBlob(async b=>{if(!b)return;const name=`FOTO_EXTRA_KM_${currentKm}_${Date.now()}.jpg`.replace(/[,/]/g,'_');try{const f=await dirHandle.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(b);await w.close();showQuickPhotoToast('Salvo: '+name)}catch(err){console.error(err);showQuickPhotoToast('Falha ao salvar JPG','err')}},'image/jpeg',.92)
 }
 async function stopCap(){
  if(!capturing||sessionEnding)return;capturing=false;sessionEnding=true;clearTimeout(captureTimer);document.getElementById('btn-stop').disabled=true;document.getElementById('btn-report-snapshot').style.display='flex';document.getElementById('rec-tag').classList.remove('on');if(buffer.length){pdfQueue.push({photos:buffer,batchNo:currentBatchNumber,final:true});buffer=[]}updateCaptureCount();showToast('Finalizando e salvando lotes...');processPdfQueue();await new Promise(r=>{const q=()=>!pdfWorkerBusy&&!pdfQueue.length?r():setTimeout(q,100);q()});sessionEnding=false;document.getElementById('btn-stop').disabled=false;document.getElementById('btn-stop').style.display='none';document.getElementById('btn-start').style.display='flex';showToast(`${savedBatchCount} lote(s) salvo(s)`);currentBatchNumber=1;updateCaptureCount()
@@ -687,6 +687,58 @@ async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(
 
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
+
+  // Etiqueta opcional em uma plaquinha discreta na parte superior.
+  const cleanLabel = String(label || '').trim();
+  if (cleanLabel) {
+    const fontSize = Math.max(18, Math.round(Math.min(w, h) * .026));
+    const padX = Math.round(fontSize * .9);
+    const plaqueH = Math.round(fontSize * 2.05);
+    const maxTextW = w * .66;
+    ctx.font = 'bold ' + fontSize + 'px Arial,sans-serif';
+
+    let shown = cleanLabel;
+    while (shown.length > 1 && ctx.measureText(shown).width > maxTextW) shown = shown.slice(0, -1);
+    if (shown !== cleanLabel) shown = shown.trimEnd() + '...';
+
+    const textW = Math.min(ctx.measureText(shown).width, maxTextW);
+    const plaqueW = Math.round(textW + padX * 2 + fontSize * .45);
+    const px = Math.round((w - plaqueW) / 2);
+    const py = Math.max(16, Math.round(h * .035));
+    const r = Math.round(plaqueH * .34);
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.45)';
+    ctx.shadowBlur = Math.round(fontSize * .6);
+    ctx.fillStyle = 'rgba(8,10,13,.82)';
+    ctx.strokeStyle = 'rgba(255,214,0,.9)';
+    ctx.lineWidth = Math.max(2, Math.round(fontSize * .08));
+    ctx.beginPath();
+    ctx.moveTo(px + r, py);
+    ctx.lineTo(px + plaqueW - r, py);
+    ctx.quadraticCurveTo(px + plaqueW, py, px + plaqueW, py + r);
+    ctx.lineTo(px + plaqueW, py + plaqueH - r);
+    ctx.quadraticCurveTo(px + plaqueW, py + plaqueH, px + plaqueW - r, py + plaqueH);
+    ctx.lineTo(px + r, py + plaqueH);
+    ctx.quadraticCurveTo(px, py + plaqueH, px, py + plaqueH - r);
+    ctx.lineTo(px, py + r);
+    ctx.quadraticCurveTo(px, py, px + r, py);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.arc(px + padX * .72, py + plaqueH / 2, Math.max(3, fontSize * .14), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(shown, px + padX + fontSize * .25, py + plaqueH / 2, maxTextW);
+    ctx.restore();
+  }
+
+  // Legenda inferior mantém apenas KM, data, hora e GPS.
   const bh = h * .13;
   const grad = ctx.createLinearGradient(0, h - bh, 0, h);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
@@ -694,11 +746,9 @@ function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   grad.addColorStop(1, 'rgba(0,0,0,.9)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, h - bh, w, bh);
-
-
   ctx.fillStyle = '#fff';
   ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
-  ctx.fillText('KM ' + kmVal + (label ? ' - ' + label : ''), 20, h - bh * .55);
+  ctx.fillText('KM ' + kmVal, 20, h - bh * .55);
   ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,.7)';
   ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
