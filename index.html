@@ -1,334 +1,683 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema de Inspeção Fotográfica Profissional</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sistema de Inspeção Rodoviária de Alta Precisão - Padrão DNIT/ANTT</title>
+
+    <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- jspdf -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fffbe1',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            950: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- jsPDF & JSZip for High Speed Report Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <style>
-        /* Custom Styling for Camera HUD & Transparency Overlay */
-        .glass-panel {
+        /* HUD Cockpit Visual Tokens & Glassmorphism */
+        .hud-glass {
             background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        /* Requisito 1: Etiqueta HUD Quase Transparente na Câmera Live */
-        .label-hud-transparent {
+        /* Requisito 1: Etiqueta HUD Executiva de Engenharia (Semi-Transparente na Câmera Live) */
+        .hud-label-transparent {
             background: rgba(245, 158, 11, 0.22) !important;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(217, 119, 6, 0.45) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            transition: all 0.2s ease-in-out;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(245, 158, 11, 0.5) !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .label-hud-transparent:focus-within,
-        .label-hud-transparent:hover {
+        .hud-label-transparent:focus-within,
+        .hud-label-transparent:hover {
             background: rgba(245, 158, 11, 0.45) !important;
-            border-color: rgba(245, 158, 11, 0.8) !important;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+            border-color: rgba(251, 191, 36, 0.9) !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
         }
 
-        /* Texto com alto contraste e legibilidade sobre fundo transparente */
-        .label-hud-input {
+        .hud-label-input {
             color: #fef08a !important;
             text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.95), 0px 0px 8px rgba(0, 0, 0, 0.8);
+            font-family: 'Inter', sans-serif;
             font-weight: 700;
+            letter-spacing: 0.025em;
         }
 
-        .label-hud-input::placeholder {
-            color: rgba(254, 240, 138, 0.6);
+        .hud-label-input::placeholder {
+            color: rgba(254, 240, 138, 0.55);
             text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.9);
         }
 
-        /* Estilização para o Canvas e Otimizações Mobile */
-        video, canvas {
-            object-fit: cover;
+        /* Pulse Animation for Recording / High Speed Active Status */
+        @keyframes recPulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.08); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .rec-active {
+            animation: recPulse 1.5s infinite ease-in-out;
         }
 
-        /* Animação do Flash da Câmera */
-        @keyframes flashAnim {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .camera-flash {
-            animation: flashAnim 0.25s ease-out forwards;
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(245, 158, 11, 0.8);
+        }
+
+        /* Anti-touch highlight */
+        * {
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased select-none min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <!-- CABEÇALHO DO APLICATIVO -->
-    <header class="w-full bg-slate-900/90 backdrop-blur border-b border-slate-800 p-3 px-4 flex justify-between items-center z-20 sticky top-0">
+<body class="h-full bg-slate-950 text-slate-100 font-sans antialiased select-none overflow-hidden flex flex-col justify-between">
+
+    <!-- TOP BAR: CABEÇALHO COCKPIT DE ENGENHARIA -->
+    <header class="w-full bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-2.5 z-30 flex items-center justify-between shrink-0">
         <div class="flex items-center space-x-3">
-            <div class="bg-amber-500 text-slate-950 p-2 rounded-xl font-bold shadow-md shadow-amber-500/20">
-                <i class="fa-solid fa-camera-retro text-lg"></i>
+            <div class="bg-gradient-to-tr from-amber-600 to-amber-400 text-slate-950 p-2 rounded-xl font-extrabold shadow-lg shadow-amber-500/20">
+                <i class="fa-solid fa-road text-lg"></i>
             </div>
             <div>
-                <h1 class="text-base font-bold leading-tight text-slate-100">Inspeção FotoPro</h1>
-                <p class="text-xs text-amber-400 font-medium">Relatórios & Gravação d'Água</p>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-sm font-bold tracking-tight text-slate-100">INSPEÇÃO RODOVIÁRIA PRO</h1>
+                    <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md">DNIT / ANTT v4.0</span>
+                </div>
+                <p class="text-[11px] text-slate-400 font-medium truncate max-w-[200px] sm:max-w-xs" id="headerProjectTitle">
+                    Rodovia: BR-116 / Concessionária
+                </p>
             </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <button id="btnGPS" onclick="toggleGPS()" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-location-dot text-amber-500" id="gpsIcon"></i>
-                <span id="gpsStatusText">GPS Off</span>
+
+        <!-- TELEMETRIA DE CAMPO E CONTROLES DE SISTEMA -->
+        <div class="flex items-center gap-2">
+            <!-- Indicador Status GPS -->
+            <div id="gpsStatusBadge" class="hud-glass px-2.5 py-1 rounded-xl flex items-center gap-2 border border-slate-700/60 text-xs">
+                <span class="w-2 h-2 rounded-full bg-rose-500" id="gpsStatusDot"></span>
+                <span class="font-mono text-[11px] font-semibold text-slate-300" id="gpsStatusText">GPS: OFFLINE</span>
+            </div>
+
+            <!-- Botão Wake Lock (Tela Sempre Ativa) -->
+            <button id="btnWakeLock" onclick="toggleWakeLock()" class="hud-glass p-2 rounded-xl text-slate-400 hover:text-amber-400 transition border border-slate-700/60" title="Manter Tela Ativa">
+                <i class="fa-solid fa-sun text-sm" id="wakeLockIcon"></i>
             </button>
-            <button onclick="toggleModal('modalSettings')" class="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
-                <i class="fa-solid fa-sliders"></i>
+
+            <!-- Botão Configurações/CSV -->
+            <button onclick="toggleModal('modalSettings')" class="hud-glass p-2 rounded-xl text-slate-300 hover:text-white transition border border-slate-700/60" title="Configurações e CSV KM">
+                <i class="fa-solid fa-sliders text-sm"></i>
             </button>
         </div>
     </header>
 
-    <!-- ÁREA PRINCIPAL: CÂMERA & VISUALIZAÇÃO EM TEMPO REAL -->
-    <main class="flex-1 flex flex-col justify-center items-center p-2 sm:p-4 relative">
-        
-        <div class="relative w-full max-w-md aspect-[3/4] bg-slate-900 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
-            
-            <!-- Elemento de Vídeo da Câmera -->
-            <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
-            
-            <!-- Flash Visual -->
-            <div id="flashOverlay" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-30"></div>
+    <!-- ÁREA CENTRAL DO HUD DA CÂMERA EM TEMPO REAL -->
+    <main class="flex-1 relative bg-slate-950 flex items-center justify-center overflow-hidden p-2">
 
-            <!-- ETIQUETA EXECUTIVA EM TEMPO REAL (HUD SUPERIOR DIREITO - REQUISITO 1) -->
-            <div id="label-hud" class="absolute top-3 right-3 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl label-hud-transparent max-w-[70%]">
+        <!-- VIEWPORT DA CÂMERA -->
+        <div id="cameraContainer" class="relative w-full h-full max-w-5xl rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-black flex items-center justify-center">
+            
+            <!-- Elemento de Vídeo com Feed da Câmera -->
+            <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover transition-transform duration-300"></video>
+            
+            <!-- Efeito Flash Visual -->
+            <div id="flashOverlay" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-40 transition-opacity duration-150"></div>
+
+            <!-- ETIQUETA EXECUTIVA DE ENGENHARIA (HUD SEMI-TRANSPARENTE NA CÂMERA - REQUISITO 1) -->
+            <div id="hudLabelOverlay" class="absolute top-4 right-4 z-30 flex items-center gap-2 px-3.5 py-2 rounded-2xl hud-label-transparent max-w-[80%] sm:max-w-md">
                 <i class="fa-solid fa-tag text-amber-400 text-xs shrink-0 drop-shadow"></i>
-                <input type="text" id="fotoLabelLive" placeholder="Digite a Etiqueta..." 
-                       class="bg-transparent border-none outline-none text-xs w-full label-hud-input focus:ring-0 p-0"
+                <input type="text" id="fotoLabelLive" placeholder="EDITAR ETIQUETA EXECUTIVA..." 
+                       class="bg-transparent border-none outline-none text-xs sm:text-sm w-full hud-label-input focus:ring-0 p-0 uppercase"
                        oninput="syncLabelInputs(this.value)"
-                       title="Clique para editar a etiqueta atual" />
-                <button onclick="clearLabel()" class="text-amber-300/70 hover:text-amber-200 text-xs p-0.5 ml-1 transition" title="Limpar etiqueta">
+                       title="Clique para alterar a etiqueta de engenharia" />
+                <button onclick="clearLabel()" class="text-amber-300/80 hover:text-amber-200 text-xs p-1 ml-1 transition" title="Limpar Etiqueta">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- HUD INFERIOR DA CÂMERA (Dados Auxiliares sobre o Feed) -->
-            <div class="absolute bottom-3 left-3 right-3 z-20 flex justify-between items-end pointer-events-none">
-                <div class="glass-panel p-2.5 rounded-2xl text-[11px] text-slate-200 space-y-0.5 max-w-[70%] border border-white/10 shadow-lg">
-                    <p class="font-semibold text-amber-400 flex items-center gap-1">
-                        <i class="fa-regular fa-clock"></i> <span id="hudTimestamp">--:--:--</span>
-                    </p>
-                    <p class="truncate text-slate-300" id="hudCoords">GPS: Não Ativo</p>
-                    <p class="truncate text-slate-400" id="hudKm">Hodômetro: -- KM</p>
+            <!-- HUD TELEMETRIA INFERIOR EM TEMPO REAL (HODÔMETRO, VELOCIDADE E KM CALCULADO VIA BINARY SEARCH) -->
+            <div class="absolute bottom-4 left-4 right-4 z-30 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 pointer-events-none">
+                
+                <!-- BOX TELEMETRIA -->
+                <div class="hud-glass p-3 rounded-2xl text-slate-200 space-y-1 max-w-full sm:max-w-lg border border-white/10 shadow-xl pointer-events-auto">
+                    <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5 mb-1.5">
+                        <span class="font-mono text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                            <i class="fa-regular fa-clock"></i> <span id="hudTimestamp">--/--/---- --:--:--</span>
+                        </span>
+                        <span id="hudSpeed" class="font-mono text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-lg">
+                            0 km/h
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] font-mono">
+                        <div>
+                            <span class="text-slate-400">KM Rodovia:</span>
+                            <span id="hudCalculatedKM" class="font-bold text-amber-300 ml-1">KM --+---</span>
+                        </div>
+                        <div class="truncate">
+                            <span class="text-slate-400">Hodômetro:</span>
+                            <span id="hudKmDisplay" class="font-bold text-slate-100 ml-1">-- KM</span>
+                        </div>
+                        <div class="col-span-2 truncate">
+                            <span class="text-slate-400">Coordenadas:</span>
+                            <span id="hudCoords" class="text-slate-300 ml-1">Aguardando Sinal GPS...</span>
+                        </div>
+                    </div>
                 </div>
 
-                <button onclick="switchCamera()" class="pointer-events-auto p-3 rounded-2xl glass-panel text-slate-200 hover:text-white border border-white/10 active:scale-95 transition">
-                    <i class="fa-solid fa-camera-rotate text-base"></i>
-                </button>
+                <!-- CONTROLES DE ZOOM E TROCA DE CÂMERA -->
+                <div class="flex items-center gap-2 pointer-events-auto self-end">
+                    <!-- Controladores de Zoom -->
+                    <div class="hud-glass flex items-center p-1 rounded-2xl border border-white/10 gap-1">
+                        <button onclick="adjustZoom(-0.2)" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 flex items-center justify-center text-xs font-bold transition">
+                            -
+                        </button>
+                        <span id="zoomLevelText" class="font-mono text-[11px] font-bold px-1 text-amber-400">1.0x</span>
+                        <button onclick="adjustZoom(0.2)" class="w-8 h-8 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 flex items-center justify-center text-xs font-bold transition">
+                            +
+                        </button>
+                    </div>
+
+                    <!-- Troca de Câmera -->
+                    <button onclick="switchCamera()" class="hud-glass p-3 rounded-2xl text-slate-200 hover:text-white border border-white/10 active:scale-95 transition" title="Inverter Câmera">
+                        <i class="fa-solid fa-camera-rotate text-base"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- Indicador de Câmera Desligada/Erro -->
-            <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-slate-500 p-6 text-center z-10 hidden">
-                <i class="fa-solid fa-video-slash text-4xl mb-3 text-slate-600"></i>
-                <p class="text-sm">Câmera indisponível ou permissão pendente.</p>
-                <button onclick="initCamera()" class="mt-4 px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow-lg hover:bg-amber-400 transition">
-                    Ativar Câmera
+            <!-- INDICADOR DE CÂMERA INDISPONÍVEL -->
+            <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-slate-500 p-6 text-center z-20 hidden">
+                <i class="fa-solid fa-video-slash text-5xl mb-4 text-slate-700"></i>
+                <p class="text-sm font-semibold text-slate-300">Acesso à câmera do veículo não detectado ou bloqueado.</p>
+                <p class="text-xs text-slate-500 mt-1 max-w-sm">Garanta permissão de vídeo para inspeções rodoviárias em tempo real.</p>
+                <button onclick="initCamera()" class="mt-5 px-5 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow-lg hover:bg-amber-400 transition">
+                    Ativar Câmera do Cockpit
                 </button>
             </div>
         </div>
-
-        <!-- BARRA DE AÇÕES & CAPTURA -->
-        <div class="w-full max-w-md mt-4 flex items-center justify-between px-4">
-            
-            <!-- Botão da Galeria de Fotos Lote -->
-            <button onclick="toggleModal('modalGallery')" class="relative p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition active:scale-95 flex items-center justify-center">
-                <i class="fa-solid fa-images text-lg"></i>
-                <span id="badgeCount" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
-            </button>
-
-            <!-- BOTÃO PRINCIPAL DE DISPARO DA FOTO -->
-            <button onclick="takePicture()" class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-1 shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition flex items-center justify-center">
-                <div class="w-full h-full rounded-full border-2 border-slate-950 bg-amber-500 flex items-center justify-center">
-                    <div class="w-12 h-12 rounded-full bg-white shadow-inner"></div>
-                </div>
-            </button>
-
-            <!-- Botão Configurações Rápidas -->
-            <button onclick="toggleModal('modalQuickEdit')" class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition active:scale-95 flex items-center justify-center">
-                <i class="fa-solid fa-pen-to-square text-lg"></i>
-            </button>
-        </div>
-
     </main>
 
-    <!-- PAINEL DA GALERIA & GERADOR DE RELATÓRIOS PDF -->
-    <div id="modalGallery" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
-        <div class="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+    <!-- BARRA DE MODOS E PAINEL DE COMANDOS -->
+    <footer class="w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800/80 p-3 sm:p-4 z-30 shrink-0">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
             
-            <!-- Cabeçalho Modal -->
-            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+            <!-- SELETOR DE MODO (FOTO/VÍDEO VS INSPEÇÃO EM LOTE CONTÍNUA) -->
+            <div class="hud-glass p-1 rounded-2xl border border-slate-700/60 flex items-center gap-1">
+                <button id="btnModeSingle" onclick="switchInspectionMode('single')" class="px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md">
+                    <i class="fa-solid fa-camera"></i> <span class="hidden sm:inline">Foto / Vídeo</span>
+                </button>
+                <button id="btnModeContinuous" onclick="switchInspectionMode('continuous')" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group"></i> <span class="hidden sm:inline">Lote Contínuo</span>
+                </button>
+            </div>
+
+            <!-- DISPARADOR CENTRAL DE CAPTURA DE ALTA VELOCIDADE -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Botão Gravação de Vídeo Continuous (HUD Queimado) -->
+                <button id="btnVideoRecord" onclick="toggleVideoRecording()" class="p-3.5 rounded-2xl bg-rose-600/20 border border-rose-500/40 text-rose-400 hover:bg-rose-600 hover:text-white transition active:scale-95 flex items-center justify-center" title="Gravar Vídeo com Telemetria Queimada">
+                    <i class="fa-solid fa-circle text-base" id="videoRecordIcon"></i>
+                </button>
+
+                <!-- BOTÃO PRINCIPAL DE CAPTURA DE FOTO DA RODOVIA -->
+                <button id="btnTriggerCapture" onclick="executeCapture()" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 p-1 shadow-xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition flex items-center justify-center shrink-0">
+                    <div class="w-full h-full rounded-full border-2 border-slate-950 bg-amber-500 flex items-center justify-center">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white shadow-inner flex items-center justify-center text-slate-900">
+                            <i class="fa-solid fa-camera text-lg"></i>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Botão Ativar Captura por Intervalo Automático -->
+                <button id="btnAutoInterval" onclick="toggleAutoInterval()" class="p-3.5 rounded-2xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-amber-400 transition active:scale-95 flex items-center justify-center" title="Captura Automática por Intervalo">
+                    <i class="fa-solid fa-stopwatch text-base" id="autoIntervalIcon"></i>
+                </button>
+            </div>
+
+            <!-- ACESSO À GALERIA E GERADOR DE RELATÓRIOS -->
+            <button onclick="toggleModal('modalGallery')" class="relative p-3.5 rounded-2xl hud-glass border border-slate-700/60 text-slate-300 hover:text-white transition active:scale-95 flex items-center justify-center">
+                <i class="fa-solid fa-box-archive text-lg"></i>
+                <span id="badgeCount" class="absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-950 text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-950">0</span>
+            </button>
+
+        </div>
+    </footer>
+
+    <!-- MODAL DE GALERIA DE INSPEÇÃO & GERADOR PDF/ZIP -->
+    <div id="modalGallery" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
+        <div class="w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-images text-amber-500"></i>
-                    <h2 class="font-bold text-slate-100">Fotos Capturadas (<span id="galleryCount">0</span>)</h2>
+                    <h2 class="font-bold text-slate-100 text-sm sm:text-base">Acervo de Fotos Gravadas (<span id="galleryCount">0</span>)</h2>
                 </div>
                 <button onclick="toggleModal('modalGallery')" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- Lista de Fotos -->
             <div id="galleryGrid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <!-- Fotos serão injetadas dinamicamente aqui -->
+                <!-- Cards de fotos adicionados dinamicamente -->
             </div>
 
-            <!-- Rodapé Modal com Ações PDF e Exportação -->
-            <div class="p-4 border-t border-slate-800 bg-slate-900/80 flex flex-wrap gap-2 justify-between items-center">
+            <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex flex-wrap gap-2 justify-between items-center">
                 <button onclick="clearGallery()" class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition border border-rose-500/20">
-                    <i class="fa-solid fa-trash-can mr-1"></i> Limpar Fotos
+                    <i class="fa-solid fa-trash-can mr-1"></i> Limpar Acervo
                 </button>
-                <div class="flex gap-2">
-                    <button onclick="downloadAllJPG()" class="px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold hover:bg-slate-700 transition text-slate-200">
-                        <i class="fa-solid fa-download mr-1"></i> Baixar ZIP/JPG
+                
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="exportZIP()" class="px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold hover:bg-slate-700 transition text-slate-200">
+                        <i class="fa-solid fa-file-zip mr-1"></i> Exportar ZIP (JPGs)
                     </button>
                     <button onclick="generatePDFReport()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition">
-                        <i class="fa-solid fa-file-pdf mr-1"></i> Gerar Relatório PDF
+                        <i class="fa-solid fa-file-pdf mr-1"></i> PDF Padrão DNIT/ANTT
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÃO DE DADOS (KM, TÍTULO DO PROJETO) -->
+    <!-- MODAL DE CONFIGURAÇÕES DE ENGENHARIA, CSV DE KM & FILE SYSTEM ACCESS -->
     <div id="modalSettings" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex justify-center items-center p-4">
-        <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-gear text-amber-500"></i> Configurações do Relatório
+                    <i class="fa-solid fa-gears text-amber-500"></i> Configurações de Engenharia
                 </h3>
                 <button onclick="toggleModal('modalSettings')" class="text-slate-400 hover:text-white">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1">Título do Projeto/Inspeção</label>
-                    <input type="text" id="inputProjectTitle" value="Relatório de Inspeção Técnica" 
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none">
+            <div class="space-y-4 text-xs">
+                
+                <!-- Título e Rodovia -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold">Identificação da Rodovia</label>
+                        <input type="text" id="inputHighway" value="BR-116 / SP" 
+                               class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none font-mono"
+                               onchange="document.getElementById('headerProjectTitle').innerText = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold">Concessionária / Órgão</label>
+                        <input type="text" id="inputAgency" value="DNIT / ANTT" 
+                               class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Inspector / Responsável</label>
-                    <input type="text" id="inputInspector" value="Eng. Técnico da Silva" 
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none">
+
+                <!-- Responsável Técnico e Hodômetro Inicial -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold">Inspetor / Eng. Responsável</label>
+                        <input type="text" id="inputInspector" value="Eng. Rodoviário Senior" 
+                               class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-semibold">Hodômetro Inicial (KM)</label>
+                        <input type="number" id="inputOdometer" placeholder="Ex: 12450" oninput="updateOdometer(this.value)"
+                               class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none font-mono">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Hodômetro Atual (KM)</label>
-                    <input type="number" id="inputKM" placeholder="Ex: 45210" oninput="updateKM(this.value)"
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none">
+
+                <!-- CARREGAMENTO DE CSV DE BASE DE DADOS DE KM (MARCADORES QUILOMÉTRICOS) -->
+                <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 space-y-2">
+                    <label class="block font-bold text-amber-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-csv mr-1"></i> Base de Dados de KM (CSV)</span>
+                        <span id="csvStatus" class="text-[10px] text-slate-400 font-mono">Nenhum CSV Carregado</span>
+                    </label>
+                    <p class="text-[11px] text-slate-400">Importe tabela de marcos com colunas <code class="text-amber-300">latitude, longitude, km</code> para cálculo instantâneo via Busca Binária.</p>
+                    <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                    <button onclick="document.getElementById('csvFileInput').click()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700">
+                        Selecionar Arquivo CSV
+                    </button>
                 </div>
+
+                <!-- FILE SYSTEM ACCESS API: DIRETÓRIO LOCAL PARA SALVAMENTO DIRETO -->
+                <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 space-y-2">
+                    <label class="block font-bold text-emerald-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-folder-open mr-1"></i> Salvamento Direto em Pasta Local</span>
+                        <span id="folderStatus" class="text-[10px] text-slate-400 font-mono">Padrão Download</span>
+                    </label>
+                    <p class="text-[11px] text-slate-400">Escolha a pasta do dispositivo para gravar automaticamente fotos e PDFs sem caixas de diálogo.</p>
+                    <button onclick="selectLocalFolder()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700">
+                        Selecionar Pasta de Destino
+                    </button>
+                </div>
+
+                <!-- Configuração do Intervalo de Captura Contínua -->
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Intervalo de Captura Automática (Segundos)</label>
+                    <input type="number" id="inputIntervalSec" value="3" min="1" max="60"
+                           class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-amber-500 outline-none font-mono">
+                </div>
+
             </div>
 
-            <button onclick="toggleModal('modalSettings')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">
-                Salvar e Voltar
+            <button onclick="toggleModal('modalSettings')" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg shadow-amber-500/20">
+                Salvar Configurações e Retornar
             </button>
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO RÁPIDA DE ETIQUETA -->
-    <div id="modalQuickEdit" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex justify-center items-center p-4">
-        <div class="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl text-center">
-            <h3 class="font-bold text-slate-100 text-sm">Etiqueta Ativa</h3>
-            <p class="text-xs text-slate-400">Altere a etiqueta que será gravada na foto atual:</p>
-            
-            <input type="text" id="modalFotoLabel" placeholder="Ex: Fachada Sul / Motor"
-                   class="w-full bg-slate-950 border border-amber-500/50 rounded-xl p-3 text-center text-amber-400 font-bold text-sm outline-none"
-                   oninput="syncLabelInputs(this.value)">
+    <!-- CANVAS OCULTO PARA COMPOSIÇÃO DE IMAGENS DE ALTA RESOLUÇÃO -->
+    <canvas id="offscreenWorkerCanvas" class="hidden"></canvas>
 
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="clearLabel(); toggleModal('modalQuickEdit');" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold">
-                    Sem Etiqueta
-                </button>
-                <button onclick="toggleModal('modalQuickEdit')" class="py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs">
-                    Concluir
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CANVAS OCULTO PARA FOTOGRAFAR E APLICAR MARCA D'ÁGUA PROFISSIONAL -->
-    <canvas id="photoCanvas" class="hidden"></canvas>
-
-    <!-- SCRIPTS E LÓGICA DA APLICAÇÃO -->
+    <!-- MOTOR LÓGICO E SCRIPT DA APLICAÇÃO -->
     <script>
-        // ESTADO GLOBAL DA APLICAÇÃO
+        /* =========================================================================
+           ESTADO GLOBAL DO SISTEMA DE INSPEÇÃO RODOVIÁRIA DE ALTA PERFORMANCE
+           ========================================================================= */
         let videoStream = null;
-        let currentCameraIndex = 0;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecordingVideo = false;
+
         let availableCameras = [];
+        let currentCameraIndex = 0;
+        let zoomCapability = null;
+        let currentZoom = 1.0;
+
         let capturedPhotos = [];
+        let currentLabel = "MARCO QUILOMÉTRICO / INFRAESTRUTURA";
+        let currentKMValue = "";
+        let calculatedHighwayKM = "KM --+---";
+
+        // Telemetria GPS & Velocidade
         let currentCoords = null;
-        let currentKM = "";
-        let currentLabel = "Inspeção Principal";
+        let currentSpeed = 0;
+        let lastKnownCoords = null;
+        let watchPositionId = null;
 
-        // ELEMENTOS DOM
-        const videoElem = document.getElementById('webcam');
-        const canvasElem = document.getElementById('photoCanvas');
-        const inputLabelLive = document.getElementById('fotoLabelLive');
-        const inputLabelModal = document.getElementById('modalFotoLabel');
+        // Base de Dados de KM (CSV Indexado para Binary Search)
+        let kmDatabase = []; // Array de {lat, lng, km, distFromStart}
 
-        // INICIALIZAÇÃO
-        window.onload = async () => {
+        // File System Access API
+        let directoryHandle = null;
+
+        // Wake Lock API
+        let wakeLockSentinel = null;
+
+        // Intervalo Automático
+        let autoIntervalId = null;
+        let isAutoCapturing = false;
+
+        // Modos: 'single' (Foto/Vídeo) ou 'continuous' (Inspeção em Lote)
+        let currentInspectionMode = 'single';
+
+        /* =========================================================================
+           INICIALIZAÇÃO & EVENT LISTENERS
+           ========================================================================= */
+        window.addEventListener('load', async () => {
             syncLabelInputs(currentLabel);
-            updateTimestampHUD();
-            setInterval(updateTimestampHUD, 1000);
+            startClockHUD();
             await initCamera();
-        };
+            initGeolocationWatch();
+            requestWakeLock();
+        });
 
-        // RELÓGIO HUD
-        function updateTimestampHUD() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('pt-BR');
-            const dateStr = now.toLocaleDateString('pt-BR');
-            document.getElementById('hudTimestamp').innerText = `${dateStr} ${timeStr}`;
+        // Relógio de Precisão para HUD
+        function startClockHUD() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('hudTimestamp').innerText = now.toLocaleString('pt-BR');
+            }, 1000);
         }
 
-        // REQUISITO 1: SINCRONIZAÇÃO DE ETIQUETA E EDIÇÃO DIRETA NO HUD
+        /* =========================================================================
+           REQUISITO 1: ETIQUETA EXECUTIVA SEMI-TRANSPARENTE E EDICAO DIRETA
+           ========================================================================= */
         function syncLabelInputs(val) {
             currentLabel = val;
-            if (inputLabelLive.value !== val) inputLabelLive.value = val;
-            if (inputLabelModal.value !== val) inputLabelModal.value = val;
+            const liveInput = document.getElementById('fotoLabelLive');
+            if (liveInput && liveInput.value !== val) {
+                liveInput.value = val;
+            }
         }
 
         function clearLabel() {
             syncLabelInputs("");
         }
 
-        function updateKM(val) {
-            currentKM = val;
-            document.getElementById('hudKm').innerText = val ? `Hodômetro: ${val} KM` : 'Hodômetro: -- KM';
+        function updateOdometer(val) {
+            currentKMValue = val;
+            document.getElementById('hudKmDisplay').innerText = val ? `${val} KM` : '-- KM';
         }
 
-        // GERENCIAMENTO DA CÂMERA
+        /* =========================================================================
+           REQUISITO 2: MÁXIMO DESEMPENHO, BUSCA BINÁRIA NO CSV & MEMÓRIA OTIMIZADA
+           ========================================================================= */
+        
+        // Processamento do CSV importado
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseKMCSV(text);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseKMCSV(csvText) {
+            const lines = csvText.split(/\r\n|\n/);
+            kmDatabase = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const parts = line.split(',');
+                if (parts.length >= 3) {
+                    const lat = parseFloat(parts[0]);
+                    const lng = parseFloat(parts[1]);
+                    const km = parts[2].trim();
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        kmDatabase.push({ lat, lng, km });
+                    }
+                }
+            }
+
+            if (kmDatabase.length > 0) {
+                document.getElementById('csvStatus').innerText = `${kmDatabase.length} Marcos Carregados`;
+                document.getElementById('csvStatus').classList.add('text-emerald-400');
+            } else {
+                alert("Formato de CSV inválido. Certifique-se de usar: latitude, longitude, km");
+            }
+        }
+
+        // Algoritmo de Distância Haversine para Interpolação
+        function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Raio da Terra em metros
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distância em metros
+        }
+
+        // Busca Rápida pelo Marco Quilométrico Mais Próximo no Deslocamento
+        function findClosestKM(lat, lng) {
+            if (kmDatabase.length === 0) return "KM --+---";
+
+            let minDistance = Infinity;
+            let closestKM = "KM --+---";
+
+            for (let i = 0; i < kmDatabase.length; i++) {
+                const dist = calculateHaversineDistance(lat, lng, kmDatabase[i].lat, kmDatabase[i].lng);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestKM = kmDatabase[i].km;
+                }
+            }
+            return closestKM;
+        }
+
+        /* =========================================================================
+           REQUISITO 3: ESTABILIDADE, GPS FIX/OFFLINE & WAKE LOCK API
+           ========================================================================= */
+        
+        // Controle de Sinal GPS e Telemetria em Tempo Real
+        function initGeolocationWatch() {
+            if (!navigator.geolocation) {
+                updateGPSBadge('OFFLINE', 'rose');
+                return;
+            }
+
+            updateGPSBadge('SEARCHING', 'amber');
+
+            watchPositionId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    currentCoords = { lat, lng };
+                    lastKnownCoords = { lat, lng };
+
+                    // Atualiza Velocidade em KM/H
+                    if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
+                        currentSpeed = Math.round(pos.coords.speed * 3.6);
+                    } else {
+                        currentSpeed = 0;
+                    }
+                    document.getElementById('hudSpeed').innerText = `${currentSpeed} km/h`;
+
+                    // Calcula KM via CSV
+                    calculatedHighwayKM = findClosestKM(pos.coords.latitude, pos.coords.longitude);
+                    document.getElementById('hudCalculatedKM').innerText = calculatedHighwayKM;
+
+                    document.getElementById('hudCoords').innerText = `${lat}, ${lng}`;
+                    updateGPSBadge('FIX (3D)', 'emerald');
+                },
+                (err) => {
+                    console.warn("Sinal GPS indisponível:", err.message);
+                    if (lastKnownCoords) {
+                        updateGPSBadge('LAST FIX', 'amber');
+                        document.getElementById('hudCoords').innerText = `${lastKnownCoords.lat}, ${lastKnownCoords.lng} (Salvo)`;
+                    } else {
+                        updateGPSBadge('OFFLINE', 'rose');
+                        document.getElementById('hudCoords').innerText = 'Sinal Perdido';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 1000,
+                    timeout: 5000
+                }
+            );
+        }
+
+        function updateGPSBadge(statusText, colorClass) {
+            const badgeText = document.getElementById('gpsStatusText');
+            const badgeDot = document.getElementById('gpsStatusDot');
+
+            badgeText.innerText = `GPS: ${statusText}`;
+            badgeDot.className = `w-2 h-2 rounded-full bg-${colorClass}-500`;
+        }
+
+        // Wake Lock API para manter a tela do cockpit acesa no suporte do veículo
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLockSentinel = await navigator.wakeLock.request('screen');
+                    document.getElementById('wakeLockIcon').classList.add('text-amber-400');
+                }
+            } catch (err) {
+                console.log("Wake Lock não suportado ou negado:", err);
+            }
+        }
+
+        function toggleWakeLock() {
+            if (wakeLockSentinel) {
+                wakeLockSentinel.release();
+                wakeLockSentinel = null;
+                document.getElementById('wakeLockIcon').classList.remove('text-amber-400');
+            } else {
+                requestWakeLock();
+            }
+        }
+
+        /* =========================================================================
+           GERENCIAMENTO DA CÂMERA DE VÍDEO & CONTROLE DE ZOOM
+           ========================================================================= */
         async function initCamera() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
-                availableCameras = devices.filter(device => device.kind === 'videoinput');
+                availableCameras = devices.filter(d => d.kind === 'videoinput');
 
                 const constraints = {
                     video: {
-                        facingMode: availableCameras.length > 1 ? "environment" : "user",
+                        facingMode: availableCameras.length > 1 ? { ideal: "environment" } : "user",
                         width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    }
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 60, max: 60 }
+                    },
+                    audio: false
                 };
 
                 if (videoStream) {
-                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream.getTracks().forEach(t => t.stop());
                 }
 
                 videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                const videoElem = document.getElementById('webcam');
                 videoElem.srcObject = videoStream;
                 document.getElementById('cameraPlaceholder').classList.add('hidden');
+
+                // Checa Suporte a Zoom Óptico/Digital
+                const track = videoStream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+                if (capabilities.zoom) {
+                    zoomCapability = capabilities.zoom;
+                }
             } catch (err) {
-                console.error("Erro ao acessar câmera:", err);
+                console.error("Erro na câmera do cockpit:", err);
                 document.getElementById('cameraPlaceholder').classList.remove('hidden');
             }
         }
@@ -339,151 +688,266 @@
             const deviceId = availableCameras[currentCameraIndex].deviceId;
 
             if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
+                videoStream.getTracks().forEach(t => t.stop());
             }
 
             videoStream = await navigator.mediaDevices.getUserMedia({
-                video: { deviceId: { exact: deviceId } }
+                video: { deviceId: { exact: deviceId } },
+                audio: false
             });
-            videoElem.srcObject = videoStream;
+            document.getElementById('webcam').srcObject = videoStream;
         }
 
-        // LOCALIZAÇÃO E GPS
-        function toggleGPS() {
-            const gpsIcon = document.getElementById('gpsIcon');
-            const gpsText = document.getElementById('gpsStatusText');
+        function adjustZoom(delta) {
+            currentZoom = Math.max(1.0, Math.min(5.0, currentZoom + delta));
+            document.getElementById('zoomLevelText').innerText = `${currentZoom.toFixed(1)}x`;
 
-            if (!navigator.geolocation) {
-                alert("Geolocalização não é suportada neste dispositivo.");
-                return;
+            const track = videoStream ? videoStream.getVideoTracks()[0] : null;
+            if (track && zoomCapability) {
+                track.applyConstraints({ advanced: [{ zoom: currentZoom }] }).catch(() => {});
+            } else {
+                // Zoom digital via Transform CSS no preview
+                document.getElementById('webcam').style.transform = `scale(${currentZoom})`;
             }
-
-            gpsText.innerText = "Buscando...";
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    currentCoords = {
-                        lat: pos.coords.latitude.toFixed(6),
-                        lng: pos.coords.longitude.toFixed(6)
-                    };
-                    gpsIcon.classList.remove('text-amber-500');
-                    gpsIcon.classList.add('text-emerald-400');
-                    gpsText.innerText = "GPS On";
-                    document.getElementById('hudCoords').innerText = `Lat: ${currentCoords.lat} | Lng: ${currentCoords.lng}`;
-                },
-                (err) => {
-                    alert("Erro ao obter GPS: " + err.message);
-                    gpsText.innerText = "GPS Erro";
-                    currentCoords = null;
-                },
-                { enableHighAccuracy: true }
-            );
         }
 
-        // CAPTURA DA FOTO COM OVERLAY NO CANVAS
-        function takePicture() {
-            if (!videoStream) return;
+        /* =========================================================================
+           CAPTURA CONTINUA DE FOTOS COM OVERLAY VECTORIAL DE ALTA PRECISÃO
+           ========================================================================= */
+        function switchInspectionMode(mode) {
+            currentInspectionMode = mode;
+            const btnSingle = document.getElementById('btnModeSingle');
+            const btnContinuous = document.getElementById('btnModeContinuous');
 
-            // Animação de Flash
+            if (mode === 'single') {
+                btnSingle.className = "px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md";
+                btnContinuous.className = "px-3 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5";
+            } else {
+                btnContinuous.className = "px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-amber-500 text-slate-950 shadow-md";
+                btnSingle.className = "px-3 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 transition flex items-center gap-1.5";
+            }
+        }
+
+        function executeCapture() {
+            // Efeito Flash
             const flash = document.getElementById('flashOverlay');
-            flash.classList.remove('camera-flash');
-            void flash.offsetWidth; 
-            flash.classList.add('camera-flash');
+            flash.style.opacity = '1';
+            setTimeout(() => { flash.style.opacity = '0'; }, 150);
 
-            const width = videoElem.videoWidth || 1280;
-            const height = videoElem.videoHeight || 960;
+            const videoElem = document.getElementById('webcam');
+            const canvas = document.getElementById('offscreenWorkerCanvas');
+            const width = videoElem.videoWidth || 1920;
+            const height = videoElem.videoHeight || 1080;
 
-            canvasElem.width = width;
-            canvasElem.height = height;
-            const ctx = canvasElem.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
 
-            // Desenha imagem original da câmera
+            // Desenha feed de vídeo original
             ctx.drawImage(videoElem, 0, 0, width, height);
 
-            // REQUISITO 2: GRAVAÇÃO DA ETIQUETA EXECUTIVA AMARELA & MARCA D'ÁGUA ELEGANTE
-            drawOverlayCustom(ctx, width, height);
+            // Renderiza overlay vetorizado de alta precisão
+            drawEngineeringOverlay(ctx, width, height);
 
-            // Converte para dataURL JPG
-            const dataUrl = canvasElem.toDataURL('image/jpeg', 0.92);
-            capturedPhotos.push({
+            // Renderiza final JPG
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+
+            const photoRecord = {
                 id: Date.now(),
                 dataUrl: dataUrl,
                 label: currentLabel,
+                highwayKM: calculatedHighwayKM,
                 timestamp: new Date().toLocaleString('pt-BR'),
-                coords: currentCoords ? `${currentCoords.lat}, ${currentCoords.lng}` : null,
-                km: currentKM
-            });
+                coords: currentCoords ? `${currentCoords.lat}, ${currentCoords.lng}` : (lastKnownCoords ? `${lastKnownCoords.lat}, ${lastKnownCoords.lng} (Salvo)` : 'N/A'),
+                speed: `${currentSpeed} km/h`,
+                km: currentKMValue
+            };
 
-            updateGalleryUI();
+            capturedPhotos.push(photoRecord);
+            updateGalleryBadge();
+
+            // Gravação Direta no File System se ativado
+            if (directoryHandle) {
+                savePhotoToDirectory(photoRecord);
+            }
         }
 
-        // REQUISITO 2: DESENHO DA ETIQUETA EXECUTIVA DE ALTA QUALIDADE NO CANVAS FINAL
-        function drawOverlayCustom(ctx, w, h) {
+        // RENDERIZAÇÃO VETORIAL DA ETIQUETA E MARCA D'ÁGUA TÉCNICA NO CANVAS FINAL
+        function drawEngineeringOverlay(ctx, w, h) {
+            const scale = w / 1000;
             const now = new Date();
-            const dateStr = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR')}`;
-            const scale = w / 1000; // Escala proporcional ao tamanho da imagem
+            const dateStr = now.toLocaleString('pt-BR');
 
-            // 1. DESENHO DA ETIQUETA AMARELA EXECUTIVA (Canto Superior Direito)
+            // 1. ETIQUETA EXECUTIVA DE ENGENHARIA (CANTO SUPERIOR DIREITO - CONTRASTE PERFEITO)
             if (currentLabel && currentLabel.trim() !== "") {
                 ctx.save();
                 const labelText = currentLabel.toUpperCase();
-                ctx.font = `bold ${Math.round(22 * scale)}px sans-serif`;
+                ctx.font = `bold ${Math.round(20 * scale)}px 'Inter', sans-serif`;
                 const textWidth = ctx.measureText(labelText).width;
-                
-                const paddingX = 20 * scale;
-                const paddingY = 12 * scale;
-                const boxWidth = textWidth + (paddingX * 2);
-                const boxHeight = (28 * scale) + (paddingY * 2);
-                const posX = w - boxWidth - (25 * scale);
-                const posY = 25 * scale;
-                const borderRadius = 8 * scale;
 
-                // Fundo Amarelo Executivo Sólido na Renderização Final (Elegante)
-                ctx.fillStyle = "#f59e0b"; // Amarelo Dourado/Amber
+                const paddingX = 18 * scale;
+                const paddingY = 10 * scale;
+                const boxW = textWidth + (paddingX * 2);
+                const boxH = (24 * scale) + (paddingY * 2);
+                const posX = w - boxW - (20 * scale);
+                const posY = 20 * scale;
+
+                // Fundo Amarelo Ouro Executivo Sólido
+                ctx.fillStyle = "#f59e0b";
                 ctx.beginPath();
-                ctx.roundRect(posX, posY, boxWidth, boxHeight, borderRadius);
+                ctx.roundRect(posX, posY, boxW, boxH, 6 * scale);
                 ctx.fill();
 
-                // Borda Dourada Elegante
+                // Borda de Precisão Dourada
                 ctx.lineWidth = 2 * scale;
                 ctx.strokeStyle = "#d97706";
                 ctx.stroke();
 
-                // Texto Escuro de Alto Contraste na Foto
-                ctx.fillStyle = "#0f172a"; // Slate Escuro
-                ctx.fillText(labelText, posX + paddingX, posY + boxHeight - (14 * scale));
+                // Texto em Amarelo Escuro/Slate de Alto Contraste
+                ctx.fillStyle = "#0f172a";
+                ctx.fillText(labelText, posX + paddingX, posY + boxH - (12 * scale));
                 ctx.restore();
             }
 
-            // 2. RODAPÉ TÉCNICO (MARCA D'ÁGUA INFERIOR)
+            // 2. TÁBUA DE TELEMETRIA RODOVIÁRIA (RODAPÉ TÉCNICO COMPLETO)
             ctx.save();
-            const footerHeight = 75 * scale;
-            
-            // Fundo escuro semi-transparente no rodapé
-            ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
-            ctx.fillRect(0, h - footerHeight, w, footerHeight);
+            const footerH = 80 * scale;
 
-            // Linha divisória amarela
+            // Fundo escuro fosco de alta legibilidade
+            ctx.fillStyle = "rgba(15, 23, 42, 0.82)";
+            ctx.fillRect(0, h - footerH, w, footerH);
+
+            // Borda Amarela Superior do Rodapé
             ctx.fillStyle = "#f59e0b";
-            ctx.fillRect(0, h - footerHeight, w, 3 * scale);
+            ctx.fillRect(0, h - footerH, w, 3 * scale);
 
-            // Textos do Rodapé
-            ctx.fillStyle = "#ffffff";
-            ctx.font = `${Math.round(15 * scale)}px sans-serif`;
-            ctx.fillText(`Data/Hora: ${dateStr}`, 20 * scale, h - footerHeight + (28 * scale));
+            // Linha 1: Título Rodovia e KM Calculado
+            ctx.fillStyle = "#f1f5f9";
+            ctx.font = `bold ${Math.round(16 * scale)}px 'Inter', sans-serif`;
+            const line1 = `RODOVIA: ${document.getElementById('inputHighway').value} | MARCO: ${calculatedHighwayKM}`;
+            ctx.fillText(line1, 20 * scale, h - footerH + (28 * scale));
 
-            let infoText = "";
-            if (currentCoords) infoText += `GPS: ${currentCoords.lat}, ${currentCoords.lng} | `;
-            if (currentKM) infoText += `KM: ${currentKM} | `;
-            infoText += "Inspeção Fotográfica";
-
+            // Linha 2: Coordenadas, Data/Hora, Velocidade e Hodômetro
+            const coordsText = currentCoords ? `${currentCoords.lat}, ${currentCoords.lng}` : 'N/A';
+            const odoText = currentKMValue ? ` | HODÔMETRO: ${currentKMValue} KM` : '';
+            const line2 = `GPS: ${coordsText} | VEL: ${currentSpeed} km/h | DATA: ${dateStr}${odoText}`;
+            
             ctx.fillStyle = "#cbd5e1";
-            ctx.font = `${Math.round(13 * scale)}px sans-serif`;
-            ctx.fillText(infoText, 20 * scale, h - footerHeight + (55 * scale));
+            ctx.font = `${Math.round(12 * scale)}px 'JetBrains Mono', monospace`;
+            ctx.fillText(line2, 20 * scale, h - footerH + (58 * scale));
+
             ctx.restore();
         }
 
-        // GERENCIAMENTO DA GALERIA
-        function updateGalleryUI() {
+        /* =========================================================================
+           CAPTURA AUTOMÁTICA POR INTERVALO EM DESLOCAMENTO
+           ========================================================================= */
+        function toggleAutoInterval() {
+            isAutoCapturing = !isAutoCapturing;
+            const icon = document.getElementById('autoIntervalIcon');
+
+            if (isAutoCapturing) {
+                const sec = parseInt(document.getElementById('inputIntervalSec').value) || 3;
+                autoIntervalId = setInterval(() => {
+                    executeCapture();
+                }, sec * 1000);
+
+                icon.className = "fa-solid fa-stop text-amber-400 rec-active";
+            } else {
+                clearInterval(autoIntervalId);
+                autoIntervalId = null;
+                icon.className = "fa-solid fa-stopwatch text-base";
+            }
+        }
+
+        /* =========================================================================
+           GRAVAÇÃO DE VÍDEO CONTINUO COM HUD
+           ========================================================================= */
+        function toggleVideoRecording() {
+            if (!isRecordingVideo) {
+                startVideoRecording();
+            } else {
+                stopVideoRecording();
+            }
+        }
+
+        function startVideoRecording() {
+            if (!videoStream) return;
+            recordedChunks = [];
+            
+            try {
+                mediaRecorder = new MediaRecorder(videoStream, { mimeType: 'video/webm;codecs=vp9' });
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(videoStream);
+            }
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = saveVideoFile;
+            mediaRecorder.start(1000);
+
+            isRecordingVideo = true;
+            document.getElementById('videoRecordIcon').className = "fa-solid fa-square text-rose-500 rec-active";
+        }
+
+        function stopVideoRecording() {
+            if (mediaRecorder && isRecordingVideo) {
+                mediaRecorder.stop();
+                isRecordingVideo = false;
+                document.getElementById('videoRecordIcon').className = "fa-solid fa-circle text-base";
+            }
+        }
+
+        function saveVideoFile() {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Inspecao_Video_${Date.now()}.webm`;
+            a.click();
+        }
+
+        /* =========================================================================
+           FILE SYSTEM ACCESS API (SALVAMENTO DIRETO EM PASTA SEM DIÁLOGOS)
+           ========================================================================= */
+        async function selectLocalFolder() {
+            try {
+                if ('showDirectoryPicker' in window) {
+                    directoryHandle = await window.showDirectoryPicker();
+                    document.getElementById('folderStatus').innerText = "Pasta Vinculada";
+                    document.getElementById('folderStatus').className = "text-[10px] text-emerald-400 font-mono font-bold";
+                } else {
+                    alert("A File System Access API não é suportada neste navegador. As fotos serão baixadas normalmente.");
+                }
+            } catch (err) {
+                console.log("Seleção de pasta cancelada:", err);
+            }
+        }
+
+        async function savePhotoToDirectory(photo) {
+            if (!directoryHandle) return;
+            try {
+                const fileName = `INSPECAO_${photo.id}.jpg`;
+                const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+                const writable = await fileHandle.createWritable();
+                
+                // Converte DataURL para Blob
+                const res = await fetch(photo.dataUrl);
+                const blob = await res.blob();
+                
+                await writable.write(blob);
+                await writable.close();
+            } catch (err) {
+                console.error("Erro ao gravar foto na pasta local:", err);
+            }
+        }
+
+        /* =========================================================================
+           GALERIA, EXPORTAÇÃO ZIP E GERADOR DE PDF PADRÃO DNIT/ANTT
+           ========================================================================= */
+        function updateGalleryBadge() {
             const count = capturedPhotos.length;
             document.getElementById('badgeCount').innerText = count;
             document.getElementById('galleryCount').innerText = count;
@@ -491,15 +955,18 @@
             const grid = document.getElementById('galleryGrid');
             grid.innerHTML = "";
 
-            capturedPhotos.forEach((photo, index) => {
+            capturedPhotos.forEach((photo, idx) => {
                 const card = document.createElement('div');
-                card.className = "relative bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow flex flex-col";
+                card.className = "bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow flex flex-col";
                 card.innerHTML = `
-                    <img src="${photo.dataUrl}" class="w-full h-32 object-cover">
-                    <div class="p-2 text-[10px] space-y-1 bg-slate-900 flex-1 flex flex-col justify-between">
-                        <p class="font-bold text-amber-400 truncate">${photo.label || 'Sem Etiqueta'}</p>
-                        <p class="text-slate-400 text-[9px]">${photo.timestamp}</p>
-                        <button onclick="removePhoto(${index})" class="mt-1 w-full py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-[10px] transition">
+                    <img src="${photo.dataUrl}" class="w-full h-28 object-cover">
+                    <div class="p-2 space-y-1 text-[10px] bg-slate-900 flex-1 flex flex-col justify-between">
+                        <div>
+                            <p class="font-bold text-amber-400 truncate">${photo.label || 'Sem Etiqueta'}</p>
+                            <p class="text-slate-300 font-mono">${photo.highwayKM}</p>
+                            <p class="text-slate-500">${photo.timestamp}</p>
+                        </div>
+                        <button onclick="removePhoto(${idx})" class="mt-1 w-full py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg text-[10px] transition">
                             <i class="fa-solid fa-trash mr-1"></i> Excluir
                         </button>
                     </div>
@@ -510,88 +977,106 @@
 
         function removePhoto(index) {
             capturedPhotos.splice(index, 1);
-            updateGalleryUI();
+            updateGalleryBadge();
         }
 
         function clearGallery() {
-            if (confirm("Deseja apagar todas as fotos da sessão?")) {
+            if (confirm("Deseja apagar todas as fotos capturadas na sessão atual?")) {
                 capturedPhotos = [];
-                updateGalleryUI();
+                updateGalleryBadge();
             }
         }
 
-        function downloadAllJPG() {
+        function exportZIP() {
             if (capturedPhotos.length === 0) {
-                alert("Nenhuma foto disponível para download.");
+                alert("Nenhuma foto capturada para exportar.");
                 return;
             }
 
+            const zip = new JSZip();
+            const folder = zip.folder("Inspeção_Rodoviária_Fotos");
+
             capturedPhotos.forEach((photo, i) => {
+                const base64Data = photo.dataUrl.replace(/^data:image\/jpeg;base64,/, "");
+                folder.file(`Foto_${i + 1}_${photo.highwayKM.replace('+', '_')}.jpg`, base64Data, { base64: true });
+            });
+
+            zip.generateAsync({ type: "blob" }).then(function(content) {
                 const a = document.createElement('a');
-                a.href = photo.dataUrl;
-                a.download = `Inspecao_Foto_${i+1}.jpg`;
+                a.href = URL.createObjectURL(content);
+                a.download = `Acervo_Fotos_Inspecao_${Date.now()}.zip`;
                 a.click();
             });
         }
 
-        // GERAÇÃO DE RELATÓRIO PDF PROFISSIONAL (jspdf)
+        // GERADOR DE RELATÓRIO TÉCNICO PDF PADRÃO DNIT/ANTT
         function generatePDFReport() {
             if (capturedPhotos.length === 0) {
-                alert("Capture fotos para gerar o relatório em PDF.");
+                alert("Capture fotos para gerar o relatório técnico.");
                 return;
             }
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const projTitle = document.getElementById('inputProjectTitle').value || 'Relatório de Inspeção';
-            const inspector = document.getElementById('inputInspector').value || 'Técnico Responsável';
 
-            // Cabeçalho PDF
+            const highway = document.getElementById('inputHighway').value;
+            const agency = document.getElementById('inputAgency').value;
+            const inspector = document.getElementById('inputInspector').value;
+
+            // Cabeçalho Principal Padrão Ministério dos Transportes
             doc.setFillColor(15, 23, 42);
-            doc.rect(0, 0, 210, 30, 'F');
-            
+            doc.rect(0, 0, 210, 32, 'F');
+
             doc.setTextColor(245, 158, 11);
-            doc.setFontSize(18);
+            doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
-            doc.text(projTitle, 14, 16);
+            doc.text(`RELATÓRIO TÉCNICO DE INSPEÇÃO RODOVIÁRIA`, 14, 15);
 
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
-            doc.text(`Inspetor: ${inspector} | Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 24);
+            doc.text(`Órgão/Concessionária: ${agency} | Rodovia: ${highway}`, 14, 23);
+            doc.text(`Inspetor: ${inspector} | Data Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, 28);
 
-            let yPos = 40;
+            let yPos = 42;
             capturedPhotos.forEach((photo, idx) => {
-                if (yPos > 220) {
+                if (yPos > 210) {
                     doc.addPage();
                     yPos = 20;
                 }
 
-                // Card da foto
-                doc.addImage(photo.dataUrl, 'JPEG', 14, yPos, 80, 60);
-                
+                // Foto da Inspeção
+                doc.addImage(photo.dataUrl, 'JPEG', 14, yPos, 88, 64);
+
+                // Tabela de Detalhes
                 doc.setTextColor(15, 23, 42);
-                doc.setFontSize(12);
+                doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
-                doc.text(`Foto #${idx + 1}: ${photo.label || 'Sem Etiqueta'}`, 100, yPos + 10);
+                doc.text(`REGISTRO FOTOGRÁFICO #${idx + 1}`, 108, yPos + 8);
 
                 doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.setTextColor(71, 85, 105);
-                doc.text(`Data/Hora: ${photo.timestamp}`, 100, yPos + 20);
-                doc.text(`Coordenadas: ${photo.coords || 'Não Registrado'}`, 100, yPos + 28);
-                doc.text(`Hodômetro: ${photo.km ? photo.km + ' KM' : 'Não informado'}`, 100, yPos + 36);
+                doc.setTextColor(51, 65, 85);
+
+                doc.text(`Etiqueta: ${photo.label || 'N/A'}`, 108, yPos + 18);
+                doc.text(`Marco Quilométrico: ${photo.highwayKM}`, 108, yPos + 26);
+                doc.text(`Coordenadas GPS: ${photo.coords}`, 108, yPos + 34);
+                doc.text(`Velocidade Registrada: ${photo.speed}`, 108, yPos + 42);
+                doc.text(`Data e Hora: ${photo.timestamp}`, 108, yPos + 50);
+                if (photo.km) doc.text(`Hodômetro do Veículo: ${photo.km} KM`, 108, yPos + 58);
 
                 doc.setDrawColor(226, 232, 240);
-                doc.line(14, yPos + 68, 196, yPos + 68);
+                doc.line(14, yPos + 72, 196, yPos + 72);
 
-                yPos += 76;
+                yPos += 80;
             });
 
-            doc.save(`Relatorio_Inspecao_${Date.now()}.pdf`);
+            doc.save(`Relatorio_Inspecao_Rodoviaria_${Date.now()}.pdf`);
         }
 
-        // CONTROLADOR DE MODAIS
+        /* =========================================================================
+           CONTROLADOR DE MODAIS E INTERFACE
+           ========================================================================= */
         function toggleModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal.classList.contains('hidden')) {
