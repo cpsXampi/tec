@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Inspeção Móvel</title>
+<title>KM Report</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
@@ -35,48 +35,76 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH CINEMATOGRÁFICO: SUPORTE NO PAINEL DO CARRO (~3.5s) ===== */
+/* ===== SPLASH: VISÃO DO PAINEL DO CARRO COM MINI CELULAR NO SUPORTE ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #000; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 30%, #111622 0%, #030406 70%);
+  overflow: hidden;
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
-#splash.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
+#splash.done { opacity: 0; transform: scale(1.08); pointer-events: none; }
+
+/* Fundo do painel e vidro do carro com reflexos */
+.sp-car-dashboard-bg {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(2,3,5,0.9) 0%, rgba(10,13,20,0.6) 50%, rgba(2,3,5,0.95) 100%);
+}
+.sp-car-dashboard-bg::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.04) 0%, transparent 60%);
+}
+
+/* Suporte de celular no painel */
+.sp-mount-base {
+  position: absolute; bottom: 22%; left: 50%; transform: translateX(-50%);
+  width: 140px; height: 35px; background: linear-gradient(180deg, #1c222d, #0d1016);
+  border-radius: 8px 8px 0 0; border: 1px solid rgba(255,255,255,0.1); z-index: 2;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+}
+.sp-mount-base::after {
+  content: ""; position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 20px; background: #141923; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Aparelho Celular em Miniatura (Horizontal) no Suporte */
+.sp-phone-device {
+  position: relative; z-index: 3;
+  width: min(76vw, 560px); height: min(42vw, 310px);
+  background: #000; border-radius: 24px;
+  border: 4px solid #28303e;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(255,214,0,0.12), inset 0 0 12px rgba(0,0,0,0.8);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+
 #sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
-/* Moldura simulando o painel do carro ao fundo e o celular no suporte */
-.sp-car-dash {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+/* HUD interno da tela do celular miniatura */
+.sp-phone-hud-km {
+  position: absolute; top: 12px; left: 12px; min-width: 110px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(4,120,87,0.85); padding: 6px 12px; text-align: center;
+  backdrop-filter: blur(10px); z-index: 5; pointer-events: none;
 }
+.sp-phone-hud-km .h-l { font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: .15em; color: rgba(220,252,231,0.6); }
+.sp-phone-hud-km .h-v { font-size: 18px; font-weight: 900; line-height: 1.1; margin-top: 1px; color: #fff; }
 
-/* HUD idêntico à tela de captura do app */
-.sp-hud-km {
-  position: absolute; top: calc(18px + var(--safe-t)); left: 14px; min-width: 160px;
-  border-radius: var(--r-md); border: 1px solid rgba(255,255,255,.1);
-  background: rgba(4,120,87,.85); padding: 10px 18px; text-align: center;
-  backdrop-filter: blur(18px); z-index: 10; pointer-events: none;
-  box-shadow: 0 6px 28px rgba(0,0,0,.6);
+.sp-phone-rec {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 16px;
+  backdrop-filter: blur(8px); z-index: 5; pointer-events: none;
 }
-.sp-hud-km .h-l { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .2em; color: rgba(220,252,231,.55); }
-.sp-hud-km .h-v { font-size: 26px; font-weight: 900; line-height: 1.1; margin-top: 2px; color: #fff; }
-
-.sp-rec-tag {
-  position: absolute; top: calc(22px + var(--safe-t)); right: 14px;
-  display: flex; align-items: center; gap: 7px; border: 1px solid rgba(255,255,255,.15);
-  background: rgba(0,0,0,.7); padding: 7px 13px; border-radius: 22px;
-  backdrop-filter: blur(12px); z-index: 10; pointer-events: none;
-}
-.sp-rec-tag .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: spBlink 0.8s infinite; }
+.sp-phone-rec .dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; animation: spBlink 0.8s infinite; }
 @keyframes spBlink { 50% { opacity: .1; } }
-.sp-rec-tag span { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: #fff; }
+.sp-phone-rec span { font-size: 7px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; color: #fff; }
 
-.sp-label-badge {
-  position: absolute; top: calc(82px + var(--safe-t)); right: 14px;
-  border-radius: var(--r-sm); border: 1px solid rgba(255,214,0,.4);
-  background: rgba(0,0,0,.8); padding: 8px 14px; backdrop-filter: blur(12px); z-index: 10;
-  font-size: 11px; font-weight: 800; color: #ffd600; text-transform: uppercase; letter-spacing: .08em;
+.sp-phone-label {
+  position: absolute; top: 56px; right: 12px;
+  border-radius: 8px; border: 1px solid rgba(255,214,0,0.4);
+  background: rgba(0,0,0,0.75); padding: 5px 10px; backdrop-filter: blur(8px); z-index: 5;
+  font-size: 8px; font-weight: 800; color: #ffd600; text-transform: uppercase; letter-spacing: .08em;
 }
 
 /* ===== MAIN MENU ===== */
@@ -199,24 +227,28 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH VISÃO DO PAINEL / SUPORTE DE CELULAR (3.5 SEGUNDOS) -->
+<!-- SPLASH: MINI CELULAR NO SUPORTE DO PAINEL (~3.5 SEGUNDOS) -->
 <div id="splash" aria-hidden="true">
-  <canvas id="sp-canvas"></canvas>
-  <div class="sp-car-dash"></div>
+  <div class="sp-car-dashboard-bg"></div>
+  <div class="sp-mount-base"></div>
   
-  <!-- HUD Idêntico à Tela de Captura do App -->
-  <div class="sp-hud-km">
-    <span class="h-l">KM atual</span>
-    <p class="h-v" id="spHudKmTxt">KM 116,40</p>
-  </div>
-  
-  <div class="sp-rec-tag">
-    <div class="dot"></div>
-    <span>Registrando no PDF</span>
-  </div>
+  <div class="sp-phone-device">
+    <canvas id="sp-canvas"></canvas>
+    
+    <!-- HUD Exato da Captura rodando dentro da tela do celular -->
+    <div class="sp-phone-hud-km">
+      <span class="h-l">KM atual</span>
+      <p class="h-v" id="spHudKmTxt">KM 116,40</p>
+    </div>
+    
+    <div class="sp-phone-rec">
+      <div class="dot"></div>
+      <span>Registrando no PDF</span>
+    </div>
 
-  <div class="sp-label-badge">
-    VISTORIA ILUMINAÇÃO
+    <div class="sp-phone-label">
+      VISTORIA ILUMINAÇÃO
+    </div>
   </div>
 </div>
 
@@ -339,26 +371,19 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH MOTOR: VISÃO DE DENTRO DO CARRO / SUPORTE NO PAINEL (~3.5 SEGUNDOS) ===== */
-(function initDashboardDashSplash() {
+/* ===== SPLASH MOTOR: ANIMAÇÃO DENTRO DO MINI CELULAR NO SUPORTE (~3.5 SEGUNDOS) ===== */
+(function initMiniPhoneSplash() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
+  let w = canvas.width = 560;
+  let h = canvas.height = 310;
 
-  window.addEventListener('resize', () => {
-    if (!canvas) return;
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  });
-
-  const DURATION = 3500; // Exatos 3.5 segundos de puro espetáculo visual
+  const DURATION = 3500; // 3.5 segundos de espetáculo visual dentro da telinha
   let startTime = null;
   let animId;
 
-  // Placas de KM e Cidades passando velozmente pela janela do carro
   const signsList = [
     { text: 'BR-116 DUTRA', sub: 'TRECHO SP-RIO' },
     { text: 'KM 116.0', sub: 'VISTORIA ILUMINAÇÃO' },
@@ -370,7 +395,7 @@ canvas#c, canvas#cUnica{display:none}
     { text: 'KM 117.5', sub: 'FOTO REGISTRADA' }
   ];
 
-  const objectsOnRoad = Array.from({ length: 40 }, (_, idx) => ({
+  const objectsOnRoad = Array.from({ length: 35 }, (_, idx) => ({
     x: (Math.random() - 0.5) * w * 3,
     y: (Math.random() - 0.5) * h * 2,
     z: Math.random() * w + 30,
@@ -384,39 +409,37 @@ canvas#c, canvas#cUnica{display:none}
     const elapsed = ts - startTime;
     const progress = Math.min(elapsed / DURATION, 1);
 
-    // Efeito de Câmera Lenta (Matrix Slow-Mo) nos últimos 25% para suavizar a entrada
+    // Câmera lenta suave no final
     const speedFactor = progress < 0.75 
       ? 1.0 
       : Math.max(0.05, 1.0 - Math.pow((progress - 0.75) / 0.25, 2) * 0.95);
 
-    // Fundo Noturno da Rodovia
-    ctx.fillStyle = '#010204';
+    // Fundo da estrada dentro do celular
+    ctx.fillStyle = '#020306';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2;
-    const cy = h * 0.48; // Ponto de fuga da pista a partir do painel do carro
+    const cy = h * 0.48;
 
-    // 1. RODOVIA E ASFALTO EM PERSPECTIVA 3D (VISÃO DO MOTORISTA)
+    // 1. PISTA E ILUMINAÇÃO DE RODOVIA
     ctx.save();
-    
-    // Pista
     ctx.beginPath();
-    ctx.moveTo(cx - 40, cy);
-    ctx.lineTo(cx + 40, cy);
+    ctx.moveTo(cx - 30, cy);
+    ctx.lineTo(cx + 30, cy);
     ctx.lineTo(w * 2, h);
     ctx.lineTo(-w, h);
     ctx.closePath();
-    ctx.fillStyle = '#05070a';
+    ctx.fillStyle = '#06080d';
     ctx.fill();
 
-    // Faixas centrais amarelas passando em alta velocidade
-    const travelSpeed = elapsed * 2.2 * speedFactor;
+    // Faixas centrais amarelas
+    const travelSpeed = elapsed * 2.0 * speedFactor;
     ctx.strokeStyle = '#ffd600';
-    ctx.lineWidth = 5;
-    for (let i = 0; i < 12; i++) {
-      const p1 = ((travelSpeed + i * (h / 5)) % (h - cy));
+    ctx.lineWidth = 4;
+    for (let i = 0; i < 10; i++) {
+      const p1 = ((travelSpeed + i * (h / 4)) % (h - cy));
       const y1 = cy + p1;
-      const y2 = y1 + 35 * (p1 / (h - cy));
+      const y2 = y1 + 30 * (p1 / (h - cy));
       
       ctx.beginPath();
       ctx.moveTo(cx, y1);
@@ -424,80 +447,78 @@ canvas#c, canvas#cUnica{display:none}
       ctx.stroke();
     }
 
-    // Postes de Iluminação nas Laterais com Focos de Luz Realistas
-    for (let i = 0; i < 6; i++) {
-      const p1 = ((travelSpeed * 1.2 + i * (h / 4)) % (h - cy));
+    // Postes de iluminação lateral com feixes de luz
+    for (let i = 0; i < 5; i++) {
+      const p1 = ((travelSpeed * 1.2 + i * (h / 3.5)) % (h - cy));
       const y1 = cy + p1;
       const scale = (y1 - cy) / (h - cy);
-      const xLeft = cx - (w * 0.75 * scale);
-      const xRight = cx + (w * 0.75 * scale);
+      const xLeft = cx - (w * 0.7 * scale);
+      const xRight = cx + (w * 0.7 * scale);
 
-      // Glow / Feixe de luz da lâmpada do poste
-      const gradL = ctx.createRadialGradient(xLeft, y1 - 35 * scale, 2, xLeft, y1 - 35 * scale, 70 * scale);
-      gradL.addColorStop(0, 'rgba(255, 214, 0, 0.7)');
+      // Glow da lâmpada
+      const gradL = ctx.createRadialGradient(xLeft, y1 - 30 * scale, 1, xLeft, y1 - 30 * scale, 50 * scale);
+      gradL.addColorStop(0, 'rgba(255, 214, 0, 0.65)');
       gradL.addColorStop(1, 'rgba(255, 214, 0, 0)');
       ctx.fillStyle = gradL;
-      ctx.fillRect(xLeft - 70, y1 - 100, 140, 140);
+      ctx.fillRect(xLeft - 50, y1 - 80, 100, 100);
 
-      // Haste do Poste
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = Math.max(1, 3.5 * scale);
+      // Haste
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = Math.max(1, 2.5 * scale);
       ctx.beginPath();
       ctx.moveTo(xLeft, y1);
-      ctx.lineTo(xLeft, y1 - 40 * scale);
-      ctx.lineTo(xLeft + 14 * scale, y1 - 40 * scale);
+      ctx.lineTo(xLeft, y1 - 32 * scale);
+      ctx.lineTo(xLeft + 10 * scale, y1 - 32 * scale);
       ctx.stroke();
 
-      // Globo luminoso
+      // Globo
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(xLeft + 14 * scale, y1 - 40 * scale, Math.max(2, 4.5 * scale), 0, Math.PI * 2);
+      ctx.arc(xLeft + 10 * scale, y1 - 32 * scale, Math.max(1.5, 3.5 * scale), 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
 
-    // 2. PLACAS E PLACAS DE KM VOANDO PELA TELA
+    // 2. PLACAS E KMs VOANDO DENTRO DA TELA
     objectsOnRoad.forEach(p => {
-      p.z -= (18 + (progress * 12)) * speedFactor;
+      p.z -= (16 + (progress * 10)) * speedFactor;
       if (p.z <= 0) {
-        p.z = w + 80;
-        p.x = (Math.random() - 0.5) * w * 3.2;
+        p.z = w + 60;
+        p.x = (Math.random() - 0.5) * w * 3;
         p.y = (Math.random() - 0.5) * h * 2;
         p.kmMark = (116.0 + progress * 2.0).toFixed(2).replace('.', ',');
       }
 
-      const scale = 240 / p.z;
+      const scale = 200 / p.z;
       const px = p.x * scale + cx;
       const py = p.y * scale + cy;
 
-      if (px >= -150 && px <= w + 150 && py >= -150 && py <= h + 150) {
+      if (px >= -100 && px <= w + 100 && py >= -100 && py <= h + 100) {
         ctx.save();
         ctx.translate(px, py);
 
         if (p.type === 'sign') {
-          // Placa Verde Estilo Dutra
-          const bw = 135 * scale;
-          const bh = 52 * scale;
-          ctx.fillStyle = 'rgba(4, 115, 62, 0.92)';
+          const bw = 110 * scale;
+          const bh = 42 * scale;
+          ctx.fillStyle = 'rgba(4, 115, 62, 0.9)';
           ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = Math.max(1, 2 * scale);
+          ctx.lineWidth = Math.max(1, 1.5 * scale);
           ctx.beginPath();
-          ctx.roundRect(-bw/2, -bh/2, bw, bh, 5 * scale);
+          ctx.roundRect(-bw/2, -bh/2, bw, bh, 4 * scale);
           ctx.fill();
           ctx.stroke();
 
           ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${Math.max(8, 11 * scale)}px Arial, sans-serif`;
+          ctx.font = `bold ${Math.max(7, 10 * scale)}px Arial, sans-serif`;
           ctx.textAlign = 'center';
-          ctx.fillText(p.data.text, 0, -4 * scale);
-          ctx.font = `${Math.max(6, 7.5 * scale)}px Arial, sans-serif`;
+          ctx.fillText(p.data.text, 0, -3 * scale);
+          ctx.font = `${Math.max(5, 6.5 * scale)}px Arial, sans-serif`;
           ctx.fillStyle = '#ffd600';
-          ctx.fillText(p.data.sub, 0, 10 * scale);
+          ctx.fillText(p.data.sub, 0, 9 * scale);
         } else {
-          // Placa de KM na lateral da pista
-          ctx.font = `900 ${Math.max(14, 26 * scale)}px Arial, sans-serif`;
+          ctx.font = `900 ${Math.max(12, 22 * scale)}px Arial, sans-serif`;
           ctx.fillStyle = '#ffd600';
-          ctx.shadowBlur = 12 * scale;
+          ctx.shadowBlur = 10 * scale;
           ctx.shadowColor = '#ffd600';
           ctx.fillText(`KM ${p.kmMark}`, 0, 0);
         }
@@ -505,7 +526,7 @@ canvas#c, canvas#cUnica{display:none}
       }
     });
 
-    // 3. ATUALIZAÇÃO DO KM NO HUD EM TEMPO REAL
+    // 3. ATUALIZAÇÃO DO HUD DENTRO DO CELULAR
     const currentKmSim = (116.0 + progress * 1.85).toFixed(2).replace('.', ',');
     const spHudKmTxt = document.getElementById('spHudKmTxt');
     if (spHudKmTxt) spHudKmTxt.textContent = `KM ${currentKmSim}`;
