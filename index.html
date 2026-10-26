@@ -108,6 +108,34 @@ input,select{font-family:var(--font);outline:none}
 #btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none;box-shadow:0 6px 24px rgba(220,38,38,.16)}
 #btn-menu{flex-shrink:0;padding:0 16px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.4);backdrop-filter:blur(10px);font-size:10px;color:var(--text2)}
 
+/* ===== FEEDBACK DISCRETO DE ETIQUETA ATIVA ===== */
+.tag-indicator{
+  position:absolute;
+  top:calc(82px + var(--safe-t));
+  left:14px;
+  z-index:100;
+  padding:4px 9px;
+  border-radius:8px;
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(6px);
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:rgba(255,255,255,0.45);
+  text-transform:uppercase;
+  pointer-events:none;
+  max-width:200px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tag-indicator.active{
+  color:rgba(255,214,0,0.85);
+  border-color:rgba(255,214,0,0.25);
+  background:rgba(0,0,0,0.5);
+}
+
 /* ===== SETTINGS MODALS ===== */
 #settings, #settingsUnica{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
 #settings.open, #settingsUnica.open{opacity:1;visibility:visible;pointer-events:auto}
@@ -122,7 +150,7 @@ input,select{font-family:var(--font);outline:none}
 
 canvas#c, canvas#cUnica{display:none}
 
-/* ===== TOAST COMPACTO & NO CANTO SUPERIOR (REAJUSTADO) ===== */
+/* ===== TOAST COMPACTO & NO CANTO SUPERIOR ===== */
 .toast{
   position:fixed;
   top:calc(12px + var(--safe-t));
@@ -199,14 +227,14 @@ canvas#c, canvas#cUnica{display:none}
       <!-- Foto e Vídeo Principal -->
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Foto e Vídeo</h3><p>Capture Fotos e Vídeos com KM, GPS, Data e hora </p></span>
+        <span class="mc-b"><h3>Foto e Vídeo</h3><p>Capture fotos e vídeos com KM, GPS e etiqueta</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
       <!-- Inspeção PDF -->
       <button class="mc sec-btn" onclick="openMod('inspecao')">
         <span class="mc-i small"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-        <span class="mc-b small"><h3>Inspeção Fotográfica</h3><p>Captura automática e relatório em PDF</p></span>
+        <span class="mc-b small"><h3>Inspeção Fotográfica</h3><p>Captura automática e relatório em PDF por lote</p></span>
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
@@ -221,6 +249,9 @@ canvas#c, canvas#cUnica{display:none}
     <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
   </div>
   
+  <!-- FEEDBACK DISCRETO ETIQUETA -->
+  <div id="tagIndicatorUnica" class="tag-indicator">🏷️ Sem Etiqueta</div>
+
   <div style="position:absolute;top:calc(18px + var(--safe-t));right:14px;z-index:100;">
     <button onclick="openMod('menu')" style="height:42px;padding:0 16px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;backdrop-filter:blur(10px)">Voltar</button>
   </div>
@@ -230,7 +261,7 @@ canvas#c, canvas#cUnica{display:none}
       <button class="settings-close" onclick="toggleSetUnica()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSelUnica" onchange="switchCamUnica(this.value)"></select><p id="camStatusUnica" class="s-note">A prévia ao fundo mostra a câmera selecionada.</p></div>
-      <div class="s-group"><label class="s-lbl">Etiqueta <span style="text-transform:none;font-weight:500">(opcional)</span></label><input class="s-inp" id="fotoLabelUnica" type="text" maxlength="80" placeholder="Ex: Vistoria, Manutenção..."><p class="s-note">Se ficar vazia, nenhuma etiqueta será gravada.</p></div>
+      <div class="s-group"><label class="s-lbl">Etiqueta <span style="text-transform:none;font-weight:500">(opcional)</span></label><input class="s-inp" id="fotoLabelUnica" type="text" maxlength="80" placeholder="Ex: Vistoria, Manutenção..." oninput="updateTagIndicatorUnica(this.value)"><p class="s-note">Se ficar vazia, nenhuma etiqueta será gravada.</p></div>
     </div>
   </div>
 
@@ -397,8 +428,17 @@ function showToast(msg, type = 'ok') {
   requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 1500); });
 }
 
-function showQuickPhotoToast(msg,type='ok'){
- showToast(msg, type);
+function updateTagIndicatorUnica(val) {
+  const el = document.getElementById('tagIndicatorUnica');
+  if (!el) return;
+  const txt = val.trim();
+  if (txt.length > 0) {
+    el.textContent = '🏷️ Etiqueta: ' + txt;
+    el.classList.add('active');
+  } else {
+    el.textContent = '🏷️ Sem Etiqueta';
+    el.classList.remove('active');
+  }
 }
 
 async function openMod(id) {
