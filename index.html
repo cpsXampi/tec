@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KM Report</title>
+<title>KM Report — Sistema de Apoio & Inspeção</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
@@ -35,7 +35,7 @@ input,select{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH ORIGINAL CINEMÁTICO INTEGRADO ===== */
+/* ===== SPLASH CINEMÁTICO (CLONE & MATCH) ===== */
 #splash {
   position: fixed; inset: 0; z-index: 99999;
   display: flex; align-items: center; justify-content: center;
@@ -46,7 +46,6 @@ input,select{font-family:var(--font);outline:none}
 #splash.done { opacity: 0; transform: scale(1.08); pointer-events: none; }
 #sp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
 
-/* HUD flutuante do splash sincronizado com os ícones */
 .sp-hud-km {
   position: absolute; top: calc(24px + var(--safe-t)); left: 20px; min-width: 140px;
   border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
@@ -66,21 +65,6 @@ input,select{font-family:var(--font);outline:none}
 .sp-rec-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: spBlink 0.8s infinite; }
 @keyframes spBlink { 50% { opacity: .1; } }
 .sp-rec-badge span { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: #fff; }
-
-/* Ícones flutuantes do menu nascendo no final do splash */
-.sp-morph-icons {
-  position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 20px; z-index: 10; pointer-events: none; opacity: 0;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.sp-morph-icons.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.sp-mini-icon {
-  width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
-}
-.sp-mini-icon.pri { background: linear-gradient(145deg, #ffd600, #b89500); color: #050608; }
-.sp-mini-icon.sec { background: linear-gradient(145deg, #34d399, #047857); color: #050608; }
-.sp-mini-icon svg { width: 30px; height: 30px; }
 
 /* ===== MAIN MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:calc(28px + var(--safe-t)) 20px calc(28px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(255,214,0,.08),transparent 35%),linear-gradient(180deg,#090b0f,#050609);overflow-y:auto}
@@ -202,42 +186,29 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH ORIGINAL CINEMÁTICO COM MORPHING PARA OS ÍCONES -->
+<!-- SPLASH CINEMÁTICO -->
 <div id="splash" aria-hidden="true">
   <canvas id="sp-canvas"></canvas>
-  
   <div class="sp-hud-km">
     <span class="h-l">KM atual</span>
     <p class="h-v" id="spHudKmTxt">KM 116,40</p>
   </div>
-  
   <div class="sp-rec-badge">
     <div class="dot"></div>
     <span>Registrando no PDF</span>
   </div>
-
-  <div class="sp-morph-icons" id="spMorphIcons">
-    <div class="sp-mini-icon pri">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg>
-    </div>
-    <div class="sp-mini-icon sec">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    </div>
-  </div>
 </div>
 
-<!-- MENU -->
+<!-- MENU PRINCIPAL -->
 <div id="main-menu">
   <div class="menu-inner">
     <div class="menu-grid">
-      <!-- Foto e Vídeo Principal -->
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
         <span class="mc-b"><h3>Foto e Vídeo</h3><p>Capture fotos e vídeos com KM, GPS e etiqueta</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
-      <!-- Inspeção PDF -->
       <button class="mc sec-btn" onclick="openMod('inspecao')">
         <span class="mc-i small"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
         <span class="mc-b small"><h3>Inspeção Fotográfica</h3><p>Captura automática e relatório em PDF por lote</p></span>
@@ -345,8 +316,8 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== SPLASH MOTOR ORIGINAL + MORPHING PARA OS ÍCONES ===== */
-(function initOriginalSplashWithIcons() {
+/* ===== SPLASH ENGINE (RODOVIA EM MOVIMENTO 3D) ===== */
+(function initSplash() {
   const canvas = document.getElementById('sp-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -359,7 +330,7 @@ canvas#c, canvas#cUnica{display:none}
     h = canvas.height = window.innerHeight;
   });
 
-  const DURATION = 3200; // 3.2 segundos de espetáculo na rodovia
+  const DURATION = 3200;
   let startTime = null;
   let animId;
 
@@ -369,12 +340,10 @@ canvas#c, canvas#cUnica{display:none}
     { text: 'SÃO PAULO', sub: 'SAÍDA CAPITAL' },
     { text: 'KM 116.4', sub: 'POSTE #084' },
     { text: 'GUARULHOS', sub: 'KM 215' },
-    { text: 'KM 117.0', sub: 'INSPEÇÃO AUTOMÁTICA' },
-    { text: 'S. J. DOS CAMPOS', sub: 'KM 148' },
-    { text: 'KM 117.5', sub: 'FOTO REGISTRADA' }
+    { text: 'KM 117.0', sub: 'INSPEÇÃO AUTOMÁTICA' }
   ];
 
-  const objectsOnRoad = Array.from({ length: 35 }, (_, idx) => ({
+  const objectsOnRoad = Array.from({ length: 30 }, (_, idx) => ({
     x: (Math.random() - 0.5) * w * 3,
     y: (Math.random() - 0.5) * h * 2,
     z: Math.random() * w + 30,
@@ -398,7 +367,7 @@ canvas#c, canvas#cUnica{display:none}
     const cx = w / 2;
     const cy = h * 0.48;
 
-    // Pista e Iluminação da Rodovia
+    // Pista central
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(cx - 35, cy);
@@ -423,6 +392,7 @@ canvas#c, canvas#cUnica{display:none}
       ctx.stroke();
     }
 
+    // Postes de luz laterais
     for (let i = 0; i < 5; i++) {
       const p1 = ((travelSpeed * 1.2 + i * (h / 3.5)) % (h - cy));
       const y1 = cy + p1;
@@ -450,6 +420,7 @@ canvas#c, canvas#cUnica{display:none}
     }
     ctx.restore();
 
+    // Placas e KMs em 3D
     objectsOnRoad.forEach(p => {
       p.z -= (18 + (progress * 12)) * speedFactor;
       if (p.z <= 0) {
@@ -500,11 +471,6 @@ canvas#c, canvas#cUnica{display:none}
     const spHudKmTxt = document.getElementById('spHudKmTxt');
     if (spHudKmTxt) spHudKmTxt.textContent = `KM ${currentKmSim}`;
 
-    // Mostra os ícones do menu no terço final para fazer a correlação visual
-    if (progress > 0.7) {
-      document.getElementById('spMorphIcons').classList.add('show');
-    }
-
     if (progress < 1) {
       animId = requestAnimationFrame(render);
     } else {
@@ -536,7 +502,7 @@ let renderIntervalUnica = null;
 let recordingStartTimeStr = '';
 let captureTimer = null;
 let selectedModule = null;
-let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, sessionStamp='', savedBatchCount=0;
+let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, savedBatchCount=0;
 const REPORT_JPEG_QUALITY=0.82;
 
 async function chooseDirectoryForModule() {
@@ -889,7 +855,7 @@ function toggleHudControls(e) {
 
 function startCap(){
  if(!dirHandle){showToast('Pasta de destino não selecionada','err');return} if(capturing||sessionEnding)return;
- capturing=true;sessionEnding=false;captureBusy=false;buffer=[];pdfQueue=[];currentBatchNumber=1;savedBatchCount=0;sessionStamp=new Date().toISOString().replace(/[:.]/g,'-');
+ capturing=true;sessionEnding=false;captureBusy=false;buffer=[];pdfQueue=[];currentBatchNumber=1;savedBatchCount=0;
  updateCaptureCount();document.getElementById('btn-start').style.display='none';document.getElementById('btn-stop').style.display='flex';document.getElementById('btn-report-snapshot').style.display='flex';document.getElementById('rec-tag').classList.add('on');showToast('Captura contínua iniciada');
  
  document.getElementById('mod-inspecao').classList.add('clean-hud');
