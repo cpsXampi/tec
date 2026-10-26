@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KM Report</title>
+<title>KM Report — kmreport.cps.net.br</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
@@ -16,58 +16,51 @@
   --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--border3:rgba(255,255,255,.16);
   --accent:#ffd600;--accent2:#ffe44d;--accent3:#c8a800;
   --accent-dim:rgba(255,214,0,.06);--accent-glow:rgba(255,214,0,.15);
-  --green:#10b981;--green2:#34d399;--green3:#059669;--green-dim:rgba(16,185,129,.08);
+  --green:#10b981;--green2:#34d399;--green3:#059669;
+  --green-dim:rgba(16,185,129,.08);
   --red:#ef4444;--red-dim:rgba(239,68,68,.08);
   --warn:#f59e0b;--warn-dim:rgba(245,158,11,.08);
   --text:#f0f0f2;--text2:#d4d4d8;--text3:#a1a1aa;--muted:#71717a;--dim:#3f3f46;--dimmer:#27272a;
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --r-xs:8px;--r-sm:12px;--r-md:16px;--r-lg:20px;--r-xl:24px;--r-2xl:28px;
-  --shadow-xs:0 1px 3px rgba(0,0,0,.4);--shadow-sm:0 2px 8px rgba(0,0,0,.4);
-  --shadow-md:0 4px 16px rgba(0,0,0,.5);--shadow-lg:0 12px 40px rgba(0,0,0,.6);--shadow-xl:0 24px 80px rgba(0,0,0,.7);
+  --shadow-xs:0 1px 3px rgba(0,0,0,.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.6);
+  --shadow-xl:0 24px 80px rgba(0,0,0,.7);
   --safe-b:max(env(safe-area-inset-bottom,0px),20px);
   --safe-t:env(safe-area-inset-top,0px);
   --ease:cubic-bezier(.4,0,.2,1);
+  --glass:rgba(255,255,255,.03);--glass2:rgba(255,255,255,.05);--glass3:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit;-webkit-user-select:none;user-select:none}
 input,select{font-family:var(--font);outline:none}
+img,video{display:block;max-width:100%}
 ::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--dim);border-radius:9px}
 
-/* ===== SPLASH DOMÍNIO E INICIALIZAÇÃO ===== */
-#splash {
-  position: fixed; inset: 0; z-index: 99999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: radial-gradient(circle at 50% 40%, #111622 0%, #030406 75%);
-  gap: 16px; padding: 20px; text-align: center;
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
-#splash.done { opacity: 0; transform: scale(1.05); pointer-events: none; }
-.sp-domain {
-  font-size: clamp(18px, 4vw, 24px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  color: var(--accent);
-  text-shadow: 0 0 20px rgba(255,214,0,0.3);
-}
-.sp-loading-wrap {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.15em; color: var(--muted);
-}
-.sp-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  animation: spPulse 1s infinite alternate;
-}
-.sp-dot:nth-child(2) { animation-delay: 0.2s; }
-.sp-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes spPulse {
-  0% { transform: scale(0.6); opacity: 0.3; }
-  100% { transform: scale(1.2); opacity: 1; }
-}
+/* ===== SPLASH (EXATAMENTE DO MODELO) ===== */
+#splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
+#splash.done{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease}
+.sp-bg{position:absolute;inset:0;overflow:hidden}
+.sp-glow{position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 50% 42%,rgba(255,214,0,.09),transparent 70%);animation:glowPulse 3s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.sp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.01) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 60% 50% at 50% 50%,black 10%,transparent 65%)}
+.sp-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,214,0,.12),transparent);animation:scan 3s linear infinite}
+@keyframes scan{from{top:-2px}to{top:100%}}
+.sp-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sp-logo-wrap{position:relative;width:104px;height:104px}
+.sp-logo{width:100%;height:100%;border-radius:28px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;box-shadow:0 0 0 1px rgba(255,214,0,.25),0 24px 80px rgba(255,214,0,.22),inset 0 1px 0 rgba(255,255,255,.3)}
+.sp-logo svg{width:56px;height:56px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+.sp-title{margin-top:16px;font-size:clamp(28px,8vw,36px);font-weight:900;letter-spacing:-.03em;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sp-bar{margin-top:48px;width:180px;height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.sp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:barLoad .2s ease-in-out both;transform-origin:left}
+@keyframes barLoad{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
-/* ===== MAIN MENU ===== */
+/* ===== MENU ===== */
 #main-menu{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:calc(28px + var(--safe-t)) 20px calc(28px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(255,214,0,.08),transparent 35%),linear-gradient(180deg,#090b0f,#050609);overflow-y:auto}
 .menu-inner{max-width:760px;width:100%;margin:auto}
 .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
@@ -187,39 +180,46 @@ canvas#c, canvas#cUnica{display:none}
 </head>
 <body>
 
-<!-- SPLASH MÍNIMO COM O DOMÍNIO E INICIALIZAÇÃO -->
+<!-- SPLASH EXATO DO ARQUIVO MODELO -->
 <div id="splash" aria-hidden="true">
-  <div class="sp-domain">kmreport.cps.net.br</div>
-  <div class="sp-loading-wrap">
-    <span>Inicializando o sistema</span>
-    <div style="display:flex;gap:4px;margin-left:4px;">
-      <div class="sp-dot"></div>
-      <div class="sp-dot"></div>
-      <div class="sp-dot"></div>
+  <div class="sp-bg">
+    <div class="sp-glow"></div>
+    <div class="sp-grid"></div>
+    <div class="sp-scan"></div>
+  </div>
+  <div class="sp-content">
+    <div class="sp-logo-wrap">
+      <div class="sp-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
     </div>
+    <h1 class="sp-title">Sistema de Inspeção</h1>
+    <div class="sp-bar"><div class="sp-bar-fill"></div></div>
   </div>
 </div>
 
-<!-- MENU PRINCIPAL -->
+<!-- MENU -->
 <div id="main-menu">
   <div class="menu-inner">
     <div class="menu-grid">
+      <!-- Foto e Vídeo Principal -->
       <button class="mc pri" onclick="openMod('foto-unica')">
         <span class="mc-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3"/></svg></span>
-        <span class="mc-b"><h3>Foto e Vídeo</h3><p>Capture fotos e vídeos com KM, GPS e etiqueta</p></span>
+        <span class="mc-b"><h3>Foto e Vídeo com Áudio</h3><p>Capture fotos e vídeos com KM, GPS e etiqueta</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
+      <!-- Inspeção PDF -->
       <button class="mc sec-btn" onclick="openMod('inspecao')">
         <span class="mc-i small"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-        <span class="mc-b small"><h3>Inspeção Fotográfica</h3><p>Captura automática e relatório em PDF por lote</p></span>
+        <span class="mc-b small"><h3>Inspeção Fotográfica PDF</h3><p>Captura automática e relatório em PDF por lote</p></span>
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- FOTO E VÍDEO -->
+<!-- FOTO E VÍDEO COM ÁUDIO -->
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
   <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
@@ -261,7 +261,7 @@ canvas#c, canvas#cUnica{display:none}
       <div class="gate-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
-      <h1>Inspeção Fotográfica</h1>
+      <h1>Inspeção Fotográfica PDF</h1>
       <p>Pasta selecionada. Ative a câmera e inicie a captura automática do relatório em PDF.</p>
       <div id="gateErr" class="gate-err" style="display:none"></div>
       <div style="margin-top:20px;text-align:left">
@@ -317,14 +317,16 @@ canvas#c, canvas#cUnica{display:none}
 <div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
-/* ===== REMOÇÃO AUTOMÁTICA DO SPLASH APÓS 1.2s ===== */
-setTimeout(() => {
-  const sp = document.getElementById('splash');
-  if (sp) {
-    sp.classList.add('done');
-    setTimeout(() => sp.remove(), 500);
-  }
-}, 1200);
+/* ===== REMOÇÃO AUTOMÁTICA DO SPLASH DO MODELO ===== */
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const sp = document.getElementById('splash');
+    if(sp) {
+      sp.classList.add('done');
+      setTimeout(() => sp.remove(), 300);
+    }
+  }, 350);
+});
 
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
@@ -573,30 +575,73 @@ function takeSinglePhoto() {
   }, 'image/jpeg', 0.90);
 }
 
+let micStream = null;
 async function toggleVideoRecording() {
   if (!isRecordingVideo) await startVideoRecording(); else stopVideoRecording();
 }
 async function startVideoRecording() {
   const c = document.getElementById('cUnica');
   if (!c.width || !dirHandle) { showToast('Câmera ou pasta não disponível', 'err'); return; }
+  
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: { ideal: 2 },
+        sampleRate: { ideal: 48000 },
+        sampleSize: { ideal: 24 },
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      },
+      video: false
+    });
+  } catch (e) {
+    showToast('Microfone indisponível (gravando sem áudio)', 'err');
+  }
+
   const canvasStream = c.captureStream(30);
+  const tracks = [canvasStream.getVideoTracks()[0]];
+  if (micStream && micStream.getAudioTracks().length > 0) {
+    tracks.push(micStream.getAudioTracks()[0]);
+  }
+  const combinedStream = new MediaStream(tracks);
+
   recordedChunks = [];
   recordingStartTimeStr = new Date().toLocaleTimeString('pt-BR');
-  const candidates = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
-  const mimeType = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
-  try { mediaRecorder = new MediaRecorder(canvasStream, mimeType ? {mimeType,videoBitsPerSecond:8000000} : {videoBitsPerSecond:8000000}); }
+  
+  let options = {
+    mimeType: 'video/webm; codecs=vp9,opus',
+    videoBitsPerSecond: 8000000,
+    audioBitsPerSecond: 256000
+  };
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    options = { mimeType: 'video/webm', videoBitsPerSecond: 8000000, audioBitsPerSecond: 256000 };
+  }
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    options = {};
+  }
+
+  try { 
+    mediaRecorder = new MediaRecorder(combinedStream, options); 
+  }
   catch(e){ showToast('Gravação de vídeo não suportada', 'err'); return; }
+
   mediaRecorder.ondataavailable = e => { if(e.data?.size) recordedChunks.push(e.data); };
   mediaRecorder.onstop = async () => {
-    canvasStream.getTracks().forEach(t=>t.stop());
+    combinedStream.getTracks().forEach(t=>t.stop());
     const end = new Date().toLocaleTimeString('pt-BR').replace(/:/g,'-');
     const ini = recordingStartTimeStr.replace(/:/g,'-');
     const blob = new Blob(recordedChunks,{type:mediaRecorder.mimeType || 'video/webm'});
     await saveFileToDirectory(blob, `VIDEO_KM_${currentKm}_INICIO_${ini}_FIM_${end}.webm`.replace(/[,/]/g,'_'));
+
+    if (micStream) {
+      micStream.getTracks().forEach(t => t.stop());
+      micStream = null;
+    }
   };
   mediaRecorder.start(1000); isRecordingVideo = true;
   const b=document.getElementById('btnRecVideoUnica'); b.style.background='#ef4444'; b.style.borderColor='#fca5a5';
-  showToast('Gravação de vídeo iniciada — sem áudio');
+  showToast('Gravação de vídeo com áudio iniciada');
 }
 function stopVideoRecording() {
   if(mediaRecorder && isRecordingVideo){ mediaRecorder.stop(); isRecordingVideo=false;
