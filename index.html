@@ -148,6 +148,7 @@ canvas#c, canvas#cUnica{display:none}
 .toast.err{border-color:rgba(239,68,68,.25);color:#fca5a5}
 
 /* ===== ACABAMENTOS DA VERSÃO FINAL ===== */
+.folder-chip{position:absolute;z-index:120;top:calc(76px + var(--safe-t));left:14px;max-width:min(70vw,320px);padding:8px 11px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(0,0,0,.58);backdrop-filter:blur(14px);font-size:10px;font-weight:800;color:#d4d4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .capture-count{position:absolute;z-index:120;top:calc(22px + var(--safe-t));left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:20px;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.12);font-size:10px;font-weight:900;letter-spacing:.06em;backdrop-filter:blur(12px)}
 .icon-settings{width:52px;height:52px;border-radius:16px!important;border:1px solid rgba(255,255,255,.15)!important;background:rgba(8,10,13,.72)!important;box-shadow:0 8px 24px rgba(0,0,0,.35);display:grid!important;place-items:center!important}
 .icon-settings svg{width:23px!important;height:23px!important}
@@ -205,6 +206,7 @@ canvas#c, canvas#cUnica{display:none}
 <!-- FOTO E VÍDEO -->
 <div id="mod-foto-unica" class="module">
   <video id="vidUnica" autoplay playsinline muted></video>
+  <div class="folder-chip" id="folderChipUnica">Pasta não selecionada</div>
   <div id="km-hud-unica" style="position:absolute;top:calc(18px + var(--safe-t));left:14px;min-width:160px;border-radius:var(--r-md);border:1px solid rgba(255,255,255,.1);background:rgba(4,120,87,.78);padding:10px 18px;text-align:center;backdrop-filter:blur(18px);z-index:100;pointer-events:none">
     <span style="font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:rgba(220,252,231,.55)">KM atual</span>
     <p style="font-size:26px;font-weight:900;line-height:1.1;margin-top:2px;color:#fff" id="kmTxtUnica">KM ---</p>
@@ -221,7 +223,7 @@ canvas#c, canvas#cUnica{display:none}
       <button class="settings-close" onclick="toggleSetUnica()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Fechar</button>
       <h2>Configurações</h2>
       <div class="s-group"><label class="s-lbl">Câmera ativa</label><select class="s-inp" id="camSelUnica" onchange="switchCamUnica(this.value)"></select><p id="camStatusUnica" class="s-note">A prévia ao fundo mostra a câmera selecionada.</p></div>
-      <div class="s-group"><label class="s-lbl">Etiqueta <span style="text-transform:none;font-weight:500">(opcional)</span></label><input class="s-inp" id="fotoLabelUnica" type="text" maxlength="80" placeholder="Ex: Vistoria, Manutenção..."><p class="s-note">Se ficar vazia, nenhuma etiqueta será gravada.</p></div>
+      <div class="s-group"><label class="s-lbl">Etiqueta <span style="text-transform:none;font-weight:500">(opcional)</span></label><input class="s-inp" id="fotoLabelUnica" type="text" maxlength="80" placeholder="Ex: Vistoria, Manutenção..." oninput="syncFotoLabel(this.value)"><p class="s-note">Se ficar vazia, nenhuma etiqueta será gravada.</p></div>
     </div>
   </div>
 
@@ -353,6 +355,7 @@ async function chooseDirectoryForModule() {
     if (perm !== 'granted') perm = await chosen.requestPermission({ mode: 'readwrite' });
     if (perm !== 'granted') throw new Error('Permissão de gravação negada');
     dirHandle = chosen;
+    document.querySelectorAll('.folder-chip').forEach(el => el.textContent = 'Pasta: ' + chosen.name);
     showToast('Pasta selecionada: ' + chosen.name);
     return chosen;
   } catch (e) {
@@ -696,6 +699,7 @@ async function startApp() {
 function syncFotoLabel(val) {
   document.getElementById('fotoLabel').value = val;
   document.getElementById('fotoLabelLive').value = val;
+  document.getElementById('fotoLabelUnica').value = val;
 }
 
 function toggleSet() {
@@ -730,54 +734,52 @@ async function generateBatchPDF(job){
 }
 async function savePdfSilently(blob,name){const f=await dirHandle.getFileHandle(name,{create:true}),w=await f.createWritable();await w.write(blob);await w.close();showQuickPhotoToast('Salvo: '+name)}
 
+/* ===== RENDERIZAÇÃO DO CANVAS (RODAPÉ ORIGINAL + PLACA DE ETIQUETA NO TOPO DIREITO) ===== */
 function drawOverlayCustom(ctx, videoEl, w, h, kmVal, ts, gpsStr, label = '') {
   ctx.drawImage(videoEl, 0, 0, w, h);
   
-  // Rodapé padrão (apenas KM, Data/Hora e GPS)
-  const bh = h * .11;
+  // Rodapé original mantido exatamente como o anterior
+  const bh = h * .13;
   const grad = ctx.createLinearGradient(0, h - bh, 0, h);
   grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(.3, 'rgba(0,0,0,.6)');
-  grad.addColorStop(1, 'rgba(0,0,0,.85)');
+  grad.addColorStop(.25, 'rgba(0,0,0,.55)');
+  grad.addColorStop(1, 'rgba(0,0,0,.9)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, h - bh, w, bh);
 
   ctx.fillStyle = '#fff';
-  ctx.font = 'bold ' + Math.round(bh * .36) + 'px Arial,sans-serif';
-  ctx.fillText('KM ' + kmVal, 24, h - bh * .48);
-  
-  ctx.font = Math.round(bh * .22) + 'px Arial,sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.75)';
-  ctx.fillText(ts + ' | GPS: ' + gpsStr, 24, h - bh * .18);
+  ctx.font = 'bold ' + Math.round(bh * .30) + 'px Arial,sans-serif';
+  ctx.fillText('KM ' + kmVal, 20, h - bh * .55);
+  ctx.font = Math.round(bh * .18) + 'px Arial,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.7)';
+  ctx.fillText(ts + ' | GPS: ' + gpsStr, 20, h - bh * .22);
 
-  // Placa destacada da Etiqueta no Topo Superior Esquerdo (caso preenchida)
+  // Placa decorada, pequena e discreta no canto superior direito para a etiqueta
   if (label && label.trim() !== '') {
-    const textLabel = 'ETIQUETA: ' + label.trim();
-    ctx.font = 'bold ' + Math.round(h * 0.022) + 'px Arial,sans-serif';
+    const textLabel = label.trim().toUpperCase();
+    ctx.font = 'bold ' + Math.round(h * 0.02) + 'px Arial,sans-serif';
     const textMetrics = ctx.measureText(textLabel);
-    const paddingX = 16;
-    const paddingY = 10;
+    
+    const paddingX = 14;
     const boxW = textMetrics.width + (paddingX * 2);
-    const boxH = Math.round(h * 0.045);
-    const boxX = 24;
-    const boxY = 24;
-    const radius = 8;
+    const boxH = Math.round(h * 0.038);
+    const boxX = w - boxW - 20;
+    const boxY = 20;
+    const radius = 6;
 
-    // Fundo da Placa com leve transparência e borda amarela de destaque
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-    ctx.strokeStyle = 'rgba(255, 214, 0, 0.85)';
-    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.strokeStyle = 'rgba(255, 214, 0, 0.8)';
+    ctx.lineWidth = 1.5;
 
     ctx.beginPath();
     ctx.roundRect(boxX, boxY, boxW, boxH, radius);
     ctx.fill();
     ctx.stroke();
 
-    // Texto da Etiqueta dentro da Placa
     ctx.fillStyle = '#ffd600';
     ctx.textBaseline = 'middle';
     ctx.fillText(textLabel, boxX + paddingX, boxY + (boxH / 2));
-    ctx.textBaseline = 'alphabetic'; // Reset padrão
+    ctx.textBaseline = 'alphabetic';
   }
 }
 </script>
