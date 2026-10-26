@@ -139,8 +139,25 @@ canvas#c, canvas#cUnica{display:none}
 #btn-report-snapshot span{font-size:7px;font-weight:900}
 #btn-report-snapshot:active{transform:scale(.91)}
 #btn-stop{margin-left:8px}
-.toast.quick-photo{top:calc(14px + var(--safe-t));right:14px;bottom:auto;left:auto;max-width:min(58vw,240px);padding:8px 11px;font-size:9px;transform:translateY(-10px)}
+
+/* STATUS RÁPIDO NO CANTO SUPERIOR DIREITO SEM COBRIR OS BOTÕES */
+.toast.quick-photo{
+  top:calc(18px + var(--safe-t))!important;
+  right:14px!important;
+  bottom:auto!important;
+  left:auto!important;
+  max-width:min(55vw,220px);
+  padding:8px 12px;
+  font-size:9px;
+  transform:translateY(-10px);
+  z-index:10000;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+  border-color:rgba(255,214,0,.4);
+  background:rgba(15,18,22,.92);
+  color:#fff;
+}
 .toast.quick-photo.show{transform:translateY(0)}
+
 @media(orientation:portrait){.capture-count{top:calc(92px + var(--safe-t));padding:6px 11px;font-size:9px;opacity:.9}#label-hud{top:calc(132px + var(--safe-t))!important}}
 @media(max-width:390px){#ui-ctrl{gap:6px;padding-left:8px;padding-right:8px}#btn-menu{padding:0 9px}#btn-stop{margin-left:3px;font-size:9px}#btn-report-snapshot{width:51px;min-width:51px;flex-basis:51px}}
 </style>
@@ -338,7 +355,7 @@ async function saveFileToDirectory(blob, filename) {
       const writable = await fileHandle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showToast('Salvo na pasta: ' + filename);
+      showQuickPhotoToast('Salvo: ' + filename);
       return;
     } catch (e) { console.error(e); }
   }
@@ -351,7 +368,7 @@ async function saveFileToDirectory(blob, filename) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Baixado: ' + filename);
+  showQuickPhotoToast('Baixado: ' + filename);
 }
 
 function triggerFullscreen() {
@@ -370,9 +387,9 @@ function showToast(msg, type = 'ok') {
   requestAnimationFrame(() => { el.classList.add('show'); _tt = setTimeout(() => el.classList.remove('show'), 3000); });
 }
 
-function showQuickPhotoToast(msg,type='ok'){
+function showQuickPhotoToast(msg, type='ok'){
  const el=document.getElementById('toast'); clearTimeout(_tt); el.className='toast quick-photo '+type; el.textContent=msg;
- requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),650)});
+ requestAnimationFrame(()=>{el.classList.add('show');_tt=setTimeout(()=>el.classList.remove('show'),700)});
 }
 
 async function openMod(id) {
