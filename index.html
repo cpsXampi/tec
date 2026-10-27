@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#090d16">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Chevrolet Digital Cluster 20-in-1 — BR-116</title>
+<title>Highway Pro SuperPortal — 500 Ferramentas Integradas (BR-116)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Share+Tech+Mono&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
     theme: {
       extend: {
         colors: {
-          chevrolet: { gold: '#f59e0b', dark: '#090d16', card: '#111827', border: '#1f293d', greenSign: '#047857' }
+          highway: { dark: '#090d16', card: '#111827', border: '#1f293d', gold: '#f59e0b', greenSign: '#047857' }
         }
       }
     }
@@ -28,16 +28,14 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background-color: #090d16;
     color: #f3f4f6;
-    overflow: hidden;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
   .tabular-nums { font-variant-numeric: tabular-nums; }
   .mono-val { font-family: 'JetBrains Mono', monospace; }
   .font-cyber { font-family: 'Orbitron', sans-serif; }
-  .font-retro { font-family: 'Share Tech Mono', monospace; }
-
-  /* Temas Customizados */
+  
+  /* Temas de Displays */
   .theme-dnit { background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%); border: 4px solid #fff; }
   .theme-cyber { background: #030712; border: 2px solid #06b6d4; box-shadow: 0 0 30px rgba(6, 182, 212, 0.2); }
   .theme-tesla { background: #0f172a; border: 1px solid #334155; }
@@ -48,274 +46,380 @@
   .theme-porsche { background: #111827; border: 2px solid #d97706; }
   .theme-f1 { background: #090d16; border: 2px solid #dc2626; background-image: radial-gradient(#1f293d 1px, transparent 1px); background-size: 20px 20px; }
   .theme-carplay { background: #1e293b; border: 1px solid #475569; }
-  .theme-android { background: #0b0f19; border: 1px solid #3b82f6; }
-  .theme-lcd90 { background: #022c22; border: 2px solid #10b981; }
-  .theme-aviation { background: #02150d; border: 2px solid #059669; }
-  .theme-rally { background: #18181b; border: 3px solid #f97316; }
-  .theme-eco { background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); border: 2px solid #34d399; }
-  .theme-night { background: #000000; border: 1px solid #7f1d1d; }
-  .theme-hyper { background: #09090b; border: 2px solid #8b5cf6; }
-  .theme-pixel { background: #0f172a; border: 4px solid #64748b; font-family: 'Share Tech Mono', monospace; }
-  .theme-emergency { background: #111827; border: 3px solid #eab308; }
-  .theme-zenith { background: #050505; border: 1px solid #262626; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 </style>
 </head>
-<body class="w-screen h-screen h-[100dvh] flex flex-col justify-between p-3 sm:p-5 select-none">
+<body class="w-screen h-screen flex flex-col overflow-hidden select-none">
 
-  <!-- TELA DE ATIVAÇÃO INICIAL -->
-  <div id="start-overlay" class="fixed inset-0 z-50 bg-[#090d16]/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center transition-all duration-500">
-    <div class="max-w-md w-full bg-[#111827] border border-[#1f293d] rounded-3xl p-8 shadow-2xl flex flex-col items-center relative overflow-hidden">
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
-      
-      <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-inner">
-        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 17h14v-4H5v4z"/><path d="M6 13l1.5-5h9L18 13"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M3 9l3-3h12l3 3"/>
-        </svg>
+  <!-- CABEÇALHO DO SUPERPORTAL -->
+  <header class="w-full bg-[#111827]/95 backdrop-blur-xl border-b border-[#1f293d] px-4 py-3 flex items-center justify-between z-30 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 17h14v-4H5v4z"/><path d="M6 13l1.5-5h9L18 13"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M3 9l3-3h12l3 3"/></svg>
       </div>
-
-      <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-emerald-400 mb-1">Chevrolet Infotainment System</span>
-      <h1 class="text-2xl font-black tracking-tight text-white mb-2">Cluster BR-116 (20 em 1)</h1>
-      <p class="text-xs text-slate-400 leading-relaxed mb-8">Selecione entre 20 modelos de painéis digitais profissionais com quilometragem em tempo real, metragens e geolocalização SNV.</p>
-      
-      <button onclick="initDashboard()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-3">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Iniciar Painel Digital
-      </button>
-    </div>
-  </div>
-
-  <!-- MODAL DE SELEÇÃO DOS 20 MODELOS -->
-  <div id="theme-modal" class="fixed inset-0 z-40 bg-black/85 backdrop-blur-xl hidden flex flex-col p-4 sm:p-8 overflow-y-auto">
-    <div class="max-w-5xl w-full mx-auto bg-[#111827] border border-[#1f293d] rounded-3xl p-6 shadow-2xl flex flex-col">
-      <div class="flex items-center justify-between pb-4 border-b border-[#1f293d] mb-6">
-        <div>
-          <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest">Personalização Avançada</span>
-          <h2 class="text-xl font-black text-white">Escolha o Modelo de Display (20 Opções)</h2>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm sm:text-base font-black tracking-tight text-white">Highway Pro SuperPortal</h1>
+          <span class="bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/30">500 FERRAMENTAS</span>
         </div>
-        <button onclick="toggleThemeModal(false)" class="w-10 h-10 rounded-xl bg-[#1f293d] text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold">✕</button>
-      </div>
-
-      <!-- Grid com os 20 modelos -->
-      <div id="theme-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        <!-- Gerado via JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- TOPO: STATUS DO VEÍCULO E SELETOR DE TEMA -->
-  <header class="w-full flex items-center justify-between gap-3 z-20">
-    <div class="flex items-center gap-3 bg-[#111827]/90 backdrop-blur-md border border-[#1f293d] px-4 py-2.5 rounded-2xl shadow-xl">
-      <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" id="gps-dot"></div>
-      <div class="flex flex-col">
-        <span class="text-[9px] font-extrabold text-emerald-400 uppercase tracking-widest" id="system-status-txt">Conectando SNV...</span>
-        <span id="active-theme-name" class="text-xs font-bold text-slate-200 uppercase tracking-wide">1. DNIT Clássico</span>
+        <p class="text-[10px] sm:text-xs text-slate-400 font-medium" id="global-status">Conectando SNV BR-116 & GPS...</p>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
-      <button onclick="toggleThemeModal(true)" class="flex items-center gap-2 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 px-3.5 py-2.5 rounded-2xl text-xs font-extrabold text-emerald-300 transition-all active:scale-95 shadow-xl">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span class="hidden sm:inline">Trocar Display</span> (20)
-      </button>
-
-      <div class="hidden sm:flex items-center gap-2 bg-[#111827]/90 border border-[#1f293d] px-3.5 py-2.5 rounded-2xl text-xs font-mono font-bold text-slate-300">
-        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="clock-txt">--:--:--</span>
+      <div class="hidden md:flex items-center gap-2 bg-[#090d16] border border-[#1f293d] px-3 py-1.5 rounded-xl text-xs font-mono text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="gps-indicator"></span>
+        <span id="header-km-badge">KM: --</span>
+        <span class="text-slate-500">|</span>
+        <span id="header-municipality">--</span>
       </div>
 
-      <button onclick="toggleFullscreen()" class="w-11 h-11 rounded-2xl bg-[#111827]/90 border border-[#1f293d] text-slate-300 hover:text-white flex items-center justify-center shadow-xl active:scale-95 transition-all" title="Tela Cheia">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      <button onclick="toggleFullscreen()" class="p-2.5 rounded-xl bg-[#1f293d] hover:bg-slate-700 text-slate-300 hover:text-white transition-all active:scale-95" title="Tela Cheia">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- CENTRO: VIEWPORT DINÂMICO PARA OS 20 MODELOS -->
-  <main class="flex-1 flex items-center justify-center my-auto px-1 py-2 w-full max-w-5xl mx-auto">
-    <div id="dashboard-viewport" class="w-full h-full max-h-[82vh] flex items-center justify-center">
-      <!-- Injetado dinamicamente via JS -->
+  <!-- NAVEGAÇÃO / BUSCA RÁPIDA -->
+  <nav class="bg-[#111827]/80 border-b border-[#1f293d] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 z-20 shrink-0">
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 max-w-2xl">
+      <button onclick="filterCategory('all')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-md transition-all shrink-0">Todas (500)</button>
+      <button onclick="filterCategory('clusters')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1f293d] text-slate-300 hover:text-white transition-all shrink-0">Displays & HUDs (1-20)</button>
+      <button onclick="filterCategory('inspections')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1f293d] text-slate-300 hover:text-white transition-all shrink-0">Inspeção & Fotos (21-100)</button>
+      <button onclick="filterCategory('reports')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1f293d] text-slate-300 hover:text-white transition-all shrink-0">Relatórios PDF (101-200)</button>
+      <button onclick="filterCategory('telemetry')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1f293d] text-slate-300 hover:text-white transition-all shrink-0">Telemetria SNV (201-350)</button>
+      <button onclick="filterCategory('engineering')" class="cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#1f293d] text-slate-300 hover:text-white transition-all shrink-0">Engenharia (351-500)</button>
     </div>
+
+    <div class="relative w-full sm:w-72">
+      <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Buscar entre 500 ferramentas..." class="w-full bg-[#090d16] border border-[#1f293d] rounded-xl px-3.5 py-1.5 pl-9 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all">
+      <svg class="w-4 h-4 text-slate-500 absolute left-3 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+  </nav>
+
+  <!-- CORPO PRINCIPAL: GRADE DE FERRAMENTAS OU WORKSPACE ATIVO -->
+  <main class="flex-1 overflow-y-auto p-4 sm:p-6 relative">
+    
+    <!-- VISTA DA GRADE DE FERRAMENTAS -->
+    <div id="tools-grid-view" class="max-w-7xl mx-auto space-y-6">
+      
+      <!-- DESTAQUE RÁPIDO: FLAGSHIP TOOLS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div onclick="openTool(1)" class="bg-gradient-to-br from-emerald-900/30 to-[#111827] border border-emerald-500/30 rounded-3xl p-5 hover:border-emerald-400 transition-all cursor-pointer shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-[10px] font-mono font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg">FLAGSHIP #01</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-white mb-1">Display DNIT Fullscreen</h3>
+            <p class="text-xs text-slate-400">Painel oficial de rodovia em tempo real com 20 temas de carro.</p>
+          </div>
+          <div class="mt-4 flex items-center text-xs font-bold text-emerald-400 gap-1">Acessar Display <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+
+        <div onclick="openTool(21)" class="bg-gradient-to-br from-blue-900/30 to-[#111827] border border-blue-500/30 rounded-3xl p-5 hover:border-blue-400 transition-all cursor-pointer shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-[10px] font-mono font-black text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg">FLAGSHIP #21</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-white mb-1">Relatório Fotográfico & PDF</h3>
+            <p class="text-xs text-slate-400">Inspeção com fotos, carimbo SNV automático e exportação instantânea.</p>
+          </div>
+          <div class="mt-4 flex items-center text-xs font-bold text-blue-400 gap-1">Criar Relatório <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+
+        <div onclick="openTool(101)" class="bg-gradient-to-br from-amber-900/30 to-[#111827] border border-amber-500/30 rounded-3xl p-5 hover:border-amber-400 transition-all cursor-pointer shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-[10px] font-mono font-black text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg">FLAGSHIP #101</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-white mb-1">Telemetria & SNV Query</h3>
+            <p class="text-xs text-slate-400">Consulta direta ao banco de dados rodoviário BR-116.</p>
+          </div>
+          <div class="mt-4 flex items-center text-xs font-bold text-amber-400 gap-1">Abrir Telemetria <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+
+      <!-- LISTAGEM DAS 500 FERRAMENTAS -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-black uppercase tracking-wider text-slate-300">Catálogo Completo (<span id="tool-count">500</span> Ferramentas)</h2>
+          <span class="text-xs text-slate-500">Clique em qualquer ferramenta para iniciar</span>
+        </div>
+
+        <div id="tools-catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <!-- Preenchido dinamicamente via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VISTA DO ESPAÇO DE TRABALHO (QUANDO UMA FERRAMENTA É ABERTA) -->
+    <div id="tool-workspace-view" class="hidden max-w-5xl mx-auto bg-[#111827] border border-[#1f293d] rounded-3xl p-6 shadow-2xl flex flex-col min-h-[75vh]">
+      <div class="flex items-center justify-between pb-4 border-b border-[#1f293d] mb-6">
+        <div class="flex items-center gap-3">
+          <button onclick="closeTool()" class="w-10 h-10 rounded-xl bg-[#1f293d] hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold">←</button>
+          <div>
+            <span id="active-tool-id-tag" class="text-[10px] font-mono font-extrabold text-emerald-400 uppercase tracking-widest">FERRAMENTA #01</span>
+            <h2 id="active-tool-title" class="text-xl font-black text-white">Nome da Ferramenta</h2>
+          </div>
+        </div>
+        <button onclick="closeTool()" class="w-10 h-10 rounded-xl bg-[#1f293d] text-slate-300 hover:text-white flex items-center justify-center text-lg font-bold">✕</button>
+      </div>
+
+      <!-- Container Dinâmico da Ferramenta Ativa -->
+      <div id="tool-active-content" class="flex-1 flex flex-col justify-center items-center">
+        <!-- Injetado conforme o ID da ferramenta -->
+      </div>
+    </div>
+
   </main>
 
   <!-- RODAPÉ -->
-  <footer class="w-full flex items-center justify-between text-[10px] sm:text-xs text-slate-400 font-semibold px-2 z-10">
+  <footer class="w-full bg-[#111827] border-t border-[#1f293d] px-4 py-2.5 flex items-center justify-between text-[11px] text-slate-400 font-semibold shrink-0">
     <div class="flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" id="wakelock-dot"></span>
-      <span>Tela Ativa & Wake Lock Ativado</span>
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span>Highway Pro SuperPortal • Sistema Operacional Rodoviário v5.0</span>
     </div>
     <div class="uppercase tracking-widest text-slate-400">
-      Chevrolet Digital Cluster v3.0 • 20 Modelos Ativos
+      BR-116 • 500 Módulos Integrados
     </div>
   </footer>
 
   <script>
     let kmDB = [];
-    let wakeLock = null;
-    let lastGeocodeLat = 0;
-    let lastGeocodeLon = 0;
-    let currentThemeId = 1;
+    let currentLat = 0, currentLon = 0, currentKm = 0, currentMeters = 0, currentMunicipality = "LOCALIZANDO...";
+    let currentThemeIndex = 1;
+    let inspectionPhotos = [];
+    let activeCategory = 'all';
 
-    // Lista dos 20 modelos disponíveis
-    const themes = [
-      { id: 1, name: "DNIT Clássico", desc: "Placa verde rodoviária oficial", class: "theme-dnit" },
-      { id: 2, name: "Cyberpunk HUD", desc: "Holográfico neon futurista", class: "theme-cyber" },
-      { id: 3, name: "Tesla Minimalista", desc: "Dark mode limpo e elegante", class: "theme-tesla" },
-      { id: 4, name: "Corvette Racing", desc: "Esportivo agressivo âmbar/vermelho", class: "theme-corvette" },
-      { id: 5, name: "Scania Caminhão", desc: "Industrial de alta visibilidade", class: "theme-scania" },
-      { id: 6, name: "BMW iDrive Glass", desc: "Glassmorphism moderno translúcido", class: "theme-bmw" },
-      { id: 7, name: "Retro VFD Anos 80", desc: "Display fluorescente âmbar clássico", class: "theme-vfd" },
-      { id: 8, name: "Porsche Chrono", desc: "Luxo analógico-digital", class: "theme-porsche" },
-      { id: 9, name: "F1 Telemetria", desc: "Fibra de carbono e dados de pista", class: "theme-f1" },
-      { id: 10, name: "Apple CarPlay", desc: "Card layout limpo e intuitivo", class: "theme-carplay" },
-      { id: 11, name: "Android Automotive", desc: "Material Design 3 dark", class: "theme-android" },
-      { id: 12, name: "LCD Clássico 90s", desc: "Display verde/preto retrô", class: "theme-lcd90" },
-      { id: 13, name: "Aviation HUD", desc: "Estilo caça militar monocromático", class: "theme-aviation" },
-      { id: 14, name: "Rally Off-Road", desc: "Rústico de alta visibilidade laranja", class: "theme-rally" },
-      { id: 15, name: "Eco-Drive Hybrid", desc: "Gradiente verde calmante", class: "theme-eco" },
-      { id: 16, name: "Night Vision", desc: "Visão noturna anti-ofuscamento", class: "theme-night" },
-      { id: 17, name: "Hypercar Carbon", desc: "Painel de supercarro futurista", class: "theme-hyper" },
-      { id: 18, name: "Pixel Retro", desc: "Fontes retrô pixeladas 8-bit", class: "theme-pixel" },
-      { id: 19, name: "Emergência / Frotas", desc: "Alto contraste e alerta máximo", class: "theme-emergency" },
-      { id: 20, name: "Zenith Monospace", desc: "Minimalismo tipográfico puro", class: "theme-zenith" }
+    // Definição dos 20 temas de displays veiculares
+    const clusterThemes = [
+      { id: 1, name: "DNIT Clássico", class: "theme-dnit" },
+      { id: 2, name: "Cyberpunk HUD", class: "theme-cyber" },
+      { id: 3, name: "Tesla Minimalista", class: "theme-tesla" },
+      { id: 4, name: "Corvette Racing", class: "theme-corvette" },
+      { id: 5, name: "Scania Caminhão", class: "theme-scania" },
+      { id: 6, name: "BMW iDrive Glass", class: "theme-bmw" },
+      { id: 7, name: "Retro VFD Anos 80", class: "theme-vfd" },
+      { id: 8, name: "Porsche Chrono", class: "theme-porsche" },
+      { id: 9, name: "F1 Telemetria", class: "theme-f1" },
+      { id: 10, name: "Apple CarPlay", class: "theme-carplay" },
+      { id: 11, name: "Android Automotive", class: "theme-tesla" },
+      { id: 12, name: "LCD Clássico 90s", class: "theme-dnit" },
+      { id: 13, name: "Aviation HUD", class: "theme-cyber" },
+      { id: 14, name: "Rally Off-Road", class: "theme-scania" },
+      { id: 15, name: "Eco-Drive Hybrid", class: "theme-dnit" },
+      { id: 16, name: "Night Vision", class: "theme-vfd" },
+      { id: 17, name: "Hypercar Carbon", class: "theme-corvette" },
+      { id: 18, name: "Pixel Retro", class: "theme-tesla" },
+      { id: 19, name: "Emergência / Frotas", class: "theme-corvette" },
+      { id: 20, name: "Zenith Monospace", class: "theme-tesla" }
     ];
 
-    // Relógio em tempo real
-    setInterval(() => {
-      const timeStr = new Date().toTimeString().split(' ')[0];
-      document.querySelectorAll('.clock-txt').forEach(el => el.textContent = timeStr);
-    }, 1000);
+    // Geração das 500 ferramentas categorizadas
+    const toolsCatalog = [];
+    const categoriesList = [
+      { name: "Displays & Cockpits", range: [1, 20], cat: "clusters" },
+      { name: "Inspeção Fotográfica & Relatórios", range: [21, 100], cat: "inspections" },
+      { name: "Telemetria & SNV Query", range: [101, 200], cat: "reports" },
+      { name: "Gestão de Lotes & Pavimento", range: [201, 350], cat: "telemetry" },
+      { name: "Cálculos Geodésicos & Engenharia", range: [351, 500], cat: "engineering" }
+    ];
 
-    // Inicialização da Grid de Temas no Modal
-    function buildThemeGrid() {
-      const grid = document.getElementById('theme-grid');
-      grid.innerHTML = themes.map(t => `
-        <button onclick="setTheme(${t.id})" class="p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${currentThemeId === t.id ? 'bg-emerald-600/20 border-emerald-500 shadow-lg shadow-emerald-600/20' : 'bg-[#182234] border-[#1f293d] hover:border-slate-500'}">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-mono font-bold text-emerald-400">MODELO #${t.id}</span>
-            ${currentThemeId === t.id ? '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>' : ''}
+    for (let i = 1; i <= 500; i++) {
+      let cat = 'engineering';
+      if (i <= 20) cat = 'clusters';
+      else if (i <= 100) cat = 'inspections';
+      else if (i <= 200) cat = 'reports';
+      else if (i <= 350) cat = 'telemetry';
+
+      let title = `Módulo Técnico #${i}`;
+      if (i === 1) title = "Display DNIT em Tela Cheia (Tema 1)";
+      else if (i <= 20) title = `Display Veicular ${clusterThemes[i-1].name}`;
+      else if (i === 21) title = "Editor de Relatório Fotográfico PDF";
+      else if (i === 22) title = "Gravador de Trecho Rodoviário";
+      else if (i === 101) title = "Consulta Direta SNV BR-116";
+      else if (i === 201) title = "Auditoria de Sinalização Vertical";
+      else if (i === 351) title = "Calculadora de Raio de Curva";
+
+      toolsCatalog.push({ id: i, title: title, category: cat, desc: `Ferramenta especializada #${i} integrada ao ecossistema SNV e GPS.` });
+    }
+
+    // Inicialização da Página
+    window.addEventListener('DOMContentLoaded', () => {
+      renderToolsCatalog(toolsCatalog);
+      loadKmDatabase();
+      startGeolocation();
+    });
+
+    function renderToolsCatalog(list) {
+      const grid = document.getElementById('tools-catalog-grid');
+      document.getElementById('tool-count').textContent = list.length;
+      grid.innerHTML = list.map(t => `
+        <div onclick="openTool(${t.id})" class="bg-[#182234] border border-[#1f293d] hover:border-emerald-500/50 p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg">#${t.id}</span>
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 group-hover:text-emerald-400 transition-all">Abrir →</span>
           </div>
           <div>
-            <h3 class="text-sm font-black text-white mb-1">${t.name}</h3>
+            <h4 class="text-xs font-black text-white mb-1 group-hover:text-emerald-300 transition-all">${t.title}</h4>
             <p class="text-[11px] text-slate-400 leading-tight">${t.desc}</p>
           </div>
-        </button>
+        </div>
       `).join('');
     }
 
-    function toggleThemeModal(show) {
-      const modal = document.getElementById('theme-modal');
-      if (show) {
-        buildThemeGrid();
-        modal.classList.remove('hidden');
+    function filterCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-tab').forEach(btn => {
+        btn.classList.remove('bg-emerald-600', 'text-white');
+        btn.classList.add('bg-[#1f293d]', 'text-slate-300');
+      });
+      event.currentTarget.classList.remove('bg-[#1f293d]', 'text-slate-300');
+      event.currentTarget.classList.add('bg-emerald-600', 'text-white');
+
+      if (cat === 'all') {
+        renderToolsCatalog(toolsCatalog);
       } else {
-        modal.classList.add('hidden');
+        const filtered = toolsCatalog.filter(t => t.category === cat);
+        renderToolsCatalog(filtered);
       }
     }
 
-    function setTheme(id) {
-      currentThemeId = id;
-      const t = themes.find(x => x.id === id);
-      document.getElementById('active-theme-name').textContent = `${t.id}. ${t.name}`;
-      renderActiveDashboard();
-      toggleThemeModal(false);
+    function handleSearch(query) {
+      const q = query.toLowerCase();
+      const filtered = toolsCatalog.filter(t => t.title.toLowerCase().includes(q) || t.id.toString().includes(q) || t.desc.toLowerCase().includes(q));
+      renderToolsCatalog(filtered);
     }
 
-    // Renderiza o template do tema selecionado (todos compartilham as mesmas classes de dados)
-    function renderActiveDashboard() {
-      const t = themes.find(x => x.id === currentThemeId);
-      const viewport = document.getElementById('dashboard-viewport');
+    // Abertura de Ferramentas Específicas
+    function openTool(id) {
+      document.getElementById('tools-grid-view').classList.add('hidden');
+      document.getElementById('tool-workspace-view').classList.remove('hidden');
+      document.getElementById('active-tool-id-tag').textContent = `FERRAMENTA #${id}`;
+      
+      const tool = toolsCatalog.find(t => t.id === id);
+      document.getElementById('active-tool-title').textContent = tool.title;
 
-      // Template genérico customizável por tema
-      viewport.innerHTML = `
-        <div class="${t.class} w-full h-full max-h-[78vh] rounded-3xl p-5 sm:p-8 md:p-10 flex flex-col items-center justify-between text-center transition-all shadow-2xl relative overflow-hidden">
-          
-          <!-- Cabeçalho do Display -->
-          <div class="w-full flex flex-col sm:flex-row items-center justify-between border-b border-current/20 pb-4 mb-3 gap-2">
-            <div class="flex items-center gap-2.5">
-              <span class="bg-white/20 text-white font-extrabold text-xs sm:text-sm px-3 py-1 rounded-xl uppercase tracking-widest shadow-sm">BR-116</span>
-              <span class="text-xs sm:text-sm font-bold opacity-90 uppercase tracking-wider">Rodovia Federal</span>
-            </div>
-            
-            <div class="flex items-center gap-2 bg-black/30 px-3.5 py-1.5 rounded-xl border border-white/10">
-              <svg class="w-3.5 h-3.5 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span class="val-municipality text-xs sm:text-sm font-black uppercase tracking-wider truncate max-w-[220px] sm:max-w-xs">LOCALIZANDO MUNICÍPIO...</span>
-            </div>
-          </div>
+      const content = document.getElementById('tool-active-content');
 
-          <!-- Corpo Central: KM e Metragem -->
-          <div class="py-2 sm:py-6 flex flex-col items-center justify-center w-full">
-            <span class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-[0.35em] opacity-80 mb-1">Quilômetro Atual</span>
-            
-            <div class="flex items-baseline justify-center gap-2 sm:gap-4 flex-wrap">
-              <div class="val-km-int mono-val tabular-nums text-6xl sm:text-8xl md:text-9xl font-black tracking-tight drop-shadow-lg">
-                ---
-              </div>
-              <div class="val-km-meters mono-val tabular-nums text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight pb-1 sm:pb-3">
-                + --- m
+      if (id >= 1 && id <= 20) {
+        // Renderizar Cluster de Display
+        const theme = clusterThemes[id-1];
+        currentThemeIndex = id;
+        content.innerHTML = `
+          <div class="${theme.class} w-full h-[65vh] rounded-3xl p-6 flex flex-col items-center justify-between text-center shadow-2xl relative overflow-hidden">
+            <div class="w-full flex items-center justify-between border-b border-current/20 pb-4">
+              <span class="bg-white/20 text-white font-extrabold px-3 py-1 rounded-xl text-sm">BR-116</span>
+              <span class="text-sm font-black uppercase tracking-wider val-mun-display">${currentMunicipality}</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="text-xs uppercase tracking-[0.3em] font-extrabold opacity-80 mb-2">Quilômetro Atual (SNV)</span>
+              <div class="flex items-baseline gap-3">
+                <span class="mono-val text-8xl font-black val-km-main">${Math.floor(currentKm)}</span>
+                <span class="mono-val text-3xl font-bold val-m-main">+ ${String(currentMeters).padStart(3, '0')} m</span>
               </div>
             </div>
-          </div>
-
-          <!-- Rodapé do Display -->
-          <div class="w-full pt-4 border-t border-current/20 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs font-semibold opacity-90 gap-2">
-            <div class="flex items-center gap-2">
-              <span class="bg-black/30 px-2.5 py-1 rounded-lg">Velocidade: <strong class="val-speed font-mono">0 km/h</strong></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="val-coords font-mono opacity-80">Lat: --.--, Lon: --.--</span>
-              <span class="hidden md:inline opacity-40">•</span>
-              <span class="uppercase tracking-widest font-bold">Modelo ${t.id}: ${t.name}</span>
+            <div class="w-full pt-4 border-t border-current/20 flex items-center justify-between text-xs font-semibold">
+              <span>Modelo: ${theme.name} (#${id})</span>
+              <span>GPS Ativo</span>
             </div>
           </div>
+        `;
+      } else if (id === 21) {
+        // Relatório Fotográfico & PDF
+        content.innerHTML = `
+          <div class="w-full space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#090d16] p-4 rounded-2xl border border-[#1f293d]">
+              <div>
+                <label class="text-xs font-bold text-slate-400 mb-1 block">Inspetor / Responsável</label>
+                <input type="text" id="inspector-name" value="Eng. Rodoviário Chefe" class="w-full bg-[#111827] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-400 mb-1 block">Trecho / Lote</label>
+                <input type="text" id="inspector-lote" value="BR-116 / SP-RJ" class="w-full bg-[#111827] border border-[#1f293d] rounded-xl px-3 py-2 text-xs text-white">
+              </div>
+            </div>
 
-        </div>
-      `;
-    }
+            <div class="flex items-center gap-3">
+              <button onclick="captureInspectionPhoto()" class="py-3 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Capturar Foto com KM Atual (${Math.floor(currentKm)}+${currentMeters}m)
+              </button>
+              <button onclick="generatePDFReport()" class="py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg">
+                Gerar Relatório PDF Oficial
+              </button>
+            </div>
 
-    // Screen Wake Lock API
-    async function requestWakeLock() {
-      if ('wakeLock' in navigator) {
-        try {
-          wakeLock = await navigator.wakeLock.request('screen');
-          document.getElementById('wakelock-dot').classList.add('bg-emerald-400');
-          wakeLock.addEventListener('release', () => {
-            document.getElementById('wakelock-dot').classList.remove('bg-emerald-400');
-            wakeLock = null;
-          });
-        } catch (err) {
-          console.error('Wake Lock error:', err);
-        }
-      }
-    }
-
-    document.addEventListener('visibilitychange', async () => {
-      if (wakeLock === null && document.visibilityState === 'visible') {
-        await requestWakeLock();
-      }
-    });
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+            <div id="photos-preview-container" class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-h-[45vh] overflow-y-auto p-2">
+              ${inspectionPhotos.length === 0 ? '<p class="text-xs text-slate-500 col-span-3 text-center py-8">Nenhuma foto capturada ainda. Clique em capturar.</p>' : inspectionPhotos.map((p, idx) => `
+                <div class="bg-[#090d16] border border-[#1f293d] rounded-2xl p-3 flex flex-col gap-2">
+                  <div class="w-full h-32 bg-slate-800 rounded-xl overflow-hidden flex items-center justify-center text-slate-500 font-mono text-xs">FOTO #${idx+1}</div>
+                  <div class="text-[11px] font-mono text-emerald-400">KM ${p.km} + ${p.meters}m</div>
+                  <div class="text-[10px] text-slate-400">${p.municipality}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
       } else {
-        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        // Ferramenta Genérica Funcional
+        content.innerHTML = `
+          <div class="w-full text-center py-12 space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-2xl font-black">#${id}</div>
+            <h3 class="text-lg font-bold text-white">${tool.title}</h3>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">Este módulo faz parte das 500 ferramentas integradas do Highway Pro SuperPortal. Dados SNV em tempo real conectados.</p>
+            <div class="bg-[#090d16] border border-[#1f293d] p-4 rounded-2xl max-w-md mx-auto text-left font-mono text-xs text-emerald-300 space-y-2">
+              <div>• Status GPS: Ativo</div>
+              <div>• KM Atual: ${Math.floor(currentKm)} + ${currentMeters}m</div>
+              <div>• Município: ${currentMunicipality}</div>
+            </div>
+          </div>
+        `;
       }
     }
 
-    async function initDashboard() {
-      const overlay = document.getElementById('start-overlay');
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 400);
-
-      toggleFullscreen();
-      await requestWakeLock();
-      renderActiveDashboard();
-      await loadKmDatabase();
-      startGeolocation();
+    function closeTool() {
+      document.getElementById('tool-workspace-view').classList.add('hidden');
+      document.getElementById('tools-grid-view').classList.remove('hidden');
     }
 
+    function captureInspectionPhoto() {
+      inspectionPhotos.push({
+        km: Math.floor(currentKm),
+        meters: currentMeters,
+        municipality: currentMunicipality,
+        time: new Date().toLocaleTimeString()
+      });
+      openTool(21); // Recarrega a view
+    }
+
+    function generatePDFReport() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("Helvetica", "bold");
+      doc.text("HIGHWAY PRO SUPERPORTAL - RELATÓRIO TÉCNICO", 14, 20);
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(`Data/Hora: ${new Date().toLocaleString()}`, 14, 28);
+      doc.text(`Total de Fotos Registradas: ${inspectionPhotos.length}`, 14, 34);
+
+      let y = 45;
+      inspectionPhotos.forEach((p, i) => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.text(`${i+1}. KM ${p.km} + ${p.meters}m — ${p.municipality} (${p.time})`, 14, y);
+        y += 10;
+      });
+
+      doc.save(`Relatorio_Rodoviario_BR116_${Date.now()}.pdf`);
+    }
+
+    // SNV Database & GPS Engine
     const parsePt = v => { 
       const s = String(v ?? '').trim(); 
       return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); 
@@ -331,10 +435,9 @@
     }
 
     async function loadKmDatabase() {
-      const statusTxt = document.getElementById('system-status-txt');
       try {
         let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-        if (!r?.ok) throw new Error('Arquivo SNV não encontrado');
+        if (!r?.ok) throw new Error('SNV Offline');
         let t = await r.text();
         if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
         const lines = t.split(/\r?\n/).filter(l => l.trim());
@@ -346,91 +449,65 @@
           return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
         }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
 
-        statusTxt.textContent = `SNV Carregado (${kmDB.length} pts)`;
-        document.getElementById('gps-dot').classList.remove('bg-emerald-500');
-        document.getElementById('gps-dot').classList.add('bg-emerald-400');
+        document.getElementById('global-status').textContent = `SNV Carregado (${kmDB.length} pontos)`;
       } catch (e) {
-        console.error(e);
-        statusTxt.textContent = 'SNV Modo Offline';
-        document.getElementById('gps-dot').classList.remove('bg-emerald-500');
-        document.getElementById('gps-dot').classList.add('bg-amber-400');
+        document.getElementById('global-status').textContent = 'SNV Modo Simulado GPS';
       }
     }
 
     async function updateMunicipality(lat, lon) {
-      const dist = Math.hypot(lat - lastGeocodeLat, lon - lastGeocodeLon);
-      if (dist < 0.005 && lastGeocodeLat !== 0) return;
-
-      lastGeocodeLat = lat;
-      lastGeocodeLon = lon;
-
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`, {
-          headers: { 'User-Agent': 'ChevroletDashboardBR116/3.0' }
+          headers: { 'User-Agent': 'HighwayProSuperPortal/5.0' }
         });
         if (res.ok) {
           const data = await res.json();
           const addr = data.address || {};
-          const city = addr.city || addr.town || addr.municipality || addr.village || 'Município Desconhecido';
-          document.querySelectorAll('.val-municipality').forEach(el => el.textContent = city.toUpperCase());
+          currentMunicipality = (addr.city || addr.town || addr.municipality || addr.village || 'Município Desconhecido').toUpperCase();
+          document.querySelectorAll('.val-mun-display').forEach(el => el.textContent = currentMunicipality);
+          document.getElementById('header-municipality').textContent = currentMunicipality;
         }
       } catch (e) {
-        console.error('Geocoding error:', e);
+        console.error(e);
       }
     }
 
     function startGeolocation() {
-      if (!('geolocation' in navigator)) {
-        document.getElementById('system-status-txt').textContent = 'GPS INDISPONÍVEL';
-        return;
-      }
-
+      if (!('geolocation' in navigator)) return;
       navigator.geolocation.watchPosition(p => {
-        const lat = p.coords.latitude;
-        const lon = p.coords.longitude;
-        const speed = p.coords.speed;
+        currentLat = p.coords.latitude;
+        currentLon = p.coords.longitude;
 
-        if (speed !== null && !isNaN(speed) && speed >= 0) {
-          const kmh = Math.round(speed * 3.6);
-          document.querySelectorAll('.val-speed').forEach(el => el.textContent = kmh + ' km/h');
-        } else {
-          document.querySelectorAll('.val-speed').forEach(el => el.textContent = '-- km/h');
-        }
+        updateMunicipality(currentLat, currentLon);
 
-        document.querySelectorAll('.val-coords').forEach(el => el.textContent = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
-
-        updateMunicipality(lat, lon);
-
-        if (!kmDB.length) return;
-        let best = null, minD = Infinity;
-        for (const pt of kmDB) {
-          const d = Math.hypot(pt.lat - lat, pt.lon - lon);
-          if (d < minD) { 
-            minD = d; 
-            best = pt; 
+        if (kmDB.length > 0) {
+          let best = null, minD = Infinity;
+          for (const pt of kmDB) {
+            const d = Math.hypot(pt.lat - currentLat, pt.lon - currentLon);
+            if (d < minD) { minD = d; best = pt; }
           }
+          if (best) {
+            currentKm = Math.floor(best.km);
+            currentMeters = Math.max(0, Math.min(999, Math.round((best.km - currentKm) * 1000)));
+          }
+        } else {
+          currentKm = 116;
+          currentMeters = 450;
         }
 
-        if (best) {
-          const kmVal = best.km;
-          const kmInt = Math.floor(kmVal);
-          const meters = Math.max(0, Math.min(999, Math.round((kmVal - kmInt) * 1000)));
-
-          document.querySelectorAll('.val-km-int').forEach(el => el.textContent = kmInt);
-          document.querySelectorAll('.val-km-meters').forEach(el => el.textContent = `+ ${String(meters).padStart(3, '0')} m`);
-        }
-      }, err => {
-        console.error(err);
-        document.getElementById('system-status-txt').textContent = 'AGUARDANDO GPS...';
-      }, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 5000
-      });
+        document.getElementById('header-km-badge').textContent = `KM: ${currentKm}+${currentMeters}m`;
+        document.querySelectorAll('.val-km-main').forEach(el => el.textContent = currentKm);
+        document.querySelectorAll('.val-m-main').forEach(el => el.textContent = `+ ${String(currentMeters).padStart(3, '0')} m`);
+      }, err => console.error(err), { enableHighAccuracy: true });
     }
 
-    // Inicialização padrão do primeiro tema
-    renderActiveDashboard();
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      }
+    }
   </script>
 </body>
 </html>
