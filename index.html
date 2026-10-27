@@ -1,134 +1,180 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#040608">
+<meta name="theme-color" content="#090d16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Painel KM — Rodovia BR-116</title>
+<title>Chevrolet Digital Cluster — BR-116</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<style>
-  :root {
-    --dnit-green: #047857;
-    --dnit-green-dark: #064e3b;
-    --dnit-green-glow: rgba(4, 120, 87, 0.25);
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          chevrolet: {
+            gold: '#f59e0b',
+            dark: '#090d16',
+            card: '#111827',
+            border: '#1f293d',
+            greenSign: '#047857',
+            greenSignDark: '#022c22'
+          }
+        }
+      }
+    }
   }
+</script>
+<style>
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #040608;
-    color: #f8fafc;
+    background-color: #090d16;
+    color: #f3f4f6;
     overflow: hidden;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
   .mono-val {
     font-family: 'JetBrains Mono', monospace;
   }
-  /* Estilo de Placa Oficial DNIT */
-  .dnit-sign {
-    background: linear-gradient(145deg, #059669, #047857);
-    border: 6px solid #ffffff;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 2px 10px rgba(255, 255, 255, 0.3), inset 0 -4px 15px rgba(0, 0, 0, 0.4);
+  /* Placa DNIT com toque automotivo de luxo */
+  .luxury-dnit-sign {
+    background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
+    border: 4px solid #ffffff;
+    box-shadow: 
+      0 20px 50px rgba(0, 0, 0, 0.8),
+      inset 0 2px 8px rgba(255, 255, 255, 0.35),
+      inset 0 -4px 12px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
   }
-  .dnit-sign::before {
+  .luxury-dnit-sign::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 70%);
+    background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.2), transparent 70%);
     pointer-events: none;
   }
-  /* Animação suave para alterações de KM */
-  .pulse-km {
-    animation: kmPulse 0.4s ease-out;
-  }
-  @keyframes kmPulse {
-    0% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+  /* Brilho sutil imitando display OLED de carro de luxo */
+  .oled-glow {
+    box-shadow: 0 0 40px rgba(4, 120, 87, 0.15);
   }
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 </style>
 </head>
-<body class="w-screen h-screen h-[100dvh] flex flex-col justify-between p-4 md:p-6 select-none">
+<body class="w-screen h-screen h-[100dvh] flex flex-col justify-between p-3 sm:p-5 select-none">
 
-  <!-- TELA DE INICIALIZAÇÃO / TOQUE PARA ATIVAR -->
-  <div id="start-overlay" class="fixed inset-0 z-50 bg-[#040608]/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center transition-opacity duration-300">
-    <div class="max-w-md w-full bg-[#0d131f] border border-white/10 rounded-3xl p-8 shadow-2xl flex flex-col items-center">
-      <div class="w-20 h-20 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-inner">
-        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+  <!-- TELA DE ATIVAÇÃO INICIAL (Obrigatório para iniciar GPS, Fullscreen e Wake Lock) -->
+  <div id="start-overlay" class="fixed inset-0 z-50 bg-[#090d16]/98 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center transition-all duration-500">
+    <div class="max-w-md w-full bg-[#111827] border border-[#1f293d] rounded-3xl p-8 shadow-2xl flex flex-col items-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+      
+      <!-- Ícone Chevrolet / Veicular -->
+      <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6 shadow-inner">
+        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 17h14v-4H5v4z"/><path d="M6 13l1.5-5h9L18 13"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M3 9l3-3h12l3 3"/>
         </svg>
       </div>
-      <h1 class="text-2xl font-black tracking-tight text-white mb-2">Painel KM BR-116</h1>
-      <p class="text-xs text-slate-400 leading-relaxed mb-8">Monitor em tempo real integrado ao SNV e GPS. A tela permanecerá ativa automaticamente durante todo o trajeto.</p>
-      <button onclick="initDashboard()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/25 active:scale-95 transition-all flex items-center justify-center gap-3">
+
+      <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-emerald-400 mb-1">Chevrolet Infotainment System</span>
+      <h1 class="text-2xl font-black tracking-tight text-white mb-2">Monitor BR-116 Pro</h1>
+      <p class="text-xs text-slate-400 leading-relaxed mb-8">Sistema ativo de quilometragem e metragens em tempo real via SNV e GPS. Tela otimizada para manter-se ligada durante o trajeto.</p>
+      
+      <button onclick="initDashboard()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 active:scale-95 transition-all flex items-center justify-center gap-3">
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Iniciar Monitor
+        Ativar Painel Digital
       </button>
     </div>
   </div>
 
-  <!-- TOPO: MUNICÍPIO E STATUS -->
-  <header class="w-full flex items-center justify-between gap-4 z-20">
-    <div class="flex items-center gap-3 bg-[#0f172a]/80 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-2xl shadow-lg">
-      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="gps-dot"></div>
+  <!-- TOPO: STATUS DO VEÍCULO E CONEXÃO -->
+  <header class="w-full flex items-center justify-between gap-3 z-20">
+    <div class="flex items-center gap-3 bg-[#111827]/90 backdrop-blur-md border border-[#1f293d] px-4 py-2.5 rounded-2xl shadow-xl">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" id="gps-dot"></div>
       <div class="flex flex-col">
-        <span class="text-[9px] font-extrabold text-emerald-400/80 uppercase tracking-widest">Município Atual</span>
-        <h2 id="city-txt" class="text-xs md:text-sm font-black tracking-wide text-white uppercase truncate max-w-[200px] md:max-w-sm">Localizando GPS...</h2>
+        <span class="text-[9px] font-extrabold text-emerald-400 uppercase tracking-widest">Status SNV / GPS</span>
+        <span id="system-status-txt" class="text-xs font-bold text-slate-200 uppercase tracking-wide">Conectando...</span>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
-      <div id="status-badge" class="hidden sm:flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 text-amber-400 px-3 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider">
-        Carregando SNV...
+      <div class="hidden sm:flex items-center gap-2 bg-[#111827]/90 border border-[#1f293d] px-3.5 py-2.5 rounded-2xl text-xs font-mono font-bold text-slate-300">
+        <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="clock-txt">--:--:--</span>
       </div>
-      <button onclick="toggleFullscreen()" class="w-11 h-11 rounded-2xl bg-[#0f172a]/80 border border-white/10 text-slate-300 flex items-center justify-center shadow-lg active:scale-95 transition-all" title="Tela Cheia">
+      <button onclick="toggleFullscreen()" class="w-11 h-11 rounded-2xl bg-[#111827]/90 border border-[#1f293d] text-slate-300 hover:text-white flex items-center justify-center shadow-xl active:scale-95 transition-all" title="Tela Cheia">
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- CENTRO: PLACA DO DNIT ESTILIZADA -->
-  <main class="flex-1 flex items-center justify-center my-auto px-2 py-4">
-    <div class="dnit-sign w-full max-w-xl rounded-3xl p-6 md:p-10 flex flex-col items-center justify-center text-center transition-all">
+  <!-- CENTRO: DISPLAY PRINCIPAL (PLACA DNIT DE LUXO) -->
+  <main class="flex-1 flex items-center justify-center my-auto px-1 py-2 w-full max-w-4xl mx-auto">
+    <div class="luxury-dnit-sign oled-glow w-full rounded-3xl p-5 sm:p-8 md:p-10 flex flex-col items-center justify-between text-center transition-all">
       
-      <!-- Cabeçalho da Placa -->
-      <div class="w-full flex items-center justify-between border-b border-white/20 pb-4 mb-4">
+      <!-- CABEÇALHO DA PLACA: RODOVIA + MUNICÍPIO INTEGRADO -->
+      <div class="w-full flex flex-col sm:flex-row items-center justify-between border-b border-white/20 pb-4 mb-3 gap-2">
+        <div class="flex items-center gap-2.5">
+          <span class="bg-white/20 text-white font-extrabold text-xs sm:text-sm px-3 py-1 rounded-xl uppercase tracking-widest shadow-sm">BR-116</span>
+          <span class="text-xs sm:text-sm font-bold text-white/90 uppercase tracking-wider">Rodovia Federal</span>
+        </div>
+        
+        <!-- MUNICÍPIO DENTRO DA PLACA -->
+        <div class="flex items-center gap-2 bg-black/25 px-3.5 py-1.5 rounded-xl border border-white/10">
+          <svg class="w-3.5 h-3.5 text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="municipality-txt" class="text-xs sm:text-sm font-black text-white uppercase tracking-wider truncate max-w-[220px] sm:max-w-xs">LOCALIZANDO MUNICÍPIO...</span>
+        </div>
+      </div>
+
+      <!-- CORPO CENTRAL: KM E METRAGEM COM NÚMEROS TABULARES -->
+      <div class="py-2 sm:py-6 flex flex-col items-center justify-center w-full">
+        <span class="text-[11px] sm:text-xs md:text-sm font-black uppercase tracking-[0.35em] text-white/80 mb-1">Quilômetro Atual</span>
+        
+        <div class="flex items-baseline justify-center gap-2 sm:gap-4 flex-wrap">
+          <!-- KM Principal -->
+          <div id="km-int-txt" class="mono-val tabular-nums text-6xl sm:text-8xl md:text-9xl font-black text-white tracking-tight drop-shadow-lg">
+            ---
+          </div>
+          <!-- Metragem -->
+          <div id="km-meters-txt" class="mono-val tabular-nums text-2xl sm:text-4xl md:text-5xl font-extrabold text-emerald-200 tracking-tight pb-1 sm:pb-3">
+            + --- m
+          </div>
+        </div>
+      </div>
+
+      <!-- RODAPÉ DA PLACA: VELOCÍMETRO E COORDENADAS -->
+      <div class="w-full pt-4 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between text-[11px] sm:text-xs font-semibold text-white/80 gap-2">
         <div class="flex items-center gap-2">
-          <span class="bg-white/20 text-white font-extrabold text-[10px] md:text-xs px-2.5 py-1 rounded-lg uppercase tracking-widest">BR-116</span>
-          <span class="text-[10px] md:text-xs font-bold text-white/80 uppercase tracking-wider">Rodovia Federal</span>
+          <span class="bg-black/20 px-2.5 py-1 rounded-lg">Velocidade: <strong id="speed-txt" class="text-white font-mono">0 km/h</strong></span>
         </div>
-        <div id="speed-indicator" class="text-xs font-mono font-bold text-white/90 bg-black/20 px-3 py-1 rounded-full">
-          -- km/h
+        <div class="flex items-center gap-2">
+          <span id="coords-txt" class="font-mono text-white/70">Lat: --.--, Lon: --.--</span>
+          <span class="hidden md:inline text-white/40">•</span>
+          <span class="uppercase tracking-widest text-emerald-200 font-bold">SNV DNIT</span>
         </div>
-      </div>
-
-      <!-- Corpo Principal com KM Gigante -->
-      <div class="py-4 md:py-6 flex flex-col items-center">
-        <span class="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-white/80 mb-1">Quilômetro</span>
-        <div id="km-txt" class="mono-val text-6xl sm:text-7xl md:text-8xl font-black text-white tracking-tight drop-shadow-md">
-          ---
-        </div>
-      </div>
-
-      <!-- Rodapé da Placa -->
-      <div class="w-full pt-4 border-t border-white/20 flex items-center justify-between text-[10px] md:text-xs font-semibold text-white/70">
-        <span id="coords-txt">Lat: --, Lon: --</span>
-        <span class="uppercase tracking-widest text-emerald-200">Sistema SNV DNIT</span>
       </div>
 
     </div>
   </main>
 
-  <!-- RODAPÉ DISCRETO -->
-  <footer class="w-full text-center pb-2 z-10">
-    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Painel de Bordo Automotivo • Tela Sempre Ativa</p>
+  <!-- RODAPÉ DO DISPLAY DE BORDO -->
+  <footer class="w-full flex items-center justify-between text-[10px] sm:text-xs text-slate-400 font-semibold px-2 z-10">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" id="wakelock-dot"></span>
+      <span>Tela Ativa & Wake Lock Ativado</span>
+    </div>
+    <div class="uppercase tracking-widest text-slate-400">
+      Chevrolet Digital Cluster v2.5
+    </div>
   </footer>
 
   <script>
@@ -136,14 +182,21 @@
     let wakeLock = null;
     let lastGeocodeLat = 0;
     let lastGeocodeLon = 0;
-    let watchId = null;
 
-    // Solicitar Wake Lock para evitar que a tela apague no painel do carro
+    // Relógio em tempo real no topo
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock-txt').textContent = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    // Screen Wake Lock API para evitar que a tela apague
     async function requestWakeLock() {
       if ('wakeLock' in navigator) {
         try {
           wakeLock = await navigator.wakeLock.request('screen');
+          document.getElementById('wakelock-dot').classList.add('bg-emerald-400');
           wakeLock.addEventListener('release', () => {
+            document.getElementById('wakelock-dot').classList.remove('bg-emerald-400');
             wakeLock = null;
           });
         } catch (err) {
@@ -167,19 +220,13 @@
     }
 
     async function initDashboard() {
-      // Ocultar overlay de boas-vindas
       const overlay = document.getElementById('start-overlay');
       overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 300);
+      setTimeout(() => overlay.remove(), 400);
 
-      // Entrar em tela cheia e ativar wake lock
       toggleFullscreen();
       await requestWakeLock();
-
-      // Carregar SNV CSV
       await loadKmDatabase();
-
-      // Iniciar monitoramento de geolocalização em tempo real
       startGeolocation();
     }
 
@@ -198,7 +245,7 @@
     }
 
     async function loadKmDatabase() {
-      const badge = document.getElementById('status-badge');
+      const statusTxt = document.getElementById('system-status-txt');
       try {
         let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' }).catch(() => null);
         if (!r?.ok) throw new Error('Arquivo SNV não encontrado');
@@ -213,19 +260,18 @@
           return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
         }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
 
-        badge.textContent = 'SNV Ativo';
-        badge.classList.remove('bg-amber-500/20', 'text-amber-400');
-        badge.classList.add('bg-emerald-500/20', 'text-emerald-400');
+        statusTxt.textContent = `SNV Carregado (${kmDB.length} pts)`;
+        document.getElementById('gps-dot').classList.remove('bg-emerald-500');
+        document.getElementById('gps-dot').classList.add('bg-emerald-400');
       } catch (e) {
         console.error(e);
-        badge.textContent = 'Erro no SNV';
-        badge.classList.remove('bg-amber-500/20', 'text-amber-400');
-        badge.classList.add('bg-rose-500/20', 'text-rose-400');
+        statusTxt.textContent = 'Erro no SNV (Offline)';
+        document.getElementById('gps-dot').classList.remove('bg-emerald-500');
+        document.getElementById('gps-dot').classList.add('bg-amber-400');
       }
     }
 
     async function updateMunicipality(lat, lon) {
-      // Atualizar apenas se o veículo se deslocar mais de ~500 metros para poupar requisições
       const dist = Math.hypot(lat - lastGeocodeLat, lon - lastGeocodeLon);
       if (dist < 0.005 && lastGeocodeLat !== 0) return;
 
@@ -234,13 +280,13 @@
 
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`, {
-          headers: { 'User-Agent': 'KM-Dashboard-BR116/2.0' }
+          headers: { 'User-Agent': 'ChevroletDashboardBR116/3.0' }
         });
         if (res.ok) {
           const data = await res.json();
           const addr = data.address || {};
           const city = addr.city || addr.town || addr.municipality || addr.village || 'Município Desconhecido';
-          document.getElementById('city-txt').textContent = city.toUpperCase();
+          document.getElementById('municipality-txt').textContent = city.toUpperCase();
         }
       } catch (e) {
         console.error('Geocoding error:', e);
@@ -249,29 +295,26 @@
 
     function startGeolocation() {
       if (!('geolocation' in navigator)) {
-        document.getElementById('city-txt').textContent = 'GPS INDISPONÍVEL';
+        document.getElementById('system-status-txt').textContent = 'GPS INDISPONÍVEL';
         return;
       }
 
-      watchId = navigator.geolocation.watchPosition(p => {
+      navigator.geolocation.watchPosition(p => {
         const lat = p.coords.latitude;
         const lon = p.coords.longitude;
         const speed = p.coords.speed; // m/s
 
-        // Atualizar velocímetro se disponível
         if (speed !== null && !isNaN(speed) && speed >= 0) {
           const kmh = Math.round(speed * 3.6);
-          document.getElementById('speed-indicator').textContent = kmh + ' km/h';
+          document.getElementById('speed-txt').textContent = kmh + ' km/h';
         } else {
-          document.getElementById('speed-indicator').textContent = '-- km/h';
+          document.getElementById('speed-txt').textContent = '-- km/h';
         }
 
         document.getElementById('coords-txt').textContent = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
 
-        // Buscar Município via API
         updateMunicipality(lat, lon);
 
-        // Calcular KM mais próximo na base SNV
         if (!kmDB.length) return;
         let best = null, minD = Infinity;
         for (const pt of kmDB) {
@@ -283,18 +326,16 @@
         }
 
         if (best) {
-          const formattedKm = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
-          const kmEl = document.getElementById('km-txt');
-          if (kmEl.textContent !== formattedKm) {
-            kmEl.textContent = formattedKm;
-            kmEl.classList.remove('pulse-km');
-            void kmEl.offsetWidth; // Trigger reflow
-            kmEl.classList.add('pulse-km');
-          }
+          const kmVal = best.km;
+          const kmInt = Math.floor(kmVal);
+          const meters = Math.max(0, Math.min(999, Math.round((kmVal - kmInt) * 1000)));
+
+          document.getElementById('km-int-txt').textContent = kmInt;
+          document.getElementById('km-meters-txt').textContent = `+ ${String(meters).padStart(3, '0')} m`;
         }
       }, err => {
         console.error(err);
-        document.getElementById('city-txt').textContent = 'AGUARDANDO SINAL GPS...';
+        document.getElementById('system-status-txt').textContent = 'AGUARDANDO GPS...';
       }, {
         enableHighAccuracy: true,
         maximumAge: 0,
