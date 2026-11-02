@@ -118,6 +118,7 @@ body.clean #map{opacity:0}
       <label class="opt"><span>GPS</span><input type="checkbox" data-hud="gps"></label>
       <label class="opt"><span>Velocidade</span><input type="checkbox" data-hud="speed"></label>
       <label class="opt"><span>Endereço / contexto</span><input type="checkbox" data-hud="ctx"></label>
+      <label class="opt"><span>Mapa</span><input type="checkbox" data-hud="map"></label>
     </div>
   </div>
   <button class="btn" id="expTrk">Exportar trilha (.csv)</button>
@@ -131,7 +132,7 @@ const $=id=>document.getElementById(id);
 const S={trk:[],db:[],km:'---',lat:0,lon:0,acc:null,dir:null,stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0};
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
 const cfg=JSON.parse(localStorage.getItem('kmr')||'{}');
-const defaultHud={km:true,gps:false,speed:false,ctx:false};
+const defaultHud={km:true,gps:false,speed:false,ctx:false,map:false};
 Object.assign(cfg, defaultHud, {
   label: cfg.label || '',
   int: cfg.int || 200,
@@ -139,16 +140,17 @@ Object.assign(cfg, defaultHud, {
   km: cfg.km !== undefined ? cfg.km : defaultHud.km,
   gps: cfg.gps !== undefined ? cfg.gps : defaultHud.gps,
   speed: cfg.speed !== undefined ? cfg.speed : defaultHud.speed,
-  ctx: cfg.ctx !== undefined ? cfg.ctx : defaultHud.ctx
+  ctx: cfg.ctx !== undefined ? cfg.ctx : defaultHud.ctx,
+  map: cfg.map !== undefined ? cfg.map : defaultHud.map
 });
 ['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined && $(k))$(k).value=cfg[k]});
-function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,km:cfg.km,gps:cfg.gps,speed:cfg.speed,ctx:cfg.ctx}))}catch(e){}}
+function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,km:cfg.km,gps:cfg.gps,speed:cfg.speed,ctx:cfg.ctx,map:cfg.map}))}catch(e){}}
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
 $('lbl').value=$('label').value;
 $('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
 
 document.querySelectorAll('[data-hud]').forEach(el=>{const key=el.dataset.hud;el.checked=!!cfg[key];el.addEventListener('change',()=>{cfg[key]=el.checked;persist();applyHudVisibility();});});
-function hudState(){return {km:!!cfg.km,gps:!!cfg.gps,speed:!!cfg.speed,ctx:!!cfg.ctx};}
+function hudState(){return {km:!!cfg.km,gps:!!cfg.gps,speed:!!cfg.speed,ctx:!!cfg.ctx,map:!!cfg.map};}
 function applyHudVisibility(){
   const state=hudState();
   const kmWrap=$('km')?.closest('.hud-line');
@@ -156,7 +158,9 @@ function applyHudVisibility(){
   $('gps').hidden=!state.gps;
   $('spd').hidden=!state.speed;
   $('ctx').hidden=!state.ctx;
+  $('map').hidden=!state.map;
   $('hud').hidden=!Object.values(state).some(Boolean);
+  if(map && state.map){map.invalidateSize();}
 }
 applyHudVisibility();
 
@@ -232,6 +236,8 @@ function initMap(){
   if(S.db.length)L.polyline(S.db.filter((_,i)=>i%st===0).map(p=>[p.lat,p.lon]),{color:'#ffd600',weight:3,opacity:.8}).addTo(map);
   trkL=L.polyline([],{color:'#34d399',weight:4}).addTo(map);
   mk=L.circleMarker([S.lat,S.lon],{radius:7,color:'#fff',fillColor:'#10b981',fillOpacity:1}).addTo(map);
+  if(!cfg.map) map.setZoom(1, {animate:false});
+  applyHudVisibility();
 }
 if('geolocation' in navigator)navigator.geolocation.watchPosition(onFix,()=>{$('gps').textContent='GPS indisponível'},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
 $('expTrk').onclick=()=>{if(!S.trk.length)return toast('Nenhum ponto gravado ainda',1);
@@ -271,7 +277,7 @@ async function openCam(id){
 }
 $('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
 $('go').onclick=async()=>{
-  try{if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');initMap();}
+  try{if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');if(!map) initMap();else if(cfg.map) map.invalidateSize();}
   catch(e){toast('Não foi possível acessar a câmera: '+e.message,1)}
 };
 function pinchZoom(){
@@ -307,7 +313,7 @@ function frame(){
   if(state.gps)gpsText.push(`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)} ±${Math.round(S.acc||0)}m`);
   if(state.speed&&S.spd!=null)gpsText.push(`${Math.round(S.spd)} km/h`);
   if(gpsText.length)items.push({type:'meta',text:gpsText.join(' · '),size:Math.round(h*.018),color:'rgba(255,255,255,.82)'});
-  if(state.ctx){const text=[S.road,S.city,S.wx].filter(Boolean).join(' · ');if(text)items.push({type:'meta',text,size:Math.round(h*.018),color:'rgba(255,255,255,.82)'})}
+  if(state.ctx){const text=[S.road,S.city,S.wx].filter(Boolean).join(' · '); if(text) items.push({type:'meta',text,size:Math.round(h*.018),color:'rgba(255,255,255,.82)'}); }
   if(items.length===0 && !$('label').value.trim())return cv;
   const bh=h*.17,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.3,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);
   let y=h-bh*.58;
