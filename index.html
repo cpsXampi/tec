@@ -8,19 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{
-  --bg:#07090c;
-  --s1:#10141a;
-  --s2:#171c24;
-  --line:rgba(255,255,255,.12);
-  --acc:#ffd600;
-  --acc-2:#ffc107;
-  --ok:#34d399;
-  --bad:#ef4444;
-  --tx:#f2f2f4;
-  --mu:#a7acb6;
-  --sb:max(env(safe-area-inset-bottom),16px);
-  --st:env(safe-area-inset-top,0px);
-  --shadow:0 24px 50px rgba(0,0,0,.28);
+  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.12);--acc:#ffd600;--acc-2:#ffc107;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#a7acb6;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);--shadow:0 24px 50px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
@@ -42,7 +30,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .check input{accent-color:var(--acc);width:16px;height:16px}
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hud{position:absolute;z-index:5;top:calc(14px + var(--st));left:12px;max-width:min(360px,calc(100% - 24px));background:rgba(5, 15, 12, .72);backdrop-filter:blur(16px);border:1px solid rgba(255,214,0,.28);border-radius:18px;padding:12px 14px;box-shadow:0 18px 35px rgba(0,0,0,.25)}
+.hud{position:absolute;z-index:5;top:calc(14px + var(--st));left:12px;max-width:min(360px,calc(100% - 24px));background:rgba(5,15,12,.72);backdrop-filter:blur(16px);border:1px solid rgba(255,214,0,.28);border-radius:18px;padding:12px 14px;box-shadow:0 18px 35px rgba(0,0,0,.25)}
 .hud .summary{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:8px}
 .hud .label{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#c9f7d8;font-weight:700}
 .hud .km{font-size:clamp(24px,2.8vw,38px);line-height:1;font-weight:800;color:var(--tx)}
@@ -55,9 +43,7 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
 .pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}@keyframes b{50%{opacity:.15}}
 .lbl{width:170px;background:rgba(0,0,0,.66);border:1px solid rgba(255,214,0,.35);border-radius:12px;padding:9px 12px;font-size:13px;box-shadow:0 10px 20px rgba(0,0,0,.2)}
-.legend{
-  position:absolute;z-index:5;left:16px;right:16px;bottom:118px;background:rgba(7,9,12,.58);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 18px 30px rgba(0,0,0,.16);
-}
+.legend{position:absolute;z-index:5;left:16px;right:16px;bottom:118px;background:rgba(7,9,12,.58);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 18px 30px rgba(0,0,0,.16)}
 .legend[hidden]{display:none}
 .legend .title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
 .legend .title strong{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#cfe8ff}
@@ -101,11 +87,6 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
       <input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off">
     </div>
 
-    <div class="fld">
-      <label for="company">Cliente / local (opcional)</label>
-      <input id="company" class="inp" maxlength="80" placeholder="Ex.: Empresa ABC, Rodovia SP-123" autocomplete="off">
-    </div>
-
     <button class="btn" id="pick">Escolher pasta de destino</button>
     <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
     <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
@@ -124,10 +105,6 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
       <div class="km" id="km">KM ---</div>
     </div>
     <div class="meta">
-      <div class="meta-line" data-toggle="showCompanyInfo">
-        <div class="name">Local</div>
-        <div class="value" id="companyInfo">Cliente/local não informado</div>
-      </div>
       <div class="meta-line" data-toggle="showDate">
         <div class="name">Data</div>
         <div class="value" id="date">--</div>
@@ -160,7 +137,6 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
     <div class="grid">
       <div class="item" data-toggle="showLabel"><div class="n">Etiqueta</div><div class="v" id="legendLabel">Sem etiqueta</div></div>
       <div class="item" data-toggle="showKm"><div class="n">KM</div><div class="v" id="legendKm">KM ---</div></div>
-      <div class="item" data-toggle="showCompanyInfo"><div class="n">Local</div><div class="v" id="legendCompany">Cliente/local não informado</div></div>
       <div class="item" data-toggle="showGps"><div class="n">GPS</div><div class="v" id="legendGps">Aguardando GPS…</div></div>
       <div class="item" data-toggle="showAddress"><div class="n">Endereço</div><div class="v" id="legendAddress">Aguardando endereço…</div></div>
       <div class="item" data-toggle="showWeather"><div class="n">Clima</div><div class="v" id="legendWeather">Aguardando clima…</div></div>
@@ -205,7 +181,6 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
         <label class="check"><input type="checkbox" id="showLabel" checked> Etiqueta</label>
         <label class="check"><input type="checkbox" id="showAddress" checked> Endereço</label>
         <label class="check"><input type="checkbox" id="showWeather" checked> Clima</label>
-        <label class="check"><input type="checkbox" id="showCompanyInfo" checked> Cliente / local</label>
       </div>
     </div>
 
@@ -230,7 +205,6 @@ const $ = id => document.getElementById(id);
 
 const defaultCfg = {
   label: '',
-  company: '',
   int: 200,
   lote: 150,
   showKm: true,
@@ -239,7 +213,6 @@ const defaultCfg = {
   showLabel: true,
   showAddress: true,
   showWeather: true,
-  showCompanyInfo: true,
   photoOverlay: true,
   videoOverlay: true,
   pdfOverlay: true
@@ -256,6 +229,7 @@ const S = {
   mode: 'foto',
   cap: false,
   rec: null,
+  chunks: [],
   buf: [],
   batch: 1,
   queue: [],
@@ -271,20 +245,10 @@ const S = {
 
 const cv = $('c');
 const cx = cv.getContext('2d', { alpha: false });
-
-const toggleKeys = ['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather', 'showCompanyInfo'];
-const displayMap = {
-  showKm: ['#km', '#legendKm'],
-  showGps: ['#gps', '#legendGps'],
-  showDate: ['#date', '#legendDate'],
-  showLabel: ['#lbl', '#legendLabel'],
-  showAddress: ['#addr', '#legendAddress'],
-  showWeather: ['#weather', '#legendWeather'],
-  showCompanyInfo: ['#companyInfo', '#legendCompany']
-};
+const toggleKeys = ['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather'];
 
 const cfg = Object.assign({}, defaultCfg, JSON.parse(localStorage.getItem('kmr') || '{}'));
-['label', 'company', 'int', 'lote'].forEach(k => {
+['label', 'int', 'lote'].forEach(k => {
   if (cfg[k] !== undefined && cfg[k] !== null) $(k).value = cfg[k];
 });
 Object.keys(defaultCfg).forEach(k => {
@@ -298,7 +262,6 @@ function persist(){
   try {
     localStorage.setItem('kmr', JSON.stringify({
       label: $('label').value,
-      company: $('company').value,
       int: $('int').value,
       lote: $('lote').value,
       showKm: $('showKm').checked,
@@ -307,7 +270,6 @@ function persist(){
       showLabel: $('showLabel').checked,
       showAddress: $('showAddress').checked,
       showWeather: $('showWeather').checked,
-      showCompanyInfo: $('showCompanyInfo').checked,
       photoOverlay: $('photoOverlay').checked,
       videoOverlay: $('videoOverlay').checked,
       pdfOverlay: $('pdfOverlay').checked
@@ -317,11 +279,12 @@ function persist(){
   }
 }
 
-['label', 'company', 'int', 'lote'].forEach(k => $(k).addEventListener('input', persist));
-['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather', 'showCompanyInfo', 'photoOverlay', 'videoOverlay', 'pdfOverlay']
+['label', 'int', 'lote'].forEach(k => $(k).addEventListener('input', persist));
+['showKm','showGps','showDate','showLabel','showAddress','showWeather','photoOverlay','videoOverlay','pdfOverlay']
   .forEach(k => $(k).addEventListener('change', () => {
     persist();
     updateLiveHud();
+    refreshMetaText();
   }));
 
 $('lbl').value = $('label').value;
@@ -423,11 +386,9 @@ function setMetaField(id, value) {
 
 function updateLegendText() {
   const label = $('label').value.trim() || 'Sem etiqueta';
-  const company = $('company').value.trim() || 'Cliente/local não informado';
   const dateText = formatDateTime(new Date());
 
   setMetaField('legendLabel', label);
-  setMetaField('legendCompany', company);
   setMetaField('legendDate', dateText);
   setMetaField('legendKm', S.db.length ? `KM ${S.km}` : 'KM ---');
   setMetaField('legendGps', Number.isFinite(S.lat) && Number.isFinite(S.lon) && S.db.length ? `GPS ±${Math.round(S.acc || 0)} m` : 'Aguardando GPS…');
@@ -436,7 +397,6 @@ function updateLegendText() {
 }
 
 function updateLiveHud(){
-  const company = $('company').value.trim();
   const label = $('label').value.trim();
   $('lbl').value = label;
 
@@ -461,40 +421,13 @@ function updateLiveHud(){
 
   $('date').textContent = formatDateTime(new Date());
   $('legendDate').textContent = formatDateTime(new Date());
-  $('companyInfo').textContent = company || 'Cliente/local não informado';
-  $('legendCompany').textContent = company || 'Cliente/local não informado';
   $('lbl').placeholder = label ? label : 'Etiqueta';
   $('addr').textContent = S.addr || 'Aguardando endereço…';
   $('weather').textContent = S.weather || 'Aguardando clima…';
   $('legendAddress').textContent = S.addr || 'Aguardando endereço…';
   $('legendWeather').textContent = S.weather || 'Aguardando clima…';
 
-  document.querySelectorAll('[data-toggle]').forEach(el => {
-    const key = el.dataset.toggle;
-    const visible = !!$('show' + key.replace(/^[a-z]/, c => c.toUpperCase()).replace(/^show/, 'show')).checked;
-    if (el.id === 'lbl') {
-      el.style.display = $('showLabel').checked ? 'block' : 'none';
-      return;
-    }
-    if (el.classList.contains('item')) {
-      el.style.display = $('show' + key.replace(/^[a-z]/, c => c.toUpperCase())).checked ? 'flex' : 'none';
-      return;
-    }
-    if (key === 'showLabel') return;
-    const target = el.closest('[data-toggle]');
-    if (target) {
-      const chkId = 'show' + key.replace('show', '').replace(/^[a-z]/, c => c.toUpperCase());
-      const checkbox = $(chkId);
-      el.style.display = checkbox && checkbox.checked ? 'flex' : 'none';
-    }
-  });
-
-  const visibleLabel = $('showLabel').checked;
-  $('lbl').style.display = visibleLabel ? 'block' : 'none';
-  $('legend').hidden = ![...toggleKeys].some(key => $(key).checked);
-  if (!document.querySelector('[data-toggle="showCompanyInfo"]').style.display || !document.querySelector('#legendCompany').textContent) {
-    $('legend').hidden = true;
-  }
+  $('legend').hidden = !( $('showKm').checked || $('showGps').checked || $('showAddress').checked || $('showWeather').checked || $('showDate').checked || $('showLabel').checked );
 }
 
 function refreshMetaText(){
@@ -502,23 +435,8 @@ function refreshMetaText(){
   const showGps = $('showGps').checked;
   const showAddress = $('showAddress').checked;
   const showWeather = $('showWeather').checked;
-  const showCompanyInfo = $('showCompanyInfo').checked;
   const showDate = $('showDate').checked;
   const showLabel = $('showLabel').checked;
-
-  const fieldMap = {
-    showKm: ['#km'],
-    showGps: ['#gps'],
-    showAddress: ['#addr'],
-    showWeather: ['#weather'],
-    showCompanyInfo: ['#companyInfo'],
-    showDate: ['#date'],
-    showLabel: ['#lbl']
-  };
-
-  Object.entries(fieldMap).forEach(([key, selectors]) => {
-    const visible = eval(key) === undefined ? true : eval(key); // no-op fallback
-  });
 
   const apply = (selector, visible) => {
     const el = document.querySelector(selector);
@@ -529,7 +447,6 @@ function refreshMetaText(){
   apply('#gps', showGps);
   apply('#addr', showAddress);
   apply('#weather', showWeather);
-  apply('#companyInfo', showCompanyInfo);
   apply('#date', showDate);
   apply('#lbl', showLabel);
 
@@ -537,11 +454,10 @@ function refreshMetaText(){
   apply('#legendGps', showGps);
   apply('#legendAddress', showAddress);
   apply('#legendWeather', showWeather);
-  apply('#legendCompany', showCompanyInfo);
   apply('#legendDate', showDate);
   apply('#legendLabel', showLabel);
 
-  $('legend').hidden = !(showKm || showGps || showAddress || showWeather || showCompanyInfo || showDate || showLabel);
+  $('legend').hidden = !(showKm || showGps || showAddress || showWeather || showDate || showLabel);
   updateLegendText();
 }
 
@@ -553,6 +469,7 @@ async function fetchAddress(lat, lon){
     const data = await resp.json();
     S.addr = data?.address ? [data.address.road, data.address.city || data.address.town || data.address.village, data.address.state, data.address.country].filter(Boolean).join(', ') : 'Endereço não informado';
     $('addr').textContent = S.addr;
+    $('legendAddress').textContent = S.addr;
   } catch (e) {
     S.addr = 'Endereço não informado';
   }
@@ -573,6 +490,7 @@ async function fetchWeather(lat, lon){
     };
     S.weather = `${temp} · ${map[code] || 'Clima'}`;
     $('weather').textContent = S.weather;
+    $('legendWeather').textContent = S.weather;
   } catch (e) {
     S.weather = 'Clima não informado';
   }
@@ -677,19 +595,13 @@ function pinchZoom(){
   let z0 = 1;
   v.ontouchstart = e => {
     if (e.touches.length === 2) {
-      d0 = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
+      d0 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
       z0 = Number(v.style.zoom || 1);
     }
   };
   v.ontouchmove = e => {
     if (e.touches.length === 2) {
-      const d1 = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
+      const d1 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
       const factor = d1 / d0 || 1;
       const next = Math.min(2.2, Math.max(1, z0 * factor));
       v.style.zoom = next;
@@ -725,7 +637,6 @@ function drawLegendOverlay(ctx, w, h) {
   const show = {
     label: $('showLabel').checked,
     km: $('showKm').checked,
-    company: $('showCompanyInfo').checked,
     gps: $('showGps').checked,
     address: $('showAddress').checked,
     weather: $('showWeather').checked,
@@ -733,7 +644,6 @@ function drawLegendOverlay(ctx, w, h) {
   };
 
   const entries = [];
-  if (show.company) entries.push(['LOCAL', ($('company').value.trim() || 'Cliente/local não informado')]);
   if (show.label) entries.push(['ETIQUETA', ($('label').value.trim() || 'Sem etiqueta')]);
   if (show.km) entries.push(['KM', `KM ${S.km}`]);
   if (show.date) entries.push(['DATA', formatDateTime(new Date())]);
@@ -802,7 +712,6 @@ $('snap').onclick = async e => {
   await save(b, `FOTO_EXTRA_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);
 };
 
-let vidLoop = 0;
 function toggleVideo(){
   if (S.rec) {
     S.rec.stop();
@@ -937,14 +846,13 @@ async function makePdf({ p, n }) {
   doc.setFontSize(12);
   doc.setTextColor(196, 210, 220);
   doc.text(`Etiqueta: ${($('label').value || 'Sem etiqueta').slice(0, 60)}`, 44, 76);
-  doc.text(`Cliente/local: ${($('company').value || 'Não informado').slice(0, 80)}`, 44, 96);
-  doc.text(`KM: ${S.km || '---'}`, 44, 116);
-  doc.text(`Data: ${formatDateTime(new Date())}`, 44, 136);
-  doc.text(`GPS: ${S.db.length ? `±${Math.round(S.acc || 0)} m` : 'Indisponível'}`, 44, 156);
-  doc.text(`Endereço: ${String(S.addr || 'Endereço não informado').slice(0, 90)}`, 44, 176);
-  doc.text(`Clima: ${String(S.weather || 'Clima não informado').slice(0, 90)}`, 44, 196);
+  doc.text(`KM: ${S.km || '---'}`, 44, 96);
+  doc.text(`Data: ${formatDateTime(new Date())}`, 44, 116);
+  doc.text(`GPS: ${S.db.length ? `±${Math.round(S.acc || 0)} m` : 'Indisponível'}`, 44, 136);
+  doc.text(`Endereço: ${String(S.addr || 'Endereço não informado').slice(0, 90)}`, 44, 156);
+  doc.text(`Clima: ${String(S.weather || 'Clima não informado').slice(0, 90)}`, 44, 176);
 
-  let imgY = 230;
+  let imgY = 210;
   for (let i = 0; i < p.length; i++) {
     const item = p[i];
     const base64 = btoa(String.fromCharCode(...item.u8));
@@ -962,7 +870,7 @@ async function makePdf({ p, n }) {
   }
 
   const blob = doc.output('blob');
-  const name = `RELATORIO_${safe($('company').value || 'KM')}_${stamp()}.pdf`;
+  const name = `RELATORIO_${safe($('label').value || 'KM')}_${stamp()}.pdf`;
   await save(blob, name);
 }
 
