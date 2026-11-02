@@ -115,7 +115,7 @@ body.clean #map{opacity:0}
     <label>Itens visíveis no painel</label>
     <div class="opts">
       <label class="opt"><span>KM</span><input type="checkbox" data-hud="km" checked></label>
-      <label class="opt"><span>GPS</span><input type="checkbox" data-hud="gps"></label>
+      <label class="opt"><span>Precisão atual do GPS</span><input type="checkbox" data-hud="gps"></label>
       <label class="opt"><span>Velocidade</span><input type="checkbox" data-hud="speed"></label>
       <label class="opt"><span>Endereço / contexto</span><input type="checkbox" data-hud="ctx"></label>
       <label class="opt"><span>Mapa</span><input type="checkbox" data-hud="map"></label>
@@ -168,6 +168,7 @@ function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 const safe=s=>s.replace(/[,/\\:]/g,'_');
+const fmtDistance=v=>v>=1000?`${(v/1000).toFixed(2).replace('.',',')} km`:`${Math.round(v)} m`;
 
 /* ---- tabela de KM ---- */
 const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
@@ -210,7 +211,9 @@ function onFix(p){
     hist.push({t:p.timestamp,km:n.km});while(hist.length>1&&p.timestamp-hist[0].t>15000)hist.shift();
     const d=n.km-hist[0].km;S.dirTxt=p.timestamp-hist[0].t>=4000&&Math.abs(d)>.004?(d>0?'sentido crescente':'sentido decrescente'):'';
     $('km').textContent='KM '+S.km}
-  $('gps').textContent=`GPS ±${Math.round(S.acc)} m`+(n&&n.dist>500?' · longe da rodovia':'');
+  const gpsText=`Precisão do GPS: ±${Math.round(S.acc)} m`;
+  const distText=n ? ` · Distância lateral ao marco: ${fmtDistance(n.dist)}` : '';
+  $('gps').textContent=gpsText + distText;
   $('spd').textContent=[S.spd!=null?Math.round(S.spd)+' km/h':'',S.dirTxt].filter(Boolean).join(' · ');
   if(S.cap||S.rec){S.trk.push([new Date(p.timestamp).toISOString(),S.km,S.lat.toFixed(6),S.lon.toFixed(6),S.spd!=null?S.spd.toFixed(1):'',S.acc.toFixed(1)]);trkL?.addLatLng([S.lat,S.lon])}
   if(map){mk.setLatLng([S.lat,S.lon]);map.panTo([S.lat,S.lon],{animate:false})}
@@ -310,7 +313,7 @@ function frame(){
   const items=[];
   if(state.km)items.push({type:'km',text:'KM '+S.km+(S.dirTxt?'  '+S.dirTxt:''),size:Math.round(h*.045),color:'#fff'});
   const gpsText=[];
-  if(state.gps)gpsText.push(`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)} ±${Math.round(S.acc||0)}m`);
+  if(state.gps)gpsText.push(`Precisão do GPS: ±${Math.round(S.acc||0)} m${S.db.length&&S.lat&&S.lon?` · Distância lateral ao marco: ${fmtDistance(nearest(S.lat,S.lon).dist)}`:''}`);
   if(state.speed&&S.spd!=null)gpsText.push(`${Math.round(S.spd)} km/h`);
   if(gpsText.length)items.push({type:'meta',text:gpsText.join(' · '),size:Math.round(h*.018),color:'rgba(255,255,255,.82)'});
   if(state.ctx){const text=[S.road,S.city,S.wx].filter(Boolean).join(' · '); if(text) items.push({type:'meta',text,size:Math.round(h*.018),color:'rgba(255,255,255,.82)'}); }
