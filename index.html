@@ -1,408 +1,608 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07090c">
-<title>KM Report Pro</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-<style>
-:root{--bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}
-:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
-/* início */
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
-.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
-.card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
-.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
-.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
-.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}
-.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
-.btn:active{transform:scale(.98)}
-.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--dim,#555);flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
-/* câmera */
-#cam{flex-direction:column;background:#000}
-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hud{position:absolute;z-index:5;background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;top:calc(14px + var(--st));left:12px;max-width:72vw}
-.hud-line{display:flex;flex-direction:column;gap:2px}
-.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{font-size:26px;line-height:1.1}
-.hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hud[hidden]{display:none}.hud .acc[hidden]{display:none}.hud .hud-line[hidden]{display:none}
-.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
-.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
-.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}
-@keyframes b{50%{opacity:.15}}
-.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
-body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
-.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
-.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
-.modes button[aria-pressed=true]{background:var(--acc);color:#000}
-.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}
-.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
-.rb svg{width:22px;height:22px}
-#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
-#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}
-#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}
-#snap{visibility:hidden}#snap.on{visibility:visible}
-/* ajustes */
-#set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
-#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}
-.opts{display:grid;gap:8px;margin-top:10px}
-.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
-.opt input{width:18px;height:18px;accent-color:var(--acc)}
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;color:var(--tx);opacity:0;transition:opacity .2s ease,transform .2s ease}
-#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-#map{position:absolute;z-index:4;left:12px;top:calc(150px + var(--st));width:118px;height:118px;border-radius:14px;border:1px solid var(--line);overflow:hidden;pointer-events:none;transition:opacity .2s ease}
-body.clean #map{opacity:0}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07090c">
+  <title>KM Report Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #07090c;
+      --s1: #10141a;
+      --s2: #171c24;
+      --line: rgba(255,255,255,.1);
+      --acc: #ffd600;
+      --ok: #34d399;
+      --bad: #ef4444;
+      --tx: #f2f2f4;
+      --mu: #8b8f98;
+      --sb: max(env(safe-area-inset-bottom), 16px);
+      --st: env(safe-area-inset-top, 0px);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+    button,input,select{font:inherit;color:inherit}
+    button{border:0;background:none;cursor:pointer}
+    :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+    .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
+    #start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
+    .card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
+    .card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
+    .fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
+    .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
+    .btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}
+    .btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
+    .btn:active{transform:scale(.98)}
+    .st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
+    .dot{width:9px;height:9px;border-radius:50%;background:var(--dim,#555);flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
+
+    #cam{flex-direction:column;background:#000}
+    video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .hud{position:absolute;z-index:5;left:12px;top:calc(14px + var(--st));background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;max-width:72vw;transition:opacity .2s ease}
+    .hud-line{display:flex;flex-direction:column;gap:2px}
+    .hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{font-size:26px;line-height:1.1}
+    .hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hud[hidden], .hud-line[hidden], .hud .acc[hidden]{display:none !important}
+
+    .chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
+    .pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
+    .pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}
+    @keyframes b{50%{opacity:.15}}
+    .lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
+    .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
+    body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
+    .modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
+    .modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
+    .modes button[aria-pressed=true]{background:var(--acc);color:#000}
+    .row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}
+    .rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
+    .rb svg{width:22px;height:22px}
+    #shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
+    #shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}
+    #shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}
+    #snap{visibility:hidden}#snap.on{visibility:visible}
+
+    #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
+    #set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}
+    .opts{display:grid;gap:8px;margin-top:10px}
+    .opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
+    .opt input{width:18px;height:18px;accent-color:var(--acc)}
+
+    #toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none}
+    #toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+
+    #map{position:absolute;z-index:4;left:12px;top:calc(150px + var(--st));width:118px;height:118px;border-radius:14px;border:1px solid var(--line);overflow:hidden;pointer-events:none;transition:opacity .2s ease}
+    body.clean #map{opacity:0}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
 </head>
 <body>
-
-<main id="start" class="screen on">
-  <div class="card">
-    <h1>KM Report Pro</h1>
-    <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data e GPS gravados na imagem.</p>
-    <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
-    <button class="btn" id="pick">Escolher pasta de destino</button>
-    <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
-    <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
-    <button class="btn" id="csv" style="display:none">Carregar tabela de KM (.csv)</button>
-    <input type="file" id="csvf" accept=".csv,text/csv" hidden>
-    <button class="btn pri" id="go">Abrir câmera</button>
-  </div>
-</main>
-
-<section id="cam" class="screen">
-  <video id="v" autoplay playsinline muted></video>
-  <div class="hud" id="hud">
-    <div class="hud-line"><small>KM atual</small><b id="km">KM ---</b></div>
-    <div class="acc" id="gps">Aguardando GPS…</div>
-    <div class="acc" id="spd"></div>
-    <div class="acc" id="ctx"></div>
-  </div>
-  <div id="map"></div>
-  <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
-  <div class="bar">
-    <div class="modes" role="group" aria-label="Modo">
-      <button data-m="foto" aria-pressed="true">Foto</button>
-      <button data-m="video" aria-pressed="false">Vídeo</button>
-      <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
+  <main id="start" class="screen on">
+    <div class="card">
+      <h1>KM Report Pro</h1>
+      <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data e GPS gravados na imagem.</p>
+      <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
+      <button class="btn" id="pick">Escolher pasta de destino</button>
+      <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
+      <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
+      <button class="btn" id="csv" style="display:none">Carregar tabela de KM (.csv)</button>
+      <input type="file" id="csvf" accept=".csv,text/csv" hidden>
+      <button class="btn pri" id="go">Abrir câmera</button>
     </div>
-    <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
-      <button id="shut" aria-label="Capturar"><i></i></button>
-      <button class="rb" id="snap" aria-label="Foto avulsa em JPG">JPG</button>
+  </main>
+
+  <section id="cam" class="screen">
+    <video id="v" autoplay playsinline muted></video>
+    <div class="hud" id="hud">
+      <div class="hud-line" id="rowKm"><small>KM atual</small><b id="km">KM ---</b></div>
+      <div class="acc" id="gps">Aguardando GPS…</div>
+      <div class="acc" id="spd"></div>
+      <div class="acc" id="addr"></div>
+      <div class="acc" id="ctx"></div>
     </div>
-    <button class="pill" id="back">Voltar</button>
-  </div>
-</section>
+    <div id="map"></div>
+    <div class="chip">
+      <div class="pill rec" id="rec">Gravando</div>
+      <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
+    </div>
+    <div class="bar">
+      <div class="modes" role="group" aria-label="Modo">
+        <button data-m="foto" aria-pressed="true">Foto</button>
+        <button data-m="video" aria-pressed="false">Vídeo</button>
+        <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
+      </div>
+      <div class="row">
+        <button class="rb" id="gear" aria-label="Ajustes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 7h10M18 7h2M4 17h2M10 17h10"/>
+            <circle cx="16" cy="7" r="2.5"/>
+            <circle cx="7" cy="17" r="2.5"/>
+          </svg>
+        </button>
+        <button id="shut" aria-label="Capturar"><i></i></button>
+        <button class="rb" id="snap" aria-label="Foto avulsa em JPG">JPG</button>
+      </div>
+      <button class="pill" id="back">Voltar</button>
+    </div>
+  </section>
 
-<div id="set"><div class="card">
-  <h1 style="font-size:20px">Ajustes</h1>
-  <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
-  <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-  <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-  <div class="fld">
-    <label>Itens visíveis no painel</label>
-    <div class="opts">
-      <label class="opt"><span>KM</span><input type="checkbox" data-hud="km" checked></label>
-      <label class="opt"><span>Precisão atual do GPS</span><input type="checkbox" data-hud="gps"></label>
-      <label class="opt"><span>Velocidade</span><input type="checkbox" data-hud="speed"></label>
-      <label class="opt"><span>Endereço / contexto</span><input type="checkbox" data-hud="ctx"></label>
-      <label class="opt"><span>Mapa</span><input type="checkbox" data-hud="map"></label>
+  <div id="set">
+    <div class="card">
+      <h1 style="font-size:20px">Ajustes</h1>
+      <p class="sub">Selecione quais dados aparecem no HUD. Por padrão, o KM fica ativo e os demais são opcionais.</p>
+      <div class="opts">
+        <label class="opt"><span>KM atual</span><input type="checkbox" data-field="km" checked></label>
+        <label class="opt"><span>GPS</span><input type="checkbox" data-field="gps"></label>
+        <label class="opt"><span>Velocidade</span><input type="checkbox" data-field="speed"></label>
+        <label class="opt"><span>Endereço</span><input type="checkbox" data-field="address"></label>
+        <label class="opt"><span>Contexto</span><input type="checkbox" data-field="context"></label>
+        <label class="opt"><span>Mapa</span><input type="checkbox" data-field="map"></label>
+      </div>
+      <button class="btn pri" id="closeSet">Salvar</button>
     </div>
   </div>
-  <button class="btn" id="expTrk">Exportar trilha (.csv)</button>
-  <button class="btn pri" id="closeSet">Fechar</button>
-</div></div>
-<div id="toast" role="status"></div>
-<canvas id="c" hidden></canvas>
 
-<script>
-const $=id=>document.getElementById(id);
-const S={trk:[],db:[],km:'---',lat:0,lon:0,acc:null,dir:null,stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0};
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
-const cfg=JSON.parse(localStorage.getItem('kmr')||'{}');
-const defaultHud={km:true,gps:false,speed:false,ctx:false,map:false};
-Object.assign(cfg, defaultHud, {
-  label: cfg.label || '',
-  int: cfg.int || 200,
-  lote: cfg.lote || 150,
-  km: cfg.km !== undefined ? cfg.km : defaultHud.km,
-  gps: cfg.gps !== undefined ? cfg.gps : defaultHud.gps,
-  speed: cfg.speed !== undefined ? cfg.speed : defaultHud.speed,
-  ctx: cfg.ctx !== undefined ? cfg.ctx : defaultHud.ctx,
-  map: cfg.map !== undefined ? cfg.map : defaultHud.map
-});
-['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined && $(k))$(k).value=cfg[k]});
-function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,km:cfg.km,gps:cfg.gps,speed:cfg.speed,ctx:cfg.ctx,map:cfg.map}))}catch(e){}}
-['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
-$('lbl').value=$('label').value;
-$('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
+  <div id="toast" aria-live="polite"></div>
 
-document.querySelectorAll('[data-hud]').forEach(el=>{const key=el.dataset.hud;el.checked=!!cfg[key];el.addEventListener('change',()=>{cfg[key]=el.checked;persist();applyHudVisibility();});});
-function hudState(){return {km:!!cfg.km,gps:!!cfg.gps,speed:!!cfg.speed,ctx:!!cfg.ctx,map:!!cfg.map};}
-function applyHudVisibility(){
-  const state=hudState();
-  const kmWrap=$('km')?.closest('.hud-line');
-  if(kmWrap)kmWrap.hidden=!state.km;
-  $('gps').hidden=!state.gps;
-  $('spd').hidden=!state.speed;
-  $('ctx').hidden=!state.ctx;
-  $('map').hidden=!state.map;
-  $('hud').hidden=!Object.values(state).some(Boolean);
-  if(map && state.map){map.invalidateSize();}
-}
-applyHudVisibility();
+  <script>
+    const STORAGE_KEY = 'km-report-pro-settings-v1';
+    const DEFAULT_FIELDS = { km: true, gps: false, speed: false, address: false, context: false, map: false };
 
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2400)}
-const pad=n=>String(n).padStart(2,'0');
-const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>s.replace(/[,/\\:]/g,'_');
-const fmtDistance=v=>v>=1000?`${(v/1000).toFixed(2).replace('.',',')} km`:`${Math.round(v)} m`;
+    const hud = document.getElementById('hud');
+    const kmEl = document.getElementById('km');
+    const gpsEl = document.getElementById('gps');
+    const spdEl = document.getElementById('spd');
+    const addrEl = document.getElementById('addr');
+    const ctxEl = document.getElementById('ctx');
+    const rowKmEl = document.getElementById('rowKm');
+    const mapWrap = document.getElementById('map');
+    const settingsPanel = document.getElementById('set');
+    const toast = document.getElementById('toast');
 
-/* ---- tabela de KM ---- */
-const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
-const col=(h,c)=>{const m=h.map(s=>s.trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i}return -1};
-function parseCsv(t){
-  if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
-  const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];
-  const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);
-  const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);
-  return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite)).sort((x,y)=>x.km-y.km);
-}
-function kmStatus(){const ok=S.db.length>0;$('dKm').className='dot '+(ok?'ok':'bad');$('tKm').textContent=ok?`Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.`:'Tabela de KM não encontrada. Use o CSV manualmente.';}
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t)}).catch(()=>{}).finally(kmStatus);
-$('csv').onclick=()=>$('csvf').click();
-$('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus()}};
+    let kmTable = [];
+    let map = null;
+    let marker = null;
+    let currentPosition = null;
+    let lastAddress = '';
+    let watchId = null;
+    let lastCsvUrl = null;
 
-/* ---- GPS preciso: filtro + interpolação + APIs gratuitas ---- */
-function nearest(la,lo){
-  const k=Math.cos(la*Math.PI/180),D=S.db;let bi=0,m=1e18;
-  for(let i=0;i<D.length;i++){const d=(D[i].lat-la)**2+((D[i].lon-lo)*k)**2;if(d<m){m=d;bi=i}}
-  let best={km:D[bi].km,d:m};
-  for(const j of [bi-1,bi]){const a=D[j],b=D[j+1];if(!a||!b)continue;
-    const ax=a.lon*k,dx=b.lon*k-ax,dy=b.lat-a.lat,l=dx*dx+dy*dy;if(!l)continue;
-    const t=Math.max(0,Math.min(1,((lo*k-ax)*dx+(la-a.lat)*dy)/l)),d=(lo*k-ax-t*dx)**2+(la-a.lat-t*dy)**2;
-    if(d<best.d)best={km:a.km+t*(b.km-a.km),d}}
-  return{km:best.km,dist:Math.sqrt(best.d)*111320};
-}
-const WC={0:'Céu limpo',1:'Poucas nuvens',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Neblina',51:'Garoa',53:'Garoa',55:'Garoa',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',80:'Pancadas',81:'Pancadas fortes',82:'Pancadas fortes'};
-const dm=(a,b,c,d)=>Math.hypot(a-c,(b-d)*Math.cos(a*Math.PI/180))*111320;
-let F=null,hist=[],geo={t:0,la:0,lo:0},wxT=0,ctxBusy=false,map,mk,trkL;
-function onFix(p){
-  const c=p.coords,z={la:c.latitude,lo:c.longitude},r=Math.max(c.accuracy,3)**2;
-  if(F&&c.accuracy>60)return;
-  if(!F)F={...z,p:r,t:p.timestamp};
-  else{const dt=Math.max((p.timestamp-F.t)/1000,.1);F.p+=(Math.max(c.speed||0,1)*dt)**2;
-    const K=F.p/(F.p+r);F.la+=K*(z.la-F.la);F.lo+=K*(z.lo-F.lo);F.p*=1-K;F.t=p.timestamp}
-  S.lat=F.la;S.lon=F.lo;S.acc=Math.sqrt(F.p);S.spd=c.speed!=null?c.speed*3.6:null;
-  const n=S.db.length?nearest(S.lat,S.lon):null;
-  if(n){S.km=n.km.toFixed(3).replace('.',',');
-    hist.push({t:p.timestamp,km:n.km});while(hist.length>1&&p.timestamp-hist[0].t>15000)hist.shift();
-    const d=n.km-hist[0].km;S.dirTxt=p.timestamp-hist[0].t>=4000&&Math.abs(d)>.004?(d>0?'sentido crescente':'sentido decrescente'):'';
-    $('km').textContent='KM '+S.km}
-  const gpsText=`Precisão do GPS: ±${Math.round(S.acc)} m`;
-  const distText=n ? ` · Distância lateral ao marco: ${fmtDistance(n.dist)}` : '';
-  $('gps').textContent=gpsText + distText;
-  $('spd').textContent=[S.spd!=null?Math.round(S.spd)+' km/h':'',S.dirTxt].filter(Boolean).join(' · ');
-  if(S.cap||S.rec){S.trk.push([new Date(p.timestamp).toISOString(),S.km,S.lat.toFixed(6),S.lon.toFixed(6),S.spd!=null?S.spd.toFixed(1):'',S.acc.toFixed(1)]);trkL?.addLatLng([S.lat,S.lon])}
-  if(map){mk.setLatLng([S.lat,S.lon]);map.panTo([S.lat,S.lon],{animate:false})}
-  ctxUpdate();
-}
-async function ctxUpdate(){
-  if(ctxBusy)return;ctxBusy=true;const now=Date.now(),j=async u=>(await fetch(u)).json();
-  try{
-    if(!geo.t||(now-geo.t>20000&&dm(S.lat,S.lon,geo.la,geo.lo)>150)){geo={t:now,la:S.lat,lo:S.lon};
-      try{S.road=(await j(`https://router.project-osrm.org/nearest/v1/driving/${S.lon},${S.lat}`)).waypoints?.[0]?.name||''}catch(e){}
-      try{const a=(await j(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=12&lat=${S.lat}&lon=${S.lon}`)).address||{};
-        S.city=[a.city||a.town||a.village||a.municipality,a['ISO3166-2-lvl4']?.slice(-2)].filter(Boolean).join('/')}catch(e){}}
-    if(now-wxT>6e5){wxT=now;try{const c=(await j(`https://api.open-meteo.com/v1/forecast?latitude=${S.lat}&longitude=${S.lon}&current=temperature_2m,weather_code`)).current;
-      S.wx=`${Math.round(c.temperature_2m)}°C ${WC[c.weather_code]||''}`.trim()}catch(e){wxT=0}}
-    $('ctx').textContent=[S.road,S.city,S.wx].filter(Boolean).join(' · ');
-  }finally{ctxBusy=false}
-}
-function initMap(){
-  if(!window.L||map)return;
-  map=L.map('map',{zoomControl:false,attributionControl:false}).setView([S.lat||-23,S.lon||-46],16);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-  const st=Math.ceil(S.db.length/1500)||1;
-  if(S.db.length)L.polyline(S.db.filter((_,i)=>i%st===0).map(p=>[p.lat,p.lon]),{color:'#ffd600',weight:3,opacity:.8}).addTo(map);
-  trkL=L.polyline([],{color:'#34d399',weight:4}).addTo(map);
-  mk=L.circleMarker([S.lat,S.lon],{radius:7,color:'#fff',fillColor:'#10b981',fillOpacity:1}).addTo(map);
-  if(!cfg.map) map.setZoom(1, {animate:false});
-  applyHudVisibility();
-}
-if('geolocation' in navigator)navigator.geolocation.watchPosition(onFix,()=>{$('gps').textContent='GPS indisponível'},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
-$('expTrk').onclick=()=>{if(!S.trk.length)return toast('Nenhum ponto gravado ainda',1);
-  save(new Blob(['data_hora;km;lat;lon;vel_kmh;precisao_m\n'+S.trk.map(r=>r.join(';')).join('\n')],{type:'text/csv'}),`Trilha_${stamp()}.csv`)};
-/* pasta lembrada entre sessões */
-const idb=(m,v)=>new Promise(r=>{const q=indexedDB.open('kmr',1);q.onupgradeneeded=()=>q.result.createObjectStore('s');
-  q.onsuccess=()=>{const s=q.result.transaction('s',m==='get'?'readonly':'readwrite').objectStore('s'),o=m==='get'?s.get('dir'):s.put(v,'dir');o.onsuccess=()=>r(o.result);o.onerror=()=>r()};q.onerror=()=>r()});
-idb('get').then(h=>{if(h){S.pend=h;$('tDir').textContent='Pasta salva: '+h.name+' (liberada ao abrir a câmera)'}});
+    function showToast(message, isError = false) {
+      toast.textContent = message;
+      toast.classList.toggle('err', isError);
+      toast.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
 
-/* ---- pasta / salvar ---- */
-if(!('showDirectoryPicker' in window))$('pick').style.display='none';
-$('pick').onclick=async()=>{
-  try{
-    const d=await showDirectoryPicker({mode:'readwrite'});
-    if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');
-    S.dir=d;idb('put',d);$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;
-  }catch(e){if(e.name!=='AbortError')toast(e.message,1)}
-};
-async function save(blob,name){
-  name=safe(name);
-  if(S.dir){
-    try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true}
-    catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1)}
-  }
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;
-}
+    function loadSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return { ...DEFAULT_FIELDS, ...saved };
+      } catch (e) {
+        return { ...DEFAULT_FIELDS };
+      }
+    }
 
-/* ---- câmera ---- */
-async function openCam(id){
-  S.stream?.getTracks().forEach(t=>t.stop());
-  S.stream=await navigator.mediaDevices.getUserMedia({video:id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
-  $('v').srcObject=S.stream;
-  const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');
-  const cur=S.stream.getVideoTracks()[0].getSettings().deviceId;
-  $('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');
-}
-$('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
-$('go').onclick=async()=>{
-  try{if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');if(!map) initMap();else if(cfg.map) map.invalidateSize();}
-  catch(e){toast('Não foi possível acessar a câmera: '+e.message,1)}
-};
-function pinchZoom(){
-  const v=$('v');let d0=0,z0=1;
-  v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);z0=S.stream.getVideoTracks()[0].getSettings().zoom||1}};
-  v.ontouchmove=e=>{
-    const t=S.stream.getVideoTracks()[0],c=t.getCapabilities?.()||{};
-    if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-      t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{})}
-  };
-}
-$('gear').onclick=()=>$('set').classList.add('on');
-$('closeSet').onclick=()=>$('set').classList.remove('on');
-$('back').onclick=()=>{
-  if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);
-  S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');
-  document.fullscreenElement&&document.exitFullscreen();
-};
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{
-  if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);
-  S.mode=b.dataset.m;document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));
-});
+    function saveSettings(fields) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fields));
+    }
 
-/* ---- quadro com marca d'água ---- */
-function frame(){
-  const v=$('v');if(!v.videoWidth)return null;
-  const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
-  cx.drawImage(v,0,0,w,h);
-  const state=hudState();
-  const items=[];
-  if(state.km)items.push({type:'km',text:'KM '+S.km+(S.dirTxt?'  '+S.dirTxt:''),size:Math.round(h*.045),color:'#fff'});
-  const gpsText=[];
-  if(state.gps)gpsText.push(`Precisão do GPS: ±${Math.round(S.acc||0)} m${S.db.length&&S.lat&&S.lon?` · Distância lateral ao marco: ${fmtDistance(nearest(S.lat,S.lon).dist)}`:''}`);
-  if(state.speed&&S.spd!=null)gpsText.push(`${Math.round(S.spd)} km/h`);
-  if(gpsText.length)items.push({type:'meta',text:gpsText.join(' · '),size:Math.round(h*.018),color:'rgba(255,255,255,.82)'});
-  if(state.ctx){const text=[S.road,S.city,S.wx].filter(Boolean).join(' · '); if(text) items.push({type:'meta',text,size:Math.round(h*.018),color:'rgba(255,255,255,.82)'}); }
-  if(items.length===0 && !$('label').value.trim())return cv;
-  const bh=h*.17,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.3,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);
-  let y=h-bh*.58;
-  items.forEach(item=>{
-    cx.textAlign='left';cx.textBaseline='alphabetic';
-    cx.fillStyle=item.color;cx.font=item.type==='km'?`bold ${item.size}px Arial,sans-serif`:`${item.size}px Arial,sans-serif`;
-    cx.fillText(item.text,20,y);
-    y += item.type==='km'?bh*.26:bh*.2;
-  });
-  const lb=$('label').value.trim();
-  if(lb){
-    const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;
-    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
-    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();
-    cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
-  }
-  return cv;
-}
-const toBlob=(q)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
+    function applySettings(fields) {
+      const checkboxes = document.querySelectorAll('[data-field]');
+      checkboxes.forEach(cb => {
+        const key = cb.dataset.field;
+        cb.checked = !!fields[key];
+      });
 
-/* ---- botão principal ---- */
-$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]()};
-async function photo(){if(!frame())return;const b=await toBlob(.9);save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`)}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`))};
+      const visible = Object.entries(fields).filter(([k, v]) => v && k !== 'map').map(([k]) => k)
+      const hasAny = visible.length > 0;
 
-/* vídeo: grava o canvas com a marca d'água */
-let vidLoop=0;
-function toggleVideo(){
-  if(S.rec){S.rec.stop();return}
-  if(!frame())return;
-  const cs=cv.captureStream(30),mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
-  let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6})}catch(e){return toast('Gravação não suportada neste navegador',1)}
-  const ini=stamp(),km0=S.km,ch=[];
-  r.ondataavailable=e=>e.data.size&&ch.push(e.data);
-  r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`)};
-  r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');
-  (function d(){frame();vidLoop=requestAnimationFrame(d)})();
-}
-function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',on&&S.mode==='pdf');
-  if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release();S.lock=null}}
+      rowKmEl.hidden = !fields.km;
+      gpsEl.hidden = !fields.gps;
+      spdEl.hidden = !fields.speed;
+      addrEl.hidden = !fields.address;
+      ctxEl.hidden = !fields.context;
 
-/* relatório PDF em lotes */
-const lim=()=>Math.max(parseInt($('lote').value)||150,1);
-const upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`};
-function togglePdf(){S.cap?stopPdf():startPdf()}
-function startPdf(){
-  if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);
-  S.cap=true;S.trk=[];S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();
-}
-function loop(){
-  if(!S.cap)return;const t=performance.now();
-  if(frame())toBlob(.82).then(async b=>{
-    if(!S.cap&&!b)return;
-    S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});
-    if(S.buf.length>=lim())rotate(false);upd();
-  });
-  S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-t)));
-}
-function rotate(final){
-  if(!S.buf.length)return;
-  S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();
-}
-async function stopPdf(){
-  S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');
-  rotate(true);await runQueue();
-  while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));
-  setRec(false);$('shut').disabled=false;$('expTrk').click();toast(`Sessão finalizada: ${S.saved} PDF(s)`);
-}
-async function runQueue(){
-  if(S.busy)return;S.busy=true;
-  try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0))}}
-  catch(e){console.error(e);toast('Falha ao gerar PDF',1)}
-  finally{S.busy=false}
-}
-async function makePdf({p,n}){
-  const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height]};
-  let [w,h]=sz(p[0].u8);
-  const d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});
-  p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null});
-  await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
-}
+      if (fields.map && mapWrap) {
+        mapWrap.style.display = 'block';
+      } else if (mapWrap) {
+        mapWrap.style.display = 'none';
+      }
 
-/* toque na tela limpa/mostra controles durante o relatório */
-$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean')});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{})});
-</script>
+      if (!hasAny && !fields.map) {
+        hud.hidden = true;
+      } else {
+        hud.hidden = false;
+      }
+
+      if (fields.map) {
+        if (!map) {
+          initMap();
+        }
+      }
+    }
+
+    function setFieldDisplay(field, display) {
+      const target = {
+        km: rowKmEl,
+        gps: gpsEl,
+        speed: spdEl,
+        address: addrEl,
+        context: ctxEl,
+        map: mapWrap
+      }[field];
+      if (!target) return;
+      target.hidden = !display;
+    }
+
+    function initMap() {
+      if (!window.L) return;
+      if (!map) {
+        map = L.map('map', { zoomControl: false, attributionControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(map);
+        marker = L.circleMarker([0,0], { radius: 8, color: '#ffd600', fillColor: '#ffd600', fillOpacity: 1 }).addTo(map);
+        map.setView([0, 0], 2);
+      }
+    }
+
+    function setMapCenter(lat, lon) {
+      if (!map || !marker) return;
+      map.setView([lat, lon], 15, { animate: true, duration: 0.8 });
+      marker.setLatLng([lat, lon]);
+    }
+
+    function normalizeHeader(value) {
+      return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+    }
+
+    function parseNumber(value) {
+      if (value === null || value === undefined) return null;
+      const text = String(value).trim();
+      if (!text) return null;
+      const clean = text.replace(/\./g, '').replace(',', '.').replace(/[^0-9.-]/g, '');
+      const num = Number(clean);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function parseCsvTable(text) {
+      if (!text || !text.trim()) return [];
+      const textNoBom = text.replace(/^\uFEFF/, '');
+      const lines = textNoBom.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      if (lines.length < 2) return [];
+      const delimiter = lines[0].includes(';') ? ';' : ',';
+      const headers = lines[0].split(delimiter).map(normalizeHeader);
+      const kmIndex = headers.findIndex(h => ['km','kilometragem','odometro','odometrokm','kmatual'].includes(h));
+      const latIndex = headers.findIndex(h => ['lat','latitude','latitud'].includes(h));
+      const lonIndex = headers.findIndex(h => ['lon','lng','long','longitude','longitud'].includes(h));
+      if (kmIndex < 0 || latIndex < 0 || lonIndex < 0) return [];
+
+      const rows = [];
+      lines.slice(1).forEach(line => {
+        const cols = line.split(delimiter).map(v => v.trim());
+        if (cols.length <= Math.max(kmIndex, latIndex, lonIndex)) return;
+        const km = parseNumber(cols[kmIndex]);
+        const lat = parseNumber(cols[latIndex]);
+        const lon = parseNumber(cols[lonIndex]);
+        if (km === null || lat === null || lon === null) return;
+        rows.push({ km, lat, lon });
+      });
+      return rows.sort((a, b) => a.km - b.km);
+    }
+
+    function estimateKmFromPosition(lat, lon) {
+      if (!Array.isArray(kmTable) || !kmTable.length) return null;
+      let best = null;
+      let bestDist = Infinity;
+      for (const row of kmTable) {
+        const d = Math.hypot(row.lat - lat, row.lon - lon) * 111000;
+        if (d < bestDist) { bestDist = d; best = row; }
+      }
+      return best && bestDist < 5000 ? best.km : null;
+    }
+
+    function getKmCsvUrl() {
+      const candidates = [
+        './SNVBR116SPRJ.csv',
+        'SNVBR116SPRJ.csv',
+        'https://raw.githubusercontent.com/cpsXampi/tec/main/SNVBR116SPRJ.csv',
+        'https://github.com/cpsXampi/tec/raw/main/SNVBR116SPRJ.csv'
+      ];
+      return candidates;
+    }
+
+    async function loadKmCsv() {
+      const dots = document.getElementById('dKm');
+      const textEl = document.getElementById('tKm');
+      dots.classList.remove('ok','bad');
+      textEl.textContent = 'Carregando tabela de KM…';
+
+      let lastError = null;
+      for (const url of getKmCsvUrl()) {
+        try {
+          const response = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store' });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const text = await response.text();
+          const rows = parseCsvTable(text);
+          if (!rows.length) throw new Error('CSV sem colunas válidas');
+          kmTable = rows;
+          lastCsvUrl = url;
+          dots.classList.add('ok');
+          textEl.textContent = 'Tabela de KM carregada com sucesso.';
+          showToast('Tabela de KM carregada');
+          return true;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      dots.classList.add('bad');
+      textEl.textContent = 'Não foi possível carregar a tabela de KM.';
+      showToast('Erro ao carregar CSV do KM', true);
+      console.error('Erro ao carregar KM CSV:', lastError);
+      return false;
+    }
+
+    function formatKm(value) {
+      if (value === null || value === undefined || Number.isNaN(Number(value))) return 'KM ---';
+      return `KM ${Number(value).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}`;
+    }
+
+    function formatSpeed(speedMps) {
+      if (speedMps === null || speedMps === undefined || Number.isNaN(Number(speedMps))) return '';
+      const kmh = speedMps * 3.6;
+      return `${kmh.toFixed(0)} km/h`;
+    }
+
+    function refreshKmFromPosition(lat, lon) {
+      if (kmTable.length) {
+        const nearest = estimateKmFromPosition(lat, lon);
+        if (nearest !== null) {
+          kmEl.textContent = formatKm(nearest);
+          return;
+        }
+      }
+      kmEl.textContent = 'KM ---';
+    }
+
+    async function reverseGeocode(lat, lon) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`, {
+          headers: { 'Accept-Language': 'pt-BR' }
+        });
+        if (!response.ok) return '';
+        const json = await response.json();
+        return json.display_name || '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function updateHudByPosition(position) {
+      currentPosition = position;
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const speed = position.coords.speed;
+      gpsEl.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      if (speed !== null) spdEl.textContent = formatSpeed(speed);
+      refreshKmFromPosition(lat, lon);
+      setMapCenter(lat, lon);
+      if (window.L && map) {
+        map.invalidateSize();
+      }
+
+      if (lastAddress === '') {
+        reverseGeocode(lat, lon).then(address => {
+          if (address) {
+            lastAddress = address;
+            addrEl.textContent = address;
+          }
+        });
+      }
+    }
+
+    function setupGeolocation() {
+      if (!navigator.geolocation) {
+        gpsEl.textContent = 'GPS não suportado';
+        return;
+      }
+
+      const onSuccess = (position) => {
+        updateHudByPosition(position);
+      };
+
+      const onError = () => {
+        gpsEl.textContent = 'GPS indisponível';
+      };
+
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 15000
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const settings = loadSettings();
+      applySettings(settings);
+
+      const allToggles = document.querySelectorAll('[data-field]');
+      allToggles.forEach(cb => {
+        cb.addEventListener('change', () => {
+          const fields = loadSettings();
+          fields[cb.dataset.field] = !!cb.checked;
+          saveSettings(fields);
+          applySettings(fields);
+        });
+      });
+
+      document.getElementById('closeSet').addEventListener('click', () => {
+        const fields = {};
+        document.querySelectorAll('[data-field]').forEach(cb => fields[cb.dataset.field] = !!cb.checked);
+        saveSettings(fields);
+        applySettings(fields);
+        settingsPanel.classList.remove('on');
+      });
+
+      document.getElementById('gear').addEventListener('click', () => {
+        settingsPanel.classList.add('on');
+      });
+
+      document.getElementById('set').addEventListener('click', (event) => {
+        if (event.target === settingsPanel) settingsPanel.classList.remove('on');
+      });
+
+      document.getElementById('back').addEventListener('click', () => {
+        document.getElementById('cam').classList.remove('on');
+        document.getElementById('start').classList.add('on');
+        if (v && v.srcObject) {
+          v.srcObject.getTracks().forEach(track => track.stop());
+          v.srcObject = null;
+        }
+      });
+
+      document.getElementById('go').addEventListener('click', async () => {
+        const startScreen = document.getElementById('start');
+        const camScreen = document.getElementById('cam');
+        startScreen.classList.remove('on');
+        camScreen.classList.add('on');
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+          const v = document.getElementById('v');
+          v.srcObject = stream;
+          await v.play();
+        } catch (e) {
+          showToast('Câmera não disponível', true);
+          console.error(e);
+        }
+
+        setupGeolocation();
+        await loadKmCsv();
+      });
+
+      document.getElementById('pick').addEventListener('click', async () => {
+        const applyDir = (dirHandle) => {
+          if (!dirHandle) return;
+          window.__destDir = dirHandle;
+          document.getElementById('dDir').classList.add('ok');
+          document.getElementById('tDir').textContent = 'Pasta de destino selecionada.';
+        };
+
+        if ('showDirectoryPicker' in window) {
+          try {
+            const dir = await window.showDirectoryPicker();
+            applyDir(dir);
+          } catch (e) {
+            document.getElementById('dDir').classList.add('bad');
+            document.getElementById('tDir').textContent = 'Seleção cancelada. Os arquivos serão baixados.';
+          }
+        } else {
+          document.getElementById('dDir').classList.add('bad');
+          document.getElementById('tDir').textContent = 'Navegador sem suporte à pasta. Os arquivos serão baixados.';
+        }
+      });
+
+      const modeButtons = document.querySelectorAll('[data-m]');
+      modeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          modeButtons.forEach(btn => btn.setAttribute('aria-pressed', String(btn === button)));
+        });
+      });
+
+      document.getElementById('csv').addEventListener('click', () => {
+        document.getElementById('csvf').click();
+      });
+
+      document.getElementById('csvf').addEventListener('change', async (event) => {
+        const [file] = event.target.files;
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const rows = parseCsvTable(text);
+          if (!rows.length) {
+            showToast('CSV sem campos válidos.', true);
+            return;
+          }
+          kmTable = rows;
+          document.getElementById('dKm').classList.add('ok');
+          document.getElementById('tKm').textContent = `Tabela carregada: ${file.name}`;
+          showToast('Tabela de KM carregada pelo arquivo local');
+        } catch (e) {
+          showToast('Não foi possível ler o CSV.', true);
+        }
+      });
+
+      const v = document.getElementById('v');
+      document.getElementById('shut').addEventListener('click', () => {
+        const mode = document.querySelector('[data-m][aria-pressed="true"]')?.dataset.m || 'foto';
+        if (mode === 'video') {
+          document.getElementById('rec').classList.toggle('on');
+          document.getElementById('shut').classList.toggle('rec');
+          return;
+        }
+
+        if (mode === 'pdf') {
+          const doc = new window.jspdf.jsPDF();
+          doc.setFillColor(7, 9, 12);
+          doc.rect(0, 0, 210, 297, 'F');
+          doc.setTextColor(255,255,255);
+          doc.setFontSize(24);
+          doc.text('KM Report Pro', 14, 22);
+          doc.setFontSize(12);
+          doc.text('KM: ' + (kmEl.textContent || 'KM ---'), 14, 42);
+          doc.text('GPS: ' + (gpsEl.textContent || 'Aguardando GPS…'), 14, 56);
+          doc.text('Endereço: ' + (addrEl.textContent || '—'), 14, 70);
+          doc.text('Velocidade: ' + (spdEl.textContent || '—'), 14, 84);
+          doc.text('Contexto: ' + (ctxEl.textContent || '—'), 14, 98);
+          doc.save('relatorio-km.pdf');
+          showToast('PDF gerado');
+          return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = v.videoWidth || 1280;
+        canvas.height = v.videoHeight || 720;
+        const context = canvas.getContext('2d');
+        context.drawImage(v, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'foto-'+Date.now()+'.jpg';
+        link.click();
+        showToast('Foto salva');
+      });
+
+      document.getElementById('snap').addEventListener('click', () => {
+        const v = document.getElementById('v');
+        if (!v || !v.videoWidth) return;
+        const canvas = document.createElement('canvas');
+        canvas.width = v.videoWidth;
+        canvas.height = v.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+        const url = canvas.toDataURL('image/jpeg', 0.9);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'km-jpg-' + Date.now() + '.jpg';
+        a.click();
+      });
+
+      if (window.location.protocol === 'file:') {
+        document.getElementById('dKm').classList.add('bad');
+        document.getElementById('tKm').textContent = 'Arquivo aberto localmente. Use um servidor para carregar a tabela automaticamente.';
+      }
+    });
+  </script>
 </body>
 </html>
