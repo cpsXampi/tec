@@ -138,6 +138,7 @@ body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
   <div class="fld" style="margin-top:14px;">
     <label style="font-weight:800;color:var(--tx);">Metadados & Privacidade</label>
     <label class="toggle-row"><input type="checkbox" id="cfgDiscrete"> <span><strong>Modo Discreto</strong><br>Oculta KM, GPS e etiquetas da foto/vídeo/PDF.</span></label>
+    <label class="toggle-row"><input type="checkbox" id="cfgShowMap" checked> <span><strong>Mostrar Mini Mapa</strong><br>Exibe ou oculta o mini mapa em tempo real na tela da câmera.</span></label>
   </div>
 
   <div class="fld" style="margin-top:14px;">
@@ -160,7 +161,7 @@ const S={
   trk:[],db:[],km:'---',lat:0,lon:0,acc:null,spd:null,dirTxt:'',road:'',city:'',wx:'',
   stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,
   saved:0,timer:null,lock:null,tt:0,dir:null,pend:null,
-  discrete:false,
+  discrete:false, showMap:true,
   ai:{motion:false,voice:false,background:false,motionHandler:null,lastMotionTs:0,recog:null}
 };
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
@@ -169,13 +170,19 @@ const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
 const cfg=JSON.parse(localStorage.getItem('kmr_super')||'{}');
 ['label','int','lote'].forEach(k=>{if(cfg[k])$(k).value=cfg[k]});
 if(cfg.discrete) S.discrete=cfg.discrete;
+if(cfg.showMap!==undefined) S.showMap=cfg.showMap;
 if(cfg.ai) S.ai=Object.assign(S.ai, cfg.ai);
+
+if(cfg.showMap!==undefined){
+  $('cfgShowMap').checked=cfg.showMap;
+  $('map').style.display=cfg.showMap?'block':'none';
+}
 
 function persist(){
   try{
     localStorage.setItem('kmr_super',JSON.stringify({
       label:$('label').value,int:$('int').value,lote:$('lote').value,
-      discrete:S.discrete,ai:{motion:S.ai.motion,voice:S.ai.voice,background:S.ai.background}
+      discrete:S.discrete,showMap:S.showMap,ai:{motion:S.ai.motion,voice:S.ai.voice,background:S.ai.background}
     }));
   }catch(e){}
 }
@@ -189,7 +196,7 @@ function toast(m,err){
 }
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>s.replace(/[,/\\:]/g,'_');
+const safe=s=>s.replace(/[,/\:]/g,'_');
 
 /* ---- Tabela de KM ---- */
 const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
@@ -211,7 +218,8 @@ function kmStatus(){
 }
 
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t)}).catch(()=>{}).finally(kmStatus);
-$('csv').onclick=()=>$('csvf').click();$('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus()}};
+$('csv').onclick=()=>$('csvf').click();
+$('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus()}};
 
 /* ---- GPS Preciso: Filtro + Interpolação + APIs ---- */
 function nearest(la,lo){
@@ -288,7 +296,8 @@ const idb=(m,v)=>new Promise(r=>{const q=indexedDB.open('kmr_super_db',1);q.onup
   q.onsuccess=()=>{const s=q.result.transaction('s',m==='get'?'readonly':'readwrite').objectStore('s'),o=m==='get'?s.get('dir'):s.put(v,'dir');o.onsuccess=()=>r(o.result);o.onerror=()=>r()};q.onerror=()=>r()});
 idb('get').then(h=>{if(h){S.pend=h;$('tDir').textContent='Pasta salva: '+h.name+' (liberada ao abrir a câmera)'}});
 
-if(!('showDirectoryPicker' in window))$('pick').style.display='none';$('pick').onclick=async()=>{
+if(!('showDirectoryPicker' in window))$('pick').style.display='none';
+$('pick').onclick=async()=>{
   try{
     const d=await showDirectoryPicker({mode:'readwrite'});
     if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');
@@ -322,7 +331,8 @@ $('go').onclick=async()=>{
     if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}
     await openCam();
     $('lbl').value=$('label').value;
-    $('start').classList.remove('on');$('cam').classList.add('on');
+    $('start').classList.remove('on');
+    $('cam').classList.add('on');
     setTimeout(()=>{initMap();map?.invalidateSize()},150);
     document.documentElement.requestFullscreen?.().catch(()=>{});
     pinchZoom();
@@ -339,7 +349,9 @@ function pinchZoom(){
   };
 }
 
-$('gear').onclick=()=>$('set').classList.add('on');$('closeSet').onclick=()=>$('set').classList.remove('on');$('back').onclick=()=>{
+$('gear').onclick=()=>$('set').classList.add('on');
+$('closeSet').onclick=()=>$('set').classList.remove('on');
+$('back').onclick=()=>{
   if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);
   S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');
   document.fullscreenElement&&document.exitFullscreen();
@@ -451,9 +463,16 @@ async function makePdf({p,n}){
 }
 
 /* ---- IA Local & Configurações de Sensores ---- */
+$('cfgShowMap').onchange=e=>{
+  S.showMap=!!e.target.checked;
+  persist();
+  $('map').style.display=S.showMap?'block':'none';
+  toast(S.showMap?'Mini mapa ativado':'Mini mapa ocultado');
+};
 $('cfgDiscrete').onchange=e=>{S.discrete=!!e.target.checked;persist();toast(S.discrete?'Modo discreto ativado':'Modo discreto desativado');};
 $('cfgAiMotion').onchange=e=>{S.ai.motion=!!e.target.checked;persist();updateAi();};
-$('cfgAiVoice').onchange=e=>{S.ai.voice=!!e.target.checked;persist();updateAi();};$('cfgAiBackground').onchange=e=>{S.ai.background=!!e.target.checked;persist();updateAi();};
+$('cfgAiVoice').onchange=e=>{S.ai.voice=!!e.target.checked;persist();updateAi();};
+$('cfgAiBackground').onchange=e=>{S.ai.background=!!e.target.checked;persist();updateAi();};
 
 function updateAi(){
   const on=S.ai.motion||S.ai.voice||S.ai.background;
@@ -505,7 +524,7 @@ function stopVoice(){if(S.ai.recog){try{S.ai.recog.stop();}catch(e){}S.ai.recog=
 
 /* Limpeza de tela e Eventos Globais */
 $('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean')});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}});
+window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec||S.ai.background))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{})});
 
 updateAi();
