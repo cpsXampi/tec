@@ -55,6 +55,8 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 /* ajustes */
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
 #set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}
+.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:18px}
+.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}
 #toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}
 #toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -95,6 +97,7 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 <div id="set"><div class="card">
   <h1 style="font-size:20px">Ajustes</h1>
   <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
+  <label class="checkrow" for="showMeta"><input id="showMeta" type="checkbox" checked><span>Incluir KM, data/hora e GPS nas imagens e vídeos</span></label>
   <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
   <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
   <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
@@ -125,16 +128,19 @@ function persist(){
     localStorage.setItem('kmr', JSON.stringify({
       label:$('label').value,
       int:$('int').value,
-      lote:$('lote').value
+      lote:$('lote').value,
+      showMeta:$('showMeta').checked
     }));
   }catch(e){}
 }
 
 const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr')||'{}')}catch{return {}}})();
 ['label','int','lote'].forEach(k=>{ if(cfg[k]!==undefined && cfg[k]!==null) $(k).value=cfg[k]; });
+if(typeof cfg.showMeta==='boolean') $('showMeta').checked=cfg.showMeta;
 $('lbl').value=$('label').value;
 $('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
+$('showMeta').addEventListener('change',persist);
 
 /* ---- tabela de KM ---- */
 const num=v=>{const s=String(v ?? '').trim(); if(!s) return NaN; return /,\d+$/.test(s) ? Number(s.replace(/\./g,'').replace(',','.')) : Number(s);};
@@ -152,33 +158,23 @@ function parseCsv(t){
   if(a<0 || b<0 || c<0) return [];
   return L.map(l=>{
     const r=l.split(sep);
-    const p={km:num(r[a]), lat:num(r[b]), lon:num(r[c])};
-    return p;
+    return {km:num(r[a]),lat:num(r[b]),lon:num(r[c])};
   }).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));
 }
-function kmStatus(){
-  const ok=S.db.length>0;
-  if(!ok) console.warn('Tabela de KM não encontrada ou vazia.');
-}
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t); kmStatus();}).catch(()=>{}).finally(kmStatus);
+function kmStatus(){if(!S.db.length) console.warn('Tabela de KM não encontrada ou vazia.');}
+fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);kmStatus();}).catch(()=>{}).finally(kmStatus);
 
 /* ---- GPS ---- */
 function nearest(la,lo){
   const k=Math.cos(la*Math.PI/180); let best=null,m=1e9;
-  for(const p of S.db){
-    const d=(p.lat-la)**2+((p.lon-lo)*k)**2;
-    if(d<m){m=d; best=p;}
-  }
-  return best && {km:best.km, dist:Math.sqrt(m)*111320};
+  for(const p of S.db){const d=(p.lat-la)**2+((p.lon-lo)*k)**2;if(d<m){m=d;best=p;}}
+  return best&&{km:best.km,dist:Math.sqrt(m)*111320};
 }
 if('geolocation' in navigator){
   navigator.geolocation.watchPosition(p=>{
-    S.lat=p.coords.latitude; S.lon=p.coords.longitude; S.acc=p.coords.accuracy;
-    const n=S.db.length ? nearest(S.lat,S.lon) : null;
-    if(n){
-      S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');
-      $('km').textContent='KM '+S.km;
-    }
+    S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;
+    const n=S.db.length?nearest(S.lat,S.lon):null;
+    if(n){S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');$('km').textContent='KM '+S.km;}
     $('gps').textContent=`GPS ±${Math.round(S.acc)} m`+(n&&n.dist>500?' · longe da rodovia':'');
   },()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 }
@@ -186,241 +182,131 @@ if('geolocation' in navigator){
 /* ---- pasta / salvar ---- */
 if(!('showDirectoryPicker' in window)) $('pick').style.display='none';
 $('pick').onclick=async()=>{
-  if(!('showDirectoryPicker' in window)){ toast('Navegador não suporta pasta de destino',1); return; }
+  if(!('showDirectoryPicker' in window)){toast('Navegador não suporta pasta de destino',1);return;}
   try{
     const d=await showDirectoryPicker({mode:'readwrite'});
-    if(await d.requestPermission({mode:'readwrite'}) !== 'granted') throw new Error('Permissão negada');
-    S.dir=d;
-    $('dDir').className='dot ok';
-    $('tDir').textContent='Pasta: '+d.name;
-  }catch(e){ if(e.name!=='AbortError') toast(e.message || 'Não foi possível acessar a pasta',1); }
+    if(await d.requestPermission({mode:'readwrite'})!=='granted') throw new Error('Permissão negada');
+    S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;
+  }catch(e){if(e.name!=='AbortError')toast(e.message||'Não foi possível acessar a pasta',1);}
 };
 async function save(blob,name){
   name=safe(name);
   if(S.dir){
-    try{
-      const w=await (await S.dir.getFileHandle(name,{create:true})).createWritable();
-      await w.write(blob);
-      await w.close();
-      toast('Salvo: '+name);
-      return true;
-    }catch(e){
-      console.error(e);
-      toast('Falha na pasta, baixando arquivo',1);
-    }
+    try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true;}
+    catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1);}
   }
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=name;
-  document.body.append(a);
-  a.click();
-  a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-  toast('Baixado: '+name);
-  return true;
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;
 }
 
 /* ---- câmera ---- */
 async function openCam(id){
   S.stream?.getTracks().forEach(t=>t.stop());
-  const isExact = !!id;
-  const constraints = isExact ? {deviceId:{exact:id}} : {facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};
-  S.stream = await navigator.mediaDevices.getUserMedia({video: constraints, audio:false});
-  $('v').srcObject = S.stream;
+  const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};
+  S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});
+  $('v').srcObject=S.stream;
   const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');
-  const cur = S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;
-  $('camSel').innerHTML = devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');
-  if(!devs.length) $('camSel').innerHTML = '<option value="">Câmera padrão</option>';
+  const cur=S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;
+  $('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');
+  if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';
 }
 $('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
 $('go').onclick=async()=>{
-  try{
-    await openCam();
-    $('lbl').value=$('label').value;
-    $('start').classList.remove('on');
-    $('cam').classList.add('on');
-    document.documentElement.requestFullscreen?.().catch(()=>{});
-    pinchZoom();
-  }catch(e){ toast('Não foi possível acessar a câmera: '+(e?.message || e),1); }
+  try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}
+  catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}
 };
 function pinchZoom(){
-  const v=$('v');
-  let d0=0, z0=1;
-  v.ontouchstart=e=>{
-    if(e.touches.length===2){
-      d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-      const t=S.stream?.getVideoTracks?.()[0];
-      z0=t?.getSettings?.().zoom || 1;
-    }
-  };
-  v.ontouchmove=e=>{
-    const t=S.stream?.getVideoTracks?.()[0];
-    const c=t?.getCapabilities?.() || {};
-    if(e.touches.length===2 && d0 && c.zoom){
-      const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-      t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});
-    }
-  };
+  const v=$('v');let d0=0,z0=1;
+  v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const t=S.stream?.getVideoTracks?.()[0];z0=t?.getSettings?.().zoom||1;}};
+  v.ontouchmove=e=>{const t=S.stream?.getVideoTracks?.()[0],c=t?.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});}};
 }
 $('gear').onclick=()=>$('set').classList.add('on');
 $('closeSet').onclick=()=>$('set').classList.remove('on');
 $('back').onclick=()=>{
-  if(S.cap||S.rec||S.busy||S.queue.length) return toast('Finalize a captura antes de voltar',1);
-  S.stream?.getTracks().forEach(t=>t.stop());
-  $('cam').classList.remove('on');
-  $('start').classList.add('on');
-  document.fullscreenElement && document.exitFullscreen();
+  if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);
+  S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();
 };
-function updateModeUI(){
-  document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.m===S.mode)));
-}
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{
-  if(S.cap||S.rec) return toast('Finalize a captura antes de trocar o modo',1);
-  S.mode=b.dataset.m;
-  updateModeUI();
-});
+function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
 /* ---- quadro com marca d'água ---- */
 function frame(){
-  const v=$('v'); if(!v || !v.videoWidth) return null;
-  const w=cv.width=v.videoWidth, h=cv.height=v.videoHeight;
-  cx.drawImage(v,0,0,w,h);
-  const bh=h*.13, g=cx.createLinearGradient(0,h-bh,0,h);
-  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(.25,'rgba(0,0,0,.55)'); g.addColorStop(1,'rgba(0,0,0,.9)');
-  cx.fillStyle=g; cx.fillRect(0,h-bh,w,bh);
-  cx.textAlign='left'; cx.textBaseline='alphabetic';
-  cx.fillStyle='#fff'; cx.font=`bold ${Math.round(bh*.3)}px Arial,sans-serif`; cx.fillText('KM '+S.km,20,h-bh*.55);
-  cx.font=`${Math.round(bh*.18)}px Arial,sans-serif`; cx.fillStyle='rgba(255,255,255,.75)';
-  cx.fillText(`${new Date().toLocaleString('pt-BR')} | GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`,20,h-bh*.22);
+  const v=$('v');if(!v||!v.videoWidth)return null;
+  const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
+  if($('showMeta').checked){
+    const bh=h*.13,g=cx.createLinearGradient(0,h-bh,0,h);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');
+    cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);
+    cx.textAlign='left';cx.textBaseline='alphabetic';
+    cx.fillStyle='#fff';cx.font=`bold ${Math.round(bh*.3)}px Arial,sans-serif`;cx.fillText('KM '+S.km,20,h-bh*.55);
+    cx.font=`${Math.round(bh*.18)}px Arial,sans-serif`;cx.fillStyle='rgba(255,255,255,.75)';
+    cx.fillText(`${new Date().toLocaleString('pt-BR')} | GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`,20,h-bh*.22);
+  }
   const lb=$('label').value.trim();
   if(lb){
-    const fs=Math.round(h*.035); cx.font=`bold ${fs}px Arial,sans-serif`;
-    const px=fs*.8, py=fs*.5; const bw=cx.measureText(lb).width+px*2; const bh2=fs+py*2; const x=w-bw-30, y=30;
-    cx.save(); cx.globalAlpha=.78; cx.fillStyle='#ffd600'; cx.beginPath(); cx.roundRect(x,y,bw,bh2,10); cx.fill();
-    cx.globalAlpha=1; cx.fillStyle='#000'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(lb,x+bw/2,y+bh2/2+1); cx.restore();
+    const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;
+    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
+    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();
+    cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
   }
   return cv;
 }
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 
 /* ---- botão principal ---- */
-$('shut').onclick=()=>{navigator.vibrate?.(20); ({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
-async function photo(){ if(!frame()) return; const b=await toBlob(.9); save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`); }
-$('snap').onclick=e=>{ e.stopPropagation(); if(!frame()) return; toBlob(.9).then(b=>save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`)); };
+$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
+async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
+$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
 
 /* vídeo: grava o canvas com a marca d'água */
 let vidLoop=0;
 function toggleVideo(){
-  if(S.rec){ S.rec.stop(); return; }
-  if(!frame()) return;
-  const cs = cv.captureStream ? cv.captureStream(30) : null;
-  if(!cs) return toast('Gravação não suportada neste navegador',1);
-  const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t)) || '';
-  let r;
-  try{ r = new MediaRecorder(cs,{ mimeType: mt || undefined, videoBitsPerSecond: 8e6 }); }
-  catch(e){ return toast('Gravação não suportada neste navegador',1); }
-  const ini=stamp(), km0=S.km, ch=[];
-  r.ondataavailable=e=>e.data.size && ch.push(e.data);
-  r.onstop=async()=>{
-    cancelAnimationFrame(vidLoop); S.rec=null; setRec(false);
-    const blob = new Blob(ch,{type:r.mimeType||'video/webm'});
-    await save(blob,`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);
-  };
-  r.start(1000);
-  S.rec=r;
-  setRec(true,'Gravando vídeo');
-  (function d(){ frame(); vidLoop=requestAnimationFrame(d); })();
+  if(S.rec){S.rec.stop();return;}
+  if(!frame())return;
+  const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);
+  const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+  let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}
+  const ini=stamp(),km0=S.km,ch=[];
+  r.ondataavailable=e=>e.data.size&&ch.push(e.data);
+  r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};
+  r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();
 }
 function setRec(on,t){
-  $('rec').classList.toggle('on',on);
-  if(t) $('rec').textContent=t;
-  $('shut').classList.toggle('rec',on);
-  $('snap').classList.toggle('on',on && S.mode==='pdf');
-  document.body.classList.toggle('clean', !!(on && S.mode==='pdf'));
-  if(on){
-    navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});
-  }else{
-    S.lock?.release?.();
-    S.lock=null;
-  }
+  $('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));
+  if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}
 }
 
 /* relatório PDF em lotes */
 const lim=()=>Math.max(parseInt($('lote').value)||150,1);
-const upd=()=>{ if(S.cap) $('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`; };
-function togglePdf(){ S.cap ? stopPdf() : startPdf(); }
-function startPdf(){
-  if(!window.jspdf) return toast('jsPDF ainda carregando, tente de novo',1);
-  S.cap=true; S.buf=[]; S.queue=[]; S.batch=1; S.saved=0; setRec(true); upd(); loop();
-}
+const upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
+function togglePdf(){S.cap?stopPdf():startPdf();}
+function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
 function loop(){
-  if(!S.cap) return;
-  const start=performance.now();
-  if(frame()){
-    toBlob(.82).then(async b=>{
-      if(!S.cap || !b) return;
-      S.buf.push({u8:new Uint8Array(await b.arrayBuffer()), km:S.km});
-      if(S.buf.length>=lim()){ rotate(false); }
-      upd();
-    }).catch(()=>{});
-  }
-  clearTimeout(S.timer);
-  S.timer=setTimeout(loop, Math.max(0, Math.max(parseInt($('int').value)||200,100) - (performance.now()-start)));
+  if(!S.cap)return;const start=performance.now();
+  if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});
+  clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));
 }
-function rotate(final){
-  if(!S.buf.length) return;
-  S.queue.push({p:S.buf, n:S.batch});
-  S.buf=[];
-  S.batch++;
-  runQueue();
-  if(final && !S.queue.length) return;
-}
+function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
 async function stopPdf(){
-  if(!S.cap) return;
-  S.cap=false;
-  clearTimeout(S.timer);
-  $('shut').disabled=true;
-  toast('Salvando lotes pendentes…');
-  rotate(true);
-  await runQueue();
-  while(S.busy || S.queue.length){ await new Promise(r=>setTimeout(r,100)); }
-  setRec(false);
-  $('shut').disabled=false;
-  toast(`Sessão finalizada: ${S.saved} PDF(s)`);
+  if(!S.cap)return;S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();
+  while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);
 }
 async function runQueue(){
-  if(S.busy) return;
-  S.busy=true;
-  try{
-    while(S.queue.length){
-      await makePdf(S.queue.shift());
-      S.saved++;
-      await new Promise(r=>setTimeout(r,0));
-    }
-  }catch(e){
-    console.error(e);
-    toast('Falha ao gerar PDF',1);
-  }finally{
-    S.busy=false;
-  }
+  if(S.busy)return;S.busy=true;
+  try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0));}}
+  catch(e){console.error(e);toast('Falha ao gerar PDF',1);}finally{S.busy=false;}
 }
 async function makePdf({p,n}){
-  const {jsPDF}=window.jspdf;
-  const sz=u=> { const i = new jsPDF().getImageProperties(u); return [i.width,i.height]; };
-  const [w,h]=sz(p[0].u8);
-  const d = new jsPDF({orientation:w>=h ? 'landscape' : 'portrait', unit:'px', format:[w,h], compress:true, hotfixes:['px_scaling']});
-  p.forEach((it,i)=>{
-    if(i) d.addPage([w,h], w>=h ? 'landscape' : 'portrait');
-    d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');
-    it.u8=null;
-  });
+  const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};
+  const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});
+  p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});
   await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
 }
 
 /* toque na tela limpa/mostra controles durante o relatório */
-$('cam').addEventListener('click',e=>{ if(S.cap && !e.target.closest('button,input,select')) document.body.classList.toggle('clean'); });
-window.addEventListener('beforeunload',e=>{ if(S.cap||S.rec||S.busy||S.queue.length){ e.preventDefault(); e.returnValue=''; } });
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden && (S.cap || S.rec)) navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{}); });
+$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
+window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
 updateModeUI();
 </script>
 </body>
