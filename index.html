@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1320">
-<title>KM Report - Iluminação Viária</title>
+<title>KM Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{--bg:#0b1320;--s1:#141e30;--s2:#1e2a40;--line:rgba(255,255,255,.12);--acc:#fbbf24;--ok:#10b981;--bad:#ef4444;--tx:#f3f4f6;--mu:#9ca3af;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
@@ -65,8 +65,8 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 <button class="help-btn" id="openHelp" title="Manual de Operação">?</button>
 
 <main id="start" class="screen on"><div class="card">
-  <h1>KM Report<small class="brand">Iluminação Viária</small></h1>
-  <p class="sub">Sistema técnico de registro de inspeção de iluminação pública e viária com georreferenciamento.</p>
+  <h1>KM Report<small class="brand">Sistema Técnico</small></h1>
+  <p class="sub">Sistema de registro e inspeção de campo com georreferenciamento e quilometragem em tempo real.</p>
   <p class="dir-hint" id="dirHint">Defina o diretório de destino dos arquivos</p>
   <button class="btn" id="pick">Selecionar Diretório</button>
   <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Diretório não configurado: modo download direto.</span></p>
@@ -93,7 +93,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
     </div>
     <div class="tutorial-step">
       <div class="tutorial-num">3</div>
-      <div class="tutorial-text"><b>Identificação de Ativos:</b> Utilize o campo de texto superior direito para inserir etiquetas customizadas (Ex: <code>Poste-042</code>, <code>Luminária LED</code>). O texto é gravado de forma destacada no canto da imagem.</div>
+      <div class="tutorial-text"><b>Identificação de Elementos:</b> Utilize o campo de texto superior direito para inserir etiquetas customizadas (Ex: <code>Elemento-01</code>, <code>Ponto-A</code>). O texto é gravado de forma destacada no canto da imagem.</div>
     </div>
   </div>
 
@@ -105,11 +105,11 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
     </div>
     <div class="tutorial-step">
       <div class="tutorial-num">5</div>
-      <div class="tutorial-text"><b>Modo Vídeo:</b> Inicia e encerra a gravação contínua da inspeção veicular em arquivo de vídeo com painel integrado.</div>
+      <div class="tutorial-text"><b>Modo Vídeo:</b> Inicia e encerra a gravação contínua da inspeção em arquivo de vídeo com painel integrado.</div>
     </div>
     <div class="tutorial-step">
       <div class="tutorial-num">6</div>
-      <div class="tutorial-text"><b>Modo Relatório PDF:</b> Automatiza a captura sequencial em lotes. O sistema gera relatórios consolidados em formato PDF divididos por lotes configuráveis (ideal para varreduras longas de trechos).</div>
+      <div class="tutorial-text"><b>Modo Relatório PDF:</b> Automatiza a captura sequencial em lotes. O sistema gera relatórios consolidados em formato PDF divididos por lotes configuráveis.</div>
     </div>
   </div>
 
@@ -143,14 +143,14 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 
 <div id="set"><div class="card">
   <h1 style="font-size:18px">Configurações de Inspeção</h1>
-  <div class="fld"><label for="label">Etiqueta do Ativo (Opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: P-102, Luminária LED" autocomplete="off"></div>
+  <div class="fld"><label for="label">Etiqueta de Registro (Opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Ponto-01, Setor A" autocomplete="off"></div>
   <div class="checkgroup"><div class="checkgroup-title">Metadados Gravados no Registro</div>
     <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Exibir Quilometragem (KM)</span></label>
     <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Exibir Data e Hora</span></label>
     <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Exibir Coordenadas Geográficas</span></label>
-    <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Exibir Etiqueta de Ativo</span></label>
+    <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Exibir Etiqueta de Registro</span></label>
   </div>
-  <div class="checkgroup"><div class="checkgroup-title">Parâmetros de Rodovia</div><label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Manter KM de referência fora da faixa de domínio (&gt; 300 m)</span></label></div>
+  <div class="checkgroup"><div class="checkgroup-title">Parâmetros de Alinhamento</div><label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Manter KM de referência fora da faixa de referência (&gt; 300 m)</span></label></div>
   <div class="fld"><label for="camSel">Dispositivo de Captura</label><select id="camSel" class="inp"></select></div>
   <div class="fld"><label for="int">Intervalo entre capturas (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
   <div class="fld"><label for="lote">Registros por Lote (PDF)</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
@@ -259,7 +259,7 @@ function updateLocationUI(){
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
   $('locationTitle').textContent=outside&&!showFarKm?'Localização Atual':'KM Atual';
-  $('km').textContent=outside&&!showFarKm?'Fora do alinhamento da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
+  $('km').textContent=outside&&!showFarKm?'Fora do alinhamento':(S.km==='---'?'KM ---':`KM ${S.km}`);
   
   let gpsText = S.acc===null?'Sincronizando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
   $('gps').textContent = gpsText;
@@ -339,7 +339,7 @@ function frame(){
 
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 $('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
-async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`INSPECAO_KM_${S.km}_${stamp()}.jpg`);}
+async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`REGISTRO_KM_${S.km}_${stamp()}.jpg`);}
 $('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`CAPTURA_DIRETA_KM_${S.km}_${stamp()}.jpg`));};
 
 let vidLoop=0;
@@ -348,12 +348,12 @@ function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textConte
 
 const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
 function togglePdf(){S.cap?stopPdf():startPdf();}
-function startPdf(){if(!window.jspdf)return toast('Biblioteca PDF em inicialização',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
+function startPdf(){if(!window.jspdf)return toast('Biblioteca PDF em inicialização',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop ক্ষমতার();}
 function loop(){if(!S.cap)return;const start=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));}
 function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
 async function stopPdf(){if(!S.cap)return;S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Processando lotes...');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão concluída: ${S.saved} relatório(s)`);}
 async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0));}}catch(e){toast('Erro na geração do relatório',1);}finally{S.busy=false;}}
-async function makePdf({p,n}){const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});await save(d.output('blob'),`Relatorio_Inspecao_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
+async function makePdf({p,n}){const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
 $('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
 window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
