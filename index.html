@@ -31,7 +31,8 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 </div></main>
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
-  <div class="hud" id="hud"><small id="locationTitle">KM atual · BR-116</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
+  <!-- Alterado aqui o texto do HUD -->
+  <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
   <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
   <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button></div>
     <div class="row">
@@ -60,7 +61,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 <script>
 const $=id=>document.getElementById(id);
 const S={db:[],km:'---',lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL='BR-116';
+const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL=''; /* ROUTE_LABEL esvaziado para remover o nome da rodovia */
 const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 function toast(m,err=false){const t=$('toast');t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',1800);}
@@ -109,14 +110,15 @@ function updateLocationUI(){
   const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
-  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual · ${ROUTE_LABEL}`;
-  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`${ROUTE_LABEL} · KM ${S.km}`);
+  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
+  // Removido o prefixo ROUTE_LABEL para não concatenar o nome da rodovia
+  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   $('gps').textContent=S.acc===null?'Aguardando GPS…':`GPS ±${Math.round(S.acc)} m${outside?' · fora da rodovia':''}`;
   $('address').hidden=!(outside&&S.address);
   if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;
   return{outside,kmIsShown};
 }
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;min'}[c]));}
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);refreshNearest();}).catch(()=>{});
 if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 
@@ -136,7 +138,16 @@ function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
 /* Quadro com campos configuráveis; fora da rodovia usa endereço em vez do KM, salvo opção explícita. */
-function frame(){const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);const {outside,kmIsShown}=updateLocationUI(),lines=[];if($('showKm').checked&&kmIsShown&&S.km!=='---')lines.push({text:`${ROUTE_LABEL} · KM ${S.km}`,large:true});if(outside&&!$('showKmFar').checked)lines.unshift({text:'Você está fora da rodovia',large:true});if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});else if($('showDate').checked)lines.push({text:new Date().toLocaleString('pt-BR')});if($('showGps').checked&&!outside)lines.push({text:`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`});if(lines.length){const bh=h*.19,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';let y=h-24;for(let i=lines.length-1;i>=0;i--){const line=lines[i];cx.fillStyle=line.large?'#fff':'rgba(255,255,255,.82)';cx.font=line.large?`bold ${Math.round(bh*.22)}px Arial,sans-serif`:`${Math.round(bh*.14)}px Arial,sans-serif`;cx.fillText(line.text,20,y, w-40);y-=line.large?Math.round(bh*.3):Math.round(bh*.18);}}const lb=$('label').value.trim();if(lb&&$('showLabel').checked){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();}return cv;}
+function frame(){
+  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
+  const {outside,kmIsShown}=updateLocationUI(),lines=[];
+  if($('showKm').checked&&kmIsShown&&S.km!=='---')lines.push({text:`KM ${S.km}`,large:true}); /* Removido ROUTE_LABEL daqui também */
+  if(outside&&!$('showKmFar').checked)lines.unshift({text:'Você está fora da rodovia',large:true});
+  if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});else if($('showDate').checked)lines.push({text:new Date().toLocaleString('pt-BR')});
+  if($('showGps').checked&&!outside)lines.push({text:`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`});
+  if(lines.length){const bh=h*.19,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';let y=h-24;for(let i=lines.length-1;i>=0;i--){const line=lines[i];cx.fillStyle=line.large?'#fff':'rgba(255,255,255,.82)';cx.font=line.large?`bold ${Math.round(bh*.22)}px Arial,sans-serif`:`${Math.round(bh*.14)}px Arial,sans-serif`;cx.fillText(line.text,20,y, w-40);y-=line.large?Math.round(bh*.3):Math.round(bh*.18);}}
+  const lb=$('label').value.trim();if(lb&&$('showLabel').checked){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();}return cv;
+}
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 $('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
 async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
