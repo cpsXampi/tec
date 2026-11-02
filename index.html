@@ -111,7 +111,6 @@ function updateLocationUI(){
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
   $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
-  // Na placa (tela), continua informando se está fora da rodovia
   $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   
   let gpsText = S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
@@ -145,18 +144,15 @@ function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
   
-  // Nas fotos e relatórios, se estiver fora da rodovia (e sem forçar o KM), nenhuma linha de KM ou aviso é adicionada
   if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside) {
     lines.push({text:`KM ${S.km}`,large:true});
   } else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked) {
     lines.push({text:`KM ${S.km}`,large:true});
   }
   
-  // Endereço ou Data/Hora
   if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
   else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
   
-  // Precisão do GPS e Coordenadas
   if($('showGps').checked) {
     const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
     lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, small: true});
@@ -208,7 +204,7 @@ let vidLoop=0;
 function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
 function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}}
 
-/* Relatório PDF em lotes */
+/* Relatório PDF em lotes otimizado */
 const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
 function togglePdf(){S.cap?stopPdf():startPdf();}
 function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
