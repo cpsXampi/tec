@@ -10,7 +10,7 @@
 :root{--bg:#0b1320;--s1:#141e30;--s2:#1e2a40;--line:rgba(255,255,255,.12);--acc:#fbbf24;--ok:#10b981;--bad:#ef4444;--tx:#f3f4f6;--mu:#9ca3af;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
 button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:28px 22px;box-shadow:0 8px 20px rgba(0,0,0,.4)}.card h1{font-size:24px;letter-spacing:-.01em;color:#fff}.card p.sub{color:var(--mu);font-size:13px;line-height:1.5;margin-top:6px}.brand{display:inline-block;margin-left:6px;font-size:9px;font-weight:600;color:var(--acc);letter-spacing:.05em;vertical-align:baseline}
+#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}.card{width:100%;max-width:440px;background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:28px 22px;box-shadow:0 8px 20px rgba(0,0,0,.4)}.card h1{font-size:24px;letter-spacing:-.01em;color:#fff}.card p.sub{color:var(--mu);font-size:13px;line-height:1.5;margin-top:6px}.brand{display:inline-block;margin-left:6px;font-size:9px;font-weight:600;color:var(--acc);letter-spacing:.05em;vertical-align:baseline}
 .fld{margin-top:18px}.fld label{display:block;font-size:12px;color:var(--mu);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;color:#fff}.btn{width:100%;min-height:48px;border-radius:12px;font-weight:700;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line);transition:transform .1s}.btn.pri{background:var(--acc);color:#0b1320;border-color:var(--acc)}.btn:active{transform:scale(.98)}.st{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}.dir-hint{margin:18px 0 0;color:var(--acc);font-size:13px;font-weight:600;text-align:center}.dir-hint[hidden],#pick[hidden]{display:none}
 
 #cam{flex-direction:column;background:#000}video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -46,8 +46,12 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
 .checkgroup-title{font-size:12px;color:var(--mu);margin-bottom:4px;font-weight:600;text-transform:uppercase}
 
-.tutorial-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
-.tutorial-num{background:var(--acc);color:#0b1320;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;flex:none}
+/* Estilização do Manual Técnico */
+.manual-section{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.manual-section:last-child{border-bottom:none;margin-bottom:0}
+.manual-title{font-size:13px;font-weight:700;color:var(--acc);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+.tutorial-step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.tutorial-num{background:var(--acc);color:#0b1320;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;flex:none}
 .tutorial-text{font-size:13px;color:var(--mu);line-height:1.4}
 .tutorial-text b{color:#fff}
 
@@ -58,7 +62,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 </head>
 <body>
 
-<button class="help-btn" id="openHelp" title="Instruções de Operação">?</button>
+<button class="help-btn" id="openHelp" title="Manual de Operação">?</button>
 
 <main id="start" class="screen on"><div class="card">
   <h1>KM Report<small class="brand">Iluminação Viária</small></h1>
@@ -69,30 +73,59 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
   <button class="btn pri" id="go">Iniciar Câmera</button>
 </div></main>
 
+<!-- Modal com o Manual de Instruções Completo -->
 <div id="helpModal"><div class="card">
-  <h1 style="font-size:18px; margin-bottom:14px;">📖 Procedimento Operacional</h1>
+  <h1 style="font-size:18px; margin-bottom:16px;">📖 Manual Técnico de Operação</h1>
   
-  <div class="tutorial-step">
-    <div class="tutorial-num">1</div>
-    <div class="tutorial-text"><b>Diretório de Armazenamento:</b> Selecione a pasta local para salvamento automático dos registros.</div>
-  </div>
-  
-  <div class="tutorial-step">
-    <div class="tutorial-num">2</div>
-    <div class="tutorial-text"><b>Captura Georreferenciada:</b> Ao iniciar a câmera, a quilometragem e as coordenadas geográficas são calculadas via GPS.</div>
+  <div class="manual-section">
+    <div class="manual-title">1. Configuração Inicial</div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">1</div>
+      <div class="tutorial-text"><b>Diretório de Salvamento:</b> Clique em "Selecionar Diretório" na tela inicial para autorizar uma pasta no dispositivo onde os arquivos (fotos, vídeos e relatórios) serão gravados automaticamente. Caso ignore, os arquivos irão para a pasta padrão de downloads do navegador.</div>
+    </div>
   </div>
 
-  <div class="tutorial-step">
-    <div class="tutorial-num">3</div>
-    <div class="tutorial-text"><b>Modos de Inspeção:</b> Alterne entre <b>Foto</b>, <b>Vídeo</b> ou emissão sequencial de <b>Relatório PDF</b>.</div>
+  <div class="manual-section">
+    <div class="manual-title">2. Operação da Câmera e HUD</div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">2</div>
+      <div class="tutorial-text"><b>Leitura de KM e GPS:</b> Ao ativar a câmera, o sistema processa a posição via satélite e exibe na placa superior a quilometragem atual calculada, o status do sinal e coordenadas geográficas.</div>
+    </div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">3</div>
+      <div class="tutorial-text"><b>Identificação de Ativos:</b> Utilize o campo de texto superior direito para inserir etiquetas customizadas (Ex: <code>Poste-042</code>, <code>Luminária LED</code>). O texto é gravado de forma destacada no canto da imagem.</div>
+    </div>
   </div>
 
-  <div class="tutorial-step">
-    <div class="tutorial-num">4</div>
-    <div class="tutorial-text"><b>Identificação de Ativo:</b> Utilize o campo superior direito para adicionar o código do poste ou etiqueta de manutenção.</div>
+  <div class="manual-section">
+    <div class="manual-title">3. Modos de Captura Disponíveis</div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">4</div>
+      <div class="tutorial-text"><b>Modo Foto:</b> Pressione o botão central de disparo para capturar uma imagem estática contendo todos os metadados de quilometragem e data/hora embutidos.</div>
+    </div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">5</div>
+      <div class="tutorial-text"><b>Modo Vídeo:</b> Inicia e encerra a gravação contínua da inspeção veicular em arquivo de vídeo com painel integrado.</div>
+    </div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">6</div>
+      <div class="tutorial-text"><b>Modo Relatório PDF:</b> Automatiza a captura sequencial em lotes. O sistema gera relatórios consolidados em formato PDF divididos por lotes configuráveis (ideal para varreduras longas de trechos).</div>
+    </div>
   </div>
 
-  <button class="btn pri" id="closeHelp" style="margin-top:16px;">Fechar Instruções</button>
+  <div class="manual-section">
+    <div class="manual-title">4. Painel de Ajustes (Engrenagem)</div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">7</div>
+      <div class="tutorial-text"><b>Filtros de Metadados:</b> Permite ativar ou desativar a exibição individual de KM, Data/Hora, Coordenadas de GPS e Etiquetas nas mídias geradas.</div>
+    </div>
+    <div class="tutorial-step">
+      <div class="tutorial-num">8</div>
+      <div class="tutorial-text"><b>Parâmetros de Lote:</b> Ajuste o intervalo de tempo entre as fotos do relatório e a quantidade limite de registros por arquivo PDF.</div>
+    </div>
+  </div>
+
+  <button class="btn pri" id="closeHelp" style="margin-top:16px;">Compreendido, Fechar Manual</button>
 </div></div>
 
 <section id="cam" class="screen">
