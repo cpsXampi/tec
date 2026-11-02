@@ -113,9 +113,7 @@ const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.g
 function toast(m,err=false){
   const t=$('toast');
   t.textContent=m;
-  t.className='';
-  t.classList.add(err?'err':'');
-  t.classList.add('show');
+  t.className=err?'err show':'show';
   clearTimeout(S.tt);
   S.tt=setTimeout(()=>t.className='',1800);
 }
