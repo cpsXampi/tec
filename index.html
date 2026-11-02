@@ -1,219 +1,1419 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07090c">
-<title>KM Report</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob: https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://cdn.plot.ly https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'unsafe-inline' data: https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://cdn.plot.ly https://fonts.googleapis.com https://fonts.gstatic.com; img-src data: blob: https://ia.motiva.com.br https://motivai.blob.core.windows.net https://motivaiprod.blob.core.windows.net; font-src data: https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://cdn.plot.ly https://fonts.googleapis.com https://fonts.gstatic.com; media-src data: blob:; connect-src 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'">
+<head></head>
+<html lang="pt-BR"
+
+> <head>
+<meta charset="utf-8"
+
+> <meta name="viewport" content="width=device-width, initial-scale=1"
+
+> <meta name="description" content="Protótipo de interface aprimorada para o KM Report"
+
+> <title>KM Report — Inspeção Fotográfica</title>
+
 <style>
-:root{
-  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);
-  --shadow:0 20px 40px rgba(0,0,0,.2)
+:root {
+  --purple: #5e22f3;
+  --purple-dark: #4515c4;
+  --purple-soft: #f1edff;
+  --green: #087a53;
+  --green-soft: #e9f8f1;
+  --yellow: #9a6700;
+  --yellow-soft: #fff6d8;
+  --red: #b42318;
+  --red-soft: #fff0ee;
+  --blue: #175cd3;
+  --blue-soft: #eff6ff;
+  --ink: #171321;
+  --muted: #696475;
+  --line: #ddd9e5;
+  --surface: #ffffff;
+  --background: #f5f4f8;
+  --shadow: 0 12px 34px rgba(25, 16, 52, 0.09);
+  --radius: 16px;
+  --radius-small: 10px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}
-:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
-.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px;box-shadow:var(--shadow)}
-.card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
-.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
-.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
-.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}
-.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
-.btn:active{transform:scale(.98)}
-.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--dim,#555);flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
-.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-top:12px}
-.check{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--tx)}
-.check input{accent-color:var(--acc);width:16px;height:16px}
-#cam{flex-direction:column;background:#000}
-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hud{position:absolute;z-index:5;background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;top:calc(14px + var(--st));left:12px;max-width:min(78vw,320px)}
-.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{font-size:26px;line-height:1.1}
-.hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:normal;word-break:break-word}
-.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
-.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
-.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}@keyframes b{50%{opacity:.15}}
-.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
-body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
-.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
-.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
-.modes button[aria-pressed=true]{background:var(--acc);color:#000}
-.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}
-.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
-.rb svg{width:22px;height:22px}
-#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
-#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}
-#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}
-#snap{visibility:hidden}#snap.on{visibility:visible}
-#set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
-#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto;max-width:520px}
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none}
-#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--background);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(94, 34, 243, 0.28);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -50px;
+  left: 16px;
+  z-index: 1000;
+  padding: 10px 14px;
+  color: #fff;
+  background: var(--ink);
+  border-radius: 8px;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  color: #fff;
+  background: linear-gradient(115deg, #38109f, var(--purple));
+  box-shadow: 0 4px 20px rgba(35, 10, 99, 0.22);
+}
+
+.header-content {
+  width: min(1440px, 100%);
+  min-height: 72px;
+  margin: auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.brand-symbol {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 19px;
+  color: var(--purple);
+  background: #fff;
+  border-radius: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.15;
+}
+
+.brand p {
+  margin: 3px 0 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-badge {
+  min-height: 40px;
+  padding: 8px 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.live-dot {
+  width: 9px;
+  height: 9px;
+  background: #52e4a1;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(82, 228, 161, 0.15);
+}
+
+.header-button {
+  min-height: 40px;
+  padding: 8px 14px;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.layout {
+  width: min(1440px, 100%);
+  margin: auto;
+  padding: 22px 24px 110px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.8fr);
+  gap: 22px;
+}
+
+.main-column,
+.side-column {
+  min-width: 0;
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.card-header h2,
+.card-header h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.card-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.status-item {
+  min-height: 82px;
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+
+.status-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+.status-item.ok .status-icon {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.status-item.warning .status-icon {
+  color: var(--yellow);
+  background: var(--yellow-soft);
+}
+
+.status-item.info .status-icon {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.status-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.camera-frame {
+  position: relative;
+  min-height: 430px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 70% 25%, rgba(122, 100, 174, 0.46), transparent 25%),
+    linear-gradient(150deg, #191523 0%, #2c263a 48%, #110e17 100%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.camera-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.road-preview {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -70px;
+  height: 300px;
+  background: linear-gradient(90deg, #2b2930, #46434d 48%, #2b2930);
+  transform: perspective(420px) rotateX(54deg);
+  transform-origin: bottom;
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+}
+
+.road-line {
+  position: absolute;
+  left: calc(50% - 3px);
+  bottom: 0;
+  width: 6px;
+  height: 250px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #f5e477 0,
+    #f5e477 30px,
+    transparent 30px,
+    transparent 52px
+  );
+}
+
+.camera-top {
+  position: absolute;
+  inset: 16px 16px auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.preview-pill {
+  padding: 8px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(12, 9, 18, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.camera-center {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.camera-center-icon {
+  width: 68px;
+  height: 68px;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  font-size: 28px;
+  backdrop-filter: blur(7px);
+}
+
+.camera-center p {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.83);
+  font-size: 13px;
+}
+
+.evidence-overlay {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 13px 15px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+  background: rgba(14, 10, 20, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.evidence-overlay strong {
+  display: block;
+  font-size: 15px;
+}
+
+.evidence-overlay span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+}
+
+.km-display {
+  font-size: 22px !important;
+  font-weight: 900;
+  color: #fff !important;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 17px;
+}
+
+.form-group {
+  min-width: 0;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+label,
+.label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.required {
+  color: var(--red);
+}
+
+.helper {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #cfcad9;
+  border-radius: var(--radius-small);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: #aaa2bc;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--purple);
+}
+
+.input-suffix {
+  position: relative;
+}
+
+.input-suffix input {
+  padding-right: 56px;
+}
+
+.input-suffix span {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  color: var(--muted);
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.inline-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.option {
+  position: relative;
+}
+
+.option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option label {
+  min-height: 46px;
+  margin: 0;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.option input:checked + label {
+  color: var(--purple-dark);
+  background: var(--purple-soft);
+  border-color: var(--purple);
+}
+
+.notice {
+  padding: 13px 14px;
+  display: flex;
+  gap: 11px;
+  border-radius: 11px;
+  font-size: 12px;
+}
+
+.notice.info {
+  color: #123b74;
+  background: var(--blue-soft);
+  border: 1px solid #c9defe;
+}
+
+.notice.warning {
+  color: #6b4700;
+  background: var(--yellow-soft);
+  border: 1px solid #f1d475;
+}
+
+.notice strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+
+.progress-header {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.progress-track {
+  height: 12px;
+  overflow: hidden;
+  background: #ebe8f0;
+  border-radius: 999px;
+}
+
+.progress-value {
+  width: 64%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), #8d65fa);
+  border-radius: inherit;
+}
+
+.progress-details {
+  margin-top: 11px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.metric-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.metric {
+  padding: 13px;
+  background: #faf9fc;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 17px;
+}
+
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  position: relative;
+  padding: 0 0 17px 28px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 10px;
+  height: 10px;
+  background: var(--green);
+  border: 3px solid var(--green-soft);
+  border-radius: 50%;
+}
+
+.timeline li::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  bottom: 0;
+  left: 10px;
+  width: 1px;
+  background: var(--line);
+}
+
+.timeline li:last-child::after {
+  display: none;
+}
+
+.timeline strong {
+  display: block;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.timeline time {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.check-list {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+}
+
+.check-list li {
+  padding: 10px 11px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: #faf9fc;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.check {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  background: var(--green-soft);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.action-bar {
+  position: fixed;
+  z-index: 90;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 13px 24px;
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -10px 30px rgba(24, 16, 45, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.action-content {
+  width: min(1392px, 100%);
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.action-summary {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.action-summary strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 11px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  font-weight: 850;
+}
+
+.btn-secondary {
+  color: var(--ink);
+  background: #fff;
+  border-color: var(--line);
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--purple);
+  box-shadow: 0 7px 18px rgba(94, 34, 243, 0.22);
+}
+
+.btn-primary:hover {
+  background: var(--purple-dark);
+}
+
+.btn-danger {
+  color: var(--red);
+  background: var(--red-soft);
+  border-color: #f5c4be;
+}
+
+details {
+  overflow: hidden;
+}
+
+details summary {
+  padding: 16px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  list-style-position: inside;
+}
+
+details[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+
+details .details-content {
+  padding: 16px 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.offline-banner {
+  width: min(1440px, calc(100% - 48px));
+  margin: 16px auto 0;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #6b4700;
+  background: var(--yellow-soft);
+  border: 1px solid #edd27a;
+  border-radius: 11px;
+  font-size: 12px;
+}
+
+.offline-banner strong {
+  color: #4d3300;
+}
+
+.mobile-label {
+  display: none;
+}
+
+@media (max-width: 1050px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .header-content {
+    min-height: 64px;
+    padding: 10px 15px;
+  }
+
+  .brand p,
+  .session-badge,
+  .header-button span {
+    display: none;
+  }
+
+  .layout {
+    padding: 14px 14px 150px;
+  }
+
+  .offline-banner {
+    width: calc(100% - 28px);
+    margin-top: 12px;
+    align-items: flex-start;
+  }
+
+  .status-grid,
+  .form-grid,
+  .side-column {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full {
+    grid-column: auto;
+  }
+
+  .camera-frame {
+    min-height: 390px;
+  }
+
+  .camera-top {
+    flex-wrap: wrap;
+  }
+
+  .evidence-overlay {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .evidence-overlay > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .inline-options {
+    grid-template-columns: 1fr;
+  }
+
+  .action-bar {
+    padding: 10px 14px;
+  }
+
+  .action-content {
+    display: block;
+  }
+
+  .action-summary {
+    margin-bottom: 8px;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn-primary {
+    grid-column: 1 / -1;
+    min-height: 54px;
+  }
+
+  .mobile-label {
+    display: inline;
+  }
+}
+
+@media print {
+  .app-header,
+  .action-bar,
+  .offline-banner {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .layout {
+    display: block;
+    padding: 0;
+  }
+
+  .card,
+  .camera-frame {
+    margin-bottom: 18px;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
 </style>
 </head>
+
 <body>
-<main id="start" class="screen on">
-  <div class="card">
-    <h1>KM Report</h1>
-    <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data, GPS, endereço, clima e marca d'água configuráveis.</p>
+<a class="skip-link" href="#conteudo">Ir para o conteúdo principal</a>
 
-    <div class="fld">
-      <label for="label">Etiqueta (opcional)</label>
-      <input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off">
+<header class="app-header"
+
+>   <div class="header-content"
+
+>     <div class="brand"
+
+>       <div class="brand-symbol" aria-hidden="true">KM</div>
+      <div>
+        <h1>KM Report</h1>
+        <p>Sistema de apoio e inspeção fotográfica</p>
+      </div>
     </div>
 
-    <div class="fld">
-      <label for="company">Cliente / local (opcional)</label>
-      <input id="company" class="inp" maxlength="80" placeholder="Ex.: Empresa ABC, Rodovia SP-123" autocomplete="off">
-    </div>
+    <div class="header-actions"
 
-    <button class="btn" id="pick">Escolher pasta de destino</button>
-    <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
-    <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
-    <button class="btn" id="csv" style="display:none">Carregar tabela de KM (.csv)</button>
-    <input type="file" id="csvf" accept=".csv,text/csv" hidden>
-    <button class="btn pri" id="go">Abrir câmera</button>
-  </div>
-</main>
+>       <div class="session-badge" aria-label="Sessão ativa"
 
-<section id="cam" class="screen">
-  <video id="v" autoplay playsinline muted></video>
-  <div class="hud">
-    <small>KM atual</small>
-    <b id="km">KM ---</b>
-    <div class="acc" id="gps">Aguardando GPS…</div>
-    <div class="acc" id="addr">Aguardando endereço…</div>
-    <div class="acc" id="weather">Aguardando clima…</div>
-  </div>
-  <div class="chip">
-    <div class="pill rec" id="rec">Gravando</div>
-    <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
-  </div>
-  <div class="bar">
-    <div class="modes" role="group" aria-label="Modo">
-      <button data-m="foto" aria-pressed="true">Foto</button>
-      <button data-m="video" aria-pressed="false">Vídeo</button>
-      <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
-    </div>
-    <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path>
-          <circle cx="15" cy="7" r="3"></circle>
-          <circle cx="7" cy="17" r="3"></circle>
-        </svg>
+>         <span class="live-dot" aria-hidden="true"></span>
+        Sessão em andamento
+      </div>
+      <button class="header-button" type="button" aria-label="Abrir ajuda"
+
+>         ? <span>Ajuda</span>
       </button>
-      <button id="shut" aria-label="Capturar"><i></i></button>
-      <button class="rb" id="snap" aria-label="Foto avulsa em JPG">JPG</button>
     </div>
-    <button class="pill" id="back">Voltar</button>
   </div>
-</section>
+</header>
 
-<div id="set">
-  <div class="card">
-    <h1 style="font-size:20px">Ajustes</h1>
+<div class="offline-banner" role="status"
 
-    <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
-    <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-    <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-
-    <div class="fld">
-      <label>Elementos visíveis na tela</label>
-      <div class="check-grid">
-        <label class="check"><input type="checkbox" id="showKm" checked> KM</label>
-        <label class="check"><input type="checkbox" id="showGps" checked> GPS</label>
-        <label class="check"><input type="checkbox" id="showDate" checked> Data/Hora</label>
-        <label class="check"><input type="checkbox" id="showLabel" checked> Etiqueta</label>
-        <label class="check"><input type="checkbox" id="showAddress" checked> Endereço</label>
-        <label class="check"><input type="checkbox" id="showWeather" checked> Clima</label>
-        <label class="check"><input type="checkbox" id="showCompanyInfo" checked> Cliente / local</label>
-      </div>
-    </div>
-
-    <div class="fld">
-      <label>Onde aplicar as marcas</label>
-      <div class="check-grid">
-        <label class="check"><input type="checkbox" id="photoOverlay" checked> Fotos</label>
-        <label class="check"><input type="checkbox" id="videoOverlay" checked> Vídeos</label>
-        <label class="check"><input type="checkbox" id="pdfOverlay" checked> PDF</label>
-      </div>
-    </div>
-
-    <button class="btn pri" id="closeSet">Fechar</button>
+>   <div>
+    <strong>Modo de contingência disponível</strong>
+    — As evidências podem ser mantidas no dispositivo e sincronizadas quando
+    houver conexão.
   </div>
+  <span>Conexão estável</span>
 </div>
 
-<div id="toast" role="status"></div>
-<canvas id="c" hidden></canvas>
+<main id="conteudo" class="layout"
 
-<script>
-const $=id=>document.getElementById(id);
-const defaultCfg={label:'',company:'',int:200,lote:150,showKm:true,showGps:true,showDate:true,showLabel:true,showAddress:true,showWeather:true,showCompanyInfo:true,photoOverlay:true,videoOverlay:true,pdfOverlay:true};
-const S={db:[],km:'---',lat:0,lon:0,acc:null,dir:null,stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,addr:'',weather:'',lastAddrFetch:0,lastWeatherFetch:0};
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
-const cfg=Object.assign({},defaultCfg,JSON.parse(localStorage.getItem('kmr')||'{}'));
-['label','company','int','lote'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
-Object.keys(defaultCfg).forEach(k=>{if((k.startsWith('show')||k.endsWith('Overlay'))){const el=$(k);if(el&&cfg[k]!==undefined)el.checked=!!cfg[k];}});
-function persist(){try{localStorage.setItem('kmr', JSON.stringify({label:$('label').value,company:$('company').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showGps:$('showGps').checked,showDate:$('showDate').checked,showLabel:$('showLabel').checked,showAddress:$('showAddress').checked,showWeather:$('showWeather').checked,showCompanyInfo:$('showCompanyInfo').checked,photoOverlay:$('photoOverlay').checked,videoOverlay:$('videoOverlay').checked,pdfOverlay:$('pdfOverlay').checked}))}catch(e){}}
-['label','company','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
-['showKm','showGps','showDate','showLabel','showAddress','showWeather','showCompanyInfo','photoOverlay','videoOverlay','pdfOverlay'].forEach(k=>$(k).addEventListener('change',persist));
-$('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',3000);}
-const pad=n=>String(n).padStart(2,'0');
-const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>String(s ?? '').replace(/[\\/\:*?"<>|,]/g,'_').trim();
-const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
-const col=(h,c)=>{const m=h.map(s=>s.trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i}return -1};
-function parseCsv(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',';const h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
-function kmStatus(){const ok=S.db.length>0;$('dKm').className='dot '+(ok?'ok':'bad');$('tKm').textContent=ok?`Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.`:'Tabela de KM não encontrada. Use .csv manualmente.';}
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t)}).catch(()=>{}).finally(kmStatus);
-$('csv').onclick=()=>$('csvf').click();
-$('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus();}};
-function nearest(la,lo){const k=Math.cos(la*Math.PI/180);let best=null,m=1e9;for(const p of S.db){const d=(p.lat-la)**2+((p.lon-lo)*k)**2;if(d<m){m=d;best=p}}return best&&{km:best.km,dist:Math.sqrt(m)*111320};}
-function updateKmLabel(){if(S.db.length){const n=nearest(S.lat,S.lon);if(n){S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');$('km').textContent='KM '+S.km;$('gps').textContent=`GPS ±${Math.round(S.acc||0)} m`+(n.dist>500?' · longe da rodovia':'');}else{$('km').textContent='KM ---';$('gps').textContent=`GPS ±${Math.round(S.acc||0)} m`;}}else{$('km').textContent='KM ---';}}
-async function fetchAddress(lat,lon){if(!Number.isFinite(lat)||!Number.isFinite(lon))return;try{const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=pt-BR`,{headers:{'Accept-Language':'pt-BR'}});if(!resp.ok)throw new Error('Nominatim falhou');const data=await resp.json();const a=data.address||{};const list=[a.road,a.neighbourhood,a.suburb,a.city||a.town||a.village,a.state,a.country].filter(Boolean);S.addr=list.slice(0,4).join(', ')||'Coordenadas disponíveis';}catch(e){S.addr='Endereço indisponível';}}
-async function fetchWeather(lat,lon){if(!Number.isFinite(lat)||!Number.isFinite(lon))return;try{const resp=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto&forecast_days=1`);if(!resp.ok)throw new Error('Open-Meteo falhou');const data=await resp.json();const w=data.current;const map={0:'Limpo',1:'Parcialmente nublado',2:'Nublado',3:'Encoberto',45:'Nevoeiro',48:'Nevoeiro com gelo',51:'Garoa leve',53:'Garoa',55:'Garoa forte',56:'Gelo leve',57:'Gelo forte',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',66:'Chuva gelada',67:'Chuva gelada forte',71:'Neve leve',73:'Neve',75:'Neve forte',77:'Granizo',80:'Pancadas leves',81:'Pancadas',82:'Pancadas fortes',85:'Neve leve',86:'Neve forte',95:'Trovoada',96:'Trovoada com granizo',99:'Trovoada severa'};const temp=w?.temperature_2m ?? '--';const hum=w?.relative_humidity_2m ?? '--';const wind=w?.wind_speed_10m ?? '--';S.weather=`${map[w?.weather_code] || 'Clima'} · ${temp}°C · ${wind} km/h · ${hum}%`;}catch(e){S.weather='Clima indisponível';}}
-function refreshMetaText(){const showKm=$('showKm').checked;const showGps=$('showGps').checked;const showAddress=$('showAddress').checked;const showWeather=$('showWeather').checked;const kmText=showKm&&S.km!=='---'?'KM '+S.km:'KM oculto';if(showKm){$('km').textContent=kmText==='KM oculto'?'KM ---':kmText;}$('gps').textContent = showGps ? (`GPS ±${Math.round(S.acc||0)} m`) : 'GPS oculto';$('addr').textContent = showAddress ? (S.addr || 'Aguardando endereço…') : 'Endereço oculto';$('weather').textContent = showWeather ? (S.weather || 'Aguardando clima…') : 'Clima oculto';if(!showGps&&!showAddress&&!showWeather){$('gps').textContent='Metadados ocultos';}}
-if('geolocation' in navigator){navigator.geolocation.watchPosition(async p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;updateKmLabel();refreshMetaText();const now=Date.now();if(now-S.lastAddrFetch>20000){S.lastAddrFetch=now;await fetchAddress(S.lat,S.lon);}if(now-S.lastWeatherFetch>60000){S.lastWeatherFetch=now;await fetchWeather(S.lat,S.lon);}refreshMetaText();},()=>{$('gps').textContent='GPS indisponível';S.addr='Endereço indisponível';S.weather='Clima indisponível';refreshMetaText();},{enableHighAccuracy:true,maximumAge:1000,timeout:15000});}else{$('gps').textContent='GPS indisponível';}
-if(!('showDirectoryPicker' in window))$('pick').style.display='none';
-$('pick').onclick=async()=>{try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;}catch(e){if(e.name!=='AbortError')toast(e.message,1)}};
-async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1)}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
-async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());S.stream=await navigator.mediaDevices.getUserMedia({video:id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');const cur=S.stream.getVideoTracks()[0].getSettings().deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');}
-$('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
-$('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+e.message,1)}};
-function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);z0=S.stream.getVideoTracks()[0].getSettings().zoom||1}};v.ontouchmove=e=>{const t=S.stream.getVideoTracks()[0],c=t.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{})}}}
-$('gear').onclick=()=>$('set').classList.add('on');
-$('closeSet').onclick=()=>$('set').classList.remove('on');
-$('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));});
-function frame(){const v=$('v');if(!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.clearRect(0,0,w,h);cx.drawImage(v,0,0,w,h);const footerH=h*0.18;const g=cx.createLinearGradient(0,h-footerH,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-footerH,w,footerH);const labelText=$('label').value.trim();const companyText=$('company').value.trim();const showKm=$('showKm').checked;const showGps=$('showGps').checked;const showDate=$('showDate').checked;const showAddress=$('showAddress').checked;const showWeather=$('showWeather').checked;const showLabel=$('showLabel').checked;const showCompanyInfo=$('showCompanyInfo').checked;let yBase=h-footerH+22;if(showKm){cx.textAlign='left';cx.textBaseline='alphabetic';cx.fillStyle='#fff';cx.font=`bold ${Math.round(footerH*.35)}px Arial,sans-serif`;cx.fillText('KM '+S.km,20,yBase+12);}if(showDate){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.fillStyle='rgba(255,255,255,.8)';cx.fillText(`${new Date().toLocaleString('pt-BR')}`,20,yBase+36);}const lines=[];if(showGps)lines.push(`GPS: ${Number.isFinite(S.lat)&&Number.isFinite(S.lon)?`${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`:'---'}`);if(showAddress&&S.addr)lines.push(S.addr);if(showWeather&&S.weather)lines.push(S.weather);if(showCompanyInfo&&companyText)lines.push(companyText);if(lines.length){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.textAlign='left';cx.textBaseline='alphabetic';let y=yBase+(showKm||showDate?54:12);for(const line of lines){if(y>h-10)break;cx.fillStyle='rgba(255,255,255,.75)';cx.fillText(line,20,y);y+=18;}}if(showLabel&&labelText){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5;const bw=cx.measureText(labelText).width+px*2,bh=fs+py*2,x=Math.max(30,w-bw-30),y=30;cx.save();cx.globalAlpha=.82;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(labelText,x+bw/2,y+bh/2+1);cx.restore();}if(showCompanyInfo&&companyText){const fs=Math.round(h*.022);cx.font=`bold ${fs}px Arial,sans-serif`;cx.textAlign='right';cx.textBaseline='top';const text=companyText.slice(0,60);const padX=18,padY=12;const bw=cx.measureText(text).width+padX*2;const bh=fs+padY*2;const x=w-bw-24,y=30;cx.save();cx.globalAlpha=.9;cx.fillStyle='rgba(16,20,26,.8)';cx.beginPath();cx.roundRect(x,y,bw,bh,12);cx.fill();cx.fillStyle='#fff';cx.fillText(text,x+padX,y+padY+1);cx.restore();}return cv;}
-const toBlob=(q)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]()};
-async function photo(){if(!frame())return;const b=await toBlob(.9);const label=$('label').value.trim()||'Sem_Etiqueta';save(b,`FOTO_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;const label=$('label').value.trim()||'Sem_Etiqueta';toBlob(.9).then(b=>save(b,`FOTO_EXTRA_${safe(label)}_KM_${S.km}_${stamp()}.jpg`));};
-let vidLoop=0;
-function toggleVideo(){if(S.rec){S.rec.stop();return}if(!frame())return;const cs=cv.captureStream(30),mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6})}catch(e){return toast('Gravação não suportada neste navegador',1)}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_${safe($('label').value || 'Sem_Etiqueta')}_KM_${km0}_${ini}_a_${stamp()}.webm`)};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d)})();}
-function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',on&&S.mode==='pdf');if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release();S.lock=null}}
-const lim=()=>Math.max(parseInt($('lote').value)||150,1);const upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`};
-function togglePdf(){S.cap?stopPdf():startPdf()}
-function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
-function loop(){if(!S.cap)return;const t=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap&&!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();});S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-t)));}
-function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();}
-async function stopPdf(){S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);}
-async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0))}}catch(e){console.error(e);toast('Falha ao gerar PDF',1)}finally{S.busy=false}}
-async function makePdf({p,n}){const {jsPDF}=window.jspdf;const sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height]};let [w,h]=sz(p[0].u8);const d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
-$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean')});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{})});
-refreshMetaText();
-</script>
+>   <section class="main-column" aria-label="Área principal da inspeção"
+
+> 
+    <article class="card" aria-labelledby="status-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h2 id="status-title">Condições para captura</h2>
+          <p>Confira os recursos antes de iniciar ou continuar a inspeção.</p>
+        </div>
+      </div>
+
+      <div class="card-body"
+
+>         <div class="status-grid"
+
+>           <div class="status-item ok"
+
+>             <div class="status-icon" aria-hidden="true">●</div>
+            <div>
+              <span class="status-label">Câmera</span>
+              <span class="status-value">Ativa</span>
+            </div>
+          </div>
+
+          <div class="status-item ok"
+
+>             <div class="status-icon" aria-hidden="true">⌖</div>
+            <div>
+              <span class="status-label">GPS</span>
+              <span class="status-value">Precisão de 4 m</span>
+            </div>
+          </div>
+
+          <div class="status-item info"
+
+>             <div class="status-icon" aria-hidden="true">KM</div>
+            <div>
+              <span class="status-label">Quilometragem</span>
+              <span class="status-value">KM 145+320</span>
+            </div>
+          </div>
+
+          <div class="status-item warning"
+
+>             <div class="status-icon" aria-hidden="true">◫</div>
+            <div>
+              <span class="status-label">Armazenamento</span>
+              <span class="status-value">3,8 GB livres</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <section class="camera-frame" aria-label="Prévia da câmera"
+
+>       <div class="road-preview" aria-hidden="true"
+
+>         <div class="road-line"></div>
+      </div>
+
+      <div class="camera-top"
+
+>         <span class="preview-pill"
+
+>           <span class="live-dot" aria-hidden="true"></span>
+          Câmera traseira
+        </span>
+        <span class="preview-pill">Qualidade alta · JPG</span>
+      </div>
+
+      <div class="camera-center"
+
+>         <div class="camera-center-icon" aria-hidden="true">◎</div>
+        <p>Prévia da câmera do dispositivo</p>
+      </div>
+
+      <div class="evidence-overlay"
+
+>         <div>
+          <strong>BR-000 · Pista Norte</strong>
+          <span>Inspeção de pavimento</span>
+        </div>
+        <div>
+          <span>KM ATUAL</span>
+          <strong class="km-display">145+320</strong>
+        </div>
+        <div>
+          <span>GPS</span>
+          <strong>-23.5505, -46.6333</strong>
+        </div>
+      </div>
+    </section>
+
+    <article class="card" aria-labelledby="config-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h2 id="config-title">Configuração da inspeção</h2>
+          <p>Os dados abaixo serão aplicados às próximas evidências.</p>
+        </div>
+      </div>
+
+      <div class="card-body"
+
+>         <form>
+          <div class="form-grid"
+
+>             <div class="form-group"
+
+>               <label for="rodovia"
+
+>                 Rodovia ou ativo <span class="required">*</span>
+              </label>
+              <select id="rodovia" name="rodovia" required>
+                <option>BR-000</option>
+                <option>SP-000</option>
+                <option>Outro ativo</option>
+              </select>
+            </div>
+
+            <div class="form-group"
+
+>               <label for="sentido"
+
+>                 Sentido <span class="required">*</span>
+              </label>
+              <select id="sentido" name="sentido" required>
+                <option>Norte</option>
+                <option>Sul</option>
+                <option>Leste</option>
+                <option>Oeste</option>
+              </select>
+            </div>
+
+            <div class="form-group"
+
+>               <label for="tipo">Tipo de serviço</label>
+              <select id="tipo" name="tipo"
+
+>                 <option>Inspeção de pavimento</option>
+                <option>Sinalização</option>
+                <option>Drenagem</option>
+                <option>Obra de arte especial</option>
+                <option>Faixa de domínio</option>
+                <option>Outro</option>
+              </select>
+            </div>
+
+            <div class="form-group"
+
+>               <label for="etiqueta">Etiqueta da evidência</label>
+              <input
+                id="etiqueta"
+                name="etiqueta"
+                type="text"
+                value="Levantamento preventivo"
+                maxlength="80"
+
+>               <span class="helper">Máximo de 80 caracteres.</span>
+            </div>
+
+            <div class="form-group"
+
+>               <span class="label">Intervalo entre capturas</span>
+              <div class="inline-options"
+
+>                 <div class="option"
+
+>                   <input id="tempo-1" name="tempo" type="radio"
+
+>                   <label for="tempo-1">1 segundo</label>
+                </div>
+                <div class="option"
+
+>                   <input id="tempo-3" name="tempo" type="radio" checked>
+                  <label for="tempo-3">3 segundos</label>
+                </div>
+                <div class="option"
+
+>                   <input id="tempo-5" name="tempo" type="radio"
+
+>                   <label for="tempo-5">5 segundos</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group"
+
+>               <label for="quantidade">Fotos por lote</label>
+              <div class="input-suffix"
+
+>                 <input
+                  id="quantidade"
+                  name="quantidade"
+                  type="number"
+                  min="1"
+                  max="500"
+                  value="150"
+
+>                 <span>fotos</span>
+              </div>
+              <span class="helper">Limite recomendado: até 200 fotos.</span>
+            </div>
+
+            <div class="form-group full"
+
+>               <label for="pasta">Pasta de armazenamento</label>
+              <input
+                id="pasta"
+                name="pasta"
+                type="text"
+                value="KM Report / 2026-11-02 / BR-000"
+                readonly
+              >
+              <span class="helper"
+
+>                 O relatório PDF e os arquivos JPG serão salvos nesta pasta.
+              </span>
+            </div>
+
+            <div class="form-group full"
+
+>               <div class="notice info"
+
+>                 <span aria-hidden="true">ⓘ</span>
+                <div>
+                  <strong>Registro automático das evidências</strong>
+                  Cada captura incluirá data, hora, coordenadas, KM, rodovia,
+                  sentido, lote e etiqueta.
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </article>
+  </section>
+
+  <aside class="side-column" aria-label="Resumo e acompanhamento"
+
+> 
+    <article class="card" aria-labelledby="progress-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h3 id="progress-title">Progresso do lote</h3>
+          <p>Lote 1 de 3</p>
+        </div>
+        <strong>64%</strong>
+      </div>
+
+      <div class="card-body"
+
+>         <div class="progress-header"
+
+>           <span>96 de 150 fotos</span>
+          <strong>54 restantes</strong>
+        </div>
+
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Progresso do lote"
+          aria-valuemin="0"
+          aria-valuemax="150"
+          aria-valuenow="96"
+
+>           <div class="progress-value"></div>
+        </div>
+
+        <div class="progress-details"
+
+>           <span>Início: 14:32</span>
+          <span>Previsão: 14:40</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" aria-labelledby="summary-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h3 id="summary-title">Resumo da sessão</h3>
+          <p>Dados atualizados da inspeção.</p>
+        </div>
+      </div>
+
+      <div class="card-body"
+
+>         <div class="metric-list"
+
+>           <div class="metric"
+
+>             <span>Fotos</span>
+            <strong>96</strong>
+          </div>
+          <div class="metric"
+
+>             <span>Vídeos</span>
+            <strong>0</strong>
+          </div>
+          <div class="metric"
+
+>             <span>Distância</span>
+            <strong>2,4 km</strong>
+          </div>
+          <div class="metric"
+
+>             <span>Duração</span>
+            <strong>08:14</strong>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" aria-labelledby="events-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h3 id="events-title">Últimos registros</h3>
+          <p>Rastreabilidade da sessão atual.</p>
+        </div>
+      </div>
+
+      <div class="card-body"
+
+>         <ol class="timeline"
+
+>           <li>
+            <strong>Foto 096 registrada</strong>
+            <time>14:39:42</time> · KM 145+320
+          </li>
+          <li>
+            <strong>Foto 095 registrada</strong>
+            <time>14:39:39</time> · KM 145+303
+          </li>
+          <li>
+            <strong>Precisão do GPS recuperada</strong>
+            <time>14:39:35</time> · Precisão de 4 m
+          </li>
+          <li>
+            <strong>Sessão iniciada</strong>
+            <time>14:32:00</time> · Configuração validada
+          </li>
+        </ol>
+      </div>
+    </article>
+
+    <article class="card" aria-labelledby="check-title"
+
+>       <div class="card-header"
+
+>         <div>
+          <h3 id="check-title">Validações automáticas</h3>
+          <p>Condições verificadas pelo sistema.</p>
+        </div>
+      </div>
+
+      <div class="card-body"
+
+>         <ul class="check-list"
+
+>           <li>
+            <span class="check" aria-hidden="true">✓</span>
+            Data e hora disponíveis
+          </li>
+          <li>
+            <span class="check" aria-hidden="true">✓</span>
+            Rodovia e sentido informados
+          </li>
+          <li>
+            <span class="check" aria-hidden="true">✓</span>
+            GPS com precisão aceitável
+          </li>
+          <li>
+            <span class="check" aria-hidden="true">✓</span>
+            Espaço suficiente no dispositivo
+          </li>
+        </ul>
+      </div>
+    </article>
+
+    <details class="card"
+
+>       <summary>Boas práticas de operação</summary>
+      <div class="details-content"
+
+>         Mantenha o dispositivo fixado, confirme o enquadramento antes de
+        iniciar e não opere os controles durante a condução. Caso o GPS perca
+        precisão, aguarde a recuperação do sinal antes de continuar.
+      </div>
+    </details>
+
+  </aside>
+</main>
+
+<footer class="action-bar"
+
+>   <div class="action-content"
+
+>     <div class="action-summary"
+
+>       <strong>Inspeção em andamento</strong>
+      Salvamento automático ativado · Último registro às 14:39:42
+    </div>
+
+    <div class="buttons"
+
+>       <button class="btn btn-danger" type="button"
+
+>         ■ <span class="mobile-label">Encerrar</span>
+        <span>Finalizar sessão</span>
+      </button>
+
+      <button class="btn btn-secondary" type="button"
+
+>         ‖ Pausar
+      </button>
+
+      <button class="btn btn-primary" type="button"
+
+>         ◎ Capturar foto agora
+      </button>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
