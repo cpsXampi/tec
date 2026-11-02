@@ -178,7 +178,7 @@ $('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.v
 $('openHelp').onclick=()=>$('helpModal').classList.add('on');
 $('closeHelp').onclick=()=>$('helpModal').classList.remove('on');
 
-/* Algoritmo de Cálculo de KM */
+/* Algoritmo de Cálculo de KM Otimizado */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
 function parseCsv(t){
@@ -286,7 +286,7 @@ $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Fin
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de alterar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
-/* Desenho Técnico no Canvas */
+/* Desenho Otimizado no Canvas para Celulares de Entrada */
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
@@ -348,7 +348,7 @@ function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textConte
 
 const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
 function togglePdf(){S.cap?stopPdf():startPdf();}
-function startPdf(){if(!window.jspdf)return toast('Biblioteca PDF em inicialização',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop ক্ষমতার();}
+function startPdf(){if(!window.jspdf)return toast('Biblioteca PDF em inicialização',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
 function loop(){if(!S.cap)return;const start=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));}
 function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
 async function stopPdf(){if(!S.cap)return;S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Processando lotes...');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão concluída: ${S.saved} relatório(s)`);}
