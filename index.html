@@ -8,8 +8,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{
-  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);
-  --shadow:0 20px 40px rgba(0,0,0,.2)
+  --bg:#07090c;
+  --s1:#10141a;
+  --s2:#171c24;
+  --line:rgba(255,255,255,.12);
+  --acc:#ffd600;
+  --acc-2:#ffc107;
+  --ok:#34d399;
+  --bad:#ef4444;
+  --tx:#f2f2f4;
+  --mu:#a7acb6;
+  --sb:max(env(safe-area-inset-bottom),16px);
+  --st:env(safe-area-inset-top,0px);
+  --shadow:0 24px 50px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
@@ -31,16 +42,32 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .check input{accent-color:var(--acc);width:16px;height:16px}
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hud{position:absolute;z-index:5;background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;top:calc(14px + var(--st));left:12px;max-width:min(78vw,320px)}
-.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{font-size:26px;line-height:1.1}
-.hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:normal;word-break:break-word}
+.hud{position:absolute;z-index:5;top:calc(14px + var(--st));left:12px;max-width:min(360px,calc(100% - 24px));background:rgba(5, 15, 12, .72);backdrop-filter:blur(16px);border:1px solid rgba(255,214,0,.28);border-radius:18px;padding:12px 14px;box-shadow:0 18px 35px rgba(0,0,0,.25)}
+.hud .summary{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:8px}
+.hud .label{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#c9f7d8;font-weight:700}
+.hud .km{font-size:clamp(24px,2.8vw,38px);line-height:1;font-weight:800;color:var(--tx)}
+.meta{display:flex;flex-direction:column;gap:7px}
+.meta-line{display:flex;align-items:flex-start;gap:8px;min-height:18px}
+.meta-line .name{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#b8f7d0;font-weight:700;min-width:48px;opacity:.9}
+.meta-line .value{font-size:12px;line-height:1.35;color:#ecfdf5;font-weight:600;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 .pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
 .pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
 .pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}@keyframes b{50%{opacity:.15}}
-.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
+.lbl{width:170px;background:rgba(0,0,0,.66);border:1px solid rgba(255,214,0,.35);border-radius:12px;padding:9px 12px;font-size:13px;box-shadow:0 10px 20px rgba(0,0,0,.2)}
+.legend{
+  position:absolute;z-index:5;left:16px;right:16px;bottom:118px;background:rgba(7,9,12,.58);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;backdrop-filter:blur(10px);box-shadow:0 18px 30px rgba(0,0,0,.16);
+}
+.legend[hidden]{display:none}
+.legend .title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.legend .title strong{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#cfe8ff}
+.legend .title span{font-size:11px;color:#d9e5f3;opacity:.8}
+.legend .grid{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:6px 14px}
+.legend .item{display:flex;flex-direction:column;gap:2px;min-width:0}
+.legend .item .n{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#aee7bc;font-weight:700}
+.legend .item .v{font-size:12px;line-height:1.25;color:#f6f8fb;font-weight:700;overflow-wrap:anywhere}
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
-body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
+body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none}
 .modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
 .modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
 .modes button[aria-pressed=true]{background:var(--acc);color:#000}
@@ -53,8 +80,13 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 #snap{visibility:hidden}#snap.on{visibility:visible}
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
 #set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto;max-width:520px}
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;pointer-events:none;transition:.2s ease}
 #toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+@media (max-width:520px){
+  .hud{max-width:calc(100% - 24px)}
+  .legend{bottom:134px}
+  .legend .grid{grid-template-columns:1fr}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -85,17 +117,56 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
-  <div class="hud">
-    <small>KM atual</small>
-    <b id="km">KM ---</b>
-    <div class="acc" id="gps">Aguardando GPS…</div>
-    <div class="acc" id="addr">Aguardando endereço…</div>
-    <div class="acc" id="weather">Aguardando clima…</div>
+
+  <div class="hud" id="hud">
+    <div class="summary">
+      <span class="label">KM atual</span>
+      <div class="km" id="km">KM ---</div>
+    </div>
+    <div class="meta">
+      <div class="meta-line" data-toggle="showCompanyInfo">
+        <div class="name">Local</div>
+        <div class="value" id="companyInfo">Cliente/local não informado</div>
+      </div>
+      <div class="meta-line" data-toggle="showDate">
+        <div class="name">Data</div>
+        <div class="value" id="date">--</div>
+      </div>
+      <div class="meta-line" data-toggle="showGps">
+        <div class="name">GPS</div>
+        <div class="value" id="gps">Aguardando GPS…</div>
+      </div>
+      <div class="meta-line" data-toggle="showAddress">
+        <div class="name">End.</div>
+        <div class="value" id="addr">Aguardando endereço…</div>
+      </div>
+      <div class="meta-line" data-toggle="showWeather">
+        <div class="name">Clima</div>
+        <div class="value" id="weather">Aguardando clima…</div>
+      </div>
+    </div>
   </div>
+
   <div class="chip">
     <div class="pill rec" id="rec">Gravando</div>
-    <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
+    <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80" data-toggle="showLabel">
   </div>
+
+  <div class="legend" id="legend" aria-live="polite">
+    <div class="title">
+      <strong>Legenda do relatório</strong>
+      <span id="legendDate">--</span>
+    </div>
+    <div class="grid">
+      <div class="item" data-toggle="showLabel"><div class="n">Etiqueta</div><div class="v" id="legendLabel">Sem etiqueta</div></div>
+      <div class="item" data-toggle="showKm"><div class="n">KM</div><div class="v" id="legendKm">KM ---</div></div>
+      <div class="item" data-toggle="showCompanyInfo"><div class="n">Local</div><div class="v" id="legendCompany">Cliente/local não informado</div></div>
+      <div class="item" data-toggle="showGps"><div class="n">GPS</div><div class="v" id="legendGps">Aguardando GPS…</div></div>
+      <div class="item" data-toggle="showAddress"><div class="n">Endereço</div><div class="v" id="legendAddress">Aguardando endereço…</div></div>
+      <div class="item" data-toggle="showWeather"><div class="n">Clima</div><div class="v" id="legendWeather">Aguardando clima…</div></div>
+    </div>
+  </div>
+
   <div class="bar">
     <div class="modes" role="group" aria-label="Modo">
       <button data-m="foto" aria-pressed="true">Foto</button>
@@ -155,65 +226,766 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 <canvas id="c" hidden></canvas>
 
 <script>
-const $=id=>document.getElementById(id);
-const defaultCfg={label:'',company:'',int:200,lote:150,showKm:true,showGps:true,showDate:true,showLabel:true,showAddress:true,showWeather:true,showCompanyInfo:true,photoOverlay:true,videoOverlay:true,pdfOverlay:true};
-const S={db:[],km:'---',lat:0,lon:0,acc:null,dir:null,stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,addr:'',weather:'',lastAddrFetch:0,lastWeatherFetch:0};
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
-const cfg=Object.assign({},defaultCfg,JSON.parse(localStorage.getItem('kmr')||'{}'));
-['label','company','int','lote'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
-Object.keys(defaultCfg).forEach(k=>{if((k.startsWith('show')||k.endsWith('Overlay'))){const el=$(k);if(el&&cfg[k]!==undefined)el.checked=!!cfg[k];}});
-function persist(){try{localStorage.setItem('kmr', JSON.stringify({label:$('label').value,company:$('company').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showGps:$('showGps').checked,showDate:$('showDate').checked,showLabel:$('showLabel').checked,showAddress:$('showAddress').checked,showWeather:$('showWeather').checked,showCompanyInfo:$('showCompanyInfo').checked,photoOverlay:$('photoOverlay').checked,videoOverlay:$('videoOverlay').checked,pdfOverlay:$('pdfOverlay').checked}))}catch(e){}}
-['label','company','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
-['showKm','showGps','showDate','showLabel','showAddress','showWeather','showCompanyInfo','photoOverlay','videoOverlay','pdfOverlay'].forEach(k=>$(k).addEventListener('change',persist));
-$('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',3000);}
-const pad=n=>String(n).padStart(2,'0');
-const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>String(s ?? '').replace(/[\\/\:*?"<>|,]/g,'_').trim();
-const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
-const col=(h,c)=>{const m=h.map(s=>s.trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i}return -1};
-function parseCsv(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',';const h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
-function kmStatus(){const ok=S.db.length>0;$('dKm').className='dot '+(ok?'ok':'bad');$('tKm').textContent=ok?`Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.`:'Tabela de KM não encontrada. Use .csv manualmente.';}
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t)}).catch(()=>{}).finally(kmStatus);
-$('csv').onclick=()=>$('csvf').click();
-$('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus();}};
-function nearest(la,lo){const k=Math.cos(la*Math.PI/180);let best=null,m=1e9;for(const p of S.db){const d=(p.lat-la)**2+((p.lon-lo)*k)**2;if(d<m){m=d;best=p}}return best&&{km:best.km,dist:Math.sqrt(m)*111320};}
-function updateKmLabel(){if(S.db.length){const n=nearest(S.lat,S.lon);if(n){S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');$('km').textContent='KM '+S.km;$('gps').textContent=`GPS ±${Math.round(S.acc||0)} m`+(n.dist>500?' · longe da rodovia':'');}else{$('km').textContent='KM ---';$('gps').textContent=`GPS ±${Math.round(S.acc||0)} m`;}}else{$('km').textContent='KM ---';}}
-async function fetchAddress(lat,lon){if(!Number.isFinite(lat)||!Number.isFinite(lon))return;try{const resp=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=pt-BR`,{headers:{'Accept-Language':'pt-BR'}});if(!resp.ok)throw new Error('Nominatim falhou');const data=await resp.json();const a=data.address||{};const list=[a.road,a.neighbourhood,a.suburb,a.city||a.town||a.village,a.state,a.country].filter(Boolean);S.addr=list.slice(0,4).join(', ')||'Coordenadas disponíveis';}catch(e){S.addr='Endereço indisponível';}}
-async function fetchWeather(lat,lon){if(!Number.isFinite(lat)||!Number.isFinite(lon))return;try{const resp=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto&forecast_days=1`);if(!resp.ok)throw new Error('Open-Meteo falhou');const data=await resp.json();const w=data.current;const map={0:'Limpo',1:'Parcialmente nublado',2:'Nublado',3:'Encoberto',45:'Nevoeiro',48:'Nevoeiro com gelo',51:'Garoa leve',53:'Garoa',55:'Garoa forte',56:'Gelo leve',57:'Gelo forte',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',66:'Chuva gelada',67:'Chuva gelada forte',71:'Neve leve',73:'Neve',75:'Neve forte',77:'Granizo',80:'Pancadas leves',81:'Pancadas',82:'Pancadas fortes',85:'Neve leve',86:'Neve forte',95:'Trovoada',96:'Trovoada com granizo',99:'Trovoada severa'};const temp=w?.temperature_2m ?? '--';const hum=w?.relative_humidity_2m ?? '--';const wind=w?.wind_speed_10m ?? '--';S.weather=`${map[w?.weather_code] || 'Clima'} · ${temp}°C · ${wind} km/h · ${hum}%`;}catch(e){S.weather='Clima indisponível';}}
-function refreshMetaText(){const showKm=$('showKm').checked;const showGps=$('showGps').checked;const showAddress=$('showAddress').checked;const showWeather=$('showWeather').checked;const kmText=showKm&&S.km!=='---'?'KM '+S.km:'KM oculto';if(showKm){$('km').textContent=kmText==='KM oculto'?'KM ---':kmText;}$('gps').textContent = showGps ? (`GPS ±${Math.round(S.acc||0)} m`) : 'GPS oculto';$('addr').textContent = showAddress ? (S.addr || 'Aguardando endereço…') : 'Endereço oculto';$('weather').textContent = showWeather ? (S.weather || 'Aguardando clima…') : 'Clima oculto';if(!showGps&&!showAddress&&!showWeather){$('gps').textContent='Metadados ocultos';}}
-if('geolocation' in navigator){navigator.geolocation.watchPosition(async p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;updateKmLabel();refreshMetaText();const now=Date.now();if(now-S.lastAddrFetch>20000){S.lastAddrFetch=now;await fetchAddress(S.lat,S.lon);}if(now-S.lastWeatherFetch>60000){S.lastWeatherFetch=now;await fetchWeather(S.lat,S.lon);}refreshMetaText();},()=>{$('gps').textContent='GPS indisponível';S.addr='Endereço indisponível';S.weather='Clima indisponível';refreshMetaText();},{enableHighAccuracy:true,maximumAge:1000,timeout:15000});}else{$('gps').textContent='GPS indisponível';}
-if(!('showDirectoryPicker' in window))$('pick').style.display='none';
-$('pick').onclick=async()=>{try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;}catch(e){if(e.name!=='AbortError')toast(e.message,1)}};
-async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1)}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
-async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());S.stream=await navigator.mediaDevices.getUserMedia({video:id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');const cur=S.stream.getVideoTracks()[0].getSettings().deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');}
-$('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
-$('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+e.message,1)}};
-function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);z0=S.stream.getVideoTracks()[0].getSettings().zoom||1}};v.ontouchmove=e=>{const t=S.stream.getVideoTracks()[0],c=t.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{})}}}
-$('gear').onclick=()=>$('set').classList.add('on');
-$('closeSet').onclick=()=>$('set').classList.remove('on');
-$('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));});
-function frame(){const v=$('v');if(!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.clearRect(0,0,w,h);cx.drawImage(v,0,0,w,h);const footerH=h*0.18;const g=cx.createLinearGradient(0,h-footerH,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-footerH,w,footerH);const labelText=$('label').value.trim();const companyText=$('company').value.trim();const showKm=$('showKm').checked;const showGps=$('showGps').checked;const showDate=$('showDate').checked;const showAddress=$('showAddress').checked;const showWeather=$('showWeather').checked;const showLabel=$('showLabel').checked;const showCompanyInfo=$('showCompanyInfo').checked;let yBase=h-footerH+22;if(showKm){cx.textAlign='left';cx.textBaseline='alphabetic';cx.fillStyle='#fff';cx.font=`bold ${Math.round(footerH*.35)}px Arial,sans-serif`;cx.fillText('KM '+S.km,20,yBase+12);}if(showDate){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.fillStyle='rgba(255,255,255,.8)';cx.fillText(`${new Date().toLocaleString('pt-BR')}`,20,yBase+36);}const lines=[];if(showGps)lines.push(`GPS: ${Number.isFinite(S.lat)&&Number.isFinite(S.lon)?`${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`:'---'}`);if(showAddress&&S.addr)lines.push(S.addr);if(showWeather&&S.weather)lines.push(S.weather);if(showCompanyInfo&&companyText)lines.push(companyText);if(lines.length){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.textAlign='left';cx.textBaseline='alphabetic';let y=yBase+(showKm||showDate?54:12);for(const line of lines){if(y>h-10)break;cx.fillStyle='rgba(255,255,255,.75)';cx.fillText(line,20,y);y+=18;}}if(showLabel&&labelText){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5;const bw=cx.measureText(labelText).width+px*2,bh=fs+py*2,x=Math.max(30,w-bw-30),y=30;cx.save();cx.globalAlpha=.82;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(labelText,x+bw/2,y+bh/2+1);cx.restore();}if(showCompanyInfo&&companyText){const fs=Math.round(h*.022);cx.font=`bold ${fs}px Arial,sans-serif`;cx.textAlign='right';cx.textBaseline='top';const text=companyText.slice(0,60);const padX=18,padY=12;const bw=cx.measureText(text).width+padX*2;const bh=fs+padY*2;const x=w-bw-24,y=30;cx.save();cx.globalAlpha=.9;cx.fillStyle='rgba(16,20,26,.8)';cx.beginPath();cx.roundRect(x,y,bw,bh,12);cx.fill();cx.fillStyle='#fff';cx.fillText(text,x+padX,y+padY+1);cx.restore();}return cv;}
-const toBlob=(q)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]()};
-async function photo(){if(!frame())return;const b=await toBlob(.9);const label=$('label').value.trim()||'Sem_Etiqueta';save(b,`FOTO_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;const label=$('label').value.trim()||'Sem_Etiqueta';toBlob(.9).then(b=>save(b,`FOTO_EXTRA_${safe(label)}_KM_${S.km}_${stamp()}.jpg`));};
-let vidLoop=0;
-function toggleVideo(){if(S.rec){S.rec.stop();return}if(!frame())return;const cs=cv.captureStream(30),mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6})}catch(e){return toast('Gravação não suportada neste navegador',1)}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_${safe($('label').value || 'Sem_Etiqueta')}_KM_${km0}_${ini}_a_${stamp()}.webm`)};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d)})();}
-function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',on&&S.mode==='pdf');if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release();S.lock=null}}
-const lim=()=>Math.max(parseInt($('lote').value)||150,1);const upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`};
-function togglePdf(){S.cap?stopPdf():startPdf()}
-function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
-function loop(){if(!S.cap)return;const t=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap&&!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();});S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-t)));}
-function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();}
-async function stopPdf(){S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);}
-async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0))}}catch(e){console.error(e);toast('Falha ao gerar PDF',1)}finally{S.busy=false}}
-async function makePdf({p,n}){const {jsPDF}=window.jspdf;const sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height]};let [w,h]=sz(p[0].u8);const d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
-$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean')});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{})});
+const $ = id => document.getElementById(id);
+
+const defaultCfg = {
+  label: '',
+  company: '',
+  int: 200,
+  lote: 150,
+  showKm: true,
+  showGps: true,
+  showDate: true,
+  showLabel: true,
+  showAddress: true,
+  showWeather: true,
+  showCompanyInfo: true,
+  photoOverlay: true,
+  videoOverlay: true,
+  pdfOverlay: true
+};
+
+const S = {
+  db: [],
+  km: '---',
+  lat: 0,
+  lon: 0,
+  acc: 0,
+  dir: null,
+  stream: null,
+  mode: 'foto',
+  cap: false,
+  rec: null,
+  buf: [],
+  batch: 1,
+  queue: [],
+  busy: false,
+  saved: 0,
+  timer: null,
+  lock: null,
+  tt: 0,
+  addr: '',
+  weather: '',
+  lastStamp: null
+};
+
+const cv = $('c');
+const cx = cv.getContext('2d', { alpha: false });
+
+const toggleKeys = ['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather', 'showCompanyInfo'];
+const displayMap = {
+  showKm: ['#km', '#legendKm'],
+  showGps: ['#gps', '#legendGps'],
+  showDate: ['#date', '#legendDate'],
+  showLabel: ['#lbl', '#legendLabel'],
+  showAddress: ['#addr', '#legendAddress'],
+  showWeather: ['#weather', '#legendWeather'],
+  showCompanyInfo: ['#companyInfo', '#legendCompany']
+};
+
+const cfg = Object.assign({}, defaultCfg, JSON.parse(localStorage.getItem('kmr') || '{}'));
+['label', 'company', 'int', 'lote'].forEach(k => {
+  if (cfg[k] !== undefined && cfg[k] !== null) $(k).value = cfg[k];
+});
+Object.keys(defaultCfg).forEach(k => {
+  if ((k.startsWith('show') || k.endsWith('Overlay'))){
+    const el = $(k);
+    if (el && cfg[k] !== undefined) el.checked = !!cfg[k];
+  }
+});
+
+function persist(){
+  try {
+    localStorage.setItem('kmr', JSON.stringify({
+      label: $('label').value,
+      company: $('company').value,
+      int: $('int').value,
+      lote: $('lote').value,
+      showKm: $('showKm').checked,
+      showGps: $('showGps').checked,
+      showDate: $('showDate').checked,
+      showLabel: $('showLabel').checked,
+      showAddress: $('showAddress').checked,
+      showWeather: $('showWeather').checked,
+      showCompanyInfo: $('showCompanyInfo').checked,
+      photoOverlay: $('photoOverlay').checked,
+      videoOverlay: $('videoOverlay').checked,
+      pdfOverlay: $('pdfOverlay').checked
+    }));
+  } catch (e) {
+    console.warn('persist fail', e);
+  }
+}
+
+['label', 'company', 'int', 'lote'].forEach(k => $(k).addEventListener('input', persist));
+['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather', 'showCompanyInfo', 'photoOverlay', 'videoOverlay', 'pdfOverlay']
+  .forEach(k => $(k).addEventListener('change', () => {
+    persist();
+    updateLiveHud();
+  }));
+
+$('lbl').value = $('label').value;
+$('lbl').oninput = e => {
+  $('label').value = e.target.value;
+  persist();
+  updateLiveHud();
+};
+
+function toast(m, err = false) {
+  const t = $('toast');
+  t.textContent = m;
+  t.className = 'show' + (err ? ' err' : '');
+  clearTimeout(S.tt);
+  S.tt = setTimeout(() => t.className = '', 2400);
+}
+
+const pad = n => String(n).padStart(2, '0');
+const stamp = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+const safe = s => String(s ?? '').replace(/[\\/\:*?"<>|,]/g, '_').trim();
+const num = v => {
+  const s = String(v ?? '').trim();
+  return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s);
+};
+
+function parseCsv(t) {
+  if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
+  const lines = t.split(/\r?\n/).filter(l => l.trim());
+  if (!lines.length) return [];
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const header = lines.shift().split(sep).map(s => s.trim().toLowerCase());
+  const idx = {
+    lat: header.findIndex(h => /lat|latitude/.test(h)),
+    lon: header.findIndex(h => /lon|longitude/.test(h)),
+    km: header.findIndex(h => /km|quilometragem/.test(h))
+  };
+
+  const rows = [];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cols = line.split(sep);
+    if (cols.length < 2) continue;
+    const lat = num(cols[idx.lat] ?? cols[0]);
+    const lon = num(cols[idx.lon] ?? cols[1]);
+    const km = num(cols[idx.km] ?? cols[2]);
+    if (Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(km)) {
+      rows.push({ lat, lon, km });
+    }
+  }
+  return rows;
+}
+
+function kmStatus(){
+  const ok = S.db.length > 0;
+  $('dKm').className = 'dot ' + (ok ? 'ok' : 'bad');
+  $('tKm').textContent = ok ? `Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.` : 'Tabela de KM não encontrada.';
+}
+
+fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.text() : '')
+  .then(t => { S.db = parseCsv(t); })
+  .catch(() => {})
+  .finally(kmStatus);
+
+$('csv').onclick = () => $('csvf').click();
+$('csvf').onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  S.db = parseCsv(await f.text());
+  kmStatus();
+};
+
+function nearest(la, lo) {
+  if (!S.db.length) return null;
+  const k = Math.cos(la * Math.PI / 180);
+  let best = null;
+  let m = Infinity;
+  for (const p of S.db) {
+    const d = (p.lat - la) ** 2 + ((p.lon - lo) * k) ** 2;
+    if (d < m) {
+      m = d;
+      best = p;
+    }
+  }
+  return best ? { km: best.km, dist: Math.sqrt(m) } : null;
+}
+
+function formatDateTime(d = new Date()) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  }).format(d);
+}
+
+function setMetaField(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value;
+}
+
+function updateLegendText() {
+  const label = $('label').value.trim() || 'Sem etiqueta';
+  const company = $('company').value.trim() || 'Cliente/local não informado';
+  const dateText = formatDateTime(new Date());
+
+  setMetaField('legendLabel', label);
+  setMetaField('legendCompany', company);
+  setMetaField('legendDate', dateText);
+  setMetaField('legendKm', S.db.length ? `KM ${S.km}` : 'KM ---');
+  setMetaField('legendGps', Number.isFinite(S.lat) && Number.isFinite(S.lon) && S.db.length ? `GPS ±${Math.round(S.acc || 0)} m` : 'Aguardando GPS…');
+  setMetaField('legendAddress', S.addr || 'Aguardando endereço…');
+  setMetaField('legendWeather', S.weather || 'Aguardando clima…');
+}
+
+function updateLiveHud(){
+  const company = $('company').value.trim();
+  const label = $('label').value.trim();
+  $('lbl').value = label;
+
+  if (S.db.length) {
+    const res = nearest(S.lat, S.lon);
+    if (res) {
+      S.km = (Math.round(res.km * 100) / 100).toFixed(2).replace('.', ',');
+      $('km').textContent = 'KM ' + S.km;
+      setMetaField('legendKm', 'KM ' + S.km);
+      $('gps').textContent = `GPS ±${Math.round(S.acc || 0)} m`;
+      setMetaField('legendGps', `GPS ±${Math.round(S.acc || 0)} m`);
+    } else {
+      $('km').textContent = 'KM ---';
+      setMetaField('legendKm', 'KM ---');
+      $('gps').textContent = 'Aguardando GPS…';
+      setMetaField('legendGps', 'Aguardando GPS…');
+    }
+  } else {
+    $('km').textContent = 'KM ---';
+    setMetaField('legendKm', 'KM ---');
+  }
+
+  $('date').textContent = formatDateTime(new Date());
+  $('legendDate').textContent = formatDateTime(new Date());
+  $('companyInfo').textContent = company || 'Cliente/local não informado';
+  $('legendCompany').textContent = company || 'Cliente/local não informado';
+  $('lbl').placeholder = label ? label : 'Etiqueta';
+  $('addr').textContent = S.addr || 'Aguardando endereço…';
+  $('weather').textContent = S.weather || 'Aguardando clima…';
+  $('legendAddress').textContent = S.addr || 'Aguardando endereço…';
+  $('legendWeather').textContent = S.weather || 'Aguardando clima…';
+
+  document.querySelectorAll('[data-toggle]').forEach(el => {
+    const key = el.dataset.toggle;
+    const visible = !!$('show' + key.replace(/^[a-z]/, c => c.toUpperCase()).replace(/^show/, 'show')).checked;
+    if (el.id === 'lbl') {
+      el.style.display = $('showLabel').checked ? 'block' : 'none';
+      return;
+    }
+    if (el.classList.contains('item')) {
+      el.style.display = $('show' + key.replace(/^[a-z]/, c => c.toUpperCase())).checked ? 'flex' : 'none';
+      return;
+    }
+    if (key === 'showLabel') return;
+    const target = el.closest('[data-toggle]');
+    if (target) {
+      const chkId = 'show' + key.replace('show', '').replace(/^[a-z]/, c => c.toUpperCase());
+      const checkbox = $(chkId);
+      el.style.display = checkbox && checkbox.checked ? 'flex' : 'none';
+    }
+  });
+
+  const visibleLabel = $('showLabel').checked;
+  $('lbl').style.display = visibleLabel ? 'block' : 'none';
+  $('legend').hidden = ![...toggleKeys].some(key => $(key).checked);
+  if (!document.querySelector('[data-toggle="showCompanyInfo"]').style.display || !document.querySelector('#legendCompany').textContent) {
+    $('legend').hidden = true;
+  }
+}
+
+function refreshMetaText(){
+  const showKm = $('showKm').checked;
+  const showGps = $('showGps').checked;
+  const showAddress = $('showAddress').checked;
+  const showWeather = $('showWeather').checked;
+  const showCompanyInfo = $('showCompanyInfo').checked;
+  const showDate = $('showDate').checked;
+  const showLabel = $('showLabel').checked;
+
+  const fieldMap = {
+    showKm: ['#km'],
+    showGps: ['#gps'],
+    showAddress: ['#addr'],
+    showWeather: ['#weather'],
+    showCompanyInfo: ['#companyInfo'],
+    showDate: ['#date'],
+    showLabel: ['#lbl']
+  };
+
+  Object.entries(fieldMap).forEach(([key, selectors]) => {
+    const visible = eval(key) === undefined ? true : eval(key); // no-op fallback
+  });
+
+  const apply = (selector, visible) => {
+    const el = document.querySelector(selector);
+    if (el) el.style.display = visible ? 'block' : 'none';
+  };
+
+  apply('#km', showKm);
+  apply('#gps', showGps);
+  apply('#addr', showAddress);
+  apply('#weather', showWeather);
+  apply('#companyInfo', showCompanyInfo);
+  apply('#date', showDate);
+  apply('#lbl', showLabel);
+
+  apply('#legendKm', showKm);
+  apply('#legendGps', showGps);
+  apply('#legendAddress', showAddress);
+  apply('#legendWeather', showWeather);
+  apply('#legendCompany', showCompanyInfo);
+  apply('#legendDate', showDate);
+  apply('#legendLabel', showLabel);
+
+  $('legend').hidden = !(showKm || showGps || showAddress || showWeather || showCompanyInfo || showDate || showLabel);
+  updateLegendText();
+}
+
+async function fetchAddress(lat, lon){
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    S.addr = data?.address ? [data.address.road, data.address.city || data.address.town || data.address.village, data.address.state, data.address.country].filter(Boolean).join(', ') : 'Endereço não informado';
+    $('addr').textContent = S.addr;
+  } catch (e) {
+    S.addr = 'Endereço não informado';
+  }
+}
+
+async function fetchWeather(lat, lon){
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+  try {
+    const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const cur = data?.current;
+    if (!cur) return;
+    const code = cur.weather_code;
+    const temp = `${Math.round(cur.temperature_2m)}°C`;
+    const map = {
+      0: 'Ensolarado', 1: 'Parcialmente nublado', 2: 'Nublado', 3: 'Nublado', 45: 'Neblina', 48: 'Nevoeiro', 51: 'Chuvisco', 53: 'Chuvisco', 55: 'Chuvisco forte', 61: 'Chuva leve', 63: 'Chuva', 65: 'Chuva forte', 80: 'Pancadas', 81: 'Pancadas', 82: 'Pancadas fortes', 95: 'Trovoada', 96: 'Trovoada', 99: 'Trovoada'
+    };
+    S.weather = `${temp} · ${map[code] || 'Clima'}`;
+    $('weather').textContent = S.weather;
+  } catch (e) {
+    S.weather = 'Clima não informado';
+  }
+}
+
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(async p => {
+    S.lat = p.coords.latitude;
+    S.lon = p.coords.longitude;
+    S.acc = p.coords.accuracy || 0;
+    updateLiveHud();
+    await fetchAddress(S.lat, S.lon);
+    await fetchWeather(S.lat, S.lon);
+    updateLegendText();
+  }, () => {
+    $('gps').textContent = 'GPS indisponível';
+  }, {
+    enableHighAccuracy: true,
+    maximumAge: 15000,
+    timeout: 20000
+  });
+}
+
+if (!('showDirectoryPicker' in window)) $('pick').style.display = 'none';
+
+$('pick').onclick = async () => {
+  try {
+    const d = await showDirectoryPicker({ mode: 'readwrite' });
+    if (await d.requestPermission({ mode: 'readwrite' }) !== 'granted') throw new Error('Permissão negada');
+    S.dir = d;
+    $('dDir').className = 'dot ok';
+    $('tDir').textContent = 'Pasta selecionada: ' + (d.name || 'pasta');
+    toast('Pasta de destino configurada');
+  } catch (e) {
+    $('dDir').className = 'dot bad';
+    $('tDir').textContent = 'Sem pasta: os arquivos serão baixados.';
+    toast('Não foi possível acessar a pasta', true);
+  }
+};
+
+async function save(blob, name) {
+  name = safe(name);
+  if (S.dir) {
+    try {
+      const handle = await S.dir.getFileHandle(name, { create: true });
+      const w = await handle.createWritable();
+      await w.write(blob);
+      await w.close();
+      toast('Salvo: ' + name);
+      return;
+    } catch (e) {
+      console.warn('save dir fail', e);
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('Baixado: ' + name);
+}
+
+async function openCam(id){
+  S.stream?.getTracks().forEach(t => t.stop());
+  const constraints = {
+    video: id ? { deviceId: { exact: id } } : { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+    audio: false
+  };
+  S.stream = await navigator.mediaDevices.getUserMedia(constraints);
+  $('v').srcObject = S.stream;
+
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const vids = devices.filter(d => d.kind === 'videoinput');
+  const sel = $('camSel');
+  sel.innerHTML = vids.map((d, i) => `<option value="${d.deviceId}">${d.label || `Câmera ${i + 1}`}</option>`).join('');
+  if (id) sel.value = id;
+}
+
+$('camSel').onchange = e => openCam(e.target.value).catch(() => toast('Erro ao trocar câmera', true));
+
+$('go').onclick = async () => {
+  try {
+    await openCam();
+    $('lbl').value = $('label').value;
+    $('start').classList.remove('on');
+    $('cam').classList.add('on');
+    document.documentElement.requestFullscreen?.().catch(() => {});
+    updateLiveHud();
+    refreshMetaText();
+  } catch (e) {
+    toast('Não foi possível abrir a câmera', true);
+  }
+};
+
+function pinchZoom(){
+  const v = $('v');
+  let d0 = 0;
+  let z0 = 1;
+  v.ontouchstart = e => {
+    if (e.touches.length === 2) {
+      d0 = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      z0 = Number(v.style.zoom || 1);
+    }
+  };
+  v.ontouchmove = e => {
+    if (e.touches.length === 2) {
+      const d1 = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = d1 / d0 || 1;
+      const next = Math.min(2.2, Math.max(1, z0 * factor));
+      v.style.zoom = next;
+    }
+  };
+  v.ontouchend = () => {
+    d0 = 0;
+    z0 = 1;
+  };
+}
+
+$('gear').onclick = () => $('set').classList.add('on');
+$('closeSet').onclick = () => $('set').classList.remove('on');
+
+$('back').onclick = () => {
+  if (S.cap || S.rec || S.busy || S.queue.length) return toast('Finalize a captura antes de voltar', true);
+  S.stream?.getTracks().forEach(t => t.stop());
+  $('cam').classList.remove('on');
+  $('start').classList.add('on');
+};
+
+document.querySelectorAll('.modes button').forEach(b => {
+  b.onclick = () => {
+    if (S.cap || S.rec) return toast('Finalize a captura antes de trocar o modo', true);
+    S.mode = b.dataset.m;
+    document.querySelectorAll('.modes button').forEach(btn => btn.setAttribute('aria-pressed', String(btn === b)));
+    $('snap').classList.toggle('on', S.mode === 'pdf');
+    toast('Modo: ' + (S.mode === 'foto' ? 'Foto' : S.mode === 'video' ? 'Vídeo' : 'Relatório PDF'));
+  };
+});
+
+function drawLegendOverlay(ctx, w, h) {
+  const show = {
+    label: $('showLabel').checked,
+    km: $('showKm').checked,
+    company: $('showCompanyInfo').checked,
+    gps: $('showGps').checked,
+    address: $('showAddress').checked,
+    weather: $('showWeather').checked,
+    date: $('showDate').checked
+  };
+
+  const entries = [];
+  if (show.company) entries.push(['LOCAL', ($('company').value.trim() || 'Cliente/local não informado')]);
+  if (show.label) entries.push(['ETIQUETA', ($('label').value.trim() || 'Sem etiqueta')]);
+  if (show.km) entries.push(['KM', `KM ${S.km}`]);
+  if (show.date) entries.push(['DATA', formatDateTime(new Date())]);
+  if (show.gps) entries.push(['GPS', Number.isFinite(S.lat) && S.db.length ? `±${Math.round(S.acc || 0)} m` : 'GPS indisponível']);
+  if (show.address) entries.push(['ENDEREÇO', S.addr || 'Endereço não informado']);
+  if (show.weather) entries.push(['CLIMA', S.weather || 'Clima não informado']);
+  if (!entries.length) return;
+
+  const padX = 18;
+  const padY = 18;
+  const boxW = Math.min(w * 0.42, 420);
+  const boxH = 30 + entries.length * 24;
+
+  ctx.fillStyle = 'rgba(7,9,12,0.68)';
+  ctx.fillRect(padX, padY, boxW, boxH);
+  ctx.strokeStyle = 'rgba(255,214,0,0.45)';
+  ctx.strokeRect(padX, padY, boxW, boxH);
+
+  ctx.fillStyle = '#F7FAFF';
+  ctx.font = '700 16px sans-serif';
+  ctx.fillText('KM REPORT', padX + 14, padY + 20);
+
+  const startY = padY + 38;
+  ctx.font = '600 12px sans-serif';
+  entries.forEach(([name, value], idx) => {
+    const y = startY + idx * 22;
+    ctx.fillStyle = '#AEE7BC';
+    ctx.fillText(name, padX + 14, y);
+    ctx.fillStyle = '#F8FAFC';
+    ctx.fillText(String(value).slice(0, 80), padX + 120, y);
+  });
+}
+
+function frame(){
+  const v = $('v');
+  if (!v.videoWidth) return null;
+  const w = cv.width = v.videoWidth;
+  const h = cv.height = v.videoHeight;
+  cx.clearRect(0, 0, w, h);
+  cx.drawImage(v, 0, 0, w, h);
+  if ($('photoOverlay').checked && $('videoOverlay').checked) {
+    drawLegendOverlay(cx, w, h);
+  }
+  return { w, h };
+}
+
+const toBlob = q => new Promise(r => cv.toBlob(r, 'image/jpeg', q));
+
+$('shut').onclick = () => {
+  navigator.vibrate?.(20);
+  ({ foto: photo, video: toggleVideo, pdf: togglePdf })[S.mode]();
+};
+
+async function photo(){
+  if (!frame()) return;
+  const b = await toBlob(.9);
+  const label = $('label').value.trim() || 'Sem_Etiqueta';
+  await save(b, `FOTO_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);
+}
+
+$('snap').onclick = async e => {
+  e.stopPropagation();
+  if (!frame()) return;
+  const label = $('label').value.trim() || 'Sem_Etiqueta';
+  const b = await toBlob(.9);
+  await save(b, `FOTO_EXTRA_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);
+};
+
+let vidLoop = 0;
+function toggleVideo(){
+  if (S.rec) {
+    S.rec.stop();
+    return;
+  }
+  if (!frame()) return;
+  const cs = cv.captureStream(30);
+  const mt = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(t => MediaRecorder.isTypeSupported(t));
+  const rec = new MediaRecorder(cs, mt ? { mimeType: mt } : undefined);
+  S.rec = rec;
+  S.chunks = [];
+  rec.ondataavailable = e => { if (e.data.size) S.chunks.push(e.data); };
+  rec.onstop = () => {
+    const blob = new Blob(S.chunks, { type: rec.mimeType || 'video/webm' });
+    const label = $('label').value.trim() || 'Sem_Etiqueta';
+    save(blob, `VIDEO_${safe(label)}_KM_${S.km}_${stamp()}.webm`);
+    S.rec = null;
+    setRec(false);
+  };
+  rec.start();
+  setRec(true, 'Gravando');
+}
+
+function setRec(on, t = '') {
+  $('rec').classList.toggle('on', on);
+  if (t) $('rec').textContent = t;
+  $('shut').classList.toggle('rec', on);
+  $('snap').classList.toggle('on', on && S.mode === 'pdf');
+  document.body.classList.toggle('clean', on && S.mode === 'pdf');
+}
+
+const lim = () => Math.max(parseInt($('lote').value) || 150, 1);
+const upd = () => {
+  if (S.cap) $('rec').textContent = `Lote ${S.batch} · ${S.buf.length}/${lim()}`;
+};
+
+function togglePdf(){
+  S.cap ? stopPdf() : startPdf();
+}
+
+function startPdf(){
+  if (!window.jspdf) return toast('jsPDF ainda carregando, tente de novo', true);
+  S.cap = true;
+  S.buf = [];
+  S.queue = [];
+  S.batch = 1;
+  S.saved = 0;
+  setRec(true, 'Lote 1');
+  upd();
+  loop();
+}
+
+function loop(){
+  if (!S.cap) return;
+  const t = performance.now();
+  if (frame()) {
+    toBlob(.82).then(async b => {
+      if (!S.cap || !b) return;
+      S.buf.push({ u8: new Uint8Array(await b.arrayBuffer()), km: S.km });
+      if (S.buf.length >= lim()) {
+        rotate(false);
+      }
+      if (S.cap) {
+        const wait = Math.max(0, Number($('int').value || 200) - (performance.now() - t));
+        S.timer = setTimeout(loop, wait);
+      }
+    });
+  } else {
+    S.timer = setTimeout(loop, Number($('int').value || 200));
+  }
+}
+
+function rotate(final = false){
+  if (!S.buf.length && !final) return;
+  if (S.buf.length) {
+    S.queue.push({ p: S.buf.slice(), n: S.batch });
+    S.buf = [];
+    S.batch += 1;
+  }
+  if (final) {
+    runQueue();
+  } else {
+    upd();
+    runQueue();
+  }
+}
+
+async function stopPdf(){
+  S.cap = false;
+  clearTimeout(S.timer);
+  $('shut').disabled = true;
+  toast('Salvando lotes pendentes…');
+  rotate(true);
+  await runQueue();
+  while (S.busy || S.queue.length) await new Promise(r => setTimeout(r, 50));
+  $('shut').disabled = false;
+  setRec(false);
+  toast('Relatório PDF concluído');
+}
+
+async function runQueue(){
+  if (S.busy) return;
+  S.busy = true;
+  try {
+    while (S.queue.length) {
+      await makePdf(S.queue.shift());
+      S.saved += 1;
+      await new Promise(r => setTimeout(r, 20));
+    }
+  } catch (e) {
+    console.error(e);
+    toast('Falha ao gerar PDF', true);
+  } finally {
+    S.busy = false;
+  }
+}
+
+async function makePdf({ p, n }) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+
+  doc.setFillColor(8, 11, 18);
+  doc.rect(0, 0, pageW, pageH, 'F');
+  doc.setTextColor(245, 247, 250);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(24);
+  doc.text('KM REPORT', 44, 48);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(196, 210, 220);
+  doc.text(`Etiqueta: ${($('label').value || 'Sem etiqueta').slice(0, 60)}`, 44, 76);
+  doc.text(`Cliente/local: ${($('company').value || 'Não informado').slice(0, 80)}`, 44, 96);
+  doc.text(`KM: ${S.km || '---'}`, 44, 116);
+  doc.text(`Data: ${formatDateTime(new Date())}`, 44, 136);
+  doc.text(`GPS: ${S.db.length ? `±${Math.round(S.acc || 0)} m` : 'Indisponível'}`, 44, 156);
+  doc.text(`Endereço: ${String(S.addr || 'Endereço não informado').slice(0, 90)}`, 44, 176);
+  doc.text(`Clima: ${String(S.weather || 'Clima não informado').slice(0, 90)}`, 44, 196);
+
+  let imgY = 230;
+  for (let i = 0; i < p.length; i++) {
+    const item = p[i];
+    const base64 = btoa(String.fromCharCode(...item.u8));
+    const imgData = `data:image/jpeg;base64,${base64}`;
+    const imgW = 480;
+    const imgH = 300;
+
+    if (imgY + imgH > pageH - 40) {
+      doc.addPage();
+      imgY = 40;
+    }
+
+    doc.addImage(imgData, 'JPEG', 58, imgY, imgW, imgH, undefined, 'FAST');
+    imgY += imgH + 18;
+  }
+
+  const blob = doc.output('blob');
+  const name = `RELATORIO_${safe($('company').value || 'KM')}_${stamp()}.pdf`;
+  await save(blob, name);
+}
+
+$('cam').addEventListener('click', e => {
+  if (S.cap && !e.target.closest('button,input,select')) document.body.classList.toggle('clean');
+});
+
+window.addEventListener('beforeunload', e => {
+  if (S.cap || S.rec || S.busy || S.queue.length) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && (S.cap || S.rec)) {
+    navigator.wakeLock?.request('screen').then(l => S.lock = l).catch(() => {});
+  }
+});
+
 refreshMetaText();
+updateLiveHud();
+pinchZoom();
 </script>
 </body>
 </html>
