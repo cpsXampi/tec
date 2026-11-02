@@ -17,6 +17,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 #start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
 .card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
 .card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
+.brand{display:inline-block;margin-left:5px;font-size:8px;font-weight:400;letter-spacing:.02em;color:var(--mu);opacity:.45;vertical-align:baseline}
 .fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
 .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
 .btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}
@@ -24,6 +25,9 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .btn:active{transform:scale(.98)}
 .st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--dim,#555);flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
+.dir-hint{display:flex;align-items:center;justify-content:center;gap:8px;margin:20px 0 0;color:var(--acc);font-size:13px;font-weight:700;text-align:center}
+.dir-pointer{font-size:22px;line-height:1;display:inline-block;animation:point 1s ease-in-out infinite}
+@keyframes point{50%{transform:translateY(5px)}}
 /* câmera */
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -60,14 +64,11 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 
 <main id="start" class="screen on">
   <div class="card">
-    <h1>KM Report</h1>
+    <h1>KM Report<small class="brand">By CPS sistems</small></h1>
     <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data e GPS gravados na imagem.</p>
-    <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
+    <div class="dir-hint"><span class="dir-pointer" aria-hidden="true">☟</span><span>Selecione a pasta para salvar os arquivos</span></div>
     <button class="btn" id="pick">Escolher pasta de destino</button>
     <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
-    <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
-    <button class="btn" id="csv" style="display:none">Carregar tabela de KM (.csv)</button>
-    <input type="file" id="csvf" accept=".csv,text/csv" hidden>
     <button class="btn pri" id="go">Abrir câmera</button>
   </div>
 </main>
@@ -93,6 +94,7 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 
 <div id="set"><div class="card">
   <h1 style="font-size:20px">Ajustes</h1>
+  <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
   <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
   <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
   <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
@@ -156,18 +158,9 @@ function parseCsv(t){
 }
 function kmStatus(){
   const ok=S.db.length>0;
-  $('dKm').className='dot '+(ok?'ok':'bad');
-  $('tKm').textContent=ok ? `Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.` : 'Tabela de KM não encontrada.';
+  if(!ok) console.warn('Tabela de KM não encontrada ou vazia.');
 }
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t); kmStatus();}).catch(()=>{}).finally(kmStatus);
-$('csv').onclick=()=>$('csvf').click();
-$('csvf').onchange=async e=>{
-  const f=e.target.files[0];
-  if(f){
-    try{S.db=parseCsv(await f.text()); kmStatus(); toast('Tabela de KM carregada');}
-    catch{toast('Arquivo CSV inválido',1)}
-  }
-};
 
 /* ---- GPS ---- */
 function nearest(la,lo){
