@@ -68,7 +68,7 @@ function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label
 const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr')||'{}');}catch{return {};}})();
 ['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
 const oldMeta=typeof cfg.showMeta==='boolean'?cfg.showMeta:true;
-['showKm','showDate','showGps','showLabel'].forEach(k=>$(k).checked=typeof cfg[k]==='boolean'?cfg[k]:oldMeta);
+['showKm','showDate','showGps','showLabel'].forEach(k=>$(k).checked=typeof cfg[k]:oldMeta);
 if(typeof cfg.showKmFar==='boolean')$('showKmFar').checked=cfg.showKmFar;
 $('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist();};
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
@@ -106,22 +106,14 @@ function requestAddress(){
 }
 function refreshNearest(){const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;S.dist=n?n.dist:null;if(n)S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}updateLocationUI();if(S.dist!==null&&S.dist>OUTSIDE_LIMIT_M)requestAddress();}
 
-function getDistText(m){
-  if(m===null||m===undefined)return'';
-  if(m>=1000)return `aprox ${(m/1000).toFixed(1).replace('.',',')}km fora da rodovia`;
-  return `aprox ${Math.round(m)}m fora da rodovia`;
-}
-
 function updateLocationUI(){
   const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
   $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
-  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
+  $('km').textContent=outside&&!showFarKm?'Fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   
-  // HUD com texto ajustado para a precisão do GPS
   let gpsText = S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
-  if(outside) gpsText += ` · ${getDistText(S.dist)}`;
   $('gps').textContent = gpsText;
 
   $('address').hidden=!(outside&&S.address);
@@ -152,25 +144,23 @@ function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
   
-  if($('showKm').checked&&kmIsShown&&S.km!=='---') lines.push({text:`KM ${S.km}`,large:true});
-  if(outside&&!$('showKmFar').checked) lines.unshift({text:'Você está fora da rodovia',large:true});
-  
-  // Se estiver fora da rodovia, insere linha de aproximação
-  if(outside && S.dist !== null){
-    lines.push({text: getDistText(S.dist), small: true});
+  // Exibe o KM somente se o usuário estiver na rodovia ou se a opção "Mostrar mesmo fora" estiver ativa
+  if($('showKm').checked&&kmIsShown&&S.km!=='---') {
+    lines.push({text:`KM ${S.km}`,large:true});
   }
   
+  // Endereço (se disponível fora da rodovia) ou Data/Hora
   if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
   else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
   
-  // Precisão do GPS em texto menor
+  // Precisão do GPS e Coordenadas
   if($('showGps').checked) {
     const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
     lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, small: true});
   }
 
   if(lines.length){
-    const bh=h*.22,g=cx.createLinearGradient(0,h-bh,0,h);
+    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
     g.addColorStop(0,'rgba(0,0,0,0)');
     g.addColorStop(.25,'rgba(0,0,0,.55)');
     g.addColorStop(1,'rgba(0,0,0,.9)');
@@ -181,14 +171,14 @@ function frame(){
       const line=lines[i];
       cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');
       
-      let fontSize = Math.round(bh*.14);
-      if(line.large) fontSize = Math.round(bh*.22);
-      if(line.small) fontSize = Math.round(bh*.11);
+      let fontSize = Math.round(bh*.15);
+      if(line.large) fontSize = Math.round(bh*.24);
+      if(line.small) fontSize = Math.round(bh*.12);
       
       cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;
       cx.fillText(line.text,20,y, w-40);
       
-      y -= line.large ? Math.round(bh*.28) : (line.small ? Math.round(bh*.14) : Math.round(bh*.18));
+      y -= line.large ? Math.round(bh*.30) : (line.small ? Math.round(bh*.15) : Math.round(bh*.20));
     }
   }
 
