@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report Super Ultimate</title>
+<title>KM Report Ultimate Super App</title>
 
 <!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -20,12 +20,14 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
 
-/* Tela Inicial (Base cccccc.html) */
-.offline-badge{position:absolute;top:calc(12px + var(--st));right:12px;font-size:11px;font-weight:700;color:var(--mu);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .2s;text-decoration:none}
+/* Badge Offline topo direito da tela inicial */
+.offline-badge{position:absolute;top:calc(12px + var(--st));right:12px;font-size:11px;font-weight:700;color:var(--mu);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .2s;text-decoration:none;z-index:10}
 .offline-badge:hover,.offline-badge:active{color:var(--acc);border-color:var(--acc);background:rgba(255,214,0,.08)}
 .offline-badge i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+
+/* Tela Inicial (Base cccccc.html) */
 #start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
-.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
+.card{width:100%;max-width:440px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
 .card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
 .fld{margin-top:16px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
 .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;color:var(--tx)}
@@ -42,7 +44,7 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hud small{display:block;font-size:11px;color:#bbf7d0;font-weight:700}.hud b{font-size:26px;line-height:1.1;color:#fff}
 .hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Mini Mapa */
+/* Mini Mapa Opctional */
 #map{position:absolute;z-index:4;left:12px;top:calc(150px + var(--st));width:125px;height:125px;border-radius:14px;border:1px solid var(--line);overflow:hidden;pointer-events:none;transition:opacity .25s}
 body.clean #map{opacity:0}
 
@@ -56,7 +58,7 @@ body.clean #map{opacity:0}
 .ai-badge{display:none;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,214,0,.3);background:rgba(255,214,0,.08);color:var(--acc);font-size:10px;font-weight:800;cursor:pointer}
 .ai-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
 
-/* Barra Inferior */
+/* Barra Inferior de Controles */
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center;transition:opacity .25s}
 body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
 .modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
@@ -70,7 +72,7 @@ body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
 #shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}
 #snap{visibility:hidden}#snap.on{visibility:visible}
 
-/* Modal Ajustes */
+/* Modal Ajustes & Opções Customizáveis */
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
 #set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}
 .toggle-row{display:flex;align-items:flex-start;gap:10px;margin-top:10px;padding:10px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);cursor:pointer;font-size:12px}
@@ -84,10 +86,10 @@ body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
 <body>
 
 <main id="start" class="screen on">
-  <button id="btnOffline" class="offline-badge" title="Baixar arquivos para uso offline / APK"><i></i> Offline / App</button>
+  <button id="btnOffline" class="offline-badge" title="Instalar App / Caching 100% Offline"><i></i> Offline / App</button>
   <div class="card">
     <h1>KM Report Super</h1>
-    <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data, GPS, mapa e velocidade gravados na imagem.</p>
+    <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data, GPS, mini mapa e velocidade gravados diretamente na imagem.</p>
     
     <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
     <button class="btn" id="pick">Escolher pasta de destino</button>
@@ -140,16 +142,16 @@ body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
   <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
   
   <div class="fld" style="margin-top:14px;">
-    <label style="font-weight:800;color:var(--tx);">Metadados & Privacidade</label>
-    <label class="toggle-row"><input type="checkbox" id="cfgDiscrete"> <span><strong>Modo Discreto</strong><br>Oculta KM, GPS e etiquetas da foto/vídeo/PDF.</span></label>
+    <label style="font-weight:800;color:var(--tx);">Metadados & Opções Visuais</label>
     <label class="toggle-row"><input type="checkbox" id="cfgShowMap" checked> <span><strong>Mostrar Mini Mapa</strong><br>Exibe ou oculta o mini mapa em tempo real na tela da câmera.</span></label>
+    <label class="toggle-row"><input type="checkbox" id="cfgDiscrete"> <span><strong>Modo Discreto</strong><br>Oculta KM, GPS e etiquetas da foto/vídeo/PDF.</span></label>
   </div>
 
   <div class="fld" style="margin-top:14px;">
     <label style="font-weight:800;color:var(--tx);">Agentes Inteligentes (IA Local)</label>
-    <label class="toggle-row"><input type="checkbox" id="cfgAiMotion"> <span><strong>Captura por Movimento</strong><br>Dispara foto/relatório ao detectar balanço/chacoalha.</span></label>
+    <label class="toggle-row"><input type="checkbox" id="cfgAiMotion"> <span><strong>Captura por Movimento</strong><br>Dispara foto/relatório ao detectar balanço do dispositivo.</span></label>
     <label class="toggle-row"><input type="checkbox" id="cfgAiVoice"> <span><strong>Comandos de Voz</strong><br>Diga "fotografar", "iniciar", "parar" ou "etiqueta [nome]".</span></label>
-    <label class="toggle-row"><input type="checkbox" id="cfgAiBackground"> <span><strong>Manter ativo em segundo plano (WakeLock)</strong><br>Mantém tela acesa e execução contínua.</span></label>
+    <label class="toggle-row"><input type="checkbox" id="cfgAiBackground"> <span><strong>Manter ativo em segundo plano (WakeLock)</strong><br>Mantém a tela acesa durante a operação.</span></label>
   </div>
 
   <button class="btn" id="expTrk" style="margin-top:16px;">Exportar trilha GPS (.csv)</button>
@@ -196,7 +198,7 @@ function toast(m,err){
 }
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>s.replace(/[,/\\:]/g,'_');
+const safe=s=>s.replace(/[,/\:]/g,'_');
 
 /* ---- Tabela de KM ---- */
 const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
@@ -204,7 +206,9 @@ const col=(h,c)=>{const m=h.map(s=>s.trim().toLowerCase());for(const x of c){con
 
 function parseCsv(t){
   if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
-  const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];
+  const L=t.split(/
+?
+/).filter(l=>l.trim());if(!L.length)return[];
   const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);
   const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);
   return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite)).sort((x,y)=>x.km-y.km);
@@ -288,7 +292,9 @@ if('geolocation' in navigator)navigator.geolocation.watchPosition(onFix,()=>{$('
 
 $('expTrk').onclick=()=>{
   if(!S.trk.length)return toast('Nenhum ponto gravado ainda',1);
-  save(new Blob(['data_hora;km;lat;lon;vel_kmh;precisao_m\n'+S.trk.map(r=>r.join(';')).join('\n')],{type:'text/csv'}),`Trilha_${stamp()}.csv`);
+  save(new Blob(['data_hora;km;lat;lon;vel_kmh;precisao_m
+'+S.trk.map(r=>r.join(';')).join('
+')],{type:'text/csv'}),`Trilha_${stamp()}.csv`);
 };
 
 /* ---- Pasta Lembrada ---- */
@@ -462,8 +468,7 @@ async function makePdf({p,n}){
   await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
 }
 
-/* ---- IA Local & Configurações de Sensores ---- */
-
+/* ---- Configurações Opcionais & IA Local ---- */
 $('cfgShowMap').onchange=e=>{
   S.showMap=!!e.target.checked;
   persist();
@@ -531,7 +536,14 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S
 
 updateAi();
 
-/* ---- Suporte 100% Offline (PWA & Cache Local) ---- */
+/* ---- Suporte 100% Offline (PWA & Cache Local em 1 clique) ---- */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('btnOffline').innerHTML = '<i></i> Instalar App';
+});
+
 if('serviceWorker' in navigator){
   const swCode = `
     const C='kmr-v1';
@@ -545,7 +557,14 @@ if('serviceWorker' in navigator){
 }
 
 $('btnOffline').onclick = async () => {
-  toast('Baixando dados para funcionamento 100% offline...');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') toast('Aplicativo instalado no celular!');
+    deferredPrompt = null;
+    return;
+  }
+  toast('Salva recursos para uso 100% offline...');
   try {
     if('caches' in window){
       const c = await caches.open('kmr-v1');
@@ -556,9 +575,9 @@ $('btnOffline').onclick = async () => {
         'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
         'SNVBR116SPRJ.csv'
       ].map(u => new Request(u, {mode: 'no-cors'})));
-      toast('Sistema salvo para uso offline no celular!');
+      toast('Sistema pronto para uso 100% offline no celular!');
     } else {
-      toast('Recursos salvos no navegador!');
+      toast('Recursos salvos em cache local!');
     }
   } catch(e) {
     toast('Recursos salvos em cache local!');
