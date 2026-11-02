@@ -29,16 +29,18 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 /* câmera */
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hud{position:absolute;z-index:5;background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;top:calc(14px + var(--st));left:12px}
+.hud{position:absolute;z-index:5;background:rgba(4,90,64,.8);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 16px;top:calc(14px + var(--st));left:12px;max-width:72vw}
+.hud-line{display:flex;flex-direction:column;gap:2px}
 .hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{font-size:26px;line-height:1.1}
-.hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px}
+.hud .acc{font-size:11px;color:#bbf7d0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud[hidden]{display:none}.hud .acc[hidden]{display:none}.hud .hud-line[hidden]{display:none}
 .chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 .pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
 .pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
 .pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}
 @keyframes b{50%{opacity:.15}}
 .lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center;transition:opacity .25s}
+.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
 body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 .modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
 .modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
@@ -53,11 +55,13 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 /* ajustes */
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
 #set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:700;opacity:0;transition:all .2s;pointer-events:none;max-width:88vw;text-align:center}
+.opts{display:grid;gap:8px;margin-top:10px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
+.opt input{width:18px;height:18px;accent-color:var(--acc)}
+#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;color:var(--tx);opacity:0;transition:opacity .2s ease,transform .2s ease}
 #toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-.hud{max-width:72vw}.hud .acc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#map{position:absolute;z-index:4;left:12px;top:calc(150px + var(--st));width:118px;height:118px;border-radius:14px;border:1px solid var(--line);overflow:hidden;pointer-events:none;transition:opacity .25s}
+#map{position:absolute;z-index:4;left:12px;top:calc(150px + var(--st));width:118px;height:118px;border-radius:14px;border:1px solid var(--line);overflow:hidden;pointer-events:none;transition:opacity .2s ease}
 body.clean #map{opacity:0}
 </style>
 </head>
@@ -79,7 +83,13 @@ body.clean #map{opacity:0}
 
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
-  <div class="hud"><small>KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="acc" id="spd"></div><div class="acc" id="ctx"></div></div><div id="map"></div>
+  <div class="hud" id="hud">
+    <div class="hud-line"><small>KM atual</small><b id="km">KM ---</b></div>
+    <div class="acc" id="gps">Aguardando GPS…</div>
+    <div class="acc" id="spd"></div>
+    <div class="acc" id="ctx"></div>
+  </div>
+  <div id="map"></div>
   <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
   <div class="bar">
     <div class="modes" role="group" aria-label="Modo">
@@ -88,7 +98,7 @@ body.clean #map{opacity:0}
       <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
     </div>
     <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
+      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
       <button id="shut" aria-label="Capturar"><i></i></button>
       <button class="rb" id="snap" aria-label="Foto avulsa em JPG">JPG</button>
     </div>
@@ -101,6 +111,15 @@ body.clean #map{opacity:0}
   <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
   <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
   <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
+  <div class="fld">
+    <label>Itens visíveis no painel</label>
+    <div class="opts">
+      <label class="opt"><span>KM</span><input type="checkbox" data-hud="km" checked></label>
+      <label class="opt"><span>GPS</span><input type="checkbox" data-hud="gps"></label>
+      <label class="opt"><span>Velocidade</span><input type="checkbox" data-hud="speed"></label>
+      <label class="opt"><span>Endereço / contexto</span><input type="checkbox" data-hud="ctx"></label>
+    </div>
+  </div>
   <button class="btn" id="expTrk">Exportar trilha (.csv)</button>
   <button class="btn pri" id="closeSet">Fechar</button>
 </div></div>
@@ -112,13 +131,36 @@ const $=id=>document.getElementById(id);
 const S={trk:[],db:[],km:'---',lat:0,lon:0,acc:null,dir:null,stream:null,mode:'foto',cap:false,rec:null,chunks:[],buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0};
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
 const cfg=JSON.parse(localStorage.getItem('kmr')||'{}');
-['label','int','lote'].forEach(k=>{if(cfg[k])$(k).value=cfg[k]});
-function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value}))}catch(e){}}
+const defaultHud={km:true,gps:false,speed:false,ctx:false};
+Object.assign(cfg, defaultHud, {
+  label: cfg.label || '',
+  int: cfg.int || 200,
+  lote: cfg.lote || 150,
+  km: cfg.km !== undefined ? cfg.km : defaultHud.km,
+  gps: cfg.gps !== undefined ? cfg.gps : defaultHud.gps,
+  speed: cfg.speed !== undefined ? cfg.speed : defaultHud.speed,
+  ctx: cfg.ctx !== undefined ? cfg.ctx : defaultHud.ctx
+});
+['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined && $(k))$(k).value=cfg[k]});
+function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,km:cfg.km,gps:cfg.gps,speed:cfg.speed,ctx:cfg.ctx}))}catch(e){}}
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
 $('lbl').value=$('label').value;
 $('lbl').oninput=e=>{$('label').value=e.target.value;persist()};
 
-function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2200)}
+document.querySelectorAll('[data-hud]').forEach(el=>{const key=el.dataset.hud;el.checked=!!cfg[key];el.addEventListener('change',()=>{cfg[key]=el.checked;persist();applyHudVisibility();});});
+function hudState(){return {km:!!cfg.km,gps:!!cfg.gps,speed:!!cfg.speed,ctx:!!cfg.ctx};}
+function applyHudVisibility(){
+  const state=hudState();
+  const kmWrap=$('km')?.closest('.hud-line');
+  if(kmWrap)kmWrap.hidden=!state.km;
+  $('gps').hidden=!state.gps;
+  $('spd').hidden=!state.speed;
+  $('ctx').hidden=!state.ctx;
+  $('hud').hidden=!Object.values(state).some(Boolean);
+}
+applyHudVisibility();
+
+function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2400)}
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 const safe=s=>s.replace(/[,/\\:]/g,'_');
@@ -133,7 +175,7 @@ function parseCsv(t){
   const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);
   return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite)).sort((x,y)=>x.km-y.km);
 }
-function kmStatus(){const ok=S.db.length>0;$('dKm').className='dot '+(ok?'ok':'bad');$('tKm').textContent=ok?`Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.`:'Tabela de KM não encontrada.';$('csv').style.display=ok?'none':'block'}
+function kmStatus(){const ok=S.db.length>0;$('dKm').className='dot '+(ok?'ok':'bad');$('tKm').textContent=ok?`Tabela de KM: ${S.db.length.toLocaleString('pt-BR')} pontos.`:'Tabela de KM não encontrada. Use o CSV manualmente.';}
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t)}).catch(()=>{}).finally(kmStatus);
 $('csv').onclick=()=>$('csvf').click();
 $('csvf').onchange=async e=>{const f=e.target.files[0];if(f){S.db=parseCsv(await f.text());kmStatus()}};
@@ -149,7 +191,7 @@ function nearest(la,lo){
     if(d<best.d)best={km:a.km+t*(b.km-a.km),d}}
   return{km:best.km,dist:Math.sqrt(best.d)*111320};
 }
-const WC={0:'Céu limpo',1:'Poucas nuvens',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Neblina',51:'Garoa',53:'Garoa',55:'Garoa',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',80:'Pancadas',81:'Pancadas',82:'Pancadas fortes',95:'Tempestade',96:'Tempestade',99:'Tempestade'};
+const WC={0:'Céu limpo',1:'Poucas nuvens',2:'Parcialmente nublado',3:'Nublado',45:'Neblina',48:'Neblina',51:'Garoa',53:'Garoa',55:'Garoa',61:'Chuva fraca',63:'Chuva',65:'Chuva forte',80:'Pancadas',81:'Pancadas fortes',82:'Pancadas fortes'};
 const dm=(a,b,c,d)=>Math.hypot(a-c,(b-d)*Math.cos(a*Math.PI/180))*111320;
 let F=null,hist=[],geo={t:0,la:0,lo:0},wxT=0,ctxBusy=false,map,mk,trkL;
 function onFix(p){
@@ -229,7 +271,7 @@ async function openCam(id){
 }
 $('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
 $('go').onclick=async()=>{
-  try{if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');setTimeout(()=>{initMap();map?.invalidateSize()},150);document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom()}
+  try{if(S.pend&&!S.dir&&await S.pend.requestPermission({mode:'readwrite'})==='granted'){S.dir=S.pend;$('dDir').className='dot ok'}await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');initMap();}
   catch(e){toast('Não foi possível acessar a câmera: '+e.message,1)}
 };
 function pinchZoom(){
@@ -258,13 +300,23 @@ function frame(){
   const v=$('v');if(!v.videoWidth)return null;
   const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
   cx.drawImage(v,0,0,w,h);
-  const bh=h*.17,g=cx.createLinearGradient(0,h-bh,0,h);
-  g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.3,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,.92)');
-  cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
-  cx.fillStyle='#fff';cx.font=`bold ${Math.round(bh*.28)}px Arial,sans-serif`;cx.fillText('KM '+S.km+(S.dirTxt?'  '+S.dirTxt:''),20,h-bh*.58);
-  cx.font=`${Math.round(bh*.135)}px Arial,sans-serif`;cx.fillStyle='rgba(255,255,255,.82)';
-  cx.fillText(`${new Date().toLocaleString('pt-BR')} | GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)} ±${Math.round(S.acc||0)}m`+(S.spd!=null?` | ${Math.round(S.spd)} km/h`:''),20,h-bh*.33);
-  cx.fillText([S.road,S.city,S.wx].filter(Boolean).join(' · '),20,h-bh*.12);
+  const state=hudState();
+  const items=[];
+  if(state.km)items.push({type:'km',text:'KM '+S.km+(S.dirTxt?'  '+S.dirTxt:''),size:Math.round(h*.045),color:'#fff'});
+  const gpsText=[];
+  if(state.gps)gpsText.push(`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)} ±${Math.round(S.acc||0)}m`);
+  if(state.speed&&S.spd!=null)gpsText.push(`${Math.round(S.spd)} km/h`);
+  if(gpsText.length)items.push({type:'meta',text:gpsText.join(' · '),size:Math.round(h*.018),color:'rgba(255,255,255,.82)'});
+  if(state.ctx){const text=[S.road,S.city,S.wx].filter(Boolean).join(' · ');if(text)items.push({type:'meta',text,size:Math.round(h*.018),color:'rgba(255,255,255,.82)'})}
+  if(items.length===0 && !$('label').value.trim())return cv;
+  const bh=h*.17,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.3,'rgba(0,0,0,.6)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);
+  let y=h-bh*.58;
+  items.forEach(item=>{
+    cx.textAlign='left';cx.textBaseline='alphabetic';
+    cx.fillStyle=item.color;cx.font=item.type==='km'?`bold ${item.size}px Arial,sans-serif`:`${item.size}px Arial,sans-serif`;
+    cx.fillText(item.text,20,y);
+    y += item.type==='km'?bh*.26:bh*.2;
+  });
   const lb=$('label').value.trim();
   if(lb){
     const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;
