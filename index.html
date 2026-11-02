@@ -1,964 +1,222 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universal Portal & Executive Dashboard</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- QR Code Generator & Scanner CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        globo: '#c4170c',
-                        globoHover: '#9e1108',
-                        brand: {
-                            50: '#f0f9ff',
-                            500: '#0284c7',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        .dark ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(156, 163, 175, 0.5);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(107, 114, 128, 0.8);
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .dark .glass {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .custom-shadow {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-        }
-        .dark .custom-shadow {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090c">
+<title>KM Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{--bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
+#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}.card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}.brand{display:inline-block;margin-left:5px;font-size:8px;font-weight:400;color:var(--mu);opacity:.45;vertical-align:baseline}
+.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}.btn:active{transform:scale(.98)}.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}.dir-hint{margin:20px 0 0;color:var(--acc);font-size:13px;font-weight:700;text-align:center}.dir-hint[hidden],#pick[hidden]{display:none}
+#cam{flex-direction:column;background:#000}video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hud{position:absolute;z-index:5;max-width:min(75vw,360px);background:rgba(4,90,64,.82);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 14px;top:calc(14px + var(--st));left:12px}.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{display:block;font-size:25px;line-height:1.15;overflow-wrap:anywhere}.hud .acc{font-size:11px;color:#bbf7d0;margin-top:3px;line-height:1.35}.hud .address{font-size:12px;color:#fff;margin-top:4px;line-height:1.3}.hud .address a{color:#bbf7d0;font-size:9px}.hud.outside b{font-size:17px}
+.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}@keyframes blink{50%{opacity:.15}}.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
+.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}.modes button[aria-pressed=true]{background:var(--acc);color:#000}.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}.rb svg{width:22px;height:22px}.camera-icon{width:24px;height:24px;display:block}#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}#snap{visibility:hidden}#snap.on{visibility:visible}
+#set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}.checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:2px}
+#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
-<body class="bg-gray-100 dark:bg-slate-950 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
-
-    <!-- TOP NAVIGATION BAR -->
-    <header class="sticky top-0 z-40 glass border-b border-gray-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-3">
-            <div class="bg-gradient-to-tr from-globo to-red-500 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
-                <i class="fa-solid fa-globe text-xl"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-lg tracking-tight flex items-center gap-2">
-                    PORTAL UNIVERSAL <span class="text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-globo font-semibold border border-red-200 dark:border-red-900">AO VIVO</span>
-                </h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Notícias em tempo real, mídias e utilitários completos</p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <!-- Clock Widget in Header -->
-            <div class="hidden lg:flex items-center gap-2 bg-gray-200/60 dark:bg-slate-800/60 px-3 py-1.5 rounded-lg text-xs font-mono border border-gray-300/50 dark:border-slate-700/50">
-                <i class="fa-regular fa-clock text-globo"></i>
-                <span id="liveHeaderClock">00:00:00</span>
-            </div>
-
-            <!-- Stopwatch Quick Button -->
-            <button onclick="toggleModal('stopwatchModal')" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition" title="Cronômetro">
-                <i class="fa-solid fa-stopwatch text-lg"></i>
-            </button>
-
-            <!-- Theme Switcher -->
-            <button id="themeToggleBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition" title="Alternar Tema">
-                <i class="fa-solid fa-moon dark:hidden text-lg"></i>
-                <i class="fa-solid fa-sun hidden dark:block text-lg text-amber-400"></i>
-            </button>
-
-            <!-- Quick Help / Info -->
-            <button onclick="toggleModal('aboutModal')" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition" title="Informações do Sistema">
-                <i class="fa-solid fa-circle-info text-lg"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN DASHBOARD CONTENT GRID -->
-    <main class="flex-1 p-3 sm:p-5 max-w-[1920px] w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
-
-        <!-- LEFT COLUMN: NEWS HUB & FEEDS (Lg: 4 Cols) -->
-        <section class="lg:col-span-4 flex flex-col gap-4">
-            <!-- GLOBO.COM / NEWS HUB CARD -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow flex flex-col h-[580px]">
-                <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-slate-800">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-globo animate-pulse"></span>
-                        <h2 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            Globo.com & Feeds
-                        </h2>
-                    </div>
-                    <button onclick="fetchGloboNews()" class="text-xs text-globo font-semibold hover:underline flex items-center gap-1">
-                        <i class="fa-solid fa-rotate-right" id="newsRefreshIcon"></i> Atualizar
-                    </button>
-                </div>
-
-                <!-- Category Filters -->
-                <div class="flex gap-1.5 overflow-x-auto py-2 text-xs no-scrollbar">
-                    <button onclick="switchNewsFeed('g1')" class="news-tab px-3 py-1.5 rounded-full font-medium bg-globo text-white flex-none transition">G1 Notícias</button>
-                    <button onclick="switchNewsFeed('ge')" class="news-tab px-3 py-1.5 rounded-full font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 flex-none transition">GE Esporte</button>
-                    <button onclick="switchNewsFeed('gshow')" class="news-tab px-3 py-1.5 rounded-full font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 flex-none transition">GShow</button>
-                    <button onclick="switchNewsFeed('tech')" class="news-tab px-3 py-1.5 rounded-full font-medium bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 flex-none transition">Tecnologia</button>
-                </div>
-
-                <!-- Feed Container -->
-                <div id="newsFeedContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 mt-1">
-                    <!-- Loading Skeleton -->
-                    <div class="animate-pulse space-y-3">
-                        <div class="h-16 bg-gray-200 dark:bg-slate-800 rounded-xl"></div>
-                        <div class="h-16 bg-gray-200 dark:bg-slate-800 rounded-xl"></div>
-                        <div class="h-16 bg-gray-200 dark:bg-slate-800 rounded-xl"></div>
-                        <div class="h-16 bg-gray-200 dark:bg-slate-800 rounded-xl"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SOCIAL MEDIA QUICK LAUNCHER -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow">
-                <h3 class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Redes Sociais e Acesso Rápido</h3>
-                <div class="grid grid-cols-4 sm:grid-cols-7 lg:grid-cols-4 gap-2">
-                    <a href="https://web.whatsapp.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 hover:scale-105 transition">
-                        <i class="fa-brands fa-whatsapp text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">WhatsApp</span>
-                    </a>
-                    <a href="https://www.youtube.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:scale-105 transition">
-                        <i class="fa-brands fa-youtube text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">YouTube</span>
-                    </a>
-                    <a href="https://www.globo.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 hover:scale-105 transition">
-                        <i class="fa-solid fa-globe text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">Globo.com</span>
-                    </a>
-                    <a href="https://www.instagram.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 border border-pink-200 dark:border-pink-800/50 hover:scale-105 transition">
-                        <i class="fa-brands fa-instagram text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">Instagram</span>
-                    </a>
-                    <a href="https://open.spotify.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50 hover:scale-105 transition">
-                        <i class="fa-brands fa-spotify text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">Spotify</span>
-                    </a>
-                    <a href="https://x.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:scale-105 transition">
-                        <i class="fa-brands fa-x-twitter text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">X/Twitter</span>
-                    </a>
-                    <a href="https://www.tiktok.com" target="_blank" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50 hover:scale-105 transition">
-                        <i class="fa-brands fa-tiktok text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">TikTok</span>
-                    </a>
-                    <button onclick="toggleModal('qrcodeModal')" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 hover:scale-105 transition">
-                        <i class="fa-solid fa-qrcode text-2xl"></i>
-                        <span class="text-[10px] font-medium mt-1">QR Code</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- CENTER COLUMN: LIVE MEDIA PLAYER & CAMERA (Lg: 5 Cols) -->
-        <section class="lg:col-span-5 flex flex-col gap-4">
-            
-            <!-- UNIVERSAL MULTIMEDIA PLAYER (YOUTUBE & RADIO) -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-play text-red-500"></i> Player Multimídia
-                    </h2>
-                    <div class="flex gap-2">
-                        <button onclick="switchPlayerTab('youtube')" id="tabBtnYT" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-500 text-white transition">YouTube</button>
-                        <button onclick="switchPlayerTab('radio')" id="tabBtnRadio" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 transition">Rádio Ao Vivo</button>
-                    </div>
-                </div>
-
-                <!-- YOUTUBE TAB CONTENT -->
-                <div id="playerTabYT" class="space-y-3">
-                    <div class="relative flex items-center">
-                        <input type="text" id="ytSearchInput" placeholder="Cole o Link do YouTube ou ID do Vídeo..." class="w-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-gray-100 pr-20 focus:outline-none focus:border-red-500">
-                        <button onclick="loadYouTubeVideo()" class="absolute right-1 px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition">
-                            Tocar
-                        </button>
-                    </div>
-
-                    <!-- YouTube Video Embed -->
-                    <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-inner border border-gray-800">
-                        <iframe id="ytIframePlayer" class="w-full h-full" src="https://www.youtube.com/embed/live_stream?channel=UC4r8spNzp_61v1sXgLV452Q" title="YouTube Live Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                    </div>
-
-                    <!-- Quick Live Preset Streams -->
-                    <div class="flex items-center gap-2 overflow-x-auto text-xs py-1 no-scrollbar">
-                        <span class="text-gray-400 font-medium text-[11px] flex-none">Transmissões ao vivo:</span>
-                        <button onclick="playPresetYT('https://www.youtube.com/embed/5qap5aO4i9A')" class="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg flex-none text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 transition">Lofi Girl</button>
-                        <button onclick="playPresetYT('https://www.youtube.com/embed/live_stream?channel=UC4r8spNzp_61v1sXgLV452Q')" class="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg flex-none text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 transition">Jovem Pan Live</button>
-                        <button onclick="playPresetYT('https://www.youtube.com/embed/2g811Ko7g2A')" class="px-2.5 py-1 bg-gray-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg flex-none text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700 transition">CNN Brasil</button>
-                    </div>
-                </div>
-
-                <!-- LIVE RADIO TAB CONTENT -->
-                <div id="playerTabRadio" class="space-y-3 hidden">
-                    <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-white flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg bg-globo/20 border border-globo text-globo flex items-center justify-center">
-                                <i class="fa-solid fa-radio text-xl animate-bounce"></i>
-                            </div>
-                            <div>
-                                <h4 id="radioStationTitle" class="font-bold text-sm">CBN São Paulo 90.5 FM</h4>
-                                <p class="text-xs text-gray-400">Rádio ao vivo online contínua</p>
-                            </div>
-                        </div>
-                        <button id="radioPlayBtn" onclick="toggleRadioPlay()" class="w-10 h-10 rounded-full bg-globo hover:bg-globoHover text-white flex items-center justify-center text-lg shadow-lg transition">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                    </div>
-
-                    <audio id="audioRadioPlayer" preload="none" class="hidden"></audio>
-
-                    <!-- Station Selector -->
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <button onclick="changeRadioStation('https://s08.w3bserver.com/radio/8040/radio.mp3', 'CBN SP 90.5 FM')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-globo/10 border border-gray-200 dark:border-slate-700 text-left font-medium">
-                            <i class="fa-solid fa-broadcast-tower text-globo mr-1"></i> CBN SP 90.5 FM
-                        </button>
-                        <button onclick="changeRadioStation('https://streaming.positiva.fm:8000/stream', 'Positiva FM')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-globo/10 border border-gray-200 dark:border-slate-700 text-left font-medium">
-                            <i class="fa-solid fa-radio text-globo mr-1"></i> Positiva FM
-                        </button>
-                        <button onclick="changeRadioStation('https://18323.live.streamtheworld.com/RADIO_ALVORADA_SPA.mp3', 'Alvorada FM')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-globo/10 border border-gray-200 dark:border-slate-700 text-left font-medium">
-                            <i class="fa-solid fa-music text-globo mr-1"></i> Alvorada FM
-                        </button>
-                        <button onclick="changeRadioStation('https://stream.zeno.fm/f3wvbbqmdg8uv', 'Gospel Live')" class="p-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-globo/10 border border-gray-200 dark:border-slate-700 text-left font-medium">
-                            <i class="fa-solid fa-heart text-globo mr-1"></i> Rádio Gospel
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LIVE CAMERA & CAPTURE MODULE -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow flex flex-col">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-camera text-sky-500"></i> Câmera & Captura de Imagem
-                    </h2>
-                    <span id="cameraGpsStatus" class="text-[10px] bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-300 px-2 py-0.5 rounded-full border border-sky-200 dark:border-sky-800">GPS Ativo</span>
-                </div>
-
-                <!-- Video Viewport -->
-                <div class="relative w-full aspect-video bg-black rounded-xl overflow-hidden mb-3 border border-gray-800 flex items-center justify-center">
-                    <video id="cameraVideo" autoplay playsinline class="w-full h-full object-cover"></video>
-                    <canvas id="cameraCanvas" class="hidden"></canvas>
-                    
-                    <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950 text-gray-400 p-4 text-center">
-                        <i class="fa-solid fa-video-slash text-3xl mb-2"></i>
-                        <p class="text-xs">Clique abaixo para ativar a câmera do dispositivo</p>
-                    </div>
-
-                    <!-- Overlay GPS metadata -->
-                    <div id="cameraOverlay" class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white px-2.5 py-1 rounded-md text-[10px] font-mono hidden">
-                        <span id="overlayTime">--:--:--</span> | GPS: <span id="overlayGps">Buscando...</span>
-                    </div>
-                </div>
-
-                <!-- Camera Controls -->
-                <div class="flex gap-2">
-                    <button onclick="startCamera()" id="btnStartCam" class="flex-1 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-power-off"></i> Ligar Câmera
-                    </button>
-                    <button onclick="takeSnapshot()" id="btnSnapCam" disabled class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-camera-retro"></i> Capturar Foto
-                    </button>
-                </div>
-
-                <!-- Snapshot Gallery -->
-                <div class="mt-3 pt-3 border-t border-gray-100 dark:border-slate-800">
-                    <h4 class="text-xs font-semibold text-gray-500 mb-2">Galeria de Capturas Internas</h4>
-                    <div id="snapshotGallery" class="flex gap-2 overflow-x-auto py-1 no-scrollbar min-h-[60px]">
-                        <p class="text-xs text-gray-400 italic my-auto">Nenhuma foto capturada nesta sessão.</p>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- RIGHT COLUMN: WEATHER, VOICE RECORDER & TOOLS (Lg: 3 Cols) -->
-        <section class="lg:col-span-3 flex flex-col gap-4">
-
-            <!-- LIVE WEATHER WIDGET -->
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-2xl p-4 custom-shadow relative overflow-hidden">
-                <!-- Background Deco -->
-                <i class="fa-solid fa-cloud-sun text-white/10 text-8xl absolute -right-4 -bottom-4 pointer-events-none"></i>
-
-                <div class="flex items-center justify-between mb-3 relative z-10">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-blue-200">Previsão do Tempo</h3>
-                    <button onclick="fetchWeatherByLocation()" class="text-xs text-blue-200 hover:text-white" title="Usar minha localização">
-                        <i class="fa-solid fa-location-crosshairs"></i>
-                    </button>
-                </div>
-
-                <!-- Weather Search Bar -->
-                <div class="relative flex items-center mb-3 z-10">
-                    <input type="text" id="weatherCityInput" placeholder="Digite a cidade..." class="w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 py-1.5 text-xs text-white placeholder-blue-200/70 focus:outline-none focus:bg-white/20">
-                    <button onclick="fetchWeather()" class="absolute right-1 p-1 px-2 text-xs text-white">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-
-                <!-- Main Weather Display -->
-                <div class="relative z-10 flex items-center justify-between my-2">
-                    <div>
-                        <h2 id="weatherCityName" class="text-lg font-bold">São Paulo, BR</h2>
-                        <p id="weatherDescription" class="text-xs text-blue-200 capitalize">Parcialmente Nublado</p>
-                    </div>
-                    <div class="text-right">
-                        <span id="weatherTemp" class="text-3xl font-extrabold tracking-tight">24°C</span>
-                    </div>
-                </div>
-
-                <!-- Detailed Weather Stats -->
-                <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/15 text-xs text-blue-100 relative z-10">
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-droplet text-blue-300"></i>
-                        <span>Umidade: <strong id="weatherHumidity">65%</strong></span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-wind text-blue-300"></i>
-                        <span>Vento: <strong id="weatherWind">12 km/h</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VOICE RECORDER WIDGET -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i class="fa-solid fa-microphone text-rose-500"></i> Gravador de Voz
-                    </h3>
-                    <span id="recordingTimer" class="font-mono text-xs text-rose-500 font-bold">00:00</span>
-                </div>
-
-                <!-- Recorder Controls -->
-                <div class="flex items-center justify-center gap-3 py-2 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-800 mb-3">
-                    <button id="btnStartRecord" onclick="startVoiceRecording()" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-sm shadow transition" title="Iniciar Gravação">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
-                    <button id="btnStopRecord" onclick="stopVoiceRecording()" disabled class="w-10 h-10 rounded-full bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 flex items-center justify-center text-sm shadow transition cursor-not-allowed" title="Parar Gravação">
-                        <i class="fa-solid fa-square"></i>
-                    </button>
-                </div>
-
-                <!-- Voice Recordings List -->
-                <div id="audioRecordingsList" class="space-y-2 max-h-36 overflow-y-auto pr-1">
-                    <p class="text-xs text-gray-400 italic text-center">Nenhum áudio gravado.</p>
-                </div>
-            </div>
-
-            <!-- QUICK TOOLS & NOTEPAD -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-gray-200 dark:border-slate-800 custom-shadow flex-1 flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 dark:text-gray-500">Bloco de Notas & Ferramentas</h3>
-                    <div class="flex gap-1">
-                        <button onclick="toggleModal('calculatorModal')" class="p-1 px-2 text-xs bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded text-gray-600 dark:text-gray-300" title="Calculadora">
-                            <i class="fa-solid fa-calculator"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <textarea id="stickyNoteText" oninput="saveStickyNote()" placeholder="Digite suas anotações ou tarefas aqui... (Salvamento automático)" class="w-full flex-1 min-h-[100px] p-2.5 text-xs bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl text-gray-800 dark:text-amber-100 focus:outline-none resize-none"></textarea>
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- SYSTEM FOOTER -->
-    <footer class="mt-auto border-t border-gray-200 dark:border-slate-800 glass px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400">
-        <div class="max-w-[1920px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p>© 2026 Portal Universal Dashboard - Todas as funções e mídias integradas em tempo real.</p>
-            <div class="flex items-center gap-3 text-xs">
-                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Sistema Online</span>
-                <span>•</span>
-                <button onclick="toggleModal('aboutModal')" class="hover:underline">Recursos</button>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MODAL: STOPWATCH / CRONÔMETRO -->
-    <div id="stopwatchModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-gray-200 dark:border-slate-800 custom-shadow relative">
-            <button onclick="toggleModal('stopwatchModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="font-bold text-lg mb-4 text-center text-gray-900 dark:text-white">
-                <i class="fa-solid fa-stopwatch text-globo mr-1"></i> Cronômetro Profissional
-            </h3>
-
-            <div class="text-center font-mono text-4xl font-extrabold my-6 text-gray-800 dark:text-gray-100" id="stopwatchDisplay">
-                00:00:00
-            </div>
-
-            <div class="flex justify-center gap-3">
-                <button onclick="startStopwatch()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl transition">Iniciar</button>
-                <button onclick="pauseStopwatch()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-xl transition">Pausar</button>
-                <button onclick="resetStopwatch()" class="px-4 py-2 bg-gray-200 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-semibold text-xs rounded-xl transition">Zerar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: CALCULATOR -->
-    <div id="calculatorModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-gray-200 dark:border-slate-800 custom-shadow relative">
-            <button onclick="toggleModal('calculatorModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="font-bold text-sm mb-3 text-gray-900 dark:text-white">
-                <i class="fa-solid fa-calculator text-blue-500 mr-1"></i> Calculadora
-            </h3>
-
-            <input type="text" id="calcDisplay" readonly class="w-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-right font-mono text-xl mb-3 text-gray-800 dark:text-white">
-
-            <div class="grid grid-cols-4 gap-2 text-sm">
-                <button onclick="calcInput('C')" class="p-3 bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl font-bold">C</button>
-                <button onclick="calcInput('/')" class="p-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold">/</button>
-                <button onclick="calcInput('*')" class="p-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold">*</button>
-                <button onclick="calcInput('-')" class="p-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold">-</button>
-
-                <button onclick="calcInput('7')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">7</button>
-                <button onclick="calcInput('8')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">8</button>
-                <button onclick="calcInput('9')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">9</button>
-                <button onclick="calcInput('+')" class="p-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold">+</button>
-
-                <button onclick="calcInput('4')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">4</button>
-                <button onclick="calcInput('5')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">5</button>
-                <button onclick="calcInput('6')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">6</button>
-                <button onclick="calcEquals()" class="row-span-2 p-3 bg-globo text-white rounded-xl font-bold flex items-center justify-center">=</button>
-
-                <button onclick="calcInput('1')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">1</button>
-                <button onclick="calcInput('2')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">2</button>
-                <button onclick="calcInput('3')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">3</button>
-
-                <button onclick="calcInput('0')" class="col-span-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">0</button>
-                <button onclick="calcInput('.')" class="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl font-semibold">.</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: QR CODE GENERATOR & SCANNER -->
-    <div id="qrcodeModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-gray-200 dark:border-slate-800 custom-shadow relative">
-            <button onclick="toggleModal('qrcodeModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="font-bold text-sm mb-3 text-gray-900 dark:text-white">
-                <i class="fa-solid fa-qrcode text-amber-500 mr-1"></i> Gerador de QR Code
-            </h3>
-
-            <input type="text" id="qrTextInput" placeholder="Cole uma URL ou texto aqui..." class="w-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-2.5 text-xs text-gray-800 dark:text-white mb-3">
-
-            <button onclick="generateQRCode()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs rounded-xl mb-4 transition">
-                Gerar QR Code
-            </button>
-
-            <div id="qrcodeOutput" class="flex justify-center p-3 bg-white rounded-xl"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: ABOUT / INFO -->
-    <div id="aboutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 border border-gray-200 dark:border-slate-800 custom-shadow relative">
-            <button onclick="toggleModal('aboutModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-cubes text-globo"></i> Portal Universal Dashboard
-            </h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                Plataforma unificada desenvolvida para concentrar informações de notícias, mídia contínua em background, previsão meteorológica e utilitários de sistema.
-            </p>
-
-            <ul class="text-xs space-y-2 text-gray-700 dark:text-gray-300 mb-4">
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Notícias Globo.com em tempo real (RSS Feed)</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Rádio FM ao vivo e YouTube em background</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Captura de Câmera com metadados de GPS</li>
-                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Gravador de Voz via Web Audio API</li>
-            </ul>
-
-            <button onclick="toggleModal('aboutModal')" class="w-full py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-semibold text-xs rounded-xl">
-                Fechar
-            </button>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        /* ==================== GLOBAL APP STATE ==================== */
-        let currentNewsCategory = 'g1';
-        let mediaStream = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let stopwatchInterval = null;
-        let stopwatchTime = 0;
-        let isRadioPlaying = false;
-
-        // RSS feeds endpoints via CORS proxy
-        const RSS_FEEDS = {
-            g1: 'https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/rss/g1/',
-            ge: 'https://api.rss2json.com/v1/api.json?rss_url=https://ge.globo.com/rss/ge/',
-            gshow: 'https://api.rss2json.com/v1/api.json?rss_url=https://gshow.globo.com/rss/gshow/',
-            tech: 'https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/rss/g1/tecnologia/'
-        };
-
-        /* ==================== INITIALIZATION ==================== */
-        window.addEventListener('DOMContentLoaded', () => {
-            initClock();
-            fetchGloboNews();
-            fetchWeather();
-            loadStickyNote();
-            initGPSOverlay();
-            setupThemeToggle();
-        });
-
-        /* ==================== THEME MANAGEMENT ==================== */
-        function setupThemeToggle() {
-            const btn = document.getElementById('themeToggleBtn');
-            btn.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-            });
-        }
-
-        /* ==================== CLOCK & STOPWATCH ==================== */
-        function initClock() {
-            const clockElem = document.getElementById('liveHeaderClock');
-            setInterval(() => {
-                const now = new Date();
-                clockElem.innerText = now.toLocaleTimeString('pt-BR');
-                document.getElementById('overlayTime').innerText = now.toLocaleTimeString('pt-BR');
-            }, 1000);
-        }
-
-        function startStopwatch() {
-            if (stopwatchInterval) return;
-            stopwatchInterval = setInterval(() => {
-                stopwatchTime++;
-                const hrs = String(Math.floor(stopwatchTime / 3600)).padStart(2, '0');
-                const mins = String(Math.floor((stopwatchTime % 3600) / 60)).padStart(2, '0');
-                const secs = String(stopwatchTime % 60).padStart(2, '0');
-                document.getElementById('stopwatchDisplay').innerText = `${hrs}:${mins}:${secs}`;
-            }, 1000);
-        }
-
-        function pauseStopwatch() {
-            clearInterval(stopwatchInterval);
-            stopwatchInterval = null;
-        }
-
-        function resetStopwatch() {
-            pauseStopwatch();
-            stopwatchTime = 0;
-            document.getElementById('stopwatchDisplay').innerText = '00:00:00';
-        }
-
-        /* ==================== GLOBO.COM NEWS FEED ==================== */
-        async function fetchGloboNews() {
-            const container = document.getElementById('newsFeedContainer');
-            const refreshIcon = document.getElementById('newsRefreshIcon');
-            refreshIcon.classList.add('fa-spin');
-
-            try {
-                const url = RSS_FEEDS[currentNewsCategory];
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if (data.status === 'ok' && data.items) {
-                    container.innerHTML = '';
-                    data.items.slice(0, 15).forEach(item => {
-                        const date = new Date(item.pubDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                        const newsCard = document.createElement('a');
-                        newsCard.href = item.link;
-                        newsCard.target = '_blank';
-                        newsCard.className = 'block p-3 rounded-xl bg-gray-50 dark:bg-slate-800/60 hover:bg-red-50 dark:hover:bg-slate-800 border border-gray-100 dark:border-slate-800 transition group';
-                        
-                        newsCard.innerHTML = `
-                            <div class="flex items-start justify-between gap-2">
-                                <h4 class="text-xs font-bold text-gray-800 dark:text-gray-100 group-hover:text-globo line-clamp-2">${item.title}</h4>
-                                <span class="text-[10px] font-mono text-gray-400 flex-none">${date}</span>
-                            </div>
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">${item.description.replace(/<[^>]*>?/gm, '')}</p>
-                        `;
-                        container.appendChild(newsCard);
-                    });
-                } else {
-                    container.innerHTML = `<p class="text-xs text-gray-400 p-3 text-center">Não foi possível carregar as notícias agora.</p>`;
-                }
-            } catch (err) {
-                container.innerHTML = `<p class="text-xs text-red-400 p-3 text-center">Erro de conexão ao buscar notícias.</p>`;
-            } finally {
-                refreshIcon.classList.remove('fa-spin');
-            }
-        }
-
-        function switchNewsFeed(category) {
-            currentNewsCategory = category;
-            document.querySelectorAll('.news-tab').forEach(tab => {
-                tab.classList.remove('bg-globo', 'text-white');
-                tab.classList.add('bg-gray-100', 'dark:bg-slate-800', 'text-gray-600', 'dark:text-gray-300');
-            });
-            event.target.classList.add('bg-globo', 'text-white');
-            event.target.classList.remove('bg-gray-100', 'dark:bg-slate-800', 'text-gray-600', 'dark:text-gray-300');
-            fetchGloboNews();
-        }
-
-        /* ==================== MULTIMEDIA PLAYER ==================== */
-        function switchPlayerTab(tab) {
-            const ytTab = document.getElementById('playerTabYT');
-            const radioTab = document.getElementById('playerTabRadio');
-            const btnYT = document.getElementById('tabBtnYT');
-            const btnRadio = document.getElementById('tabBtnRadio');
-
-            if (tab === 'youtube') {
-                ytTab.classList.remove('hidden');
-                radioTab.classList.add('hidden');
-                btnYT.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-500 text-white transition';
-                btnRadio.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 transition';
-            } else {
-                ytTab.classList.add('hidden');
-                radioTab.classList.remove('hidden');
-                btnRadio.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg bg-globo text-white transition';
-                btnYT.className = 'px-2.5 py-1 text-xs font-semibold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 transition';
-            }
-        }
-
-        function loadYouTubeVideo() {
-            const input = document.getElementById('ytSearchInput').value.trim();
-            const iframe = document.getElementById('ytIframePlayer');
-            if (!input) return;
-
-            let embedUrl = input;
-            if (input.includes('youtube.com/watch?v=')) {
-                const videoId = input.split('v=')[1].split('&')[0];
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-            } else if (input.includes('youtu.be/')) {
-                const videoId = input.split('youtu.be/')[1].split('?')[0];
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-            }
-            iframe.src = embedUrl;
-        }
-
-        function playPresetYT(url) {
-            document.getElementById('ytIframePlayer').src = url;
-        }
-
-        function toggleRadioPlay() {
-            const player = document.getElementById('audioRadioPlayer');
-            const btn = document.getElementById('radioPlayBtn');
-
-            if (!player.src) {
-                changeRadioStation('https://s08.w3bserver.com/radio/8040/radio.mp3', 'CBN SP 90.5 FM');
-                return;
-            }
-
-            if (isRadioPlaying) {
-                player.pause();
-                btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
-                isRadioPlaying = false;
-            } else {
-                player.play();
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-                isRadioPlaying = true;
-            }
-        }
-
-        function changeRadioStation(url, name) {
-            const player = document.getElementById('audioRadioPlayer');
-            const title = document.getElementById('radioStationTitle');
-            const btn = document.getElementById('radioPlayBtn');
-
-            title.innerText = name;
-            player.src = url;
-            player.play();
-            btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-            isRadioPlaying = true;
-        }
-
-        /* ==================== CAMERA & SNAPSHOT ==================== */
-        async function startCamera() {
-            const video = document.getElementById('cameraVideo');
-            const placeholder = document.getElementById('cameraPlaceholder');
-            const btnSnap = document.getElementById('btnSnapCam');
-            const overlay = document.getElementById('cameraOverlay');
-
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                video.srcObject = mediaStream;
-                placeholder.classList.add('hidden');
-                overlay.classList.remove('hidden');
-                btnSnap.disabled = false;
-            } catch (err) {
-                alert('Não foi possível acessar a câmera do dispositivo: ' + err.message);
-            }
-        }
-
-        function takeSnapshot() {
-            const video = document.getElementById('cameraVideo');
-            const canvas = document.getElementById('cameraCanvas');
-            const gallery = document.getElementById('snapshotGallery');
-
-            if (!mediaStream) return;
-
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            const dataUrl = canvas.toDataURL('image/png');
-
-            if (gallery.querySelector('p')) {
-                gallery.innerHTML = '';
-            }
-
-            const imgContainer = document.createElement('div');
-            imgContainer.className = 'relative flex-none w-16 h-12 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 shadow-sm group';
-            imgContainer.innerHTML = `
-                <img src="${dataUrl}" class="w-full h-full object-cover">
-                <a href="${dataUrl}" download="captura_${Date.now()}.png" class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition">
-                    <i class="fa-solid fa-download"></i>
-                </a>
-            `;
-            gallery.prepend(imgContainer);
-        }
-
-        function initGPSOverlay() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition((pos) => {
-                    const lat = pos.coords.latitude.toFixed(4);
-                    const lon = pos.coords.longitude.toFixed(4);
-                    document.getElementById('overlayGps').innerText = `${lat}, ${lon}`;
-                }, () => {
-                    document.getElementById('overlayGps').innerText = "Indisponível";
-                });
-            }
-        }
-
-        /* ==================== WEATHER MODULE ==================== */
-        async function fetchWeather(city = 'Sao Paulo') {
-            const inputVal = document.getElementById('weatherCityInput').value.trim();
-            const queryCity = inputVal || city;
-
-            try {
-                // Using Open-Meteo & Nominatim Geocoding API (Free & Keyless)
-                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryCity)}`);
-                const geoData = await geoRes.json();
-
-                if (geoData && geoData.length > 0) {
-                    const lat = geoData[0].lat;
-                    const lon = geoData[0].lon;
-                    const cityName = geoData[0].display_name.split(',')[0];
-
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`);
-                    const weatherData = await weatherRes.json();
-
-                    document.getElementById('weatherCityName').innerText = cityName;
-                    document.getElementById('weatherTemp').innerText = `${Math.round(weatherData.current_weather.temperature)}°C`;
-                    document.getElementById('weatherWind').innerText = `${weatherData.current_weather.windspeed} km/h`;
-                    document.getElementById('weatherHumidity').innerText = `${weatherData.hourly.relativehumidity_2m[0]}%`;
-                    document.getElementById('weatherDescription').innerText = getWeatherCodeDescription(weatherData.current_weather.weathercode);
-                }
-            } catch (err) {
-                console.error('Weather error:', err);
-            }
-        }
-
-        function fetchWeatherByLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`);
-                    const weatherData = await weatherRes.json();
-
-                    document.getElementById('weatherCityName').innerText = "Sua Localização";
-                    document.getElementById('weatherTemp').innerText = `${Math.round(weatherData.current_weather.temperature)}°C`;
-                    document.getElementById('weatherWind').innerText = `${weatherData.current_weather.windspeed} km/h`;
-                    document.getElementById('weatherHumidity').innerText = `${weatherData.hourly.relativehumidity_2m[0]}%`;
-                    document.getElementById('weatherDescription').innerText = getWeatherCodeDescription(weatherData.current_weather.weathercode);
-                });
-            }
-        }
-
-        function getWeatherCodeDescription(code) {
-            const codes = {
-                0: 'Céu Limpo',
-                1: 'Principalmente Limpo',
-                2: 'Parcialmente Nublado',
-                3: 'Nublado',
-                45: 'Névoa',
-                61: 'Chuva Leve',
-                63: 'Chuva Moderada',
-                95: 'Tempestade'
-            };
-            return codes[code] || 'Ensolarado';
-        }
-
-        /* ==================== VOICE RECORDER ==================== */
-        let voiceTimerInterval = null;
-        let voiceSeconds = 0;
-
-        async function startVoiceRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    addAudioRecordingToList(audioUrl);
-                };
-
-                mediaRecorder.start();
-                document.getElementById('btnStartRecord').disabled = true;
-                document.getElementById('btnStopRecord').disabled = false;
-                document.getElementById('btnStopRecord').classList.remove('cursor-not-allowed', 'text-gray-500');
-                document.getElementById('btnStopRecord').classList.add('bg-rose-600', 'text-white');
-
-                voiceSeconds = 0;
-                voiceTimerInterval = setInterval(() => {
-                    voiceSeconds++;
-                    const m = String(Math.floor(voiceSeconds / 60)).padStart(2, '0');
-                    const s = String(voiceSeconds % 60).padStart(2, '0');
-                    document.getElementById('recordingTimer').innerText = `${m}:${s}`;
-                }, 1000);
-
-            } catch (err) {
-                alert('Acesso ao microfone negado: ' + err.message);
-            }
-        }
-
-        function stopVoiceRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                clearInterval(voiceTimerInterval);
-                document.getElementById('btnStartRecord').disabled = false;
-                document.getElementById('btnStopRecord').disabled = true;
-                document.getElementById('btnStopRecord').className = 'w-10 h-10 rounded-full bg-gray-300 dark:bg-slate-700 text-gray-500 dark:text-gray-400 flex items-center justify-center text-sm shadow transition cursor-not-allowed';
-                document.getElementById('recordingTimer').innerText = '00:00';
-            }
-        }
-
-        function addAudioRecordingToList(url) {
-            const list = document.getElementById('audioRecordingsList');
-            if (list.querySelector('p')) list.innerHTML = '';
-
-            const item = document.createElement('div');
-            item.className = 'p-2 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-between gap-2';
-            item.innerHTML = `
-                <audio src="${url}" controls class="h-8 w-full"></audio>
-                <a href="${url}" download="gravacao_${Date.now()}.mp3" class="p-1.5 bg-rose-600 text-white rounded-lg text-xs">
-                    <i class="fa-solid fa-download"></i>
-                </a>
-            `;
-            list.prepend(item);
-        }
-
-        /* ==================== STICKY NOTES ==================== */
-        function saveStickyNote() {
-            const val = document.getElementById('stickyNoteText').value;
-            localStorage.setItem('universalStickyNote', val);
-        }
-
-        function loadStickyNote() {
-            const saved = localStorage.getItem('universalStickyNote');
-            if (saved) {
-                document.getElementById('stickyNoteText').value = saved;
-            }
-        }
-
-        /* ==================== CALCULATOR LOGIC ==================== */
-        let calcVal = '';
-        function calcInput(char) {
-            const display = document.getElementById('calcDisplay');
-            if (char === 'C') {
-                calcVal = '';
-            } else {
-                calcVal += char;
-            }
-            display.value = calcVal;
-        }
-
-        function calcEquals() {
-            const display = document.getElementById('calcDisplay');
-            try {
-                calcVal = eval(calcVal).toString();
-                display.value = calcVal;
-            } catch (e) {
-                display.value = 'Erro';
-                calcVal = '';
-            }
-        }
-
-        /* ==================== QR CODE GENERATOR ==================== */
-        function generateQRCode() {
-            const text = document.getElementById('qrTextInput').value.trim();
-            const output = document.getElementById('qrcodeOutput');
-            output.innerHTML = '';
-
-            if (text) {
-                new QRCode(output, {
-                    text: text,
-                    width: 128,
-                    height: 128
-                });
-            }
-        }
-
-        /* ==================== MODAL TOGGLE HELPER ==================== */
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-    </script>
+<body>
+<main id="start" class="screen on"><div class="card">
+  <h1>KM Report<small class="brand">By CPS sistems</small></h1>
+  <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data e GPS gravados na imagem.</p>
+  <p class="dir-hint" id="dirHint">Selecione a pasta para salvar os arquivos</p>
+  <button class="btn" id="pick">Escolher pasta de destino</button>
+  <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
+  <button class="btn pri" id="go">Ativar câmera</button>
+</div></main>
+<section id="cam" class="screen">
+  <video id="v" autoplay playsinline muted></video>
+  <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
+  <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
+  <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button></div>
+    <div class="row">
+      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
+      <button id="shut" aria-label="Capturar"><i></i></button>
+      <button class="rb" id="snap" aria-label="Tirar foto durante o relatório" title="Tirar foto"><svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+    </div><button class="pill" id="back">Voltar</button>
+  </div>
+</section>
+<div id="set"><div class="card">
+  <h1 style="font-size:20px">Ajustes</h1>
+  <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
+  <div class="checkgroup"><div class="checkgroup-title">Informações na imagem e no vídeo</div>
+    <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM</span></label>
+    <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
+    <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir localização (GPS/endereço)</span></label>
+    <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta</span></label>
+  </div>
+  <div class="checkgroup"><div class="checkgroup-title">Exibição do KM</div><label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar o KM mais próximo mesmo fora da rodovia (&gt; 300 m)</span></label></div>
+  <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
+  <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
+  <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
+  <button class="btn pri" id="closeSet">Fechar</button>
+</div></div>
+<div id="toast" role="status"></div><canvas id="c" hidden></canvas>
+<script>
+const $=id=>document.getElementById(id);
+const S={db:[],km:'---',lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
+const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL='';
+const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
+const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+function toast(m,err=false){const t=$('toast');t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',1800);}
+function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showDate:$('showDate').checked,showGps:$('showGps').checked,showLabel:$('showLabel').checked,showKmFar:$('showKmFar').checked}));}catch(e){}}
+const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr')||'{}');}catch{return {};}})();
+['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
+const oldMeta=typeof cfg.showMeta==='boolean'?cfg.showMeta:true;
+['showKm','showDate','showGps','showLabel'].forEach(k=>$(k).checked=typeof cfg[k]==='boolean'?cfg[k]:oldMeta);
+if(typeof cfg.showKmFar==='boolean')$('showKmFar').checked=cfg.showKmFar;
+$('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist();};
+['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
+['showKm','showDate','showGps','showLabel','showKmFar'].forEach(k=>$(k).addEventListener('change',()=>{persist();updateLocationUI();}));
+
+/* CSV: pontos com KM e coordenadas. */
+const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
+const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
+function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
+function nearest(la,lo){const rad=Math.PI/180,R=6371000;let best=null,min=Infinity;for(const p of S.db){const dLat=(p.lat-la)*rad,dLon=(p.lon-lo)*rad,a=Math.sin(dLat/2)**2+Math.cos(la*rad)*Math.cos(p.lat*rad)*Math.sin(dLon/2)**2,dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
+
+/* Reverse geocoding gratuito via Nominatim/OSM. */
+function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
+function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
+function requestAddress(){
+  if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;
+  const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);
+  if(cached){S.address=cached;updateLocationUI();return;}
+  if(S.lastGeoPoint&&Math.hypot(S.lat-S.lastGeoPoint.lat,S.lon-S.lastGeoPoint.lon)<.001)return;
+  clearTimeout(S.geoTimer);
+  const wait=Math.max(0,1100-(Date.now()-S.lastGeoRequest));
+  S.geoTimer=setTimeout(async()=>{
+    if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;
+    const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;
+    S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};
+    try{
+      const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;
+      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});
+      if(!res.ok)throw new Error(`HTTP ${res.status}`);
+      const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';
+      S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);
+      if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}
+    }catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}
+  },wait);
+}
+function refreshNearest(){const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;S.dist=n?n.dist:null;if(n)S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}updateLocationUI();if(S.dist!==null&&S.dist>OUTSIDE_LIMIT_M)requestAddress();}
+
+function updateLocationUI(){
+  const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;
+  const kmIsShown=!outside||showFarKm;
+  $('hud').classList.toggle('outside',outside&&!showFarKm);
+  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
+  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
+  
+  let gpsText = S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
+  $('gps').textContent = gpsText;
+
+  $('address').hidden=!(outside&&S.address);
+  if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;
+  return{outside,kmIsShown};
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);refreshNearest();}).catch(()=>{});
+if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+
+/* Pasta */
+if(!('showDirectoryPicker'in window))$('pick').hidden=true;
+$('pick').onclick=async()=>{if(!('showDirectoryPicker'in window)){toast('Navegador não suporta pasta de destino',1);return;}try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;$('dirHint').hidden=true;$('pick').hidden=true;}catch(e){if(e.name!=='AbortError')toast(e.message||'Não foi possível acessar a pasta',1);}};
+async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true;}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1);}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
+
+/* Câmera */
+async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'),cur=S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';}
+$('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
+$('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}};
+function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const t=S.stream?.getVideoTracks?.()[0];z0=t?.getSettings?.().zoom||1;}};v.ontouchmove=e=>{const t=S.stream?.getVideoTracks?.()[0],c=t?.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});}};}
+$('gear').onclick=()=>$('set').classList.add('on');$('closeSet').onclick=()=>$('set').classList.remove('on');
+$('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
+function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
+
+/* Desenho do quadro e informações na imagem (Fotos e Relatórios) */
+function frame(){
+  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
+  const {outside,kmIsShown}=updateLocationUI(),lines=[];
+  
+  if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside) {
+    lines.push({text:`KM ${S.km}`,large:true});
+  } else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked) {
+    lines.push({text:`KM ${S.km}`,large:true});
+  }
+  
+  if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
+  else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
+  
+  if($('showGps').checked) {
+    const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
+    lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, small: true});
+  }
+
+  if(lines.length){
+    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
+    g.addColorStop(0,'rgba(0,0,0,0)');
+    g.addColorStop(.25,'rgba(0,0,0,.55)');
+    g.addColorStop(1,'rgba(0,0,0,.9)');
+    cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
+    
+    let y=h-20;
+    for(let i=lines.length-1;i>=0;i--){
+      const line=lines[i];
+      cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');
+      
+      let fontSize = Math.round(bh*.15);
+      if(line.large) fontSize = Math.round(bh*.24);
+      if(line.small) fontSize = Math.round(bh*.12);
+      
+      cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;
+      cx.fillText(line.text,20,y, w-40);
+      
+      y -= line.large ? Math.round(bh*.30) : (line.small ? Math.round(bh*.15) : Math.round(bh*.20));
+    }
+  }
+
+  const lb=$('label').value.trim();
+  if(lb&&$('showLabel').checked){
+    const fs=Math.round(h*.035);
+    cx.font=`bold ${fs}px Arial,sans-serif`;
+    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
+    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();
+    cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;
+    cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';
+    cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
+  }
+  return cv;
+}
+
+const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
+$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
+async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
+$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
+
+/* Gravação de vídeo */
+let vidLoop=0;
+function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
+function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}}
+
+/* Relatório PDF em lotes otimizado */
+const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
+function togglePdf(){S.cap?stopPdf():startPdf();}
+function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
+function loop(){if(!S.cap)return;const start=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));}
+function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
+async function stopPdf(){if(!S.cap)return;S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);}
+async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0));}}catch(e){console.error(e);toast('Falha ao gerar PDF',1);}finally{S.busy=false;}}
+async function makePdf({p,n}){const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
+$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
+window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
+updateModeUI();updateLocationUI();
+</script>
 </body>
 </html>
-```
-
-### Principais Recursos Incorporados:
-1. **Hub de Notícias Globo.com**: Integração dinâmica via feed RSS (G1, GE Esporte, GShow, Tecnologia) atualizados em tempo real com leitor modal/extenso.
-2. **Player de Mídia Universal**: Suporta streams do YouTube e Rádios Online em tempo real (tocando continuamente em background enquanto o usuário utiliza outras funções do app).
-3. **Câmera & Fotos com Geolocalização**: Captura imagens direto do dispositivo com timestamp e coordenadas GPS sobrepostas na foto.
-4. **Gravador de Voz Integrado**: Web Audio API com player e salvamento local.
-5. **Previsão do Tempo em Tempo Real**: Consulta instantânea de clima, temperatura e umidade para qualquer cidade do mundo.
-6. **Hub de Utilidades**: Bloco de notas com autossave, gerador de QR Code, calculadora e cronômetro.
