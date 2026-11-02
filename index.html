@@ -7,10 +7,7 @@
 <title>KM Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
-:root{
-  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);
-  --shadow:0 20px 40px rgba(0,0,0,.2)
-}
+:root{--bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);--shadow:0 20px 40px rgba(0,0,0,.2)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
 button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}
@@ -38,7 +35,7 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
 .pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
 .pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:b 1s infinite}@keyframes b{50%{opacity:.15}}
-.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
+.lbl{width:170px;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
 body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 .modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
@@ -63,17 +60,8 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
   <div class="card">
     <h1>KM Report</h1>
     <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data, GPS, endereço, clima e marca d'água configuráveis.</p>
-
-    <div class="fld">
-      <label for="label">Etiqueta (opcional)</label>
-      <input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off">
-    </div>
-
-    <div class="fld">
-      <label for="company">Cliente / local (opcional)</label>
-      <input id="company" class="inp" maxlength="80" placeholder="Ex.: Empresa ABC, Rodovia SP-123" autocomplete="off">
-    </div>
-
+    <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
+    <div class="fld"><label for="company">Cliente / local (opcional)</label><input id="company" class="inp" maxlength="80" placeholder="Ex.: Empresa ABC, Rodovia SP-123" autocomplete="off"></div>
     <button class="btn" id="pick">Escolher pasta de destino</button>
     <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
     <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
@@ -103,13 +91,7 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
       <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
     </div>
     <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path>
-          <circle cx="15" cy="7" r="3"></circle>
-          <circle cx="7" cy="17" r="3"></circle>
-        </svg>
-      </button>
+      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="15" cy="7" r="3"/><circle cx="7" cy="17" r="3"/></svg></button>
       <button id="shut" aria-label="Capturar"><i></i></button>
       <button class="rb" id="snap" aria-label="Foto avulsa em JPG">JPG</button>
     </div>
@@ -120,37 +102,14 @@ body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}
 <div id="set">
   <div class="card">
     <h1 style="font-size:20px">Ajustes</h1>
-
     <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
     <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
     <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-
-    <div class="fld">
-      <label>Elementos visíveis na tela</label>
-      <div class="check-grid">
-        <label class="check"><input type="checkbox" id="showKm" checked> KM</label>
-        <label class="check"><input type="checkbox" id="showGps" checked> GPS</label>
-        <label class="check"><input type="checkbox" id="showDate" checked> Data/Hora</label>
-        <label class="check"><input type="checkbox" id="showLabel" checked> Etiqueta</label>
-        <label class="check"><input type="checkbox" id="showAddress" checked> Endereço</label>
-        <label class="check"><input type="checkbox" id="showWeather" checked> Clima</label>
-        <label class="check"><input type="checkbox" id="showCompanyInfo" checked> Cliente / local</label>
-      </div>
-    </div>
-
-    <div class="fld">
-      <label>Onde aplicar as marcas</label>
-      <div class="check-grid">
-        <label class="check"><input type="checkbox" id="photoOverlay" checked> Fotos</label>
-        <label class="check"><input type="checkbox" id="videoOverlay" checked> Vídeos</label>
-        <label class="check"><input type="checkbox" id="pdfOverlay" checked> PDF</label>
-      </div>
-    </div>
-
+    <div class="fld"><label>Elementos visíveis na tela</label><div class="check-grid"><label class="check"><input type="checkbox" id="showKm" checked> KM</label><label class="check"><input type="checkbox" id="showGps" checked> GPS</label><label class="check"><input type="checkbox" id="showDate" checked> Data/Hora</label><label class="check"><input type="checkbox" id="showLabel" checked> Etiqueta</label><label class="check"><input type="checkbox" id="showAddress" checked> Endereço</label><label class="check"><input type="checkbox" id="showWeather" checked> Clima</label><label class="check"><input type="checkbox" id="showCompanyInfo" checked> Cliente / local</label></div></div>
+    <div class="fld"><label>Onde aplicar as marcas</label><div class="check-grid"><label class="check"><input type="checkbox" id="photoOverlay" checked> Fotos</label><label class="check"><input type="checkbox" id="videoOverlay" checked> Vídeos</label><label class="check"><input type="checkbox" id="pdfOverlay" checked> PDF</label></div></div>
     <button class="btn pri" id="closeSet">Fechar</button>
   </div>
 </div>
-
 <div id="toast" role="status"></div>
 <canvas id="c" hidden></canvas>
 
@@ -169,7 +128,7 @@ $('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.v
 function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');t.classList.add('show');if(err)t.classList.add('err');clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',3000);}
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>String(s ?? '').replace(/[\\/\:*?"<>|,]/g,'_').trim();
+const safe=s=>String(s ?? '').replace(/[\\/\\:*?\"<>|,]/g,'_').trim();
 const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
 const col=(h,c)=>{const m=h.map(s=>s.trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i}return -1};
 function parseCsv(t){if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',';const h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])}}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
@@ -194,7 +153,35 @@ $('gear').onclick=()=>$('set').classList.add('on');
 $('closeSet').onclick=()=>$('set').classList.remove('on');
 $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));});
-function frame(){const v=$('v');if(!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.clearRect(0,0,w,h);cx.drawImage(v,0,0,w,h);const footerH=h*0.18;const g=cx.createLinearGradient(0,h-footerH,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.92)');cx.fillStyle=g;cx.fillRect(0,h-footerH,w,footerH);const labelText=$('label').value.trim();const companyText=$('company').value.trim();const showKm=$('showKm').checked;const showGps=$('showGps').checked;const showDate=$('showDate').checked;const showAddress=$('showAddress').checked;const showWeather=$('showWeather').checked;const showLabel=$('showLabel').checked;const showCompanyInfo=$('showCompanyInfo').checked;let yBase=h-footerH+22;if(showKm){cx.textAlign='left';cx.textBaseline='alphabetic';cx.fillStyle='#fff';cx.font=`bold ${Math.round(footerH*.35)}px Arial,sans-serif`;cx.fillText('KM '+S.km,20,yBase+12);}if(showDate){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.fillStyle='rgba(255,255,255,.8)';cx.fillText(`${new Date().toLocaleString('pt-BR')}`,20,yBase+36);}const lines=[];if(showGps)lines.push(`GPS: ${Number.isFinite(S.lat)&&Number.isFinite(S.lon)?`${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`:'---'}`);if(showAddress&&S.addr)lines.push(S.addr);if(showWeather&&S.weather)lines.push(S.weather);if(showCompanyInfo&&companyText)lines.push(companyText);if(lines.length){cx.font=`${Math.round(footerH*.18)}px Arial,sans-serif`;cx.textAlign='left';cx.textBaseline='alphabetic';let y=yBase+(showKm||showDate?54:12);for(const line of lines){if(y>h-10)break;cx.fillStyle='rgba(255,255,255,.75)';cx.fillText(line,20,y);y+=18;}}if(showLabel&&labelText){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5;const bw=cx.measureText(labelText).width+px*2,bh=fs+py*2,x=Math.max(30,w-bw-30),y=30;cx.save();cx.globalAlpha=.82;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(labelText,x+bw/2,y+bh/2+1);cx.restore();}if(showCompanyInfo&&companyText){const fs=Math.round(h*.022);cx.font=`bold ${fs}px Arial,sans-serif`;cx.textAlign='right';cx.textBaseline='top';const text=companyText.slice(0,60);const padX=18,padY=12;const bw=cx.measureText(text).width+padX*2;const bh=fs+padY*2;const x=w-bw-24,y=30;cx.save();cx.globalAlpha=.9;cx.fillStyle='rgba(16,20,26,.8)';cx.beginPath();cx.roundRect(x,y,bw,bh,12);cx.fill();cx.fillStyle='#fff';cx.fillText(text,x+padX,y+padY+1);cx.restore();}return cv;}
+function drawRoundRect(ctx,x,y,w,h,r){const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.lineTo(x+w-rr,y);ctx.quadraticCurveTo(x+w,y,x+w,y+rr);ctx.lineTo(x+w,y+h-rr);ctx.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);ctx.lineTo(x+rr,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-rr);ctx.lineTo(x,y+rr);ctx.quadraticCurveTo(x,y,x+rr,y);ctx.closePath();}
+function frame(){const v=$('v');if(!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.clearRect(0,0,w,h);cx.drawImage(v,0,0,w,h);
+  const showKm=$('showKm').checked,showGps=$('showGps').checked,showDate=$('showDate').checked,showLabel=$('showLabel').checked,showAddress=$('showAddress').checked,showWeather=$('showWeather').checked,showCompanyInfo=$('showCompanyInfo').checked;
+  const labelText=$('label').value.trim(),companyText=$('company').value.trim();
+  const pad=18;const leftX=18;const rightX=w-18;
+  if(showKm){
+    const boxW=Math.min(220,w*0.42),boxH=76;const x=leftX,y=18;drawRoundRect(cx,x,y,boxW,boxH,18);cx.fillStyle='rgba(6,10,16,.58)';cx.fill();cx.strokeStyle='rgba(255,255,255,.18)';cx.lineWidth=1;cx.stroke();
+    cx.fillStyle='rgba(255,255,255,.75)';cx.font='700 12px Arial';cx.textAlign='left';cx.textBaseline='middle';cx.fillText('KM',x+18,y+22);cx.fillStyle='#ffd600';cx.font=`700 ${Math.min(36,h*0.045)}px Arial`;cx.fillText(S.km === '---' ? '---' : S.km,x+18,y+53);
+  }
+  const topLines=[];if(showLabel&&labelText)topLines.push(labelText);if(showCompanyInfo&&companyText)topLines.push(companyText);
+  if(topLines.length){
+    const maxText=W=>Math.max(...W.split('\n').map(s=>s.length));
+    const lineHeight=19;const itemW=Math.min(260,w*0.52);let itemH=28;let labelWidth=0;const texts=topLines.slice(0,2);
+    texts.forEach(t=>{const measure=cx.measureText(t).width;labelWidth=Math.max(labelWidth,measure+22);});
+    const blockW=Math.min(260,Math.max(120,labelWidth+14));
+    const blockH=18+(texts.length*lineHeight)+8;
+    const blockX=w-blockW-pad;const blockY=18;drawRoundRect(cx,blockX,blockY,blockW,blockH,16);cx.fillStyle='rgba(4,7,14,.62)';cx.fill();cx.strokeStyle='rgba(255,214,0,.38)';cx.stroke();
+    cx.fillStyle='#fff';cx.font='700 12px Arial';cx.textAlign='right';cx.textBaseline='middle';
+    texts.forEach((t,i)=>{const yy=blockY+20+i*lineHeight;cx.fillText(t,blockX+blockW-12,yy);});
+  }
+  const info=[];if(showDate)info.push(`Data: ${new Date().toLocaleString('pt-BR')}`);if(showGps&&Number.isFinite(S.lat)&&Number.isFinite(S.lon))info.push(`GPS: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`);else if(showGps)info.push('GPS: ---');if(showAddress&&S.addr)info.push(S.addr);if(showWeather&&S.weather)info.push(S.weather);
+  if(info.length){
+    const boxX=18,boxY=h-110,boxW=Math.min(w-36, 680),boxH=Math.min(90, 18 + info.length * 18 + 12);
+    drawRoundRect(cx,boxX,boxY,boxW,boxH,18);cx.fillStyle='rgba(6,10,16,.55)';cx.fill();cx.strokeStyle='rgba(255,255,255,.18)';cx.lineWidth=1;cx.stroke();
+    cx.textAlign='left';cx.textBaseline='middle';cx.fillStyle='rgba(255,255,255,.95)';cx.font='600 12px Arial';
+    info.forEach((line,i)=>{const yy=boxY+18+i*18;cx.fillText(line.length>90?line.slice(0,90)+'…':line, boxX+14, yy);});
+  }
+  return cv;
+}
 const toBlob=(q)=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 $('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]()};
 async function photo(){if(!frame())return;const b=await toBlob(.9);const label=$('label').value.trim()||'Sem_Etiqueta';save(b,`FOTO_${safe(label)}_KM_${S.km}_${stamp()}.jpg`);}
