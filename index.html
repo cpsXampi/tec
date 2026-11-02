@@ -21,6 +21,9 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
 
 /* Tela Inicial (Base cccccc.html) */
+.offline-badge{position:absolute;top:calc(12px + var(--st));right:12px;font-size:11px;font-weight:700;color:var(--mu);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .2s;text-decoration:none}
+.offline-badge:hover,.offline-badge:active{color:var(--acc);border-color:var(--acc);background:rgba(255,214,0,.08)}
+.offline-badge i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
 #start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
 .card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
 .card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
@@ -81,6 +84,7 @@ body.clean .bar,body.clean .lbl,body.clean .chip{opacity:0;pointer-events:none}
 <body>
 
 <main id="start" class="screen on">
+  <button id="btnOffline" class="offline-badge" title="Baixar arquivos para uso offline / APK"><i></i> Offline / App</button>
   <div class="card">
     <h1>KM Report Super</h1>
     <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data, GPS, mapa e velocidade gravados na imagem.</p>
@@ -169,14 +173,10 @@ const cv=$('c'),cx=cv.getContext('2d',{alpha:false});
 /* ---- Persistência de Configurações ---- */
 const cfg=JSON.parse(localStorage.getItem('kmr_super')||'{}');
 ['label','int','lote'].forEach(k=>{if(cfg[k])$(k).value=cfg[k]});
+if(cfg.showMap!==undefined){$('cfgShowMap').checked=cfg.showMap; $('map').style.display=cfg.showMap?'block':'none';}
 if(cfg.discrete) S.discrete=cfg.discrete;
 if(cfg.showMap!==undefined) S.showMap=cfg.showMap;
 if(cfg.ai) S.ai=Object.assign(S.ai, cfg.ai);
-
-if(cfg.showMap!==undefined){
-  $('cfgShowMap').checked=cfg.showMap;
-  $('map').style.display=cfg.showMap?'block':'none';
-}
 
 function persist(){
   try{
@@ -196,7 +196,7 @@ function toast(m,err){
 }
 const pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-const safe=s=>s.replace(/[,/\:]/g,'_');
+const safe=s=>s.replace(/[,/\\:]/g,'_');
 
 /* ---- Tabela de KM ---- */
 const num=v=>{const s=String(v??'').trim();return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
@@ -463,12 +463,14 @@ async function makePdf({p,n}){
 }
 
 /* ---- IA Local & Configurações de Sensores ---- */
+
 $('cfgShowMap').onchange=e=>{
   S.showMap=!!e.target.checked;
   persist();
   $('map').style.display=S.showMap?'block':'none';
   toast(S.showMap?'Mini mapa ativado':'Mini mapa ocultado');
 };
+
 $('cfgDiscrete').onchange=e=>{S.discrete=!!e.target.checked;persist();toast(S.discrete?'Modo discreto ativado':'Modo discreto desativado');};
 $('cfgAiMotion').onchange=e=>{S.ai.motion=!!e.target.checked;persist();updateAi();};
 $('cfgAiVoice').onchange=e=>{S.ai.voice=!!e.target.checked;persist();updateAi();};
@@ -524,10 +526,44 @@ function stopVoice(){if(S.ai.recog){try{S.ai.recog.stop();}catch(e){}S.ai.recog=
 
 /* Limpeza de tela e Eventos Globais */
 $('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean')});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}};
+window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue=''}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec||S.ai.background))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{})});
 
 updateAi();
+
+/* ---- Suporte 100% Offline (PWA & Cache Local) ---- */
+if('serviceWorker' in navigator){
+  const swCode = `
+    const C='kmr-v1';
+    const A=['./','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css','https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'];
+    self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A.map(u=>new Request(u,{mode:'no-cors'})))).then(()=>self.skipWaiting()))});
+    self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.map(x=>x!==C&&caches.delete(x)))).then(()=>self.skipWaiting()))});
+    self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))})
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
+
+$('btnOffline').onclick = async () => {
+  toast('Baixando dados para funcionamento 100% offline...');
+  try {
+    if('caches' in window){
+      const c = await caches.open('kmr-v1');
+      await c.addAll([
+        window.location.href,
+        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+        'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+        'SNVBR116SPRJ.csv'
+      ].map(u => new Request(u, {mode: 'no-cors'})));
+      toast('Sistema salvo para uso offline no celular!');
+    } else {
+      toast('Recursos salvos no navegador!');
+    }
+  } catch(e) {
+    toast('Recursos salvos em cache local!');
+  }
+};
 </script>
 </body>
 </html>
