@@ -21,6 +21,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
 .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
 .btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}
+.btn.alt{background:rgba(255,255,255,.02)}
 .btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
 .btn:active{transform:scale(.98)}
 .st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
@@ -87,6 +88,7 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
       <input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off">
     </div>
 
+    <button class="btn alt" id="cfgStart">Ajustes rápidos</button>
     <button class="btn" id="pick">Escolher pasta de destino</button>
     <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
     <p class="st"><span class="dot" id="dKm"></span><span id="tKm">Carregando tabela de KM…</span></p>
@@ -171,6 +173,7 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
     <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
     <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
     <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
+    <div class="fld"><label for="overlayAlpha">Opacidade da marca d'água</label><input id="overlayAlpha" class="inp" type="range" min="0.2" max="0.9" step="0.05" value="0.68"></div>
 
     <div class="fld">
       <label>Itens principais</label>
@@ -199,6 +202,7 @@ body.clean .bar,body.clean .lbl,body.clean .legend{opacity:0;pointer-events:none
       </div>
     </div>
 
+    <button class="btn alt" id="resetCfg">Restaurar padrão</button>
     <button class="btn pri" id="closeSet">Fechar</button>
   </div>
 </div>
@@ -213,6 +217,7 @@ const defaultCfg = {
   label: '',
   int: 200,
   lote: 150,
+  overlayAlpha: 0.68,
   showKm: true,
   showGps: true,
   showDate: true,
@@ -251,10 +256,18 @@ const S = {
 
 const cv = $('c');
 const cx = cv.getContext('2d', { alpha: false });
-const toggleKeys = ['showKm', 'showGps', 'showDate', 'showLabel', 'showAddress', 'showWeather'];
 
-const cfg = Object.assign({}, defaultCfg, JSON.parse(localStorage.getItem('kmr') || '{}'));
-['label', 'int', 'lote'].forEach(k => {
+function loadConfig() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('kmr') || '{}');
+    return Object.assign({}, defaultCfg, stored);
+  } catch (e) {
+    return Object.assign({}, defaultCfg);
+  }
+}
+
+const cfg = loadConfig();
+['label', 'int', 'lote', 'overlayAlpha'].forEach(k => {
   if (cfg[k] !== undefined && cfg[k] !== null) $(k).value = cfg[k];
 });
 Object.keys(defaultCfg).forEach(k => {
@@ -270,6 +283,7 @@ function persist(){
       label: $('label').value,
       int: $('int').value,
       lote: $('lote').value,
+      overlayAlpha: Number($('overlayAlpha').value || 0.68),
       showKm: $('showKm').checked,
       showGps: $('showGps').checked,
       showDate: $('showDate').checked,
@@ -285,7 +299,7 @@ function persist(){
   }
 }
 
-['label', 'int', 'lote'].forEach(k => $(k).addEventListener('input', persist));
+['label', 'int', 'lote', 'overlayAlpha'].forEach(k => $(k).addEventListener('input', persist));
 ['showKm','showGps','showDate','showLabel','showAddress','showWeather','photoOverlay','videoOverlay','pdfOverlay']
   .forEach(k => $(k).addEventListener('change', () => {
     persist();
@@ -595,6 +609,8 @@ $('go').onclick = async () => {
   }
 };
 
+$('cfgStart').onclick = () => $('set').classList.add('on');
+
 function pinchZoom(){
   const v = $('v');
   let d0 = 0;
@@ -618,6 +634,20 @@ function pinchZoom(){
 
 $('gear').onclick = () => $('set').classList.add('on');
 $('closeSet').onclick = () => $('set').classList.remove('on');
+
+$('resetCfg').onclick = () => {
+  Object.keys(defaultCfg).forEach(k => {
+    const el = $(k);
+    if (el) {
+      if (typeof defaultCfg[k] === 'boolean') el.checked = defaultCfg[k];
+      else el.value = defaultCfg[k];
+    }
+  });
+  persist();
+  updateLiveHud();
+  refreshMetaText();
+  toast('Configuração restaurada');
+};
 
 $('back').onclick = () => {
   if (S.cap || S.rec || S.busy || S.queue.length) return toast('Finalize a captura antes de voltar', true);
@@ -655,14 +685,15 @@ function drawLegendOverlay(ctx, w, h) {
   if (show.weather) entries.push(['CLIMA', S.weather || 'Clima não informado']);
   if (!entries.length) return;
 
+  const alpha = Number($('overlayAlpha').value || 0.68);
   const padX = 18;
   const padY = 18;
   const boxW = Math.min(w * 0.42, 420);
   const boxH = 30 + entries.length * 24;
 
-  ctx.fillStyle = 'rgba(7,9,12,0.68)';
+  ctx.fillStyle = `rgba(7,9,12,${alpha})`;
   ctx.fillRect(padX, padY, boxW, boxH);
-  ctx.strokeStyle = 'rgba(255,214,0,0.45)';
+  ctx.strokeStyle = `rgba(255,214,0,${Math.min(alpha + 0.1, 0.8)})`;
   ctx.strokeRect(padX, padY, boxW, boxH);
 
   ctx.fillStyle = '#F7FAFF';
