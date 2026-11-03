@@ -185,7 +185,6 @@ document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;
   
-  // Padronização estrita de proporção paisagem (16:9) para evitar variações horizontais/verticais
   const targetW = 1920, targetH = 1080;
   cv.width = targetW;
   cv.height = targetH;
