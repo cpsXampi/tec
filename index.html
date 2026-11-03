@@ -28,7 +28,6 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
   <button class="btn" id="pick">Escolher pasta de destino</button>
   <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
   <button class="btn pri" id="go">Ativar câmera</button>
-  <button class="btn" id="installBtn" hidden style="background:#1e293b;color:#ffd600;border-color:rgba(255,214,0,.3)">Adicionar à tela inicial</button>
 </div></main>
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
@@ -45,7 +44,6 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 <div id="set"><div class="card">
   <h1 style="font-size:20px">Ajustes</h1>
   <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
-  <button class="btn" id="installBtnSet" style="background:#1e293b;color:#ffd600;border-color:rgba(255,214,0,.3);margin-top:16px" hidden>📱 Instalar aplicativo na tela inicial</button>
   <div class="checkgroup"><div class="checkgroup-title">Informações na imagem e no vídeo</div>
     <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM</span></label>
     <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
@@ -61,32 +59,6 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 </div></div>
 <div id="toast" role="status"></div><canvas id="c" hidden></canvas>
 <script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  $('installBtn').hidden = false;
-  $('installBtnSet').hidden = false;
-});
-
-async function triggerInstall() {
-  if (!deferredPrompt) {
-    toast('Para adicionar à tela inicial, use o menu do seu navegador (Adicionar à Tela Inicial)', 1);
-    return;
-  }
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    toast('Aplicativo instalado com sucesso!');
-  }
-  deferredPrompt = null;
-  $('installBtn').hidden = true;
-  $('installBtnSet').hidden = true;
-}
-
-$('installBtn').onclick = triggerInstall;
-$('installBtnSet').onclick = triggerInstall;
-
 const $=id=>document.getElementById(id);
 const S={db:[],km:'---',lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL='';
@@ -181,66 +153,49 @@ $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Fin
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
-/* Desenho padronizado do quadro e informações na imagem (Fotos e Relatórios) */
+/* Desenho do quadro e informações na imagem (Fotos e Relatórios) */
 function frame(){
-  const v=$('v');if(!v||!v.videoWidth)return null;
-  
-  const targetW = 1920, targetH = 1080;
-  cv.width = targetW;
-  cv.height = targetH;
-  
-  const vw = v.videoWidth, vh = v.videoHeight;
-  const targetAspect = targetW / targetH;
-  const videoAspect = vw / vh;
-  
-  let sx = 0, sy = 0, sw = vw, sh = vh;
-  if (videoAspect > targetAspect) {
-    sw = vh * targetAspect;
-    sx = (vw - sw) / 2;
-  } else {
-    sh = vw / targetAspect;
-    sy = (vh - sh) / 2;
-  }
-  
-  cx.drawImage(v, sx, sy, sw, sh, 0, 0, targetW, targetH);
-  
-  const w = targetW, h = targetH;
+  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
   
+  // 1. KM (Tamanho reduzido para ficar proporcional)
   if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside) {
     lines.push({text:`KM ${S.km}`, fontRatio: 0.024, bold: true});
   } else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked) {
     lines.push({text:`KM ${S.km}`, fontRatio: 0.024, bold: true});
   }
   
+  // 2. Endereço/Localização (se fora da rodovia OU se opção de mostrar na rodovia estiver ativa)
   if((outside || $('showAddressOnHighway').checked) && S.address) {
     lines.push({text: S.address, fontRatio: 0.018});
   }
   
+  // 3. Data e Hora (Proporcional, levemente menor)
   if($('showDate').checked) {
     lines.push({text: new Date().toLocaleString('pt-BR'), fontRatio: 0.018});
   }
   
+  // 4. Coordenadas e precisão GPS
   if($('showGps').checked) {
     const accTxt = S.acc !== null ? `Precisão GPS ±${Math.round(S.acc)}m` : 'Aguardando GPS…';
     lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, fontRatio: 0.016, opacity: 0.8});
   }
 
   if(lines.length){
-    const bh=h*.22,g=cx.createLinearGradient(0,h-bh,0,h);
+    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
     g.addColorStop(0,'rgba(0,0,0,0)');
     g.addColorStop(.3,'rgba(0,0,0,.65)');
     g.addColorStop(1,'rgba(0,0,0,.92)');
     cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
     
-    let y=h-22;
+    let y=h-18;
     for(let i=lines.length-1;i>=0;i--){
       const line=lines[i];
-      const fontSize = Math.max(16, Math.round(h * line.fontRatio));
+      const fontSize = Math.max(13, Math.round(h * line.fontRatio));
       
       cx.fillStyle = line.opacity ? `rgba(255,255,255,${line.opacity})` : '#ffffff';
       cx.font = line.bold ? `bold ${fontSize}px Arial,sans-serif` : `${fontSize}px Arial,sans-serif`;
-      cx.fillText(line.text, 30, y, w - 60);
+      cx.fillText(line.text, 20, y, w - 40);
       
       y -= Math.round(fontSize * 1.35);
     }
@@ -248,9 +203,9 @@ function frame(){
 
   const lb=$('label').value.trim();
   if(lb&&$('showLabel').checked){
-    const fs=Math.round(h*.032);
+    const fs=Math.round(h*.03);
     cx.font=`bold ${fs}px Arial,sans-serif`;
-    const px=fs*.9,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-40,y=40;
+    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
     cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();
     cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;
     cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';
