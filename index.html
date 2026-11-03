@@ -139,7 +139,7 @@ $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Fin
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
-/* Desenho do quadro e informações na imagem (Fotos e Relatórios) */
+/* Desenho do quadro e informações na imagem (Fotos e Relatórios) - CORRIGIDO */
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
@@ -150,8 +150,14 @@ function frame(){
     lines.push({text:`KM ${S.km}`,large:true});
   }
   
-  if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
-  else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
+  if(outside&&$('showGps').checked&&S.address) {
+    lines.push({text:S.address});
+  }
+  
+  // CORREÇÃO: A data e hora agora aparecem de forma independente sempre que a opção estiver ativada
+  if($('showDate').checked) {
+    lines.push({text:new Date().toLocaleString('pt-BR')});
+  }
   
   if($('showGps').checked) {
     const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
@@ -159,7 +165,7 @@ function frame(){
   }
 
   if(lines.length){
-    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
+    const bh=h*.22,g=cx.createLinearGradient(0,h-bh,0,h);
     g.addColorStop(0,'rgba(0,0,0,0)');
     g.addColorStop(.25,'rgba(0,0,0,.55)');
     g.addColorStop(1,'rgba(0,0,0,.9)');
@@ -170,14 +176,14 @@ function frame(){
       const line=lines[i];
       cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');
       
-      let fontSize = Math.round(bh*.15);
-      if(line.large) fontSize = Math.round(bh*.24);
-      if(line.small) fontSize = Math.round(bh*.12);
+      let fontSize = Math.round(bh*.14);
+      if(line.large) fontSize = Math.round(bh*.22);
+      if(line.small) fontSize = Math.round(bh*.11);
       
       cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;
       cx.fillText(line.text,20,y, w-40);
       
-      y -= line.large ? Math.round(bh*.30) : (line.small ? Math.round(bh*.15) : Math.round(bh*.20));
+      y -= line.large ? Math.round(bh*.28) : (line.small ? Math.round(bh*.14) : Math.round(bh*.18));
     }
   }
 
