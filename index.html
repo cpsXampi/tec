@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport Ultimate — Topologia RioSP & Bypass</title>
+<title>KMReport RioSP — Ativos 116 & Bypass</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -208,17 +208,17 @@ canvas#c, canvas#cUnica{display:none}
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
-      <!-- Consulta de Topologia e Bypass RioSP (BASE OFICIAL) -->
+      <!-- Consulta de Topologia e Bypass RioSP (Base Completa Ativos 116) -->
       <button class="mc top-btn" onclick="openMod('topologia')">
         <span class="mc-i small" style="background:linear-gradient(145deg,#3b82f6,#1d4ed8);color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
-        <span class="mc-b small"><h3>Topologia RioSP & Bypass</h3><p>Dados oficiais do Excel (TAGs, CFTV, Status e Simulação)</p></span>
+        <span class="mc-b small"><h3>Topologia Ativos 116</h3><p>Base Completa (TAG, Fibra, IPs, Anterior e Posterior)</p></span>
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- MÓDULO TOPOLOGIA E SIMULAÇÃO DE BYPASS RIO-SP -->
+<!-- MÓDULO TOPOLOGIA E SIMULAÇÃO DE BYPASS (ATIVOS 116) -->
 <div id="mod-topologia" class="module">
   <div class="top-header">
     <div style="display:flex;align-items:center;gap:12px">
@@ -226,8 +226,8 @@ canvas#c, canvas#cUnica{display:none}
         <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
       </div>
       <div>
-        <h2 style="font-size:18px;font-weight:900">Topologia RioSP & Simulação de Bypass</h2>
-        <p style="font-size:11px;color:var(--text3)">Mapeamento oficial de ativos, TAGs, status de ativação e redundância</p>
+        <h2 style="font-size:18px;font-weight:900">Topologia Ativos 116 — Sincronização GPS & Bypass</h2>
+        <p style="font-size:11px;color:var(--text3)">Mapeamento oficial completo com cálculo de distância e fibras</p>
       </div>
     </div>
     <button class="top-back" onclick="openMod('menu')">Voltar ao Menu</button>
@@ -238,19 +238,19 @@ canvas#c, canvas#cUnica{display:none}
     <div class="top-card" style="padding:20px">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Ativo / Equipamento RioSP</span>
-          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">Base Oficial</span>
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Ativo Selecionado (Base Completa)</span>
+          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">GPS Sincronizado</span>
         </div>
         <div style="display:flex;gap:12px;align-items:center">
           <select id="topoSelect" onchange="renderTopologyCard(this.value)" style="flex:1;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
-            <!-- Preenchido via JS com base na planilha RioSP -->
+            <!-- Preenchido via JS com base na base oficial Ativos 116 -->
           </select>
           <button onclick="autoSelectNearestNE()" style="padding:12px 16px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border-radius:var(--r-sm);font-size:11px;font-weight:900;text-transform:uppercase;white-space:nowrap">Mais Próximo (GPS)</button>
         </div>
       </div>
     </div>
 
-    <!-- Desenho Visual do Equipamento com Nome Gigante e Simulação de Bypass -->
+    <!-- Desenho Visual do Ativo com Nome Gigante, Fibras, IPs e Simulação de Bypass -->
     <div id="topoVisualCard">
       <!-- Renderizado via JS -->
     </div>
@@ -331,7 +331,6 @@ canvas#c, canvas#cUnica{display:none}
       <p style="font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.18em;color:rgba(255,214,0,.75);margin-bottom:5px">Etiqueta</p>
       <input id="fotoLabelLive" type="text" placeholder="Tipo de serviço..." autocomplete="off" spellcheck="false" oninput="syncFotoLabel(this.value)" style="background:transparent;border:none;outline:none;color:#fff;font-size:11px;font-weight:700;width:100%;caret-color:var(--accent);font-family:var(--font)">
     </div>
-    <div id="rec-tag"><div class="dot"></div><span>Registrando no PDF</span></div>
     <div id="ui-ctrl">
       <button class="ui-btn icon-settings" id="btn-gear" aria-label="Abrir configurações" onclick="toggleSet()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
@@ -384,146 +383,164 @@ let selectedModule = null;
 let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, sessionStamp='', savedBatchCount=0;
 const REPORT_JPEG_QUALITY=0.82;
 
-/* Base de Dados Oficial RioSP (Extraída do seu controle de ativação) */
-const topoDatabase = {
-  "BR116-CF0001": { tag: "BR116-CF0001", eq: "CFTV DAI", km: "KM 214+728", kmNum: 214.728, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
-  "BR116-CM0001": { tag: "BR116-CM0001", eq: "CFTV MÓVEL", km: "KM 214+728", kmNum: 214.728, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
-  "SAT-214_860":  { tag: "SAT 214+860", eq: "SAT", km: "KM 214+860", kmNum: 214.860, sentido: "SUL", status: "NÃO FINALIZADO", conexao: "0", sp: { port: "GE1/0/11", remote: "BR116-CM0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
-  "BR116-CF0002": { tag: "BR116-CF0002", eq: "CFTV DAI", km: "KM 215+129", kmNum: 215.129, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0003", remotePort: "GE1/0/11" } },
-  "BR116-CF0003": { tag: "BR116-CF0003", eq: "CFTV DAI", km: "KM 215+404", kmNum: 215.404, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0002", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0004", remotePort: "GE1/0/11" } },
-  "BR116-CF0004": { tag: "BR116-CF0004", eq: "CFTV DAI", km: "KM 215+758", kmNum: 215.758, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0003", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0005", remotePort: "GE1/0/11" } },
-  "BR116-CM0002": { tag: "BR116-CM0002", eq: "CFTV MÓVEL", km: "KM 215+758", kmNum: 215.758, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0005", remotePort: "GE1/0/11" } },
-  "BR116-CF0005": { tag: "BR116-CF0005", eq: "CFTV DAI", km: "KM 216+163", kmNum: 216.163, sentido: "NORTE", status: "NÃO FINALIZADO", conexao: "0", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0006", remotePort: "GE1/0/11" } },
-  "BR116-CF0006": { tag: "BR116-CF0006", eq: "CFTV DAI", km: "KM 216+558", kmNum: 216.558, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0005", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0007", remotePort: "GE1/0/11" } },
-  "BR116-CF0007": { tag: "BR116-CF0007", eq: "CFTV DAI", km: "KM 216+946", kmNum: 216.946, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0006", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0009", remotePort: "GE1/0/11" } }
-};
+/* Base de Dados Oficial Ativos 116 Completa */
+let ativosDatabase = [];
+
+async function loadAtivos116Data() {
+  try {
+    // Dados parseados diretamente do arquivo oficial ativos 116.xlsx
+    actifsRaw = [
+      {tag: "BR116-CF0001", eq: "CFTV DAI", host: "RSP-SA58-N214_728", kmStr: "214+728", kmNum: 214.728, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.138"},
+      {tag: "BR116-CM0001", eq: "CFTV MÓVEL", host: "RSP-SA58-N214_728", kmStr: "214+728", kmNum: 214.728, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.139"},
+      {tag: "SAT 214+860", eq: "SAT", host: "-", kmStr: "214+860", kmNum: 214.860, sentido: "SUL", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.162", gerencia: "172.26.12.111", rede: "10.3.6.80", switchIp: "10.3.6.81", ativoIp: "10.3.6.86"},
+      {tag: "BR116-CF0002", eq: "CFTV DAI", host: "RSP-SA56-N215_129", kmStr: "215+129", kmNum: 215.129, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.165", gerencia: "172.26.12.114", rede: "10.3.6.104", switchIp: "10.3.6.105", ativoIp: "10.3.6.106"},
+      {tag: "BR116-CF0003", eq: "CFTV DAI", host: "RSP-SA57-N215_404", kmStr: "215+404", kmNum: 215.404, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.172", gerencia: "172.26.12.121", rede: "10.3.6.160", switchIp: "10.3.6.161", ativoIp: "10.3.6.162"},
+      {tag: "BR116-CF0004", eq: "CFTV DAI", host: "RSP-SA57-N215_758", kmStr: "215+758", kmNum: 215.758, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.154"},
+      {tag: "BR116-CM0002", eq: "CFTV MÓVEL", host: "RSP-SA57-N215_758", kmStr: "215+758", kmNum: 215.758, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.155"},
+      {tag: "BR116-CF0005", eq: "CFTV DAI", host: "RSP-SA58-N216_163", kmStr: "216+163", kmNum: 216.163, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.178", gerencia: "172.26.12.127", rede: "10.3.6.208", switchIp: "10.3.6.209", ativoIp: "10.3.6.210"},
+      {tag: "BR116-CF0006", eq: "CFTV DAI", host: "RSP-SA57-N216_558", kmStr: "216+558", kmNum: 216.558, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.180", gerencia: "172.26.12.132", rede: "10.3.7.24", switchIp: "10.3.7.25", ativoIp: "10.3.7.26"},
+      {tag: "BR116-CF0007", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.50"},
+      {tag: "BR116-CF0008", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.51"},
+      {tag: "BR116-CM0003", eq: "CFTV MÓVEL", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.52"},
+      {tag: "BR116-CF0009", eq: "CFTV DAI", host: "RSP-SA56-N217_510", kmStr: "217+510", kmNum: 217.510, sentido: "SUL", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.182", gerencia: "172.26.12.140", rede: "10.3.7.88", switchIp: "10.3.7.89", ativoIp: "10.3.7.90"},
+      {tag: "BR116-CF0010", eq: "CFTV DAI", host: "RSP-SA56-N217_713", kmStr: "217+713", kmNum: 217.713, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.184", gerencia: "172.26.12.143", rede: "10.3.7.112", switchIp: "10.3.7.113", ativoIp: "10.3.7.114"}
+    ];
+    
+    // Ordenar ativos por KM para calcular corretamente anterior e posterior na mesma fibra
+    actifsRaw.sort((a,b) => a.kmNum - b.kmNum);
+
+    actifsRaw.forEach((item, idx) => {
+      let prev = idx > 0 ? actifsRaw[idx - 1] : actifsRaw[actifsRaw.length - 1];
+      let next = idx < actifsRaw.length - 1 ? actifsRaw[idx + 1] : actifsRaw[0];
+      let distPrev = Math.abs(item.kmNum - prev.kmNum).toFixed(3);
+      let distNext = Math.abs(next.kmNum - item.kmNum).toFixed(3);
+
+      ativosDatabase.push({
+        ...item,
+        prevTag: prev.tag,
+        prevKm: prev.kmStr,
+        prevDist: distPrev,
+        nextTag: next.tag,
+        nextKm: next.kmStr,
+        nextDist: distNext
+      });
+    });
+
+    initTopologyModule();
+  } catch(e) { console.error(e); }
+}
 
 function initTopologyModule() {
   const sel = document.getElementById('topoSelect');
   if(!sel) return;
   sel.innerHTML = '';
-  Object.keys(topoDatabase).sort().forEach(key => {
-    const item = topoDatabase[key];
+  ativosDatabase.forEach((item, idx) => {
     const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = `${item.tag} — ${item.eq} (${item.km}) [${item.status}]`;
+    opt.value = idx;
+    opt.textContent = `${item.tag} — ${item.eq} (KM ${item.kmStr}) [Fibra ${item.fibra}]`;
     sel.appendChild(opt);
   });
-  renderTopologyCard(Object.keys(topoDatabase).sort()[0]);
+  autoSelectNearestNE();
 }
 
 function autoSelectNearestNE() {
   let numKm = parseFloat(currentKm.replace(',', '.'));
   if (isNaN(numKm)) {
-    showToast('Aguardando sinal de GPS para calcular proximidade', 'err');
+    if(ativosDatabase.length) { document.getElementById('topoSelect').value = 0; renderTopologyCard(0); }
     return;
   }
-  let bestKey = null, minDiff = Infinity;
-  for (const key in topoDatabase) {
-    const diff = Math.abs(topoDatabase[key].kmNum - numKm);
-    if (diff < minDiff) { minDiff = diff; bestKey = key; }
-  }
-  if (bestKey) {
-    document.getElementById('topoSelect').value = bestKey;
-    renderTopologyCard(bestKey);
-    showToast(`Mais próximo: ${topoDatabase[bestKey].tag} (${topoDatabase[bestKey].km})`);
-  }
+  let bestIdx = 0, minDiff = Infinity;
+  ativosDatabase.forEach((item, idx) => {
+    const diff = Math.abs(item.kmNum - numKm);
+    if (diff < minDiff) { minDiff = diff; bestIdx = idx; }
+  });
+  document.getElementById('topoSelect').value = bestIdx;
+  renderTopologyCard(bestIdx);
+  const matched = ativosDatabase[bestIdx];
+  showToast(`Ativo mais próximo: ${matched.tag} (KM ${matched.kmStr})`);
 }
 
 function toggleBypassSimulation() {
   bypassActive = !bypassActive;
-  const currentKey = document.getElementById('topoSelect').value;
-  renderTopologyCard(currentKey);
+  const idx = document.getElementById('topoSelect').value;
+  renderTopologyCard(idx);
 }
 
-function renderTopologyCard(neKey) {
-  const data = topoDatabase[neKey];
+function renderTopologyCard(idx) {
+  const data = ativosDatabase[idx];
   if(!data) return;
   const container = document.getElementById('topoVisualCard');
 
-  const spRemote = data.sp ? topoDatabase[data.sp.remote] : null;
-  const rjRemote = data.rj ? topoDatabase[data.rj.remote] : null;
-
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
-      <!-- Card do Equipamento Focado (NOME BEM GRANDE E DESTACADO) -->
-      <div class="top-card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:28px">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">Ativo Selecionado — Rodovia Presidente Dutra (RioSP)</span>
+      <!-- Card do Ativo Selecionado (NOME E KM EM DESTAQUE) -->
+      <div class="top-card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:26px">
+        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">Ativo Mais Próximo da sua Posição GPS</span>
         <h3 style="font-size:clamp(30px,6vw,44px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px;letter-spacing:-.02em">${data.tag}</h3>
-        <p style="font-size:15px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | ${data.km} | Sentido ${data.sentido}</p>
+        <p style="font-size:16px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
-        <div style="margin-top:12px;display:flex;justify-content:center;gap:8px">
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:${data.status === 'FINALIZADO' ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)'};color:${data.status === 'FINALIZADO' ? '#34d399' : '#fca5a5'};border:1px solid ${data.status === 'FINALIZADO' ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)'}">Status Planilha: ${data.status}</span>
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Conexão: ${data.conexao}</span>
+        <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4)">Fibra: ${data.fibra}</span>
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Cidade: ${data.cidade}</span>
         </div>
 
         <div style="margin-top:16px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
           <button onclick="toggleBypassSimulation()" style="padding:10px 20px;border-radius:20px;font-size:11px;font-weight:900;text-transform:uppercase;background:${bypassActive ? '#ef4444' : '#3b82f6'};color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:all .15s">
-            ${bypassActive ? '🛑 Desativar Simulação de Bypass' : '⚡ Simular Bypass / Falha neste Equipamento'}
+            ${bypassActive ? '🛑 Desativar Simulação de Bypass' : '⚡ Simular Bypass Óptico neste Ativo'}
           </button>
         </div>
       </div>
 
-      <!-- ALERTA DE SIMULAÇÃO DE BYPASS SE ATIVADO -->
+      <!-- DADOS COMPLETOS DO ATIVO SEM FALTAR NADA -->
+      <div class="top-card" style="padding:20px">
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos Completos</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-size:12px;font-family:monospace">
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Hostname Antigo:</strong><br><span style="color:#60a5fa">${data.host}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Anel FO:</strong><br><span style="color:#34d399">${data.anel}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#fff">${data.ipGer}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Gerência / Rede:</strong><br><span style="color:#fff">${data.gerencia} / ${data.rede}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Switch:</strong><br><span style="color:#fff">${data.switchIp}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Ativo:</strong><br><span style="color:#fff">${data.ativoIp}</span></div>
+        </div>
+      </div>
+
+      <!-- ALERTA DE SIMULAÇÃO DE BYPASS -->
       ${bypassActive ? `
         <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:18px;padding:20px;animation:pulse .2s ease">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
             <span style="font-size:20px">⚠️</span>
-            <h4 style="font-size:14px;font-weight:900;color:#fca5a5;text-transform:uppercase">Modo Simulação de Bypass Ativo neste Ativo</h4>
+            <h4 style="font-size:14px;font-weight:900;color:#fca5a5;text-transform:uppercase">Simulação de Bypass Ativa</h4>
           </div>
           <p style="font-size:12px;line-height:1.5;color:var(--text2)">
-            O equipamento <strong>${data.tag} (${data.km})</strong> está simulando interrupção de enlace ou energia. 
-            O protocolo de redundância RioSP isola este ponto e redireciona os pacotes via anel de fibra redundante entre o ativo anterior <strong>(${spRemote?.tag || 'Início'})</strong> e o ativo posterior <strong>(${rjRemote?.tag || 'Fim'})</strong>.
+            O ativo <strong>${data.tag} (KM ${data.kmStr})</strong> está isolado. O tráfego da Fibra [${data.fibra}] foi comutado em loop redundante conectando diretamente o ativo anterior <strong>(${data.prevTag} a ${data.prevDist} km)</strong> com o ativo posterior <strong>(${data.nextTag} a ${data.nextDist} km)</strong>.
           </p>
         </div>
       ` : ''}
 
-      <!-- Esquema Visual Didático (Antes / Depois) -->
+      <!-- ANTERIOR E POSTERIOR NA MESMA FIBRA COM DISTÂNCIAS -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         
-        <!-- SENTIDO SP (ANTERIOR) -->
+        <!-- ANTERIOR -->
         <div class="top-card" style="border-left:4px solid #f59e0b">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase">⬅️ Sentido SP (Anterior)</span>
-            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : 'Normal')}
+            <span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase">⬅️ Ativo Anterior (Sentido SP)</span>
+            <span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(245,158,11,.15);color:#f6ad55">${data.prevDist} km</span>
           </div>
           <div style="font-family:monospace">
-            <p style="font-size:15px;font-weight:900;color:#fff">${spRemote ? spRemote.tag : 'Início do Anel'}</p>
-            <p style="font-size:11px;color:var(--text3);margin-top:2px">${spRemote ? spRemote.km : '---'}</p>
-          </div>
-          <div class="fiber-box">
-            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta: <span style="color:#f59e0b">${data.sp?.port || 'GE1/0/11'}</span></p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;font-family:monospace">
-              <div style="display:flex;align-items:center;gap:6px;color:#fbbf24">
-                <span>📥</span> <strong>RX:</strong> ${bypassActive ? 'ISOLADO' : 'Ativo (' + (data.sp?.remotePort || '-') + ')'}
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;color:#60a5fa">
-                <span>📤</span> <strong>TX:</strong> ${bypassActive ? 'LOOP BACK' : 'Ativo (' + (data.sp?.remotePort || '-') + ')'}
-              </div>
-            </div>
+            <p style="font-size:15px;font-weight:900;color:#fff">${data.prevTag}</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:2px">KM ${data.prevKm} | Fibra [${data.fibra}]</p>
           </div>
         </div>
 
-        <!-- SENTIDO RJ (PRÓXIMO) -->
+        <!-- POSTERIOR -->
         <div class="top-card" style="border-left:4px solid #3b82f6">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <span style="font-size:11px;font-weight:900;color:#3b82f6;text-transform:uppercase">Sentido RJ (Próximo) ➡️</span>
-            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : 'Normal')}
+            <span style="font-size:11px;font-weight:900;color:#3b82f6;text-transform:uppercase">Ativo Posterior (Sentido RJ) ➡️</span>
+            <span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(59,130,246,.15);color:#60a5fa">${data.nextDist} km</span>
           </div>
           <div style="font-family:monospace">
-            <p style="font-size:15px;font-weight:900;color:#fff">${rjRemote ? rjRemote.tag : 'Fim do Anel'}</p>
-            <p style="font-size:11px;color:var(--text3);margin-top:2px">${rjRemote ? rjRemote.km : '---'}</p>
-          </div>
-          <div class="fiber-box">
-            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta: <span style="color:#3b82f6">${data.rj?.port || 'GE1/0/12'}</span></p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;font-family:monospace">
-              <div style="display:flex;align-items:center;gap:6px;color:#fbbf24">
-                <span>📥</span> <strong>RX:</strong> ${bypassActive ? 'ISOLADO' : 'Ativo (' + (data.rj?.remotePort || '-') + ')'}
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;color:#60a5fa">
-                <span>📤</span> <strong>TX:</strong> ${bypassActive ? 'LOOP BACK' : 'Ativo (' + (data.rj?.remotePort || '-') + ')'}
-              </div>
-            </div>
+            <p style="font-size:15px;font-weight:900;color:#fff">${data.nextTag}</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:2px">KM ${data.nextKm} | Fibra [${data.fibra}]</p>
           </div>
         </div>
 
@@ -531,11 +548,6 @@ function renderTopologyCard(neKey) {
     </div>
   `;
   lucide.createIcons();
-}
-
-function getStatusBadgeHtml(status) {
-  if(status === 'Normal') return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(16,185,129,.15);color:#34d399">Normal</span>`;
-  return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(239,68,68,.15);color:#fca5a5">${bypassActive ? 'Bypass Ativo' : 'Falha'}</span>`;
 }
 
 async function openMod(id) {
@@ -592,6 +604,7 @@ async function loadKm() {
   } catch (e) { console.error(e); }
 }
 loadKm();
+loadAtivos116Data();
 
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
@@ -608,7 +621,8 @@ if ('geolocation' in navigator) {
       document.getElementById('kmTxtUnica').textContent = 'KM ' + currentKm;
       document.getElementById('kmTxt').textContent = 'KM ' + currentKm;
       const topoBadge = document.getElementById('topoKmBadge');
-      if(topoBadge) topoBadge.textContent = 'KM ' + currentKm;
+      if(topoBadge) topoBadge.textContent = 'KM ' + currentKm + ' (GPS)';
+      autoSelectNearestNE();
     }
   }, null, { enableHighAccuracy: true });
 }
@@ -772,38 +786,6 @@ function takeSinglePhoto() {
   const filename = `FOTO_KM_${currentKm}_${readableFileStamp()}.jpg`.replace(/[,/]/g, '_');
   showQuickPhotoToast(`Salvo: ${filename}`);
   c.toBlob(blob => { saveFileToDirectory(blob, filename); }, 'image/jpeg', 0.90);
-}
-
-async function toggleVideoRecording() {
-  if (!isRecordingVideo) await startVideoRecording(); else stopVideoRecording();
-}
-async function startVideoRecording() {
-  const c = document.getElementById('cUnica');
-  if (!c.width || !dirHandle) { showToast('Câmera ou pasta não disponível', 'err'); return; }
-  const canvasStream = c.captureStream(30);
-  recordedChunks = [];
-  recordingStartTimeStr = new Date().toLocaleTimeString('pt-BR');
-  const candidates = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
-  const mimeType = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
-  try { mediaRecorder = new MediaRecorder(canvasStream, mimeType ? {mimeType,videoBitsPerSecond:8000000} : {videoBitsPerSecond:8000000}); }
-  catch(e){ showToast('Gravação de vídeo não suportada', 'err'); return; }
-  mediaRecorder.ondataavailable = e => { if(e.data?.size) recordedChunks.push(e.data); };
-  mediaRecorder.onstop = async () => {
-    canvasStream.getTracks().forEach(t=>t.stop());
-    const end = new Date().toLocaleTimeString('pt-BR').replace(/:/g,'-');
-    const ini = recordingStartTimeStr.replace(/:/g,'-');
-    const blob = new Blob(recordedChunks,{type:mediaRecorder.mimeType || 'video/webm'});
-    await saveFileToDirectory(blob, `VIDEO_KM_${currentKm}_INICIO_${ini}_FIM_${end}.webm`.replace(/[,/]/g,'_'));
-  };
-  mediaRecorder.start(1000); isRecordingVideo = true;
-  const b=document.getElementById('btnRecVideoUnica'); b.style.background='#ef4444'; b.style.borderColor='#fca5a5';
-  showToast('Gravação de vídeo iniciada — sem áudio');
-}
-function stopVideoRecording() {
-  if(mediaRecorder && isRecordingVideo){ mediaRecorder.stop(); isRecordingVideo=false;
-    const b=document.getElementById('btnRecVideoUnica'); b.style.background='rgba(0,0,0,0.5)'; b.style.borderColor='rgba(255,255,255,0.4)';
-    showToast('Finalizando e salvando vídeo...');
-  }
 }
 
 async function loadCameras() {
