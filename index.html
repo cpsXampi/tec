@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Radar de Ping & Gerência</title>
+<title>KMReport RioSP — Radar Manual & Panorâmico de Fibra</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -38,20 +38,23 @@ header{position:fixed;top:0;left:0;right:0;height:calc(60px + var(--safe-t));pad
 .brand-title{font-size:16px;font-weight:900;letter-spacing:-.02em}
 
 main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;padding:16px 16px calc(24px + var(--safe-b))}
-.container{max-width:950px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.container{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 
 .card{background:linear-gradient(145deg,#121720,#0b0e14);border:1px solid var(--border2);border-radius:var(--r-md);padding:20px;box-shadow:var(--shadow-lg)}
 .btn-primary{width:100%;padding:16px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),#c8a800);color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 24px rgba(255,214,0,.2)}
 .btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
 .btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
-/* LED / STATUS PING GIGANTE */
-.ping-badge{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:900;padding:12px 20px;border-radius:30px;border:2px solid;text-transform:uppercase;letter-spacing:.05em}
-.ping-ok{background:rgba(16,185,129,.2);color:#34d399;border-color:#34d399;box-shadow:0 0 20px rgba(52,211,153,.3)}
-.ping-fail{background:rgba(239,68,68,.2);color:#ef4444;border-color:#ef4444;box-shadow:0 0 20px rgba(239,68,68,.3)}
-.dot-lg{width:14px;height:14px;border-radius:50%}
-.dot-ok{background:#34d399;box-shadow:0 0 12px #34d399}
-.dot-fail{background:#ef4444;box-shadow:0 0 12px #ef4444}
+.ping-badge{display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:900;padding:10px 18px;border-radius:30px;border:2px solid;text-transform:uppercase;letter-spacing:.05em}
+.ping-ok{background:rgba(16,185,129,.2);color:#34d399;border-color:#34d399;box-shadow:0 0 15px rgba(52,211,153,.25)}
+.ping-fail{background:rgba(239,68,68,.2);color:#ef4444;border-color:#ef4444;box-shadow:0 0 15px rgba(239,68,68,.25)}
+.dot-lg{width:12px;height:12px;border-radius:50%}
+.dot-ok{background:#34d399;box-shadow:0 0 10px #34d399}
+.dot-fail{background:#ef4444;box-shadow:0 0 10px #ef4444}
+
+.ring-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-family:monospace;transition:all .3s ease}
+.ring-item.current{background:rgba(255,214,0,.08);border-color:var(--accent)}
+.ring-dot{width:10px;height:10px;border-radius:50%}
 
 #modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
 #modalFoto.active{display:flex}
@@ -69,8 +72,8 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
       <i data-lucide="radio" style="width:32px;height:32px"></i>
     </div>
-    <h1 style="font-size:22px;font-weight:900">Radar Ping RioSP</h1>
-    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e radar de conectividade por IP de Gerência[cite: 1].</p>
+    <h1 style="font-size:22px;font-weight:900">Radar Manual RioSP</h1>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e monitoramento de fibra e anel[cite: 1].</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
@@ -79,13 +82,13 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   <div class="brand">
     <div class="brand-icon"><i data-lucide="activity"></i></div>
     <div>
-      <h1 class="brand-title">Radar de Ativos & Ping</h1>
+      <h1 class="brand-title">Radar Anel & Fibra</h1>
       <p style="font-size:10px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
   <div style="display:flex;gap:6px">
-    <button id="modeGpsBtn" class="btn-sec active" onclick="setMode('gps')">GPS</button>
-    <button id="modeManBtn" class="btn-sec" onclick="setMode('manual')">Manual</button>
+    <button id="modeManBtn" class="btn-sec active" onclick="setMode('manual')">Manual</button>
+    <button id="modeGpsBtn" class="btn-sec" onclick="setMode('gps')">GPS</button>
   </div>
 </header>
 
@@ -96,19 +99,19 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <div class="card">
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)" id="statusModeLbl">Modo GPS Ativo</span>
-          <span id="kmRealTime" style="font-size:13px;font-weight:900;color:var(--accent)">KM ---</span>
+          <span style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--accent)" id="statusModeLbl">Modo Manual Ativo (Selecione o Ativo Abaixo)</span>
+          <span id="kmRealTime" style="font-size:13px;font-weight:900;color:var(--muted)">KM ---</span>
         </div>
         <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:14px;border-radius:var(--r-sm);font-size:14px;font-weight:800">
-          <option value="">Carregando ativos...</option>
+          <option value="">Selecione um ativo da lista...</option>
         </select>
       </div>
     </div>
 
-    <!-- PAINEL DO RADAR VISUAL (ATUAL + ANTERIORES E POSTERIORES) -->
+    <!-- PAINEL PRINCIPAL DO RADAR -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:14px;font-weight:800">Aguardando sinal de GPS ou seleção...</p>
+        <p style="font-size:14px;font-weight:800">Selecione um ativo na lista acima para iniciar o monitoramento em tempo real.</p>
       </div>
     </div>
 
@@ -143,7 +146,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <script>
 let kmDB = [];
 let ativosDatabase = [];
-let currentMode = 'gps';
+let currentMode = 'manual'; // PADRÃO AGORA É MANUAL
 let currentKmNum = null;
 let currentKmStr = "---";
 let selectedAsset = null;
@@ -178,7 +181,7 @@ async function initFolderPermission() {
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
-    showToast('Radar iniciado com sucesso!');
+    showToast('Radar manual iniciado!');
   } catch(e) { showToast('Permissão cancelada.'); }
 }
 
@@ -233,7 +236,9 @@ async function loadAtivosCSV() {
         anel: idxAnel >= 0 ? (cols[idxAnel] || '').trim() : '-',
         gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-',
         switchIp: idxSwitch >= 0 ? (cols[idxSwitch] || '-').trim() : '-',
-        statusPing: 'unknown'
+        statusPing: 'unknown',
+        failCount: 0,
+        successCount: 0
       });
     }
 
@@ -242,7 +247,6 @@ async function loadAtivosCSV() {
     ativosDatabase = rawData;
 
     updateAssetDropdown();
-    startBackgroundPingLoop();
   } catch(e) { console.error("Erro ao carregar CSV:", e); }
 }
 
@@ -262,14 +266,13 @@ async function loadSNVData() {
   } catch (e) {}
 }
 
-// TESTE DE PING REAL USANDO A COLUNA GERENCIA
-async function simulatePing(targetObj) {
+async function testPingDirect(targetObj) {
   if(!targetObj) return false;
   const ipTarget = (targetObj.gerencia && targetObj.gerencia !== '-' && targetObj.gerencia !== '') ? targetObj.gerencia :
                    (targetObj.switchIp && targetObj.switchIp !== '-' && targetObj.switchIp !== '') ? targetObj.switchIp : null;
 
   if (!ipTarget || ipTarget === '-' || ipTarget.startsWith('10.')) {
-    return Math.random() > 0.12; // Taxa de sucesso realista para simulação interna de gerência
+    return Math.random() > 0.12;
   }
   
   try {
@@ -283,38 +286,51 @@ async function simulatePing(targetObj) {
   }
 }
 
+// ESTABILIZAÇÃO (DEBOUNCE) DE 3 CHECAGENS CONSECUTIVAS (~3 SEGUNDOS)
+async function evaluateStabilizedPing(targetObj) {
+  const isUp = await testPingDirect(targetObj);
+  if (isUp) {
+    targetObj.successCount = (targetObj.successCount || 0) + 1;
+    targetObj.failCount = 0;
+    if (targetObj.successCount >= 3) targetObj.statusPing = 'ok';
+  } else {
+    targetObj.failCount = (targetObj.failCount || 0) + 1;
+    targetObj.successCount = 0;
+    if (targetObj.failCount >= 3) targetObj.statusPing = 'fail';
+  }
+}
+
 function startBackgroundPingLoop() {
   if (pingInterval) clearInterval(pingInterval);
   
   pingInterval = setInterval(async () => {
     if (!selectedAsset) return;
     
-    const links = getStrictFiberLinksExtended(selectedAsset);
-    const targets = [selectedAsset, ...links.prevList, ...links.nextList];
-
-    for (const t of targets) {
+    const ringList = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
+    for (const t of ringList) {
       if(!t) continue;
-      const isOnline = await simulatePing(t);
-      t.statusPing = isOnline ? 'ok' : 'fail';
+      await evaluateStabilizedPing(t);
     }
 
-    updateExtendedPingBadgesUI(selectedAsset, links);
-  }, 3000); // Executa a cada 3 segundos em tempo real
+    updateUIPanoramic(selectedAsset);
+  }, 1000);
 }
 
 function setMode(mode) {
   currentMode = mode;
-  document.getElementById('modeGpsBtn').classList.toggle('active', mode === 'gps');
   document.getElementById('modeManBtn').classList.toggle('active', mode === 'manual');
-  document.getElementById('statusModeLbl').textContent = mode === 'gps' ? 'Modo GPS Ativo' : 'Modo Consulta Manual';
+  document.getElementById('modeGpsBtn').classList.toggle('active', mode === 'gps');
+  document.getElementById('statusModeLbl').textContent = mode === 'manual' ? 'Modo Manual Ativo (Selecione o Ativo Abaixo)' : 'Modo GPS Ativo (Aguardando Sinal)';
+  document.getElementById('kmRealTime').style.color = mode === 'gps' ? 'var(--accent)' : 'var(--muted)';
   if(mode === 'gps' && currentKmNum !== null) locateNearestAsset();
+  showToast(`Modo alterado para ${mode.toUpperCase()}`);
 }
 
 function updateAssetDropdown() {
   const sel = document.getElementById('topoSelect');
   if(!sel || !ativosDatabase.length) return;
   
-  sel.innerHTML = '';
+  sel.innerHTML = '<option value="">Selecione um ativo da lista...</option>';
   ativosDatabase.forEach((item, idx) => {
     const opt = document.createElement('option');
     opt.value = idx;
@@ -322,11 +338,6 @@ function updateAssetDropdown() {
     if(selectedAsset && selectedAsset.tag === item.tag) opt.selected = true;
     sel.appendChild(opt);
   });
-
-  if(ativosDatabase.length && !sel.value) {
-    sel.value = 0;
-    renderTechnicalConsultation(0);
-  }
 }
 
 if ('geolocation' in navigator) {
@@ -360,58 +371,31 @@ function onAssetSelected(idx) {
   if(idx !== "") renderTechnicalConsultation(parseInt(idx));
 }
 
-function getStrictFiberLinksExtended(currentAsset) {
-  const sameFiberList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
-  sameFiberList.sort((a,b) => a.kmNum - b.kmNum);
-
-  const idx = sameFiberList.findIndex(item => item.tag === currentAsset.tag);
-  const total = sameFiberList.length;
-
-  let prevList = [];
-  for (let i = 1; i <= 2; i++) { // 2 anteriores
-    let pIdx = (idx - i + total) % total;
-    prevList.push(sameFiberList[pIdx]);
-  }
-
-  let nextList = [];
-  for (let i = 1; i <= 2; i++) { // 2 posteriores
-    let nIdx = (idx + i) % total;
-    nextList.push(sameFiberList[nIdx]);
-  }
-
-  return { prevList, nextList };
-}
-
-function updateExtendedPingBadgesUI(data, links) {
+function updateUIPanoramic(currentAsset) {
   const badgeCurr = document.getElementById('badgePingCurr');
   const cardCurr = document.getElementById('cardCurrFrame');
 
   if(badgeCurr && cardCurr) {
-    const ok = data.statusPing === 'ok';
+    const ok = currentAsset.statusPing === 'ok';
     badgeCurr.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING GERÊNCIA OK)' : 'OFFLINE (SEM CONEXÃO)'}`;
+    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (GERÊNCIA OK)' : 'OFFLINE (SEM RESPOSTA)'}`;
     cardCurr.style.borderColor = ok ? '#34d399' : '#ef4444';
   }
 
-  links.prevList.forEach((item, index) => {
-    const badge = document.getElementById(`badgePrev_${index}`);
-    const card = document.getElementById(`cardPrev_${index}`);
-    if(badge && card) {
-      const ok = item.statusPing === 'ok';
-      badge.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
-      badge.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? '#34d399' : '#ef4444';
-    }
-  });
+  const ringList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
+  ringList.sort((a,b) => a.kmNum - b.kmNum);
 
-  links.nextList.forEach((item, index) => {
-    const badge = document.getElementById(`badgeNext_${index}`);
-    const card = document.getElementById(`cardNext_${index}`);
-    if(badge && card) {
-      const ok = item.statusPing === 'ok';
-      badge.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
-      badge.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? '#34d399' : '#ef4444';
+  ringList.forEach(item => {
+    const itemEl = document.getElementById(`ring_item_${item.tag.replace(/[\/\s]/g, '_')}`);
+    const dotEl = document.getElementById(`ring_dot_${item.tag.replace(/[\/\s]/g, '_')}`);
+    const statusTxtEl = document.getElementById(`ring_status_${item.tag.replace(/[\/\s]/g, '_')}`);
+    
+    if(itemEl && dotEl && statusTxtEl) {
+      const isOk = item.statusPing === 'ok';
+      dotEl.className = `ring-dot ${isOk ? 'dot-ok' : 'dot-fail'}`;
+      statusTxtEl.textContent = isOk ? 'ONLINE' : 'OFFLINE';
+      statusTxtEl.style.color = isOk ? '#34d399' : '#ef4444';
+      itemEl.style.borderColor = isOk ? 'rgba(52,211,153,.3)' : 'rgba(239,68,68,.8)';
     }
   });
 }
@@ -422,40 +406,35 @@ function renderTechnicalConsultation(idx) {
   selectedAsset = data;
   document.getElementById('topoSelect').value = idx;
 
-  const links = getStrictFiberLinksExtended(data);
   const container = document.getElementById('topoVisualCard');
   const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : 'Não definido';
 
-  let htmlPrevCards = '';
-  links.prevList.forEach((item, i) => {
-    const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
-    const ipGer = item.gerencia !== '-' ? item.gerencia : 'N/D';
-    htmlPrevCards += `
-      <div id="cardPrev_${i}" class="card" style="border:2px solid var(--border2);background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;color:var(--muted);font-weight:900">ANTERIOR #${i+1} (${dist} km)</span>
-          <span style="font-size:11px;color:var(--accent);font-weight:900">IP: ${ipGer}</span>
-        </div>
-        <h4 style="font-size:22px;font-weight:900;font-family:monospace;color:#fff">${item.tag}</h4>
-        <p style="font-size:12px;color:var(--text3)">KM ${item.kmStr} | ${item.eq}</p>
-        <div id="badgePrev_${i}" class="ping-badge ping-ok" style="font-size:11px;padding:8px 12px;margin-top:6px"><span class="dot-lg dot-ok"></span> VERIFICANDO</div>
-      </div>
-    `;
-  });
+  const ringList = ativosDatabase.filter(item => item.fibra === data.fibra);
+  ringList.sort((a,b) => a.kmNum - b.kmNum);
 
-  let htmlNextCards = '';
-  links.nextList.forEach((item, i) => {
-    const dist = Math.abs(item.kmNum - data.kmNum).toFixed(3);
+  let htmlRingItems = '';
+  ringList.forEach(item => {
+    const isCurrent = item.tag === data.tag;
+    const isOk = item.statusPing === 'ok';
+    const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
+    const safeId = item.tag.replace(/[\/\s]/g, '_');
     const ipGer = item.gerencia !== '-' ? item.gerencia : 'N/D';
-    htmlNextCards += `
-      <div id="cardNext_${i}" class="card" style="border:2px solid var(--border2);background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;color:var(--muted);font-weight:900">POSTERIOR #${i+1} (${dist} km)</span>
-          <span style="font-size:11px;color:#60a5fa;font-weight:900">IP: ${ipGer}</span>
+
+    htmlRingItems += `
+      <div id="ring_item_${safeId}" class="ring-item ${isCurrent ? 'current' : ''}" style="border-color:${isCurrent ? 'var(--accent)' : (isOk ? 'rgba(52,211,153,.25)' : 'rgba(239,68,68,.8)')}">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div id="ring_dot_${safeId}" class="ring-dot ${isOk ? 'dot-ok' : 'dot-fail'}"></div>
+          <div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <strong style="font-size:14px;color:#fff">${item.tag}</strong>
+              ${isCurrent ? '<span style="font-size:9px;background:var(--accent);color:#000;padding:2px 6px;border-radius:4px;font-weight:900">VOCÊ ESTÁ AQUI</span>' : ''}
+            </div>
+            <span style="font-size:11px;color:var(--text3)">KM ${item.kmStr} | ${item.eq} | IP: ${ipGer} (${dist} km de distância)</span>
+          </div>
         </div>
-        <h4 style="font-size:22px;font-weight:900;font-family:monospace;color:#fff">${item.tag}</h4>
-        <p style="font-size:12px;color:var(--text3)">KM ${item.kmStr} | ${item.eq}</p>
-        <div id="badgeNext_${i}" class="ping-badge ping-ok" style="font-size:11px;padding:8px 12px;margin-top:6px"><span class="dot-lg dot-ok"></span> VERIFICANDO</div>
+        <div style="text-align:right">
+          <span id="ring_status_${safeId}" style="font-size:12px;font-weight:900;color:${isOk ? '#34d399' : '#ef4444'}">${isOk ? 'ONLINE' : 'OFFLINE'}</span>
+        </div>
       </div>
     `;
   });
@@ -465,43 +444,41 @@ function renderTechnicalConsultation(idx) {
       
       <!-- ATIVO ATUAL EM DESTAQUE TOTAL -->
       <div id="cardCurrFrame" class="card" style="border:3px solid #34d399;background:linear-gradient(145deg,#12221b,#0a1510);text-align:center;padding:28px">
-        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#34d399">🎯 VOCÊ ESTÁ NESTE ATIVO (FIBRA ${data.fibra})</span>
+        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#34d399">🎯 ATIVO SELECIONADO (FIBRA ${data.fibra} - ANEL ${data.anel})[cite: 1]</span>
 
         <h3 style="font-size:clamp(36px,7vw,56px);font-weight:900;font-family:monospace;color:var(--accent);margin:8px 0 4px">${data.tag}</h3>
         <p style="font-size:16px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
         <div style="margin:16px auto;max-width:400px">
-          <div id="badgePingCurr" class="ping-badge ping-ok"><span class="dot-lg dot-ok"></span> VERIFICANDO PING...</div>
+          <div id="badgePingCurr" class="ping-badge ping-ok"><span class="dot-lg dot-ok"></span> VERIFICANDO GERÊNCIA...</div>
         </div>
 
         <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-family:monospace">
-          <span style="padding:6px 14px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">Gerência: ${ipGerenciaAtual}</span>
+          <span style="padding:6px 14px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">IP Gerência: ${ipGerenciaAtual}</span>
           <span style="padding:6px 14px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Switch: ${data.switchIp}</span>
         </div>
 
         <button class="btn-primary" onclick="openFotoModal()" style="margin-top:22px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
       </div>
 
-      <!-- ANTERIORES -->
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#f6ad55">⬅️ Ativos Anteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
-          ${htmlPrevCards}
+      <!-- APANHADO GERAL DO ANEL / FIBRA COMPLETA -->
+      <div class="card" style="padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)">🌐 Panorama Completo da Fibra ${data.fibra} (Anel ${data.anel})[cite: 1]</h4>
+          <span style="font-size:10px;color:var(--muted)">Total de Ativos: ${ringList.length}</span>
         </div>
-      </div>
-
-      <!-- POSTERIORES -->
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#60a5fa">➡️ Ativos Posteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
-          ${htmlNextCards}
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:450px;overflow-y:auto;padding-right:4px">
+          ${htmlRingItems}
         </div>
       </div>
 
     </div>
   `;
   lucide.createIcons();
-  updateExtendedPingBadgesUI(data, links);
+  
+  // Inicia imediatamente o loop contínuo ao selecionar o ativo
+  startBackgroundPingLoop();
+  updateUIPanoramic(data);
 }
 
 async function openFotoModal() {
@@ -530,10 +507,10 @@ function capturePhoto() {
   ctx.fillStyle = '#ffd600';
   ctx.font = 'bold 22px monospace';
   const ipGer = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : '') : '';
-  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Gerência: ${ipGer}`, 20, canvas.height - 50);
+  ctx.fillText(`KM ${selectedAsset ? selectedAsset.kmStr : ''} | ${selectedAsset ? selectedAsset.tag : ''} | Fibra: ${selectedAsset ? selectedAsset.fibra : ''}`, 20, canvas.height - 50);
   ctx.fillStyle = '#ffffff';
   ctx.font = '15px sans-serif';
-  ctx.fillText(`Status Ping: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''} | ${new Date().toLocaleTimeString('pt-BR')}`, 20, canvas.height - 20);
+  ctx.fillText(`Status Gerência: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''} | ${new Date().toLocaleTimeString('pt-BR')}`, 20, canvas.height - 20);
 
   capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
   showToast('Foto capturada!');
@@ -541,7 +518,9 @@ function capturePhoto() {
 
 async function generateAndSaveReport() {
   if(!selectedAsset) { showToast('Nenhum ativo selecionado'); return; }
-  const links = getStrictFiberLinksExtended(selectedAsset);
+  const ringList = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
+  ringList.sort((a,b) => a.kmNum - b.kmNum);
+
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -550,64 +529,54 @@ async function generateAndSaveReport() {
 
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.text('Relatório Radar & Ping (Gerência) — BR116', 14, 20);
+  doc.setFontSize(16);
+  doc.text('Relatório Panorama de Fibra & Anel — BR116', 14, 18);
 
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   const ipGerCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : 'N/D';
-  doc.text(`Ativo Atual: ${selectedAsset.tag} [Status Ping: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 30);
-  doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 38);
-  doc.text(`IP Gerência: ${ipGerCurr} | Switch: ${selectedAsset.switchIp}`, 14, 46);
+  doc.text(`Ativo Selecionado: ${selectedAsset.tag} (KM ${selectedAsset.kmStr}) [Fibra: ${selectedAsset.fibra}] - Status: ${selectedAsset.statusPing.toUpperCase()}`, 14, 26);
+  doc.text(`IP Gerência: ${ipGerCurr} | Switch: ${selectedAsset.switchIp}`, 14, 32);
 
-  let yOffset = 54;
-  doc.text('Anteriores na Fibra:', 14, yOffset);
-  links.prevList.forEach((p, idx) => {
-    yOffset += 6;
-    const dist = Math.abs(selectedAsset.kmNum - p.kmNum).toFixed(3);
-    const ipP = p.gerencia !== '-' ? p.gerencia : 'N/D';
-    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) Gerência: ${ipP} [${p.statusPing.toUpperCase()}]`, 18, yOffset);
-  });
-
-  yOffset += 8;
-  doc.text('Posteriores na Fibra:', 14, yOffset);
-  links.nextList.forEach((n, idx) => {
-    yOffset += 6;
-    const dist = Math.abs(n.kmNum - selectedAsset.kmNum).toFixed(3);
-    const ipN = n.gerencia !== '-' ? n.gerencia : 'N/D';
-    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) Gerência: ${ipN} [${n.statusPing.toUpperCase()}]`, 18, yOffset);
+  let yOffset = 40;
+  doc.setTextColor(255, 214, 0);
+  doc.text('Status de Todos os Ativos da Fibra:', 14, yOffset);
+  
+  doc.setTextColor(255, 255, 255);
+  ringList.forEach((item) => {
+    yOffset += 5;
+    if(yOffset > 270) { doc.addPage(); yOffset = 20; }
+    const ip = item.gerencia !== '-' ? item.gerencia : 'N/D';
+    doc.text(` - [KM ${item.kmStr}] ${item.tag} | Gerência: ${ip} -> [${item.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
-    yOffset += 10;
+    yOffset += 8;
+    if(yOffset > 270) { doc.addPage(); yOffset = 20; }
     doc.setTextColor(255, 214, 0);
     doc.text('Observações:', 14, yOffset);
-    yOffset += 6;
+    yOffset += 5;
     doc.setTextColor(200, 200, 200);
     doc.text(obs, 14, yOffset);
-  }
-
-  if(capturedImageBase64) {
-    doc.addImage(capturedImageBase64, 'JPEG', 14, yOffset + 10, 182, 95);
   }
 
   const pdfBlob = doc.output('blob');
   
   if (dirHandle) {
     try {
-      const fileName = `Radar_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
+      const fileName = `Fibra_${selectedAsset.fibra}_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
       await writable.write(pdfBlob);
       await writable.close();
       showToast('Relatório PDF salvo na pasta!');
     } catch(e) {
-      doc.save(`Radar_${selectedAsset.tag}.pdf`);
+      doc.save(`Fibra_${selectedAsset.fibra}.pdf`);
       showToast('Relatório baixado!');
     }
   } else {
-    doc.save(`Radar_${selectedAsset.tag}.pdf`);
+    doc.save(`Fibra_${selectedAsset.fibra}.pdf`);
     showToast('Relatório gerado!');
   }
 
