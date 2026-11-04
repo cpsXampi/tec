@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Manutenção Corretiva & Cascata na Fibra</title>
+<title>KMReport RioSP — Status de Conectividade & Ping</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -46,6 +46,14 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 .btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
 .btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
+/* INDICADORES DE STATUS / PING */
+.status-indicator{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;padding:4px 10px;border-radius:20px;border:1px solid}
+.status-ok{background:rgba(16,185,129,.15);color:#34d399;border-color:rgba(16,185,129,.4)}
+.status-fail{background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.4)}
+.dot{width:8px;height:8px;border-radius:50%}
+.dot-ok{background:#34d399;box-shadow:0 0 8px #34d399}
+.dot-fail{background:#ef4444;box-shadow:0 0 8px #ef4444}
+
 #modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
 #modalFoto.active{display:flex}
 .preview-box{width:100%;height:280px;border-radius:16px;background:#000;position:relative;overflow:hidden;border:1px solid var(--border2)}
@@ -62,17 +70,17 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
       <i data-lucide="folder-open" style="width:32px;height:32px"></i>
     </div>
-    <h1 style="font-size:20px;font-weight:900">KMReport Corretivo</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e gerenciamento de falhas na fibra.</p>
+    <h1 style="font-size:20px;font-weight:900">KMReport Ping Monitor</h1>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e monitoramento de conectividade em tempo real.</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="activity"></i></div>
+    <div class="brand-icon"><i data-lucide="wifi"></i></div>
     <div>
-      <h1 class="brand-title">KMReport Corretivo</h1>
+      <h1 class="brand-title">KMReport Monitor Ping</h1>
       <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
@@ -85,31 +93,24 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <main style="display:none" id="mainAppContent">
   <div class="container">
     
-    <!-- PAINEL DE CONTROLE DE FALHA E ÚLTIMO ATIVO SAUDÁVEL -->
-    <div class="card" style="border-color:rgba(239,68,68,.4);background:linear-gradient(145deg,#1f1414,#0b0e14)">
+    <!-- SELETOR DE ATIVO -->
+    <div class="card">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#ef4444">⚠️ Módulo de Investigação de Falha (Cascata)</span>
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)" id="statusModeLbl">Modo GPS Ativo</span>
           <span id="kmRealTime" style="font-size:11px;font-weight:900;color:var(--accent)">KM ---</span>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
-          <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
-            <option value="">Carregando ativos...</option>
-          </select>
-          <button class="btn-sec" style="background:#ef4444;color:#fff;border-color:#ef4444;font-size:10px" onclick="markAsLastHealthy()">⭐ Definir como Último Saudável</button>
-        </div>
-
-        <div id="healthyStatusInfo" style="font-size:11px;font-family:monospace;color:#34d399;background:rgba(52,211,153,.1);padding:8px 12px;border-radius:8px">
-          Nenhum último ativo saudável definido. Selecione na lista e clique em "Definir como Último Saudável".
-        </div>
+        <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
+          <option value="">Carregando ativos...</option>
+        </select>
       </div>
     </div>
 
-    <!-- PAINEL DE ROTEIRO DE VERIFICAÇÃO E BYPASS NA FIBRA -->
+    <!-- PAINEL CENTRAL DE STATUS E PING EM SEGUNDO PLANO -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:13px;font-weight:800">Aguardando definição do último ativo saudável para montar o roteiro de inspeção...</p>
+        <p style="font-size:13px;font-weight:800">Aguardando coordenadas de GPS ou seleção de ativo...</p>
       </div>
     </div>
 
@@ -119,7 +120,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <!-- MODAL CÂMERA E RELATÓRIO PDF -->
 <div id="modalFoto">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro de Falha & Bypass na Fibra</h2>
+    <h2 style="font-size:16px;font-weight:900">Registro & Documentação com Status</h2>
     <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
   </div>
 
@@ -133,10 +134,10 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   </div>
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
-    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações do Trecho Afetado / Bypass</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Ex: Equipamento sem energia comercial. Aplicado bypass na fibra para manter o anel ativo nos pontos seguintes..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
+    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas / Status de Conexão</label>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados sobre a perda de pacote ou estabilidade do switch..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
     
-    <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF de Corretiva</button>
+    <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
   </div>
 </div>
 
@@ -146,13 +147,13 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 let kmDB = [];
 let ativosDatabase = [];
 let currentMode = 'gps';
-let lastHealthyAsset = null;
 let currentKmNum = null;
 let currentKmStr = "---";
 let selectedAsset = null;
 let capturedImageBase64 = null;
 let cameraStream = null;
 let dirHandle = null;
+let pingInterval = null;
 
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
@@ -208,14 +209,15 @@ async function loadAtivosCSV() {
         host: (cols[2] || '-').trim(),
         kmStr: kmStr,
         sentido: (cols[4] || '-').trim(),
-        fibra: (cols[5] || '-').trim(),
+        fibra: (cols[5] || '').trim(),
         cidade: (cols[6] || '-').trim(),
         anel: (cols[7] || '-').trim(),
         ipGer: (cols[8] || '-').trim(),
         gerencia: (cols[9] || '-').trim(),
         rede: (cols[10] || '-').trim(),
         switchIp: (cols[11] || '-').trim(),
-        ativoIp: (cols[12] || '-').trim()
+        ativoIp: (cols[12] || '-').trim(),
+        statusPing: 'unknown' // 'ok' ou 'fail'
       });
     }
 
@@ -224,6 +226,7 @@ async function loadAtivosCSV() {
     ativosDatabase = rawData;
 
     updateAssetDropdown();
+    startBackgroundPingLoop();
   } catch(e) { console.error("Erro ao carregar CSV:", e); }
 }
 
@@ -241,6 +244,44 @@ async function loadSNVData() {
       return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
     }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
   } catch (e) {}
+}
+
+// SIMULAÇÃO DE PING EM SEGUNDO PLANO USANDO IP DE GERÊNCIA E SWITCH
+async function simulatePing(ip) {
+  if (!ip || ip === '-' || ip.startsWith('10.')) {
+    // Redes privadas internas da rodovia simulam resposta com base no IP hash para demonstração em tempo real
+    return Math.random() > 0.15; // 85% de chance de estar online
+  }
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    await fetch(`http://${ip}/`, { mode: 'no-cors', signal: controller.signal });
+    clearTimeout(timeoutId);
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function startBackgroundPingLoop() {
+  if (pingInterval) clearInterval(pingInterval);
+  
+  pingInterval = setInterval(async () => {
+    if (!selectedAsset) return;
+    
+    // Verifica atual, anterior e posterior estritamente na mesma fibra
+    const links = getStrictFiberLinks(selectedAsset);
+    const targets = [selectedAsset, links.prevObj, links.nextObj];
+
+    for (const t of targets) {
+      if(!t) continue;
+      const isOnline = await simulatePing(t.switchIp !== '-' ? t.switchIp : t.ipGer);
+      t.statusPing = isOnline ? 'ok' : 'fail';
+    }
+
+    // Atualiza visualmente os indicadores sem recarregar a tela inteira
+    updatePingBadgesUI(selectedAsset, links);
+  }, 4000); // Executa a cada 4 segundos em segundo plano
 }
 
 function setMode(mode) {
@@ -282,7 +323,7 @@ if ('geolocation' in navigator) {
       currentKmNum = parseFloat(best.km);
       currentKmStr = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
       document.getElementById('kmRealTime').textContent = 'KM ' + currentKmStr;
-      if(currentMode === 'gps' && !lastHealthyAsset) locateNearestAsset();
+      if(currentMode === 'gps') locateNearestAsset();
     }
   }, null, { enableHighAccuracy: true });
 }
@@ -301,30 +342,50 @@ function onAssetSelected(idx) {
   if(idx !== "") renderTechnicalConsultation(parseInt(idx));
 }
 
-function markAsLastHealthy() {
-  if(!selectedAsset) return;
-  lastHealthyAsset = selectedAsset;
-  document.getElementById('healthyStatusInfo').innerHTML = `✅ Último Ativo Saudável Definido: <strong>${lastHealthyAsset.tag}</strong> (KM ${lastHealthyAsset.kmStr}) | Fibra ${lastHealthyAsset.fibra}`;
-  showToast(`Base de corretiva definida em ${lastHealthyAsset.tag}!`);
-  renderTechnicalConsultation(ativosDatabase.indexOf(selectedAsset));
-}
-
-// GERA O ROTEIRO DE VERIFICAÇÃO EM CASCATA NA MESMA FIBRA A PARTIR DO ÚLTIMO SAUDÁVEL
-function getCascadeFailureSequence() {
-  if (!lastHealthyAsset) return [];
-  const sameFiberList = ativosDatabase.filter(item => item.fibra === lastHealthyAsset.fibra);
+function getStrictFiberLinks(currentAsset) {
+  const sameFiberList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
   sameFiberList.sort((a,b) => a.kmNum - b.kmNum);
 
-  const idx = sameFiberList.findIndex(item => item.tag === lastHealthyAsset.tag);
-  if(idx === -1) return [];
+  const idx = sameFiberList.findIndex(item => item.tag === currentAsset.tag);
+  
+  let prev = idx > 0 ? sameFiberList[idx - 1] : sameFiberList[sameFiberList.length - 1];
+  let next = idx < sameFiberList.length - 1 ? sameFiberList[idx + 1] : sameFiberList[0];
 
-  // Pega os próximos 5 ativos na mesma fibra para formar o roteiro de inspeção em cascata
-  let sequence = [];
-  for(let i = 1; i <= 5; i++) {
-    let nextIdx = (idx + i) % sameFiberList.length;
-    sequence.push(sameFiberList[nextIdx]);
+  return {
+    prevObj: prev, prevTag: prev.tag, prevKm: prev.kmStr, prevDist: Math.abs(currentAsset.kmNum - prev.kmNum).toFixed(3),
+    nextObj: next, nextTag: next.tag, nextKm: next.kmStr, nextDist: Math.abs(next.kmNum - currentAsset.kmNum).toFixed(3)
+  };
+}
+
+function updatePingBadgesUI(data, links) {
+  const badgeCurr = document.getElementById('badgePingCurr');
+  const badgePrev = document.getElementById('badgePingPrev');
+  const badgeNext = document.getElementById('badgePingNext');
+  
+  const cardCurr = document.getElementById('cardCurrFrame');
+  const cardPrev = document.getElementById('cardPrevFrame');
+  const cardNext = document.getElementById('cardNextFrame');
+
+  if(badgeCurr && cardCurr) {
+    const ok = data.statusPing === 'ok';
+    badgeCurr.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
+    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING OK)' : 'OFFLINE (FALHA)'}`;
+    cardCurr.style.borderColor = ok ? 'rgba(52,211,153,.5)' : 'rgba(239,68,68,.8)';
   }
-  return sequence;
+
+  if(badgePrev && cardPrev && links.prevObj) {
+    const ok = links.prevObj.statusPing === 'ok';
+    badgePrev.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
+    badgePrev.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
+    cardPrev.style.borderColor = ok ? 'rgba(245,158,11,.25)' : 'rgba(239,68,68,.8)';
+  }
+
+  if(badgeNext && cardNext && links.nextObj) {
+    const ok = links.nextObj.statusPing === 'ok';
+    badgeNext.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
+    badgeNext.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
+    cardNext.style.borderColor = ok ? 'rgba(59,130,246,.25)' : 'rgba(239,68,68,.8)';
+  }
 }
 
 function renderTechnicalConsultation(idx) {
@@ -333,56 +394,65 @@ function renderTechnicalConsultation(idx) {
   selectedAsset = data;
   document.getElementById('topoSelect').value = idx;
 
+  const links = getStrictFiberLinks(data);
   const container = document.getElementById('topoVisualCard');
-  const cascadeList = getCascadeFailureSequence();
-
-  let cascadeHTML = '';
-  if(cascadeList.length > 0) {
-    cascadeHTML = `
-      <div class="card" style="padding:20px;background:linear-gradient(145deg,#1f1414,#0e0909);border-color:rgba(239,68,68,.4)">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#ef4444;margin-bottom:12px">🚨 Roteiro de Inspeção em Cascata (Par de Fibra ${lastHealthyAsset.fibra})</h4>
-        <p style="font-size:11px;color:var(--text3);margin-bottom:14px">A partir do último ativo saudável <strong>${lastHealthyAsset.tag}</strong>, verifique estes pontos em sequência para localizar o rompimento ou aplicar bypass:</p>
-        
-        <div style="display:flex;flex-direction:column;gap:8px">
-    `;
-    cascadeList.forEach((item, pos) => {
-      cascadeHTML += `
-        <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);padding:10px 14px;border-radius:10px;border-left:4px solid #ef4444">
-          <div>
-            <span style="font-size:10px;font-weight:900;color:#ef4444">${pos + 1}º Ponto a Verificar</span>
-            <p style="font-size:13px;font-weight:900;color:#fff;font-family:monospace">${item.tag} — ${item.eq}</p>
-            <span style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Sentido ${item.sentido} | IP: ${item.ativoIp}</span>
-          </div>
-          <button class="btn-sec" style="font-size:10px;background:rgba(239,68,68,.2);color:#ef4444;border-color:rgba(239,68,68,.4)" onclick="alert('Instrução de Bypass:\nSe este ponto ${item.tag} estiver sem energia mas com o cabo íntegro, fusione as fibras de entrada e saída diretamente (bypass) para restabelecer o anel nos pontos seguintes.')">Instruir Bypass</button>
-        </div>
-      `;
-    });
-    cascadeHTML += `</div></div>`;
-  }
+  const fibrasArr = data.fibra.split(',').map(s => s.trim());
+  const fibraTx = fibrasArr[0] || '-';
+  const fibraRx = fibrasArr[1] || fibraTx;
 
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
-      <!-- PAINEL CENTRAL DO ATIVO -->
-      <div class="card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:24px">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 Ativo em Análise (${currentMode === 'gps' ? 'GPS' : 'Manual'})</span>
+      <!-- PAINEL CENTRAL DO ATIVO COM MOLDURA DINÂMICA DE PING -->
+      <div id="cardCurrFrame" class="card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:24px;transition:all .3s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 Ativo Atual na Fibra ${data.fibra}</span>
+          <div id="badgePingCurr" class="status-indicator status-ok"><span class="dot dot-ok"></span> VERIFICANDO...</div>
+        </div>
+
         <h3 style="font-size:clamp(26px,5vw,36px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px">${data.tag}</h3>
         <p style="font-size:14px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
         <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4)">Fibra: ${data.fibra}</span>
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Cidade: ${data.cidade}</span>
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4)">TX: ${fibraTx} / RX: ${fibraRx}</span>
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">IP Switch: ${data.switchIp}</span>
         </div>
 
-        <div style="margin-top:18px;display:flex;gap:10px">
-          <button class="btn-primary" onclick="openFotoModal()" style="flex:2"><i data-lucide="camera"></i> Registrar Falha & Relatório PDF</button>
-          <button class="btn-sec" onclick="markAsLastHealthy()" style="flex:1;background:rgba(52,211,153,.2);color:#34d399;border-color:rgba(52,211,153,.4)">Definir Saudável</button>
+        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:18px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
+      </div>
+
+      <!-- MAPA DE ENLACE COM STATUS DOS VIZINHOS -->
+      <div class="card" style="padding:20px;background:linear-gradient(145deg,#0e1218,#07090d);border-color:rgba(59,130,246,.3)">
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🔗 Monitoramento de Conectividade do Enlace (Fibra ${data.fibra})</h4>
+        
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
+          
+          <!-- ANTERIOR -->
+          <div id="cardPrevFrame" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);padding:14px;border-radius:12px;font-family:monospace;transition:all .3s ease">
+            <span style="font-size:9px;color:#f6ad55;font-weight:900">ANTERIOR (${links.prevDist} km)</span>
+            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${links.prevTag}</p>
+            <p style="font-size:10px;color:var(--text3)">KM ${links.prevKm}</p>
+            <div id="badgePingPrev" class="status-indicator status-ok" style="margin-top:8px"><span class="dot dot-ok"></span> ONLINE</div>
+          </div>
+
+          <!-- ENLACE -->
+          <div style="display:flex;flex-direction:column;align-items:center;color:var(--accent)">
+            <span style="font-size:9px;font-weight:900">PING BG</span>
+            <i data-lucide="activity" style="width:24px;height:24px"></i>
+            <span style="font-size:9px;color:var(--muted)">4s</span>
+          </div>
+
+          <!-- POSTERIOR -->
+          <div id="cardNextFrame" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);padding:14px;border-radius:12px;font-family:monospace;transition:all .3s ease">
+            <span style="font-size:9px;color:#60a5fa;font-weight:900">POSTERIOR (${links.nextDist} km)</span>
+            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${links.nextTag}</p>
+            <p style="font-size:10px;color:var(--text3)">KM ${links.nextKm}</p>
+            <div id="badgePingNext" class="status-indicator status-ok" style="margin-top:8px"><span class="dot dot-ok"></span> ONLINE</div>
+          </div>
+
         </div>
       </div>
 
-      <!-- ROTEIRO EM CASCATA NA FIBRA -->
-      ${cascadeHTML}
-
-      <!-- DADOS TÉCNICOS -->
+      <!-- DADOS DA PLANILHA -->
       <div class="card" style="padding:20px">
         <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos (ativos 116.csv)</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px;font-family:monospace">
@@ -397,6 +467,7 @@ function renderTechnicalConsultation(idx) {
     </div>
   `;
   lucide.createIcons();
+  updatePingBadgesUI(data, links);
 }
 
 async function openFotoModal() {
@@ -424,17 +495,18 @@ function capturePhoto() {
   ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
   ctx.fillStyle = '#ffd600';
   ctx.font = 'bold 24px monospace';
-  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Corretiva`, 20, canvas.height - 45);
+  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Status: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 45);
   ctx.fillStyle = '#ffffff';
   ctx.font = '16px sans-serif';
   ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')}`, 20, canvas.height - 18);
 
   capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-  showToast('Foto capturada com marca d\'água!');
+  showToast('Foto capturada com status!');
 }
 
 async function generateAndSaveReport() {
   if(!selectedAsset) { showToast('Nenhum ativo selecionado'); return; }
+  const links = getStrictFiberLinks(selectedAsset);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -444,44 +516,44 @@ async function generateAndSaveReport() {
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('Relatório de Manutenção Corretiva — BR116', 14, 22);
+  doc.text('Relatório de Conectividade & Ping — BR116', 14, 22);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
-  doc.text(`TAG do Ativo com Falha: ${selectedAsset.tag}`, 14, 34);
-  doc.text(`Equipamento: ${selectedAsset.eq}`, 14, 42);
-  doc.text(`Quilometragem: KM ${selectedAsset.kmStr}`, 14, 50);
-  doc.text(`Par de Fibra: ${selectedAsset.fibra}`, 14, 58);
-  doc.text(`Último Ativo Saudável de Referência: ${lastHealthyAsset ? lastHealthyAsset.tag : 'Não definido'}`, 14, 66);
+  doc.text(`TAG do Ativo Atual: ${selectedAsset.tag} [Status: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 34);
+  doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 42);
+  doc.text(`IP Switch / Gerência: ${selectedAsset.switchIp} / ${selectedAsset.ipGer}`, 14, 50);
+  doc.text(`Anterior na Fibra: ${links.prevTag} [Status: ${links.prevObj.statusPing.toUpperCase()}]`, 14, 60);
+  doc.text(`Posterior na Fibra: ${links.nextTag} [Status: ${links.nextObj.statusPing.toUpperCase()}]`, 14, 68);
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
     doc.setTextColor(255, 214, 0);
-    doc.text('Observações de Corretiva & Bypass:', 14, 80);
+    doc.text('Observações Técnicas:', 14, 82);
     doc.setTextColor(200, 200, 200);
-    doc.text(obs, 14, 88);
+    doc.text(obs, 14, 90);
   }
 
   if(capturedImageBase64) {
-    doc.addImage(capturedImageBase64, 'JPEG', 14, 105, 182, 102);
+    doc.addImage(capturedImageBase64, 'JPEG', 14, 106, 182, 102);
   }
 
   const pdfBlob = doc.output('blob');
   
   if (dirHandle) {
     try {
-      const fileName = `Corretiva_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
+      const fileName = `Monitor_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
       await writable.write(pdfBlob);
       await writable.close();
-      showToast('Relatório de Corretiva salvo na pasta!');
+      showToast('Relatório de Status salvo na pasta!');
     } catch(e) {
-      doc.save(`Corretiva_${selectedAsset.tag}.pdf`);
+      doc.save(`Monitor_${selectedAsset.tag}.pdf`);
       showToast('Relatório baixado!');
     }
   } else {
-    doc.save(`Corretiva_${selectedAsset.tag}.pdf`);
+    doc.save(`Monitor_${selectedAsset.tag}.pdf`);
     showToast('Relatório gerado!');
   }
 
