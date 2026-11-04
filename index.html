@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Sistema Completo de Ativos & Inspeção</title>
+<title>KMReport RioSP — Fibras, Topologia & APIs de Rede</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -30,17 +30,15 @@ input,select,textarea{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:9px}
 
-/* SPLASH */
-#splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg)}
-#splash.done{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease}
+/* GATE SELEÇÃO DE PASTA */
+#gateFolder{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-xl)}
 
-/* HEADER FIXO */
 header{position:fixed;top:0;left:0;right:0;height:calc(60px + var(--safe-t));padding-top:var(--safe-t);background:rgba(6,7,10,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);z-index:500;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;display:grid;place-items:center;font-weight:900}
 .brand-title{font-size:15px;font-weight:900;letter-spacing:-.02em}
 
-/* MAIN CONTAINER */
 main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;padding:16px 16px calc(24px + var(--safe-b))}
 .container{max-width:950px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 
@@ -49,15 +47,11 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 .btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
 .btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
-/* MÓDULO CÂMERA E RELATÓRIO */
+/* MODAL CÂMERA E RELATÓRIO */
 #modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
 #modalFoto.active{display:flex}
 .preview-box{width:100%;height:280px;border-radius:16px;background:#000;position:relative;overflow:hidden;border:1px solid var(--border2)}
 #cameraVid{width:100%;height:100%;object-fit:cover}
-
-/* GATE SELEÇÃO DE PASTA */
-#gateFolder{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-xl)}
 
 .toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);backdrop-filter:blur(18px);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -65,23 +59,22 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 </head>
 <body>
 
-<!-- GATE DE SELEÇÃO DE PASTA (ESTILO KMREPORT ORIGINAL) -->
 <div id="gateFolder">
   <div class="gate-box">
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
       <i data-lucide="folder-open" style="width:32px;height:32px"></i>
     </div>
     <h1 style="font-size:20px;font-weight:900">KMReport RioSP</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta no seu dispositivo para salvar relatórios, fotos e documentação de ativos.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para salvar relatórios PDF e fotos dos ativos.</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="shield-check"></i></div>
+    <div class="brand-icon"><i data-lucide="network"></i></div>
     <div>
-      <h1 class="brand-title">KMReport RioSP</h1>
+      <h1 class="brand-title">KMReport Fibras</h1>
       <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
@@ -94,7 +87,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <main style="display:none" id="mainAppContent">
   <div class="container">
     
-    <!-- SELETOR DE ATIVO E FILTROS -->
+    <!-- SELETOR DE ATIVO E FILTRO PADRÃO DE FIBRA -->
     <div class="card">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -106,18 +99,17 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
           <option value="">Carregando ativos...</option>
         </select>
 
-        <!-- FILTROS RÁPIDOS DE INTERLIGAÇÃO -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-          <span style="font-size:10px;font-weight:900;color:var(--muted);align-self:center">Filtrar:</span>
-          <button class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('all')">Todos</button>
-          <button class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('fibra')">Mesma Fibra</button>
-          <button class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('anel')">Mesmo Anel FO</button>
-          <button class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('cidade')">Mesma Cidade</button>
+        <!-- SELETOR DE FILTRO (PADRÃO: MESMA FIBRA) -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">
+          <span style="font-size:10px;font-weight:900;color:var(--muted)">Filtro de Listagem:</span>
+          <button id="btnFiltFibra" class="btn-sec active" style="font-size:10px;padding:6px 10px" onclick="setFilter('fibra')">Mesma Fibra (Padrão)</button>
+          <button id="btnFiltAll" class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('all')">Mostrar Todos</button>
+          <button id="btnFiltAnel" class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('anel')">Mesmo Anel FO</button>
         </div>
       </div>
     </div>
 
-    <!-- PAINEL CENTRAL DE DADOS E MAPA SIMULADO DE PORTAS -->
+    <!-- PAINEL CENTRAL DE DADOS, MAPA DE PORTAS E API DE REDE -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
         <p style="font-size:13px;font-weight:800">Aguardando coordenadas de GPS ou seleção de ativo...</p>
@@ -145,7 +137,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
     <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações da Manutenção</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de fusão, conectores, switch ou manutenção preventiva..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de fusão, atenuação, conectores ou manutenção preventiva..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
     
     <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
   </div>
@@ -157,7 +149,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 let kmDB = [];
 let ativosDatabase = [];
 let currentMode = 'gps';
-let currentFilter = 'all';
+let currentFilter = 'fibra'; // PADRÃO: SEMPRE MOSTRAR DA MESMA FIBRA
 let currentKmNum = null;
 let currentKmStr = "---";
 let selectedAsset = null;
@@ -187,7 +179,7 @@ window.addEventListener('DOMContentLoaded', () => {
 async function initFolderPermission() {
   try {
     if (!window.showDirectoryPicker) {
-      alert('Seu navegador não suporta a seleção direta de pastas. Utilize Chrome ou Edge.');
+      alert('Seu navegador não suporta a seleção direta de pastas.');
       return;
     }
     dirHandle = await window.showDirectoryPicker();
@@ -278,8 +270,11 @@ function setMode(mode) {
 
 function setFilter(filterType) {
   currentFilter = filterType;
+  document.getElementById('btnFiltFibra').classList.toggle('active', filterType === 'fibra');
+  document.getElementById('btnFiltAll').classList.toggle('active', filterType === 'all');
+  document.getElementById('btnFiltAnel').classList.toggle('active', filterType === 'anel');
   updateAssetDropdown();
-  showToast(`Filtro: ${filterType.toUpperCase()}`);
+  showToast(`Filtro: ${filterType === 'fibra' ? 'Mesma Fibra' : filterType.toUpperCase()}`);
 }
 
 function updateAssetDropdown() {
@@ -291,9 +286,10 @@ function updateAssetDropdown() {
     list = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
   } else if(currentFilter === 'anel' && selectedAsset) {
     list = ativosDatabase.filter(item => item.anel === selectedAsset.anel);
-  } else if(currentFilter === 'cidade' && selectedAsset) {
-    list = ativosDatabase.filter(item => item.cidade === selectedAsset.cidade);
   }
+
+  // Se o filtro retornar vazio por algum motivo, garante a lista completa
+  if (!list.length) list = ativosDatabase;
 
   sel.innerHTML = '';
   list.forEach(item => {
@@ -347,11 +343,18 @@ function renderTechnicalConsultation(idx) {
   const data = ativosDatabase[idx];
   if(!data) return;
   selectedAsset = data;
-  const container = document.getElementById('topoVisualCard');
+  updateAssetDropdown(); // Atualiza dropdown mantendo o filtro de fibra ativo
 
+  const container = document.getElementById('topoVisualCard');
   const fibrasArr = data.fibra.split(',').map(s => s.trim());
   const fibraTx = fibrasArr[0] || '11';
   const fibraRx = fibrasArr[1] || '12';
+
+  // Simulação de cálculo de atenuação óptica baseada na distância (0.25 dB/km para 1550nm)
+  const distPrevNum = parseFloat(data.prevDist) || 1;
+  const distNextNum = parseFloat(data.nextDist) || 1;
+  const atenuacaoPrev = (distPrevNum * 0.25).toFixed(2);
+  const atenuacaoNext = (distNextNum * 0.25).toFixed(2);
 
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
@@ -369,9 +372,9 @@ function renderTechnicalConsultation(idx) {
         <button class="btn-primary" onclick="openFotoModal()" style="margin-top:18px"><i data-lucide="camera"></i> Registrar Foto & Salvar Relatório PDF</button>
       </div>
 
-      <!-- MAPA SIMULADO DE PORTAS & INTERLIGAÇÃO ÓPTICA -->
+      <!-- MAPA SIMULADO DE PORTAS, FIBRAS E ATENUAÇÃO ÓPTICA -->
       <div class="card" style="padding:20px;background:linear-gradient(145deg,#0e1218,#07090d);border-color:rgba(59,130,246,.3)">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🌐 Topologia & Mapeamento de Portas Ópticas</h4>
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🌐 Topologia, Fibras & Simulação de Enlace Óptico</h4>
         
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           
@@ -381,11 +384,12 @@ function renderTechnicalConsultation(idx) {
             <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.prevTag}</p>
             <p style="font-size:10px;color:var(--text3)">KM ${data.prevKm}</p>
             <span style="font-size:9px;background:rgba(245,158,11,.2);color:#f6ad55;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.prevFibra}]</span>
+            <p style="font-size:9px;color:#34d399;margin-top:4px">Perda Est.: ~${atenuacaoPrev} dB</p>
           </div>
 
           <!-- SETA DE CONEXÃO -->
           <div style="display:flex;flex-direction:column;align-items:center;color:var(--accent)">
-            <span style="font-size:9px;font-weight:900">LINK FO</span>
+            <span style="font-size:9px;font-weight:900">ENLACE FO</span>
             <i data-lucide="arrow-left-right" style="width:24px;height:24px"></i>
             <span style="font-size:9px;color:var(--muted)">TX/RX</span>
           </div>
@@ -396,6 +400,7 @@ function renderTechnicalConsultation(idx) {
             <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.nextTag}</p>
             <p style="font-size:10px;color:var(--text3)">KM ${data.nextKm}</p>
             <span style="font-size:9px;background:rgba(59,130,246,.2);color:#60a5fa;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.nextFibra}]</span>
+            <p style="font-size:9px;color:#34d399;margin-top:4px">Perda Est.: ~${atenuacaoNext} dB</p>
           </div>
 
         </div>
@@ -415,15 +420,35 @@ function renderTechnicalConsultation(idx) {
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>KM / Sentido:</strong><br><span style="color:#fff">KM ${data.kmStr} (${data.sentido})</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Fibra:</strong><br><span style="color:#34d399">${data.fibra}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Cidade:</strong><br><span style="color:#fff">${data.cidade}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#ffd600">${data.ipGer}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#ffd600" id="apiIpInfo">${data.ipGer}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Rede:</strong><br><span style="color:#fff">${data.rede}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Switch:</strong><br><span style="color:#fff">${data.switchIp}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Ativo:</strong><br><span style="color:#fff">${data.ativoIp}</span></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn-sec" style="font-size:10px" onclick="consultIPAPI('${data.ipGer}')"><i data-lucide="globe"></i> Consultar API de Rede (${data.ipGer})</button>
         </div>
       </div>
     </div>
   `;
   lucide.createIcons();
+}
+
+// API Gratuita de consulta IP / Rede (ipapi.co)
+async function consultIPAPI(ip) {
+  if(!ip || ip === '-') { showToast('IP inválido para consulta.'); return; }
+  showToast('Consultando API de IP...');
+  try {
+    const res = await fetch(`https://ipapi.co/${ip}/json/`);
+    const data = await res.json();
+    if(data.error) {
+      alert(`Consulta IP ${ip}:\nRede Privada / Roteamento Interno Concessionária.`);
+    } else {
+      alert(`Detalhes da API para ${ip}:\nOrganização: ${data.org}\nCidade/Região: ${data.city} / ${data.region}\nPais: ${data.country_name}`);
+    }
+  } catch(e) {
+    showToast('Consulta simulada: IP de rede local/corporativa.');
+  }
 }
 
 async function openFotoModal() {
@@ -451,7 +476,7 @@ function capturePhoto() {
   ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
   ctx.fillStyle = '#ffd600';
   ctx.font = 'bold 24px monospace';
-  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''}`, 20, canvas.height - 45);
+  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Fibra ${selectedAsset ? selectedAsset.fibra : ''}`, 20, canvas.height - 45);
   ctx.fillStyle = '#ffffff';
   ctx.font = '16px sans-serif';
   ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')}`, 20, canvas.height - 18);
@@ -471,47 +496,48 @@ async function generateAndSaveReport() {
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('Relatório Oficial de Ativo — BR116', 14, 22);
+  doc.text('Relatório Oficial de Ativo & Fibras — BR116', 14, 22);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.text(`TAG do Ativo: ${selectedAsset.tag}`, 14, 34);
   doc.text(`Equipamento: ${selectedAsset.eq}`, 14, 42);
   doc.text(`Quilometragem: KM ${selectedAsset.kmStr}`, 14, 50);
-  doc.text(`IP Ativo / Gerência: ${selectedAsset.ativoIp} / ${selectedAsset.ipGer}`, 14, 58);
-  doc.text(`Switch / Rede: ${selectedAsset.switchIp} / ${selectedAsset.rede}`, 14, 66);
-  doc.text(`Anel FO: ${selectedAsset.anel}`, 14, 74);
-  doc.text(`Conexão Óptica Anterior: ${selectedAsset.prevTag} (${selectedAsset.prevDist} km)`, 14, 82);
-  doc.text(`Conexão Óptica Posterior: ${selectedAsset.nextTag} (${selectedAsset.nextDist} km)`, 14, 90);
+  doc.text(`Fibras (TX/RX): ${selectedAsset.fibra}`, 14, 58);
+  doc.text(`IP Ativo / Gerência: ${selectedAsset.ativoIp} / ${selectedAsset.ipGer}`, 14, 66);
+  doc.text(`Switch / Rede: ${selectedAsset.switchIp} / ${selectedAsset.rede}`, 14, 74);
+  doc.text(`Anel FO: ${selectedAsset.anel}`, 14, 82);
+  doc.text(`Anterior: ${selectedAsset.prevTag} (${selectedAsset.prevDist} km)`, 14, 90);
+  doc.text(`Posterior: ${selectedAsset.nextTag} (${selectedAsset.nextDist} km)`, 14, 98);
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
     doc.setTextColor(255, 214, 0);
-    doc.text('Observações Técnicas:', 14, 104);
+    doc.text('Observações Técnicas:', 14, 110);
     doc.setTextColor(200, 200, 200);
-    doc.text(obs, 14, 112);
+    doc.text(obs, 14, 118);
   }
 
   if(capturedImageBase64) {
-    doc.addImage(capturedImageBase64, 'JPEG', 14, 126, 182, 102);
+    doc.addImage(capturedImageBase64, 'JPEG', 14, 132, 182, 102);
   }
 
   const pdfBlob = doc.output('blob');
   
   if (dirHandle) {
     try {
-      const fileName = `Relatorio_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
+      const fileName = `Relatorio_Fibra_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
       await writable.write(pdfBlob);
       await writable.close();
       showToast('Relatório PDF salvo na pasta com sucesso!');
     } catch(e) {
-      doc.save(`Relatorio_${selectedAsset.tag}.pdf`);
+      doc.save(`Relatorio_Fibra_${selectedAsset.tag}.pdf`);
       showToast('Relatório baixado no dispositivo!');
     }
   } else {
-    doc.save(`Relatorio_${selectedAsset.tag}.pdf`);
+    doc.save(`Relatorio_Fibra_${selectedAsset.tag}.pdf`);
     showToast('Relatório gerado!');
   }
 
