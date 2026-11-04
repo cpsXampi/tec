@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Consulta Técnica Precisa</title>
+<title>KMReport RioSP — Consulta Técnica & Fibras Precisa</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 :root{
-  --bg:#06070a;--bg2:#0a0d11;--surface:#0f1216;--surface2:#14181d;--surface3:#1a1f25;
-  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--border3:rgba(255,255,255,.16);
+  --bg:#06070a;--surface:#0f1216;--surface2:#14181d;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
   --accent:#ffd600;--accent2:#ffe44d;--accent3:#c8a800;
   --text:#f0f0f2;--text2:#d4d4d8;--text3:#a1a1aa;--muted:#71717a;
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -75,11 +75,6 @@ input,select{font-family:var(--font);outline:none}
 #btn-start{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000}
 #btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;display:none}
 
-/* SETTINGS */
-#settings, #settingsUnica{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.6);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s var(--ease)}
-#settings.open, #settingsUnica.open{opacity:1;visibility:visible;pointer-events:auto}
-.settings-content{width:min(90vw,400px);max-height:85vh;border-radius:var(--r-xl);border:1px solid var(--border2);background:rgba(10,13,17,0.96);padding:24px;overflow-y:auto}
-.settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px;cursor:pointer;border:0;background:none}
 canvas#c, canvas#cUnica{display:none}
 .toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);backdrop-filter:blur(18px);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -149,7 +144,6 @@ canvas#c, canvas#cUnica{display:none}
       </div>
     </div>
 
-    <!-- PAINEL DE DADOS COMPLETOS E INTERLIGAÇÃO -->
     <div id="topoVisualCard"></div>
   </div>
 </div>
@@ -199,15 +193,18 @@ window.addEventListener('DOMContentLoaded', () => {
   loadAtivos116Data();
 });
 
+/* LÓGICA RIGOROSA DO KM REPORT ORIGINAL DE CONVERSÃO DE KM E DISTÂNCIA */
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
 
 function parseKmStringToNum(kmStr) {
   if (!kmStr) return 0;
-  const s = String(kmStr).trim();
+  const s = String(kmStr).trim().replace('KM', '').trim();
   if (s.includes('+')) {
     const parts = s.split('+');
-    return parseFloat(parts[0]) + parseFloat(parts[1]) / 1000.0;
+    const kmInt = parseFloat(parts[0]) || 0;
+    const metros = parseFloat(parts[1]) || 0;
+    return kmInt + (metros / 1000.0);
   }
   return parseFloat(s.replace(',', '.')) || 0;
 }
@@ -416,7 +413,7 @@ if ('geolocation' in navigator) {
       if (d < minD) { minD = d; best = pt; }
     }
     if (best) {
-      currentKmNum = best.km;
+      currentKmNum = parseFloat(best.km);
       currentKm = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
       document.getElementById('kmTxt').textContent = 'KM ' + currentKm;
       const badge = document.getElementById('topoKmBadge');
