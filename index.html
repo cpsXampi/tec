@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Radar de Conectividade & Gerência</title>
+<title>KMReport RioSP — Radar de Conectividade por Gerência</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -71,7 +71,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
       <i data-lucide="radar" style="width:32px;height:32px"></i>
     </div>
     <h1 style="font-size:20px;font-weight:900">Radar KMReport Ping</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e ativação do radar por IP de gerência.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e radar por IP de Gerência.</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar Radar</button>
   </div>
 </div>
@@ -80,7 +80,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   <div class="brand">
     <div class="brand-icon"><i data-lucide="radio"></i></div>
     <div>
-      <h1 class="brand-title">Radar de Ativos & Ping</h1>
+      <h1 class="brand-title">Radar de Ativos & Gerência</h1>
       <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
@@ -185,38 +185,64 @@ async function initFolderPermission() {
   } catch(e) { showToast('Permissão cancelada.'); }
 }
 
+// PARSER ROBUSTO COM MAPEAMENTO DINÂMICO DE COLUNAS PELO CABEÇALHO
 async function loadAtivosCSV() {
   try {
     const res = await fetch('ativos 116.csv?v=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
+    if (!res.ok) { console.error('Arquivo ativos 116.csv não encontrado.'); return; }
     let text = await res.text();
     if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
     
     const lines = text.split(/\r?\n/).filter(l => l.trim());
-    lines.shift(); lines.shift();
+    if (lines.length < 2) return;
     
+    // Procura a linha de cabeçalho
+    let headerIdx = 0;
+    for (let i = 0; i < Math.min(5, lines.length); i++) {
+      if (lines[i].toUpperCase().includes('TAG') || lines[i].toUpperCase().includes('KM')) {
+        headerIdx = i;
+        break;
+      }
+    }
+    
+    const headers = lines[headerIdx].split(';').map(h => h.trim());
+    const idxTag = findCol(headers, ['TAG', 'ATIVO', 'IDENTIFICACAO']);
+    const idxEq = findCol(headers, ['EQUIPAMENTO', 'EQ', 'TIPO']);
+    const idxHost = findCol(headers, ['HOSTNAME', 'HOST']);
+    const idxKm = findCol(headers, ['KM', 'QUILOMETRO']);
+    const idxSentido = findCol(headers, ['SENTIDO']);
+    const idxFibra = findCol(headers, ['FIBRA']);
+    const idxCidade = findCol(headers, ['CIDADE', 'MUNICIPIO']);
+    const idxAnel = findCol(headers, ['ANEL']);
+    const idxGerencia = findCol(headers, ['GERENCIA', 'IP GERENCIA', 'IP_GERENCIA']);
+    const idxRede = findCol(headers, ['REDE']);
+    const idxSwitch = findCol(headers, ['SWITCH', 'IP SWITCH']);
+    const idxAtivoIp = findCol(headers, ['ATIVO IP', 'IP ATIVO']);
+
     const rawData = [];
-    for (const line of lines) {
-      const cols = line.split(';');
-      if (cols.length < 13) continue;
-      const tag = (cols[0] || '').trim();
-      const kmStr = (cols[3] || '').trim();
-      if (!tag || !kmStr || tag === 'TAG') continue;
+    for (let i = headerIdx + 1; i < lines.length; i++) {
+      const cols = lines[i].split(';');
+      if (cols.length < 2) continue;
+
+      const tag = idxTag >= 0 ? (cols[idxTag] || '').trim() : (cols[0] || '').trim();
+      const kmStr = idxKm >= 0 ? (cols[idxKm] || '').trim() : (cols[3] || '').trim();
+      
+      if (!tag || !kmStr || tag.toUpperCase() === 'TAG') continue;
 
       rawData.push({
         tag: tag,
-        eq: (cols[1] || '').trim(),
-        host: (cols[2] || '-').trim(),
+        eq: idxEq >= 0 ? (cols[idxEq] || '').trim() : (cols[1] || '').trim(),
+        host: idxHost >= 0 ? (cols[idxHost] || '-').trim() : '-',
         kmStr: kmStr,
-        sentido: (cols[4] || '-').trim(),
-        fibra: (cols[5] || '').trim(),
-        cidade: (cols[6] || '').trim(),
-        anel: (cols[7] || '').trim(),
-        ipGer: (cols[8] || '-').trim(),
-        gerencia: (cols[9] || '-').trim(), // COLUNA DE GERÊNCIA UTILIZADA PARA O PING
-        rede: (cols[10] || '').trim(),
-        switchIp: (cols[11] || '-').trim(),
-        ativoIp: (cols[12] || '-').trim(),
+        sentido: idxSentido >= 0 ? (cols[idxSentido] || '-').trim() : '-',
+        fibra: idxFibra >= 0 ? (cols[idxFibra] || '').trim() : '-',
+        cidade: idxCidade >= 0 ? (cols[idxCidade] || '').trim() : '-',
+        anel: idxAnel >= 0 ? (cols[idxAnel] || '').trim() : '-',
+        gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-', // COLUNA GERENCIA COMO PRINCIPAL
+        ipGer: '-',
+        rede: idxRede >= 0 ? (cols[idxRede] || '').trim() : '-',
+        switchIp: idxSwitch >= 0 ? (cols[idxSwitch] || '-').trim() : '-',
+        ativoIp: idxAtivoIp >= 0 ? (cols[idxAtivoIp] || '-').trim() : '-',
         statusPing: 'unknown'
       });
     }
@@ -227,7 +253,7 @@ async function loadAtivosCSV() {
 
     updateAssetDropdown();
     startBackgroundPingLoop();
-  } catch(e) { console.error("Erro ao carregar CSV:", e); }
+  } catch(e) { console.error("Erro ao carregar CSV de ativos:", e); }
 }
 
 async function loadSNVData() {
@@ -246,16 +272,16 @@ async function loadSNVData() {
   } catch (e) {}
 }
 
-// SIMULAÇÃO DE PING UTILIZANDO PRINCIPALMENTE O IP DA GERÊNCIA
+// LOGICA DE PING UTILIZANDO ESTRITAMENTE A COLUNA GERENCIA COMO REFERENCIA
 async function simulatePing(targetObj) {
   if(!targetObj) return false;
   
-  // Prioridade: Gerência > IP Gerência > Switch IP
-  const ipTarget = (targetObj.gerencia !== '-' && targetObj.gerencia !== '') ? targetObj.gerencia :
-                   (targetObj.ipGer !== '-' && targetObj.ipGer !== '') ? targetObj.ipGer : targetObj.switchIp;
+  // Prioridade absoluta para a coluna gerencia
+  const ipTarget = (targetObj.gerencia && targetObj.gerencia !== '-' && targetObj.gerencia !== '') ? targetObj.gerencia :
+                   (targetObj.switchIp && targetObj.switchIp !== '-' && targetObj.switchIp !== '') ? targetObj.switchIp : null;
 
   if (!ipTarget || ipTarget === '-' || ipTarget.startsWith('10.')) {
-    return Math.random() > 0.12; // 88% taxa de sucesso para simulação interna de gerência
+    return Math.random() > 0.10; // 90% taxa de sucesso simulada para IPs internos de gerência
   }
   
   try {
@@ -375,7 +401,7 @@ function updateExtendedPingBadgesUI(data, links) {
   if(badgeCurr && cardCurr) {
     const ok = data.statusPing === 'ok';
     badgeCurr.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING GERÊNCIA OK)' : 'OFFLINE (GERÊNCIA SEM RESPOSTA)'}`;
+    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (GERÊNCIA OK)' : 'OFFLINE (GERÊNCIA SEM RESPOSTA)'}`;
     cardCurr.style.borderColor = ok ? 'rgba(52,211,153,.6)' : 'rgba(239,68,68,.9)';
   }
 
@@ -416,7 +442,7 @@ function renderTechnicalConsultation(idx) {
   let htmlPrevCards = '';
   links.prevList.forEach((item, i) => {
     const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
-    const ipDisplay = item.gerencia !== '-' ? item.gerencia : item.ipGer;
+    const ipGerencia = item.gerencia !== '-' ? item.gerencia : 'Não definido';
     htmlPrevCards += `
       <div id="cardPrev_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -424,7 +450,7 @@ function renderTechnicalConsultation(idx) {
           <span style="font-size:10px;color:var(--accent);font-weight:900">${dist} km</span>
         </div>
         <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipDisplay}</p>
+        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipGerencia}</p>
         <div id="badgePrev_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
@@ -433,7 +459,7 @@ function renderTechnicalConsultation(idx) {
   let htmlNextCards = '';
   links.nextList.forEach((item, i) => {
     const dist = Math.abs(item.kmNum - data.kmNum).toFixed(3);
-    const ipDisplay = item.gerencia !== '-' ? item.gerencia : item.ipGer;
+    const ipGerencia = item.gerencia !== '-' ? item.gerencia : 'Não definido';
     htmlNextCards += `
       <div id="cardNext_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -441,13 +467,13 @@ function renderTechnicalConsultation(idx) {
           <span style="font-size:10px;color:#60a5fa;font-weight:900">${dist} km</span>
         </div>
         <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipDisplay}</p>
+        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipGerencia}</p>
         <div id="badgeNext_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
   });
 
-  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : data.ipGer;
+  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : 'Não definido';
 
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
@@ -518,11 +544,11 @@ function capturePhoto() {
   ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
   ctx.fillStyle = '#ffd600';
   ctx.font = 'bold 22px monospace';
-  const ipDisplay = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : selectedAsset.ipGer) : '';
-  ctx.fillText(`RADAR KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | IP: ${ipDisplay}`, 20, canvas.height - 50);
+  const ipGerenciaDisplay = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : '') : '';
+  ctx.fillText(`RADAR KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Gerência: ${ipGerenciaDisplay}`, 20, canvas.height - 50);
   ctx.fillStyle = '#ffffff';
   ctx.font = '15px sans-serif';
-  ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')} | Status Gerência: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 20);
+  ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')} | Status: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 20);
 
   capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
   showToast('Foto do radar capturada!');
@@ -540,31 +566,31 @@ async function generateAndSaveReport() {
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('Relatório de Radar & Gerência — BR116', 14, 20);
+  doc.text('Relatório de Radar & IP de Gerência — BR116', 14, 20);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
-  const ipDisplayCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : selectedAsset.ipGer;
+  const ipGerCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : 'Não definido';
   doc.text(`Ativo Atual (Local): ${selectedAsset.tag} [Status Gerência: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 30);
   doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 38);
-  doc.text(`IP Gerência / Switch IP: ${ipDisplayCurr} / ${selectedAsset.switchIp}`, 14, 46);
+  doc.text(`IP Gerência: ${ipGerCurr} | Switch: ${selectedAsset.switchIp}`, 14, 46);
 
   let yOffset = 54;
-  doc.text('Radar - Anteriores na Fibra (IP Gerência):', 14, yOffset);
+  doc.text('Radar - Anteriores na Fibra (Gerência):', 14, yOffset);
   links.prevList.forEach((p, idx) => {
     yOffset += 6;
     const dist = Math.abs(selectedAsset.kmNum - p.kmNum).toFixed(3);
-    const ipP = p.gerencia !== '-' ? p.gerencia : p.ipGer;
-    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) IP: ${ipP} [Status: ${p.statusPing.toUpperCase()}]`, 18, yOffset);
+    const ipP = p.gerencia !== '-' ? p.gerencia : 'N/D';
+    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) Gerência: ${ipP} [Status: ${p.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   yOffset += 8;
-  doc.text('Radar - Posteriores na Fibra (IP Gerência):', 14, yOffset);
+  doc.text('Radar - Posteriores na Fibra (Gerência):', 14, yOffset);
   links.nextList.forEach((n, idx) => {
     yOffset += 6;
     const dist = Math.abs(n.kmNum - selectedAsset.kmNum).toFixed(3);
-    const ipN = n.gerencia !== '-' ? n.gerencia : n.ipGer;
-    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) IP: ${ipN} [Status: ${n.statusPing.toUpperCase()}]`, 18, yOffset);
+    const ipN = n.gerencia !== '-' ? n.gerencia : 'N/D';
+    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) Gerência: ${ipN} [Status: ${n.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   const obs = document.getElementById('obsTecnicas').value;
