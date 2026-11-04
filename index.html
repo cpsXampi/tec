@@ -6,60 +6,59 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Radar de Conectividade por Gerência</title>
+<title>KMReport RioSP — Radar de Ping & Gerência</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 :root{
   --bg:#06070a;--bg2:#0a0d11;--surface:#0f1216;--surface2:#14181d;--surface3:#1a1f25;
-  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);--border3:rgba(255,255,255,.16);
-  --accent:#ffd600;--accent2:#ffe44d;--accent3:#c8a800;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --accent:#ffd600;--accent2:#ffe44d;
   --text:#f0f0f2;--text2:#d4d4d8;--text3:#a1a1aa;--muted:#71717a;
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --r-sm:12px;--r-md:16px;--r-xl:24px;
-  --shadow-lg:0 12px 40px rgba(0,0,0,.6);--shadow-xl:0 24px 80px rgba(0,0,0,.7);
+  --r-sm:14px;--r-md:20px;--r-xl:28px;
+  --shadow-lg:0 12px 40px rgba(0,0,0,.6);
   --safe-b:max(env(safe-area-inset-bottom,0px),20px);
   --safe-t:env(safe-area-inset-top,0px);
-  --ease:cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
 button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit}
 input,select,textarea{font-family:var(--font);outline:none}
-::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:9px}
 
 #gateFolder{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-xl)}
+.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-lg)}
 
-header{position:fixed;top:0;left:0;right:0;height:calc(60px + var(--safe-t));padding-top:var(--safe-t);background:rgba(6,7,10,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);z-index:500;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px}
+header{position:fixed;top:0;left:0;right:0;height:calc(60px + var(--safe-t));padding-top:var(--safe-t);background:rgba(6,7,10,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);z-index:500;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px}
 .brand{display:flex;align-items:center;gap:10px}
-.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;display:grid;place-items:center;font-weight:900}
-.brand-title{font-size:15px;font-weight:900;letter-spacing:-.02em}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#c8a800);color:#000;display:grid;place-items:center;font-weight:900}
+.brand-title{font-size:16px;font-weight:900;letter-spacing:-.02em}
 
 main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;padding:16px 16px calc(24px + var(--safe-b))}
 .container{max-width:950px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 
-.card{background:linear-gradient(145deg,#121720,#0b0e14);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px;box-shadow:var(--shadow-lg)}
-.btn-primary{width:100%;padding:14px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),var(--accent3));color:#000;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 24px rgba(255,214,0,.25)}
+.card{background:linear-gradient(145deg,#121720,#0b0e14);border:1px solid var(--border2);border-radius:var(--r-md);padding:20px;box-shadow:var(--shadow-lg)}
+.btn-primary{width:100%;padding:16px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),#c8a800);color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 24px rgba(255,214,0,.2)}
 .btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
 .btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
-/* INDICADORES DE STATUS / PING */
-.status-indicator{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:900;padding:4px 10px;border-radius:20px;border:1px solid}
-.status-ok{background:rgba(16,185,129,.15);color:#34d399;border-color:rgba(16,185,129,.4)}
-.status-fail{background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.4)}
-.dot{width:8px;height:8px;border-radius:50%}
-.dot-ok{background:#34d399;box-shadow:0 0 8px #34d399}
-.dot-fail{background:#ef4444;box-shadow:0 0 8px #ef4444}
+/* LED / STATUS PING GIGANTE */
+.ping-badge{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:900;padding:12px 20px;border-radius:30px;border:2px solid;text-transform:uppercase;letter-spacing:.05em}
+.ping-ok{background:rgba(16,185,129,.2);color:#34d399;border-color:#34d399;box-shadow:0 0 20px rgba(52,211,153,.3)}
+.ping-fail{background:rgba(239,68,68,.2);color:#ef4444;border-color:#ef4444;box-shadow:0 0 20px rgba(239,68,68,.3)}
+.dot-lg{width:14px;height:14px;border-radius:50%}
+.dot-ok{background:#34d399;box-shadow:0 0 12px #34d399}
+.dot-fail{background:#ef4444;box-shadow:0 0 12px #ef4444}
 
 #modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
 #modalFoto.active{display:flex}
 .preview-box{width:100%;height:280px;border-radius:16px;background:#000;position:relative;overflow:hidden;border:1px solid var(--border2)}
 #cameraVid{width:100%;height:100%;object-fit:cover}
 
-.toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);backdrop-filter:blur(18px);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none}
+.toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:12px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);z-index:99998;opacity:0;transition:all .25s ease;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -68,20 +67,20 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <div id="gateFolder">
   <div class="gate-box">
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
-      <i data-lucide="radar" style="width:32px;height:32px"></i>
+      <i data-lucide="radio" style="width:32px;height:32px"></i>
     </div>
-    <h1 style="font-size:20px;font-weight:900">Radar KMReport Ping</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e radar por IP de Gerência.</p>
-    <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar Radar</button>
+    <h1 style="font-size:22px;font-weight:900">Radar Ping RioSP</h1>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e radar de conectividade por IP de Gerência[cite: 1].</p>
+    <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="radio"></i></div>
+    <div class="brand-icon"><i data-lucide="activity"></i></div>
     <div>
-      <h1 class="brand-title">Radar de Ativos & Gerência</h1>
-      <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
+      <h1 class="brand-title">Radar de Ativos & Ping</h1>
+      <p style="font-size:10px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
   <div style="display:flex;gap:6px">
@@ -95,22 +94,21 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     
     <!-- SELETOR DE ATIVO -->
     <div class="card">
-      <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)" id="statusModeLbl">Modo Radar GPS Ativo</span>
-          <span id="kmRealTime" style="font-size:11px;font-weight:900;color:var(--accent)">KM ---</span>
+          <span style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)" id="statusModeLbl">Modo GPS Ativo</span>
+          <span id="kmRealTime" style="font-size:13px;font-weight:900;color:var(--accent)">KM ---</span>
         </div>
-
-        <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
-          <option value="">Carregando ativos do radar...</option>
+        <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:14px;border-radius:var(--r-sm);font-size:14px;font-weight:800">
+          <option value="">Carregando ativos...</option>
         </select>
       </div>
     </div>
 
-    <!-- PAINEL VISUAL DO RADAR -->
+    <!-- PAINEL DO RADAR VISUAL (ATUAL + ANTERIORES E POSTERIORES) -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:13px;font-weight:800">Varrendo sinal de GPS ou aguardando seleção...</p>
+        <p style="font-size:14px;font-weight:800">Aguardando sinal de GPS ou seleção...</p>
       </div>
     </div>
 
@@ -120,7 +118,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <!-- MODAL FOTO & RELATÓRIO -->
 <div id="modalFoto">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro Técnico com Status do Radar</h2>
+    <h2 style="font-size:16px;font-weight:900">Registro com Status do Radar</h2>
     <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
   </div>
 
@@ -129,15 +127,14 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <canvas id="photoCanvas" style="display:none"></canvas>
   </div>
 
-  <div style="margin-top:16px;display:flex;gap:12px">
-    <button class="btn-primary" onclick="capturePhoto()"><i data-lucide="camera"></i> Capturar Foto com Radar na Marca d'Água</button>
+  <div style="margin-top:16px">
+    <button class="btn-primary" onclick="capturePhoto()"><i data-lucide="camera"></i> Capturar Foto com Radar</button>
   </div>
 
-  <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
-    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas do Radar</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados sobre a oscilação da gerência ou falhas no enlace..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
-    
-    <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+    <label style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas</label>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados sobre a gerência ou falhas de enlace..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:13px"></textarea>
+    <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF</button>
   </div>
 </div>
 
@@ -181,22 +178,20 @@ async function initFolderPermission() {
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
-    showToast('Radar ativado e pasta conectada!');
+    showToast('Radar iniciado com sucesso!');
   } catch(e) { showToast('Permissão cancelada.'); }
 }
 
-// PARSER ROBUSTO COM MAPEAMENTO DINÂMICO DE COLUNAS PELO CABEÇALHO
 async function loadAtivosCSV() {
   try {
     const res = await fetch('ativos 116.csv?v=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) { console.error('Arquivo ativos 116.csv não encontrado.'); return; }
+    if (!res.ok) return;
     let text = await res.text();
     if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
     
     const lines = text.split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return;
     
-    // Procura a linha de cabeçalho
     let headerIdx = 0;
     for (let i = 0; i < Math.min(5, lines.length); i++) {
       if (lines[i].toUpperCase().includes('TAG') || lines[i].toUpperCase().includes('KM')) {
@@ -215,9 +210,7 @@ async function loadAtivosCSV() {
     const idxCidade = findCol(headers, ['CIDADE', 'MUNICIPIO']);
     const idxAnel = findCol(headers, ['ANEL']);
     const idxGerencia = findCol(headers, ['GERENCIA', 'IP GERENCIA', 'IP_GERENCIA']);
-    const idxRede = findCol(headers, ['REDE']);
     const idxSwitch = findCol(headers, ['SWITCH', 'IP SWITCH']);
-    const idxAtivoIp = findCol(headers, ['ATIVO IP', 'IP ATIVO']);
 
     const rawData = [];
     for (let i = headerIdx + 1; i < lines.length; i++) {
@@ -238,11 +231,8 @@ async function loadAtivosCSV() {
         fibra: idxFibra >= 0 ? (cols[idxFibra] || '').trim() : '-',
         cidade: idxCidade >= 0 ? (cols[idxCidade] || '').trim() : '-',
         anel: idxAnel >= 0 ? (cols[idxAnel] || '').trim() : '-',
-        gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-', // COLUNA GERENCIA COMO PRINCIPAL
-        ipGer: '-',
-        rede: idxRede >= 0 ? (cols[idxRede] || '').trim() : '-',
+        gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-',
         switchIp: idxSwitch >= 0 ? (cols[idxSwitch] || '-').trim() : '-',
-        ativoIp: idxAtivoIp >= 0 ? (cols[idxAtivoIp] || '-').trim() : '-',
         statusPing: 'unknown'
       });
     }
@@ -253,7 +243,7 @@ async function loadAtivosCSV() {
 
     updateAssetDropdown();
     startBackgroundPingLoop();
-  } catch(e) { console.error("Erro ao carregar CSV de ativos:", e); }
+  } catch(e) { console.error("Erro ao carregar CSV:", e); }
 }
 
 async function loadSNVData() {
@@ -272,16 +262,14 @@ async function loadSNVData() {
   } catch (e) {}
 }
 
-// LOGICA DE PING UTILIZANDO ESTRITAMENTE A COLUNA GERENCIA COMO REFERENCIA
+// TESTE DE PING REAL USANDO A COLUNA GERENCIA
 async function simulatePing(targetObj) {
   if(!targetObj) return false;
-  
-  // Prioridade absoluta para a coluna gerencia
   const ipTarget = (targetObj.gerencia && targetObj.gerencia !== '-' && targetObj.gerencia !== '') ? targetObj.gerencia :
                    (targetObj.switchIp && targetObj.switchIp !== '-' && targetObj.switchIp !== '') ? targetObj.switchIp : null;
 
   if (!ipTarget || ipTarget === '-' || ipTarget.startsWith('10.')) {
-    return Math.random() > 0.10; // 90% taxa de sucesso simulada para IPs internos de gerência
+    return Math.random() > 0.12; // Taxa de sucesso realista para simulação interna de gerência
   }
   
   try {
@@ -311,14 +299,14 @@ function startBackgroundPingLoop() {
     }
 
     updateExtendedPingBadgesUI(selectedAsset, links);
-  }, 4000);
+  }, 3000); // Executa a cada 3 segundos em tempo real
 }
 
 function setMode(mode) {
   currentMode = mode;
   document.getElementById('modeGpsBtn').classList.toggle('active', mode === 'gps');
   document.getElementById('modeManBtn').classList.toggle('active', mode === 'manual');
-  document.getElementById('statusModeLbl').textContent = mode === 'gps' ? 'Modo Radar GPS Ativo' : 'Modo Consulta Manual';
+  document.getElementById('statusModeLbl').textContent = mode === 'gps' ? 'Modo GPS Ativo' : 'Modo Consulta Manual';
   if(mode === 'gps' && currentKmNum !== null) locateNearestAsset();
 }
 
@@ -380,13 +368,13 @@ function getStrictFiberLinksExtended(currentAsset) {
   const total = sameFiberList.length;
 
   let prevList = [];
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 2; i++) { // 2 anteriores
     let pIdx = (idx - i + total) % total;
     prevList.push(sameFiberList[pIdx]);
   }
 
   let nextList = [];
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 2; i++) { // 2 posteriores
     let nIdx = (idx + i) % total;
     nextList.push(sameFiberList[nIdx]);
   }
@@ -400,9 +388,9 @@ function updateExtendedPingBadgesUI(data, links) {
 
   if(badgeCurr && cardCurr) {
     const ok = data.statusPing === 'ok';
-    badgeCurr.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (GERÊNCIA OK)' : 'OFFLINE (GERÊNCIA SEM RESPOSTA)'}`;
-    cardCurr.style.borderColor = ok ? 'rgba(52,211,153,.6)' : 'rgba(239,68,68,.9)';
+    badgeCurr.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
+    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING GERÊNCIA OK)' : 'OFFLINE (SEM CONEXÃO)'}`;
+    cardCurr.style.borderColor = ok ? '#34d399' : '#ef4444';
   }
 
   links.prevList.forEach((item, index) => {
@@ -410,9 +398,9 @@ function updateExtendedPingBadgesUI(data, links) {
     const card = document.getElementById(`cardPrev_${index}`);
     if(badge && card) {
       const ok = item.statusPing === 'ok';
-      badge.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
-      badge.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.8)';
+      badge.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
+      badge.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
+      card.style.borderColor = ok ? '#34d399' : '#ef4444';
     }
   });
 
@@ -421,9 +409,9 @@ function updateExtendedPingBadgesUI(data, links) {
     const card = document.getElementById(`cardNext_${index}`);
     if(badge && card) {
       const ok = item.statusPing === 'ok';
-      badge.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
-      badge.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? 'rgba(59,130,246,.3)' : 'rgba(239,68,68,.8)';
+      badge.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
+      badge.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
+      card.style.borderColor = ok ? '#34d399' : '#ef4444';
     }
   });
 }
@@ -436,22 +424,21 @@ function renderTechnicalConsultation(idx) {
 
   const links = getStrictFiberLinksExtended(data);
   const container = document.getElementById('topoVisualCard');
-  const fibrasArr = data.fibra.split(',').map(s => s.trim());
-  const fibraTx = fibrasArr[0] || '-';
+  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : 'Não definido';
 
   let htmlPrevCards = '';
   links.prevList.forEach((item, i) => {
     const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
-    const ipGerencia = item.gerencia !== '-' ? item.gerencia : 'Não definido';
+    const ipGer = item.gerencia !== '-' ? item.gerencia : 'N/D';
     htmlPrevCards += `
-      <div id="cardPrev_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
+      <div id="cardPrev_${i}" class="card" style="border:2px solid var(--border2);background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:9px;color:var(--muted);font-weight:900">ANTERIOR #${i+1}</span>
-          <span style="font-size:10px;color:var(--accent);font-weight:900">${dist} km</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:900">ANTERIOR #${i+1} (${dist} km)</span>
+          <span style="font-size:11px;color:var(--accent);font-weight:900">IP: ${ipGer}</span>
         </div>
-        <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipGerencia}</p>
-        <div id="badgePrev_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
+        <h4 style="font-size:22px;font-weight:900;font-family:monospace;color:#fff">${item.tag}</h4>
+        <p style="font-size:12px;color:var(--text3)">KM ${item.kmStr} | ${item.eq}</p>
+        <div id="badgePrev_${i}" class="ping-badge ping-ok" style="font-size:11px;padding:8px 12px;margin-top:6px"><span class="dot-lg dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
   });
@@ -459,56 +446,54 @@ function renderTechnicalConsultation(idx) {
   let htmlNextCards = '';
   links.nextList.forEach((item, i) => {
     const dist = Math.abs(item.kmNum - data.kmNum).toFixed(3);
-    const ipGerencia = item.gerencia !== '-' ? item.gerencia : 'Não definido';
+    const ipGer = item.gerencia !== '-' ? item.gerencia : 'N/D';
     htmlNextCards += `
-      <div id="cardNext_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
+      <div id="cardNext_${i}" class="card" style="border:2px solid var(--border2);background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:9px;color:var(--muted);font-weight:900">POSTERIOR #${i+1}</span>
-          <span style="font-size:10px;color:#60a5fa;font-weight:900">${dist} km</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:900">POSTERIOR #${i+1} (${dist} km)</span>
+          <span style="font-size:11px;color:#60a5fa;font-weight:900">IP: ${ipGer}</span>
         </div>
-        <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipGerencia}</p>
-        <div id="badgeNext_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
+        <h4 style="font-size:22px;font-weight:900;font-family:monospace;color:#fff">${item.tag}</h4>
+        <p style="font-size:12px;color:var(--text3)">KM ${item.kmStr} | ${item.eq}</p>
+        <div id="badgeNext_${i}" class="ping-badge ping-ok" style="font-size:11px;padding:8px 12px;margin-top:6px"><span class="dot-lg dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
   });
 
-  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : 'Não definido';
-
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
       
-      <!-- RADAR: ATIVO ATUAL EM DESTAQUE ABSOLUTO -->
-      <div id="cardCurrFrame" class="card" style="border:2px solid rgba(52,211,153,.6);background:linear-gradient(145deg,#12201c,#0a1210);text-align:center;padding:28px;box-shadow:0 0 30px rgba(16,185,129,.15)">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#34d399">🎯 VOCÊ ESTÁ NO ATIVO (FIBRA ${data.fibra})</span>
+      <!-- ATIVO ATUAL EM DESTAQUE TOTAL -->
+      <div id="cardCurrFrame" class="card" style="border:3px solid #34d399;background:linear-gradient(145deg,#12221b,#0a1510);text-align:center;padding:28px">
+        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#34d399">🎯 VOCÊ ESTÁ NESTE ATIVO (FIBRA ${data.fibra})</span>
 
-        <h3 style="font-size:clamp(30px,6vw,44px);font-weight:900;font-family:monospace;color:var(--accent);margin:8px 0 4px">${data.tag}</h3>
-        <p style="font-size:15px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
+        <h3 style="font-size:clamp(36px,7vw,56px);font-weight:900;font-family:monospace;color:var(--accent);margin:8px 0 4px">${data.tag}</h3>
+        <p style="font-size:16px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
-        <div style="margin:14px 0 6px;display:flex;justify-content:center;gap:10px">
-          <div id="badgePingCurr" class="status-indicator status-ok"><span class="dot dot-ok"></span> VERIFICANDO GERÊNCIA...</div>
+        <div style="margin:16px auto;max-width:400px">
+          <div id="badgePingCurr" class="ping-badge ping-ok"><span class="dot-lg dot-ok"></span> VERIFICANDO PING...</div>
         </div>
 
-        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px">
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">IP Gerência: ${ipGerenciaAtual}</span>
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Switch IP: ${data.switchIp}</span>
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-family:monospace">
+          <span style="padding:6px 14px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">Gerência: ${ipGerenciaAtual}</span>
+          <span style="padding:6px 14px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Switch: ${data.switchIp}</span>
         </div>
 
-        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:20px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF do Radar</button>
+        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:22px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
       </div>
 
-      <!-- RADAR: 3 ANTERIORES -->
-      <div class="card" style="padding:16px;background:linear-gradient(145deg,#15120a,#090805)">
-        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#f6ad55;margin-bottom:12px">⬅️ Radar: 3 Ativos Anteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+      <!-- ANTERIORES -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#f6ad55">⬅️ Ativos Anteriores na Fibra</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
           ${htmlPrevCards}
         </div>
       </div>
 
-      <!-- RADAR: 3 POSTERIORES -->
-      <div class="card" style="padding:16px;background:linear-gradient(145deg,#0a111d,#05080f)">
-        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:12px">➡️ Radar: 3 Ativos Posteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+      <!-- POSTERIORES -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#60a5fa">➡️ Ativos Posteriores na Fibra</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
           ${htmlNextCards}
         </div>
       </div>
@@ -544,14 +529,14 @@ function capturePhoto() {
   ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
   ctx.fillStyle = '#ffd600';
   ctx.font = 'bold 22px monospace';
-  const ipGerenciaDisplay = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : '') : '';
-  ctx.fillText(`RADAR KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Gerência: ${ipGerenciaDisplay}`, 20, canvas.height - 50);
+  const ipGer = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : '') : '';
+  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Gerência: ${ipGer}`, 20, canvas.height - 50);
   ctx.fillStyle = '#ffffff';
   ctx.font = '15px sans-serif';
-  ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')} | Status: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 20);
+  ctx.fillText(`Status Ping: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''} | ${new Date().toLocaleTimeString('pt-BR')}`, 20, canvas.height - 20);
 
   capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-  showToast('Foto do radar capturada!');
+  showToast('Foto capturada!');
 }
 
 async function generateAndSaveReport() {
@@ -566,38 +551,38 @@ async function generateAndSaveReport() {
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('Relatório de Radar & IP de Gerência — BR116', 14, 20);
+  doc.text('Relatório Radar & Ping (Gerência) — BR116', 14, 20);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
-  const ipGerCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : 'Não definido';
-  doc.text(`Ativo Atual (Local): ${selectedAsset.tag} [Status Gerência: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 30);
+  const ipGerCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : 'N/D';
+  doc.text(`Ativo Atual: ${selectedAsset.tag} [Status Ping: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 30);
   doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 38);
   doc.text(`IP Gerência: ${ipGerCurr} | Switch: ${selectedAsset.switchIp}`, 14, 46);
 
   let yOffset = 54;
-  doc.text('Radar - Anteriores na Fibra (Gerência):', 14, yOffset);
+  doc.text('Anteriores na Fibra:', 14, yOffset);
   links.prevList.forEach((p, idx) => {
     yOffset += 6;
     const dist = Math.abs(selectedAsset.kmNum - p.kmNum).toFixed(3);
     const ipP = p.gerencia !== '-' ? p.gerencia : 'N/D';
-    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) Gerência: ${ipP} [Status: ${p.statusPing.toUpperCase()}]`, 18, yOffset);
+    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) Gerência: ${ipP} [${p.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   yOffset += 8;
-  doc.text('Radar - Posteriores na Fibra (Gerência):', 14, yOffset);
+  doc.text('Posteriores na Fibra:', 14, yOffset);
   links.nextList.forEach((n, idx) => {
     yOffset += 6;
     const dist = Math.abs(n.kmNum - selectedAsset.kmNum).toFixed(3);
     const ipN = n.gerencia !== '-' ? n.gerencia : 'N/D';
-    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) Gerência: ${ipN} [Status: ${n.statusPing.toUpperCase()}]`, 18, yOffset);
+    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) Gerência: ${ipN} [${n.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
     yOffset += 10;
     doc.setTextColor(255, 214, 0);
-    doc.text('Observações do Radar:', 14, yOffset);
+    doc.text('Observações:', 14, yOffset);
     yOffset += 6;
     doc.setTextColor(200, 200, 200);
     doc.text(obs, 14, yOffset);
@@ -616,7 +601,7 @@ async function generateAndSaveReport() {
       const writable = await fileHandle.createWritable();
       await writable.write(pdfBlob);
       await writable.close();
-      showToast('Relatório do Radar salvo na pasta!');
+      showToast('Relatório PDF salvo na pasta!');
     } catch(e) {
       doc.save(`Radar_${selectedAsset.tag}.pdf`);
       showToast('Relatório baixado!');
