@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Fibras, Topologia & APIs de Rede</title>
+<title>KMReport RioSP — Trava de Fibra & Rota Guiada</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -30,7 +30,6 @@ input,select,textarea{font-family:var(--font);outline:none}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:9px}
 
-/* GATE SELEÇÃO DE PASTA */
 #gateFolder{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 .gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-xl)}
 
@@ -47,7 +46,6 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 .btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
 .btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
 
-/* MODAL CÂMERA E RELATÓRIO */
 #modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
 #modalFoto.active{display:flex}
 .preview-box{width:100%;height:280px;border-radius:16px;background:#000;position:relative;overflow:hidden;border:1px solid var(--border2)}
@@ -65,14 +63,14 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
       <i data-lucide="folder-open" style="width:32px;height:32px"></i>
     </div>
     <h1 style="font-size:20px;font-weight:900">KMReport RioSP</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para salvar relatórios PDF e fotos dos ativos.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para salvar relatórios PDF e fotos na mesma fibra.</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="network"></i></div>
+    <div class="brand-icon"><i data-lucide="git-commit"></i></div>
     <div>
       <h1 class="brand-title">KMReport Fibras</h1>
       <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
@@ -87,7 +85,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <main style="display:none" id="mainAppContent">
   <div class="container">
     
-    <!-- SELETOR DE ATIVO E FILTRO PADRÃO DE FIBRA -->
+    <!-- SELETOR DE ATIVO COM TRAVA DE FIBRA E ROTA GUIADA -->
     <div class="card">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -99,17 +97,18 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
           <option value="">Carregando ativos...</option>
         </select>
 
-        <!-- SELETOR DE FILTRO (PADRÃO: MESMA FIBRA) -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">
-          <span style="font-size:10px;font-weight:900;color:var(--muted)">Filtro de Listagem:</span>
-          <button id="btnFiltFibra" class="btn-sec active" style="font-size:10px;padding:6px 10px" onclick="setFilter('fibra')">Mesma Fibra (Padrão)</button>
-          <button id="btnFiltAll" class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('all')">Mostrar Todos</button>
-          <button id="btnFiltAnel" class="btn-sec" style="font-size:10px;padding:6px 10px" onclick="setFilter('anel')">Mesmo Anel FO</button>
+        <!-- CONTROLES DE TRAVA E ROTA NA MESMA FIBRA -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:6px">
+            <button id="btnLockFibra" class="btn-sec active" style="font-size:10px;padding:6px 10px" onclick="toggleFibraLock()">🔒 Trava Mesma Fibra (Ativa)</button>
+            <button id="btnSetBase" class="btn-sec" style="font-size:10px;padding:6px 10px;background:rgba(59,130,246,.2);color:#60a5fa;border-color:rgba(59,130,246,.4)" onclick="setAsBaseWork()">⭐ Fixar como Base de Trabalho</button>
+          </div>
+          <span id="baseWorkLbl" style="font-size:10px;color:var(--accent);font-weight:800">Base: Nenhuma</span>
         </div>
       </div>
     </div>
 
-    <!-- PAINEL CENTRAL DE DADOS, MAPA DE PORTAS E API DE REDE -->
+    <!-- PAINEL CENTRAL DE DADOS E NAVEGAÇÃO NA FIBRA -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
         <p style="font-size:13px;font-weight:800">Aguardando coordenadas de GPS ou seleção de ativo...</p>
@@ -122,7 +121,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <!-- MODAL CÂMERA E RELATÓRIO PDF -->
 <div id="modalFoto">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro & Documentação Técnica</h2>
+    <h2 style="font-size:16px;font-weight:900">Registro & Documentação na Fibra</h2>
     <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
   </div>
 
@@ -136,8 +135,8 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   </div>
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
-    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações da Manutenção</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de fusão, atenuação, conectores ou manutenção preventiva..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
+    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações da Fibra / Manutenção</label>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de fusão, atenuação ou continuidade na fibra..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
     
     <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
   </div>
@@ -149,7 +148,8 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 let kmDB = [];
 let ativosDatabase = [];
 let currentMode = 'gps';
-let currentFilter = 'fibra'; // PADRÃO: SEMPRE MOSTRAR DA MESMA FIBRA
+let fibraLocked = true; // TRAVA DE FIBRA LIGADA POR PADRÃO
+let baseWorkAsset = null; // ATIVO FIXADO COMO BASE DE TRABALHO
 let currentKmNum = null;
 let currentKmStr = "---";
 let selectedAsset = null;
@@ -178,18 +178,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function initFolderPermission() {
   try {
-    if (!window.showDirectoryPicker) {
-      alert('Seu navegador não suporta a seleção direta de pastas.');
-      return;
-    }
+    if (!window.showDirectoryPicker) { alert('Navegador sem suporte a diretórios.'); return; }
     dirHandle = await window.showDirectoryPicker();
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
     showToast('Pasta selecionada com sucesso!');
-  } catch(e) {
-    showToast('Permissão de pasta cancelada.');
-  }
+  } catch(e) { showToast('Permissão cancelada.'); }
 }
 
 async function loadAtivosCSV() {
@@ -230,9 +225,14 @@ async function loadAtivosCSV() {
     rawData.forEach(item => { item.kmNum = parseKmStringToNum(item.kmStr); });
     rawData.sort((a,b) => a.kmNum - b.kmNum);
 
+    // Mapeamento sequencial estrito considerando a mesma fibra
     rawData.forEach((item, idx) => {
-      let prev = idx > 0 ? rawData[idx - 1] : rawData[rawData.length - 1];
-      let next = idx < rawData.length - 1 ? rawData[idx + 1] : rawData[0];
+      // Filtrar anterior e posterior estritamente na mesma fibra se travado
+      let sameFibraList = rawData.filter(x => x.fibra === item.fibra);
+      let subIdx = sameFibraList.indexOf(item);
+      let prev = subIdx > 0 ? sameFibraList[subIdx - 1] : rawData[idx > 0 ? idx - 1 : rawData.length - 1];
+      let next = subIdx < sameFibraList.length - 1 ? sameFibraList[subIdx + 1] : rawData[idx < rawData.length - 1 ? idx + 1 : 0];
+
       ativosDatabase.push({
         ...item,
         prevTag: prev.tag, prevKm: prev.kmStr, prevFibra: prev.fibra, prevDist: Math.abs(item.kmNum - prev.kmNum).toFixed(3),
@@ -268,13 +268,24 @@ function setMode(mode) {
   if(mode === 'gps' && currentKmNum !== null) locateNearestAsset();
 }
 
-function setFilter(filterType) {
-  currentFilter = filterType;
-  document.getElementById('btnFiltFibra').classList.toggle('active', filterType === 'fibra');
-  document.getElementById('btnFiltAll').classList.toggle('active', filterType === 'all');
-  document.getElementById('btnFiltAnel').classList.toggle('active', filterType === 'anel');
+function toggleFibraLock() {
+  fibraLocked = !fibraLocked;
+  const btn = document.getElementById('btnLockFibra');
+  btn.classList.toggle('active', fibraLocked);
+  btn.textContent = fibraLocked ? '🔒 Trava Mesma Fibra (Ativa)' : '🔓 Trava Mesma Fibra (Desativada)';
   updateAssetDropdown();
-  showToast(`Filtro: ${filterType === 'fibra' ? 'Mesma Fibra' : filterType.toUpperCase()}`);
+  showToast(fibraLocked ? 'Filtro restrito à mesma fibra' : 'Mostrando todos os ativos');
+}
+
+function setAsBaseWork() {
+  if(!selectedAsset) return;
+  baseWorkAsset = selectedAsset;
+  document.getElementById('baseWorkLbl').textContent = `Base: ${baseWorkAsset.tag} (Fibra ${baseWorkAsset.fibra})` ;
+  fibraLocked = true; // Garante trava na fibra da base
+  document.getElementById('btnLockFibra').classList.add('active');
+  document.getElementById('btnLockFibra').textContent = '🔒 Trava Mesma Fibra (Ativa)';
+  updateAssetDropdown();
+  showToast(`Base de trabalho fixada na fibra ${baseWorkAsset.fibra}!`);
 }
 
 function updateAssetDropdown() {
@@ -282,13 +293,14 @@ function updateAssetDropdown() {
   if(!sel || !ativosDatabase.length) return;
   
   let list = ativosDatabase;
-  if(currentFilter === 'fibra' && selectedAsset) {
+  
+  // Se houver base de trabalho ou trava ativa na fibra do ativo selecionado
+  if (fibraLocked && selectedAsset) {
     list = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
-  } else if(currentFilter === 'anel' && selectedAsset) {
-    list = ativosDatabase.filter(item => item.anel === selectedAsset.anel);
+  } else if (fibraLocked && baseWorkAsset) {
+    list = ativosDatabase.filter(item => item.fibra === baseWorkAsset.fibra);
   }
 
-  // Se o filtro retornar vazio por algum motivo, garante a lista completa
   if (!list.length) list = ativosDatabase;
 
   sel.innerHTML = '';
@@ -319,7 +331,7 @@ if ('geolocation' in navigator) {
       currentKmNum = parseFloat(best.km);
       currentKmStr = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
       document.getElementById('kmRealTime').textContent = 'KM ' + currentKmStr;
-      if(currentMode === 'gps') locateNearestAsset();
+      if(currentMode === 'gps' && !baseWorkAsset) locateNearestAsset();
     }
   }, null, { enableHighAccuracy: true });
 }
@@ -343,24 +355,21 @@ function renderTechnicalConsultation(idx) {
   const data = ativosDatabase[idx];
   if(!data) return;
   selectedAsset = data;
-  updateAssetDropdown(); // Atualiza dropdown mantendo o filtro de fibra ativo
+  updateAssetDropdown();
 
   const container = document.getElementById('topoVisualCard');
   const fibrasArr = data.fibra.split(',').map(s => s.trim());
   const fibraTx = fibrasArr[0] || '11';
   const fibraRx = fibrasArr[1] || '12';
 
-  // Simulação de cálculo de atenuação óptica baseada na distância (0.25 dB/km para 1550nm)
-  const distPrevNum = parseFloat(data.prevDist) || 1;
-  const distNextNum = parseFloat(data.nextDist) || 1;
-  const atenuacaoPrev = (distPrevNum * 0.25).toFixed(2);
-  const atenuacaoNext = (distNextNum * 0.25).toFixed(2);
+  const atenuacaoPrev = (parseFloat(data.prevDist) * 0.25).toFixed(2);
+  const atenuacaoNext = (parseFloat(data.nextDist) * 0.25).toFixed(2);
 
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
       <!-- PAINEL CENTRAL DO ATIVO -->
       <div class="card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:24px">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 ${currentMode === 'gps' ? 'Ativo Mais Próximo (GPS)' : 'Ativo Selecionado (Manual)'}</span>
+        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 Ativo na Fibra ${data.fibra} ${baseWorkAsset ? '(Base Fixada)' : ''}</span>
         <h3 style="font-size:clamp(26px,5vw,36px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px">${data.tag}</h3>
         <p style="font-size:14px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
@@ -369,50 +378,46 @@ function renderTechnicalConsultation(idx) {
           <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Cidade: ${data.cidade}</span>
         </div>
 
-        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:18px"><i data-lucide="camera"></i> Registrar Foto & Salvar Relatório PDF</button>
+        <div style="margin-top:18px;display:flex;gap:10px">
+          <button class="btn-primary" onclick="openFotoModal()" style="flex:2"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
+          <button class="btn-sec" onclick="setAsBaseWork()" style="flex:1;background:rgba(59,130,246,.2);color:#60a5fa;border-color:rgba(59,130,246,.4)">Fixar Base</button>
+        </div>
       </div>
 
-      <!-- MAPA SIMULADO DE PORTAS, FIBRAS E ATENUAÇÃO ÓPTICA -->
+      <!-- MAPA DE ENLACE ÓPTICO RESTRITO À MESMA FIBRA -->
       <div class="card" style="padding:20px;background:linear-gradient(145deg,#0e1218,#07090d);border-color:rgba(59,130,246,.3)">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🌐 Topologia, Fibras & Simulação de Enlace Óptico</h4>
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🌐 Sequência na Mesma Fibra (${data.fibra})</h4>
         
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           
-          <!-- ANTERIOR -->
           <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);padding:14px;border-radius:12px;font-family:monospace">
             <span style="font-size:9px;color:#f6ad55;font-weight:900">ANTERIOR (${data.prevDist} km)</span>
             <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.prevTag}</p>
             <p style="font-size:10px;color:var(--text3)">KM ${data.prevKm}</p>
             <span style="font-size:9px;background:rgba(245,158,11,.2);color:#f6ad55;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.prevFibra}]</span>
-            <p style="font-size:9px;color:#34d399;margin-top:4px">Perda Est.: ~${atenuacaoPrev} dB</p>
+            <p style="font-size:9px;color:#34d399;margin-top:4px">~${atenuacaoPrev} dB</p>
           </div>
 
-          <!-- SETA DE CONEXÃO -->
           <div style="display:flex;flex-direction:column;align-items:center;color:var(--accent)">
-            <span style="font-size:9px;font-weight:900">ENLACE FO</span>
+            <span style="font-size:9px;font-weight:900">ENLACE</span>
             <i data-lucide="arrow-left-right" style="width:24px;height:24px"></i>
             <span style="font-size:9px;color:var(--muted)">TX/RX</span>
           </div>
 
-          <!-- POSTERIOR -->
           <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);padding:14px;border-radius:12px;font-family:monospace">
             <span style="font-size:9px;color:#60a5fa;font-weight:900">POSTERIOR (${data.nextDist} km)</span>
             <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.nextTag}</p>
             <p style="font-size:10px;color:var(--text3)">KM ${data.nextKm}</p>
             <span style="font-size:9px;background:rgba(59,130,246,.2);color:#60a5fa;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.nextFibra}]</span>
-            <p style="font-size:9px;color:#34d399;margin-top:4px">Perda Est.: ~${atenuacaoNext} dB</p>
+            <p style="font-size:9px;color:#34d399;margin-top:4px">~${atenuacaoNext} dB</p>
           </div>
 
         </div>
-
-        <div style="margin-top:14px;padding:10px;background:rgba(0,0,0,.4);border-radius:8px;font-size:11px;font-family:monospace;color:var(--text2)">
-          <strong>Anel FO Principal:</strong> ${data.anel}
-        </div>
       </div>
 
-      <!-- DADOS COMPLETOS DA PLANILHA -->
+      <!-- DADOS DA PLANILHA -->
       <div class="card" style="padding:20px">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos (ativos 116.csv)</h4>
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos do Ativo</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px;font-family:monospace">
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>TAG:</strong><br><span style="color:#ffd600">${data.tag}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Equipamento:</strong><br><span style="color:#fff">${data.eq}</span></div>
@@ -420,13 +425,9 @@ function renderTechnicalConsultation(idx) {
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>KM / Sentido:</strong><br><span style="color:#fff">KM ${data.kmStr} (${data.sentido})</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Fibra:</strong><br><span style="color:#34d399">${data.fibra}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Cidade:</strong><br><span style="color:#fff">${data.cidade}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#ffd600" id="apiIpInfo">${data.ipGer}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Rede:</strong><br><span style="color:#fff">${data.rede}</span></div>
+          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#ffd600">${data.ipGer}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Switch:</strong><br><span style="color:#fff">${data.switchIp}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Ativo:</strong><br><span style="color:#fff">${data.ativoIp}</span></div>
-        </div>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="btn-sec" style="font-size:10px" onclick="consultIPAPI('${data.ipGer}')"><i data-lucide="globe"></i> Consultar API de Rede (${data.ipGer})</button>
         </div>
       </div>
     </div>
@@ -434,29 +435,12 @@ function renderTechnicalConsultation(idx) {
   lucide.createIcons();
 }
 
-// API Gratuita de consulta IP / Rede (ipapi.co)
-async function consultIPAPI(ip) {
-  if(!ip || ip === '-') { showToast('IP inválido para consulta.'); return; }
-  showToast('Consultando API de IP...');
-  try {
-    const res = await fetch(`https://ipapi.co/${ip}/json/`);
-    const data = await res.json();
-    if(data.error) {
-      alert(`Consulta IP ${ip}:\nRede Privada / Roteamento Interno Concessionária.`);
-    } else {
-      alert(`Detalhes da API para ${ip}:\nOrganização: ${data.org}\nCidade/Região: ${data.city} / ${data.region}\nPais: ${data.country_name}`);
-    }
-  } catch(e) {
-    showToast('Consulta simulada: IP de rede local/corporativa.');
-  }
-}
-
 async function openFotoModal() {
   document.getElementById('modalFoto').classList.add('active');
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     document.getElementById('cameraVid').srcObject = cameraStream;
-  } catch(e) { showToast('Não foi possível ativar a câmera.'); }
+  } catch(e) { showToast('Câmera indisponível.'); }
 }
 
 function closeFotoModal() {
@@ -496,30 +480,28 @@ async function generateAndSaveReport() {
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('Relatório Oficial de Ativo & Fibras — BR116', 14, 22);
+  doc.text('Relatório Oficial de Fibra — BR116', 14, 22);
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.text(`TAG do Ativo: ${selectedAsset.tag}`, 14, 34);
   doc.text(`Equipamento: ${selectedAsset.eq}`, 14, 42);
   doc.text(`Quilometragem: KM ${selectedAsset.kmStr}`, 14, 50);
-  doc.text(`Fibras (TX/RX): ${selectedAsset.fibra}`, 14, 58);
+  doc.text(`Par de Fibra: ${selectedAsset.fibra}`, 14, 58);
   doc.text(`IP Ativo / Gerência: ${selectedAsset.ativoIp} / ${selectedAsset.ipGer}`, 14, 66);
-  doc.text(`Switch / Rede: ${selectedAsset.switchIp} / ${selectedAsset.rede}`, 14, 74);
-  doc.text(`Anel FO: ${selectedAsset.anel}`, 14, 82);
-  doc.text(`Anterior: ${selectedAsset.prevTag} (${selectedAsset.prevDist} km)`, 14, 90);
-  doc.text(`Posterior: ${selectedAsset.nextTag} (${selectedAsset.nextDist} km)`, 14, 98);
+  doc.text(`Anterior na Fibra: ${selectedAsset.prevTag} (${selectedAsset.prevDist} km)`, 14, 74);
+  doc.text(`Posterior na Fibra: ${selectedAsset.nextTag} (${selectedAsset.nextDist} km)`, 14, 82);
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
     doc.setTextColor(255, 214, 0);
-    doc.text('Observações Técnicas:', 14, 110);
+    doc.text('Observações Técnicas:', 14, 96);
     doc.setTextColor(200, 200, 200);
-    doc.text(obs, 14, 118);
+    doc.text(obs, 14, 104);
   }
 
   if(capturedImageBase64) {
-    doc.addImage(capturedImageBase64, 'JPEG', 14, 132, 182, 102);
+    doc.addImage(capturedImageBase64, 'JPEG', 14, 120, 182, 102);
   }
 
   const pdfBlob = doc.output('blob');
