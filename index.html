@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport Ultimate + Topologia & Bypass</title>
+<title>KMReport Ultimate — Topologia RioSP & Bypass</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -76,7 +76,7 @@ input,select{font-family:var(--font);outline:none}
 .module{display:none;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:var(--bg);z-index:10}
 .module.active{display:block}
 
-/* ===== MÓDULO TOPOLOGIA ÓPTICA ===== */
+/* ===== MÓDULO TOPOLOGIA ÓPTICA RIO-SP ===== */
 #mod-topologia{overflow-y:auto;padding:calc(20px + var(--safe-t)) 16px calc(24px + var(--safe-b));background:radial-gradient(circle at 50% 0,rgba(59,130,246,.08),transparent 40%),#06070a}
 .top-header{max-width:900px;margin:0 auto 24px;display:flex;justify-content:space-between;align-items:center}
 .top-back{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:11px;font-weight:800;text-transform:uppercase}
@@ -185,7 +185,7 @@ canvas#c, canvas#cUnica{display:none}
         <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
     </div>
-    <h1 class="sp-title">KMReport Ultimate</h1>
+    <h1 class="sp-title">KMReport RioSP</h1>
     <div class="sp-bar"><div class="sp-bar-fill"></div></div>
   </div>
 </div>
@@ -208,17 +208,17 @@ canvas#c, canvas#cUnica{display:none}
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
 
-      <!-- Consulta de Topologia e Bypass (NOVO) -->
+      <!-- Consulta de Topologia e Bypass RioSP (BASE OFICIAL) -->
       <button class="mc top-btn" onclick="openMod('topologia')">
         <span class="mc-i small" style="background:linear-gradient(145deg,#3b82f6,#1d4ed8);color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
-        <span class="mc-b small"><h3>Topologia & Bypass</h3><p>Identifique equipamento por KM, portas GBIC e simule bypass</p></span>
+        <span class="mc-b small"><h3>Topologia RioSP & Bypass</h3><p>Dados oficiais do Excel (TAGs, CFTV, Status e Simulação)</p></span>
         <span class="mc-a"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- MÓDULO TOPOLOGIA E SIMULAÇÃO DE BYPASS -->
+<!-- MÓDULO TOPOLOGIA E SIMULAÇÃO DE BYPASS RIO-SP -->
 <div id="mod-topologia" class="module">
   <div class="top-header">
     <div style="display:flex;align-items:center;gap:12px">
@@ -226,8 +226,8 @@ canvas#c, canvas#cUnica{display:none}
         <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
       </div>
       <div>
-        <h2 style="font-size:18px;font-weight:900">Topologia Óptica & Simulação de Bypass</h2>
-        <p style="font-size:11px;color:var(--text3)">Localização por GPS/KM, plano de portas (GBIC RX/TX) e rotas de contorno</p>
+        <h2 style="font-size:18px;font-weight:900">Topologia RioSP & Simulação de Bypass</h2>
+        <p style="font-size:11px;color:var(--text3)">Mapeamento oficial de ativos, TAGs, status de ativação e redundância</p>
       </div>
     </div>
     <button class="top-back" onclick="openMod('menu')">Voltar ao Menu</button>
@@ -238,12 +238,12 @@ canvas#c, canvas#cUnica{display:none}
     <div class="top-card" style="padding:20px">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">KM Atual Detectado</span>
-          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">GPS Ativo</span>
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Ativo / Equipamento RioSP</span>
+          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">Base Oficial</span>
         </div>
         <div style="display:flex;gap:12px;align-items:center">
           <select id="topoSelect" onchange="renderTopologyCard(this.value)" style="flex:1;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
-            <!-- Preenchido via JS -->
+            <!-- Preenchido via JS com base na planilha RioSP -->
           </select>
           <button onclick="autoSelectNearestNE()" style="padding:12px 16px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border-radius:var(--r-sm);font-size:11px;font-weight:900;text-transform:uppercase;white-space:nowrap">Mais Próximo (GPS)</button>
         </div>
@@ -372,7 +372,7 @@ function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCas
 let kmDB = [], stream = null, streamUnica = null, capturing = false, buffer = [], lat = '0.000000', lon = '0.000000';
 let currentKm = '---';
 let dirHandle = null;
-let bypassActive = false; // Estado da simulação de bypass
+let bypassActive = false;
 
 let mediaRecorder = null;
 let recordedChunks = [];
@@ -384,41 +384,18 @@ let selectedModule = null;
 let currentBatchNumber=1, pdfQueue=[], pdfWorkerBusy=false, sessionEnding=false, captureBusy=false, sessionStamp='', savedBatchCount=0;
 const REPORT_JPEG_QUALITY=0.82;
 
+/* Base de Dados Oficial RioSP (Extraída do seu controle de ativação) */
 const topoDatabase = {
-  "RSP-ITS01-N214_630": { ne: "RSP-ITS01-N214_630", kmNum: 214.630, km: "KM 214+630", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N230_231", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-ITS01-N218_550", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-ITS01-N220_500": { ne: "RSP-ITS01-N220_500", kmNum: 220.500, km: "KM 220+500", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-ITS01-N218_550", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N219_143", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-S0A3-N221_087": { ne: "RSP-S0A3-N221_087", kmNum: 221.087, km: "KM 221+087", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N221_550", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N223_095", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-FERNAO_DIAS": { ne: "RSP-SA01-FERNAO_DIAS", kmNum: 200.000, km: "Trecho Fernão Dias", sp: null, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N202_782", remotePort: "GE1/0/11", status: "Offline" } },
-  "RSP-SA01-N202_782": { ne: "RSP-SA01-N202_782", kmNum: 202.782, km: "KM 202+782", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-FERNAO_DIAS", remotePort: "GE1/0/12", status: "Offline" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N204_369", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N204_369": { ne: "RSP-SA01-N204_369", kmNum: 204.369, km: "KM 204+369", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N205_526", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N202_782", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N205_526": { ne: "RSP-SA01-N205_526", kmNum: 205.526, km: "KM 205+526", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N206_858", remotePort: "GE1/0/12", status: "Faulty" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N204_369", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N206_858": { ne: "RSP-SA01-N206_858", kmNum: 206.858, km: "KM 206+858", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N208_294", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N205_526", remotePort: "GE1/0/11", status: "Faulty" } },
-  "RSP-SA01-N208_294": { ne: "RSP-SA01-N208_294", kmNum: 208.294, km: "KM 208+294", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N209_708", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N206_858", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N209_708": { ne: "RSP-SA01-N209_708", kmNum: 209.708, km: "KM 209+708", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N211_003", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N208_294", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N211_003": { ne: "RSP-SA01-N211_003", kmNum: 211.003, km: "KM 211+003", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N212_684", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N209_708", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N212_684": { ne: "RSP-SA01-N212_684", kmNum: 212.684, km: "KM 212+684", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N213_527", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N211_003", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N213_527": { ne: "RSP-SA01-N213_527", kmNum: 213.527, km: "KM 213+527", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N214_501", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N212_684", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N214_501": { ne: "RSP-SA01-N214_501", kmNum: 214.501, km: "KM 214+501", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N215_740", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N213_527", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N215_740": { ne: "RSP-SA01-N215_740", kmNum: 215.740, km: "KM 215+740", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N216_471", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N214_501", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N216_471": { ne: "RSP-SA01-N216_471", kmNum: 216.471, km: "KM 216+471", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N217_109", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N215_740", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N217_109": { ne: "RSP-SA01-N217_109", kmNum: 217.109, km: "KM 217+109", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N217_826", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N216_471", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N217_826": { ne: "RSP-SA01-N217_826", kmNum: 217.826, km: "KM 217+826", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N218_147", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N217_109", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N218_147": { ne: "RSP-SA01-N218_147", kmNum: 218.147, km: "KM 218+147", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N219_143", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N217_826", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N219_143": { ne: "RSP-SA01-N219_143", kmNum: 219.143, km: "KM 219+143", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-ITS01-N220_500", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N218_147", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N221_550": { ne: "RSP-SA01-N221_550", kmNum: 221.550, km: "KM 221+550", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N223_289", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-S0A3-N221_087", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N223_095": { ne: "RSP-SA01-N223_095", kmNum: 223.095, km: "KM 223+095", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-S0A3-N221_087", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N224_221", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N223_289": { ne: "RSP-SA01-N223_289", kmNum: 223.289, km: "KM 223+289", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N221_550", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N224_577", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N224_221": { ne: "RSP-SA01-N224_221", kmNum: 224.221, km: "KM 224+221", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N223_095", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N225_481", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N224_577": { ne: "RSP-SA01-N224_577", kmNum: 224.577, km: "KM 224+577", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N223_289", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N225_551", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N225_481": { ne: "RSP-SA01-N225_481", kmNum: 225.481, km: "KM 225+481", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N224_221", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N226_263", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N225_551": { ne: "RSP-SA01-N225_551", kmNum: 225.551, km: "KM 225+551", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N224_577", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N226_543", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N226_263": { ne: "RSP-SA01-N226_263", kmNum: 226.263, km: "KM 226+263", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N225_481", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N227_661", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N226_543": { ne: "RSP-SA01-N226_543", kmNum: 226.543, km: "KM 226+543", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N225_551", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N227_267", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N227_267": { ne: "RSP-SA01-N227_267", kmNum: 227.267, km: "KM 227+267", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N227_661", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N226_543", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N227_661": { ne: "RSP-SA01-N227_661", kmNum: 227.661, km: "KM 227+661", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N228_162", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N227_267", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N228_162": { ne: "RSP-SA01-N228_162", kmNum: 228.162, km: "KM 228+162", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N229_209", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N227_661", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N229_209": { ne: "RSP-SA01-N229_209", kmNum: 229.209, km: "KM 229+209", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N228_162", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-SA01-N230_231", remotePort: "GE1/0/11", status: "Normal" } },
-  "RSP-SA01-N230_231": { ne: "RSP-SA01-N230_231", kmNum: 230.231, km: "KM 230+231", sp: { port: "GE1/0/11", alias: "Anel Secundário - Sentido SP", remote: "RSP-SA01-N229_209", remotePort: "GE1/0/12", status: "Normal" }, rj: { port: "GE1/0/12", alias: "Anel Secundário - Sentido RJ", remote: "RSP-ITS01-N214_630", remotePort: "GE1/0/11", status: "Normal" } }
+  "BR116-CF0001": { tag: "BR116-CF0001", eq: "CFTV DAI", km: "KM 214+728", kmNum: 214.728, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
+  "BR116-CM0001": { tag: "BR116-CM0001", eq: "CFTV MÓVEL", km: "KM 214+728", kmNum: 214.728, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
+  "SAT-214_860":  { tag: "SAT 214+860", eq: "SAT", km: "KM 214+860", kmNum: 214.860, sentido: "SUL", status: "NÃO FINALIZADO", conexao: "0", sp: { port: "GE1/0/11", remote: "BR116-CM0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0002", remotePort: "GE1/0/11" } },
+  "BR116-CF0002": { tag: "BR116-CF0002", eq: "CFTV DAI", km: "KM 215+129", kmNum: 215.129, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0001", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0003", remotePort: "GE1/0/11" } },
+  "BR116-CF0003": { tag: "BR116-CF0003", eq: "CFTV DAI", km: "KM 215+404", kmNum: 215.404, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0002", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0004", remotePort: "GE1/0/11" } },
+  "BR116-CF0004": { tag: "BR116-CF0004", eq: "CFTV DAI", km: "KM 215+758", kmNum: 215.758, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0003", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0005", remotePort: "GE1/0/11" } },
+  "BR116-CM0002": { tag: "BR116-CM0002", eq: "CFTV MÓVEL", km: "KM 215+758", kmNum: 215.758, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0005", remotePort: "GE1/0/11" } },
+  "BR116-CF0005": { tag: "BR116-CF0005", eq: "CFTV DAI", km: "KM 216+163", kmNum: 216.163, sentido: "NORTE", status: "NÃO FINALIZADO", conexao: "0", sp: { port: "GE1/0/11", remote: "BR116-CF0004", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0006", remotePort: "GE1/0/11" } },
+  "BR116-CF0006": { tag: "BR116-CF0006", eq: "CFTV DAI", km: "KM 216+558", kmNum: 216.558, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0005", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0007", remotePort: "GE1/0/11" } },
+  "BR116-CF0007": { tag: "BR116-CF0007", eq: "CFTV DAI", km: "KM 216+946", kmNum: 216.946, sentido: "NORTE", status: "FINALIZADO", conexao: "FO", sp: { port: "GE1/0/11", remote: "BR116-CF0006", remotePort: "GE1/0/12" }, rj: { port: "GE1/0/12", remote: "BR116-CF0009", remotePort: "GE1/0/11" } }
 };
 
 function initTopologyModule() {
@@ -429,7 +406,7 @@ function initTopologyModule() {
     const item = topoDatabase[key];
     const opt = document.createElement('option');
     opt.value = key;
-    opt.textContent = `${item.km} — (${key})`;
+    opt.textContent = `${item.tag} — ${item.eq} (${item.km}) [${item.status}]`;
     sel.appendChild(opt);
   });
   renderTopologyCard(Object.keys(topoDatabase).sort()[0]);
@@ -449,7 +426,7 @@ function autoSelectNearestNE() {
   if (bestKey) {
     document.getElementById('topoSelect').value = bestKey;
     renderTopologyCard(bestKey);
-    showToast(`Mais próximo: ${topoDatabase[bestKey].km}`);
+    showToast(`Mais próximo: ${topoDatabase[bestKey].tag} (${topoDatabase[bestKey].km})`);
   }
 }
 
@@ -471,13 +448,18 @@ function renderTopologyCard(neKey) {
     <div style="display:flex;flex-direction:column;gap:16px">
       <!-- Card do Equipamento Focado (NOME BEM GRANDE E DESTACADO) -->
       <div class="top-card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:28px">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">Equipamento Selecionado em Campo</span>
-        <h3 style="font-size:clamp(32px,6vw,46px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px;letter-spacing:-.02em">${data.km}</h3>
-        <p style="font-size:15px;font-family:monospace;color:#fff;font-weight:800">${data.ne}</p>
+        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">Ativo Selecionado — Rodovia Presidente Dutra (RioSP)</span>
+        <h3 style="font-size:clamp(30px,6vw,44px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px;letter-spacing:-.02em">${data.tag}</h3>
+        <p style="font-size:15px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | ${data.km} | Sentido ${data.sentido}</p>
         
+        <div style="margin-top:12px;display:flex;justify-content:center;gap:8px">
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:${data.status === 'FINALIZADO' ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)'};color:${data.status === 'FINALIZADO' ? '#34d399' : '#fca5a5'};border:1px solid ${data.status === 'FINALIZADO' ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)'}">Status Planilha: ${data.status}</span>
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Conexão: ${data.conexao}</span>
+        </div>
+
         <div style="margin-top:16px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
           <button onclick="toggleBypassSimulation()" style="padding:10px 20px;border-radius:20px;font-size:11px;font-weight:900;text-transform:uppercase;background:${bypassActive ? '#ef4444' : '#3b82f6'};color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:all .15s">
-            ${bypassActive ? '🛑 Desativar Simulação de Bypass' : '⚡ Simular Bypass / Corte neste Ponto'}
+            ${bypassActive ? '🛑 Desativar Simulação de Bypass' : '⚡ Simular Bypass / Falha neste Equipamento'}
           </button>
         </div>
       </div>
@@ -487,11 +469,11 @@ function renderTopologyCard(neKey) {
         <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);border-radius:18px;padding:20px;animation:pulse .2s ease">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
             <span style="font-size:20px">⚠️</span>
-            <h4 style="font-size:14px;font-weight:900;color:#fca5a5;text-transform:uppercase">Modo Simulação de Bypass Ativo neste Ponto</h4>
+            <h4 style="font-size:14px;font-weight:900;color:#fca5a5;text-transform:uppercase">Modo Simulação de Bypass Ativo neste Ativo</h4>
           </div>
           <p style="font-size:12px;line-height:1.5;color:var(--text2)">
-            O equipamento <strong>${data.ne} (${data.km})</strong> está simulando uma falha de energia ou rompimento total de cabo/fibra. 
-            O anel da rodovia aciona automaticamente o protocolo de proteção redundante: o tráfego do Sentido SP (${spRemote?.km || 'Início'}) e Sentido RJ (${rjRemote?.km || 'Fim'}) é fechado em loop de desvio, mantendo a comunicação ativa nos nós adjacentes através das fibras de backup.
+            O equipamento <strong>${data.tag} (${data.km})</strong> está simulando interrupção de enlace ou energia. 
+            O protocolo de redundância RioSP isola este ponto e redireciona os pacotes via anel de fibra redundante entre o ativo anterior <strong>(${spRemote?.tag || 'Início'})</strong> e o ativo posterior <strong>(${rjRemote?.tag || 'Fim'})</strong>.
           </p>
         </div>
       ` : ''}
@@ -503,20 +485,20 @@ function renderTopologyCard(neKey) {
         <div class="top-card" style="border-left:4px solid #f59e0b">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase">⬅️ Sentido SP (Anterior)</span>
-            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : data.sp?.status)}
+            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : 'Normal')}
           </div>
           <div style="font-family:monospace">
-            <p style="font-size:17px;font-weight:900;color:#fff">${spRemote ? spRemote.km : 'Fim de Linha'}</p>
-            <p style="font-size:11px;color:var(--text3);margin-top:2px">${data.sp ? data.sp.remote : 'Sem conexão'}</p>
+            <p style="font-size:15px;font-weight:900;color:#fff">${spRemote ? spRemote.tag : 'Início do Anel'}</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:2px">${spRemote ? spRemote.km : '---'}</p>
           </div>
           <div class="fiber-box">
-            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta Local: <span style="color:#f59e0b">${data.sp?.port || 'GE1/0/11'}</span></p>
+            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta: <span style="color:#f59e0b">${data.sp?.port || 'GE1/0/11'}</span></p>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;font-family:monospace">
               <div style="display:flex;align-items:center;gap:6px;color:#fbbf24">
-                <span>📥</span> <strong>Fibra 1 (RX):</strong> ${bypassActive ? 'ISOLADO (Bypass)' : 'Recebe sinal (' + (data.sp?.remotePort || '-') + ')'}
+                <span>📥</span> <strong>RX:</strong> ${bypassActive ? 'ISOLADO' : 'Ativo (' + (data.sp?.remotePort || '-') + ')'}
               </div>
               <div style="display:flex;align-items:center;gap:6px;color:#60a5fa">
-                <span>📤</span> <strong>Fibra 2 (TX):</strong> ${bypassActive ? 'LOOP ATIVO' : 'Envia sinal (' + (data.sp?.remotePort || '-') + ')'}
+                <span>📤</span> <strong>TX:</strong> ${bypassActive ? 'LOOP BACK' : 'Ativo (' + (data.sp?.remotePort || '-') + ')'}
               </div>
             </div>
           </div>
@@ -526,20 +508,20 @@ function renderTopologyCard(neKey) {
         <div class="top-card" style="border-left:4px solid #3b82f6">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <span style="font-size:11px;font-weight:900;color:#3b82f6;text-transform:uppercase">Sentido RJ (Próximo) ➡️</span>
-            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : data.rj?.status)}
+            ${getStatusBadgeHtml(bypassActive ? 'Faulty' : 'Normal')}
           </div>
           <div style="font-family:monospace">
-            <p style="font-size:17px;font-weight:900;color:#fff">${rjRemote ? rjRemote.km : 'Fim de Linha'}</p>
-            <p style="font-size:11px;color:var(--text3);margin-top:2px">${data.rj ? data.rj.remote : 'Sem conexão'}</p>
+            <p style="font-size:15px;font-weight:900;color:#fff">${rjRemote ? rjRemote.tag : 'Fim do Anel'}</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:2px">${rjRemote ? rjRemote.km : '---'}</p>
           </div>
           <div class="fiber-box">
-            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta Local: <span style="color:#3b82f6">${data.rj?.port || 'GE1/0/12'}</span></p>
+            <p style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Porta: <span style="color:#3b82f6">${data.rj?.port || 'GE1/0/12'}</span></p>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;font-family:monospace">
               <div style="display:flex;align-items:center;gap:6px;color:#fbbf24">
-                <span>📥</span> <strong>Fibra 1 (RX):</strong> ${bypassActive ? 'ISOLADO (Bypass)' : 'Recebe sinal (' + (data.rj?.remotePort || '-') + ')'}
+                <span>📥</span> <strong>RX:</strong> ${bypassActive ? 'ISOLADO' : 'Ativo (' + (data.rj?.remotePort || '-') + ')'}
               </div>
               <div style="display:flex;align-items:center;gap:6px;color:#60a5fa">
-                <span>📤</span> <strong>Fibra 2 (TX):</strong> ${bypassActive ? 'LOOP ATIVO' : 'Envia sinal (' + (data.rj?.remotePort || '-') + ')'}
+                <span>📤</span> <strong>TX:</strong> ${bypassActive ? 'LOOP BACK' : 'Ativo (' + (data.rj?.remotePort || '-') + ')'}
               </div>
             </div>
           </div>
@@ -553,8 +535,7 @@ function renderTopologyCard(neKey) {
 
 function getStatusBadgeHtml(status) {
   if(status === 'Normal') return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(16,185,129,.15);color:#34d399">Normal</span>`;
-  if(status === 'Faulty') return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(239,68,68,.15);color:#fca5a5">${bypassActive ? 'Bypass Ativo' : 'Falha'}</span>`;
-  return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(245,158,11,.15);color:#f6ad55">Offline</span>`;
+  return `<span style="font-size:9px;font-weight:900;padding:3px 8px;border-radius:12px;background:rgba(239,68,68,.15);color:#fca5a5">${bypassActive ? 'Bypass Ativo' : 'Falha'}</span>`;
 }
 
 async function openMod(id) {
