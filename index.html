@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Status de Conectividade & Ping</title>
+<title>KMReport RioSP — Radar de Conectividade & Gerência</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -68,19 +68,19 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <div id="gateFolder">
   <div class="gate-box">
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
-      <i data-lucide="folder-open" style="width:32px;height:32px"></i>
+      <i data-lucide="radar" style="width:32px;height:32px"></i>
     </div>
-    <h1 style="font-size:20px;font-weight:900">KMReport Ping Monitor</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e monitoramento de conectividade em tempo real.</p>
-    <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
+    <h1 style="font-size:20px;font-weight:900">Radar KMReport Ping</h1>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e ativação do radar por IP de gerência.</p>
+    <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar Radar</button>
   </div>
 </div>
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="wifi"></i></div>
+    <div class="brand-icon"><i data-lucide="radio"></i></div>
     <div>
-      <h1 class="brand-title">KMReport Monitor Ping</h1>
+      <h1 class="brand-title">Radar de Ativos & Ping</h1>
       <p style="font-size:9px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
@@ -97,30 +97,30 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <div class="card">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)" id="statusModeLbl">Modo GPS Ativo</span>
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)" id="statusModeLbl">Modo Radar GPS Ativo</span>
           <span id="kmRealTime" style="font-size:11px;font-weight:900;color:var(--accent)">KM ---</span>
         </div>
 
         <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
-          <option value="">Carregando ativos...</option>
+          <option value="">Carregando ativos do radar...</option>
         </select>
       </div>
     </div>
 
-    <!-- PAINEL CENTRAL DE STATUS E PING EM SEGUNDO PLANO -->
+    <!-- PAINEL VISUAL DO RADAR -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:13px;font-weight:800">Aguardando coordenadas de GPS ou seleção de ativo...</p>
+        <p style="font-size:13px;font-weight:800">Varrendo sinal de GPS ou aguardando seleção...</p>
       </div>
     </div>
 
   </div>
 </main>
 
-<!-- MODAL CÂMERA E RELATÓRIO PDF -->
+<!-- MODAL FOTO & RELATÓRIO -->
 <div id="modalFoto">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro & Documentação com Status</h2>
+    <h2 style="font-size:16px;font-weight:900">Registro Técnico com Status do Radar</h2>
     <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
   </div>
 
@@ -130,12 +130,12 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   </div>
 
   <div style="margin-top:16px;display:flex;gap:12px">
-    <button class="btn-primary" onclick="capturePhoto()"><i data-lucide="camera"></i> Capturar Foto com Marca d'Água</button>
+    <button class="btn-primary" onclick="capturePhoto()"><i data-lucide="camera"></i> Capturar Foto com Radar na Marca d'Água</button>
   </div>
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
-    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas / Status de Conexão</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados sobre a perda de pacote ou estabilidade do switch..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
+    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas do Radar</label>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados sobre a oscilação da gerência ou falhas no enlace..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
     
     <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
   </div>
@@ -181,7 +181,7 @@ async function initFolderPermission() {
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
-    showToast('Pasta selecionada!');
+    showToast('Radar ativado e pasta conectada!');
   } catch(e) { showToast('Permissão cancelada.'); }
 }
 
@@ -213,8 +213,8 @@ async function loadAtivosCSV() {
         cidade: (cols[6] || '').trim(),
         anel: (cols[7] || '').trim(),
         ipGer: (cols[8] || '-').trim(),
-        gerencia: (cols[9] || '-').trim(),
-        rede: (cols[10] || '-').trim(),
+        gerencia: (cols[9] || '-').trim(), // COLUNA DE GERÊNCIA UTILIZADA PARA O PING
+        rede: (cols[10] || '').trim(),
         switchIp: (cols[11] || '-').trim(),
         ativoIp: (cols[12] || '-').trim(),
         statusPing: 'unknown'
@@ -246,14 +246,22 @@ async function loadSNVData() {
   } catch (e) {}
 }
 
-async function simulatePing(ip) {
-  if (!ip || ip === '-' || ip.startsWith('10.')) {
-    return Math.random() > 0.12; // 88% de taxa de sucesso simulada para redes internas
+// SIMULAÇÃO DE PING UTILIZANDO PRINCIPALMENTE O IP DA GERÊNCIA
+async function simulatePing(targetObj) {
+  if(!targetObj) return false;
+  
+  // Prioridade: Gerência > IP Gerência > Switch IP
+  const ipTarget = (targetObj.gerencia !== '-' && targetObj.gerencia !== '') ? targetObj.gerencia :
+                   (targetObj.ipGer !== '-' && targetObj.ipGer !== '') ? targetObj.ipGer : targetObj.switchIp;
+
+  if (!ipTarget || ipTarget === '-' || ipTarget.startsWith('10.')) {
+    return Math.random() > 0.12; // 88% taxa de sucesso para simulação interna de gerência
   }
+  
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 1500);
-    await fetch(`http://${ip}/`, { mode: 'no-cors', signal: controller.signal });
+    await fetch(`http://${ipTarget}/`, { mode: 'no-cors', signal: controller.signal });
     clearTimeout(timeoutId);
     return true;
   } catch(e) {
@@ -268,16 +276,11 @@ function startBackgroundPingLoop() {
     if (!selectedAsset) return;
     
     const links = getStrictFiberLinksExtended(selectedAsset);
-    // Pega o atual + 3 anteriores + 3 posteriores
-    const targets = [
-      selectedAsset, 
-      ...links.prevList, 
-      ...links.nextList
-    ];
+    const targets = [selectedAsset, ...links.prevList, ...links.nextList];
 
     for (const t of targets) {
       if(!t) continue;
-      const isOnline = await simulatePing(t.switchIp !== '-' ? t.switchIp : t.ipGer);
+      const isOnline = await simulatePing(t);
       t.statusPing = isOnline ? 'ok' : 'fail';
     }
 
@@ -289,7 +292,7 @@ function setMode(mode) {
   currentMode = mode;
   document.getElementById('modeGpsBtn').classList.toggle('active', mode === 'gps');
   document.getElementById('modeManBtn').classList.toggle('active', mode === 'manual');
-  document.getElementById('statusModeLbl').textContent = mode === 'gps' ? 'Modo GPS Ativo' : 'Modo Consulta Manual';
+  document.getElementById('statusModeLbl').textContent = mode === 'gps' ? 'Modo Radar GPS Ativo' : 'Modo Consulta Manual';
   if(mode === 'gps' && currentKmNum !== null) locateNearestAsset();
 }
 
@@ -343,7 +346,6 @@ function onAssetSelected(idx) {
   if(idx !== "") renderTechnicalConsultation(parseInt(idx));
 }
 
-// Retorna 3 anteriores e 3 posteriores estritamente na mesma fibra ordenados por KM
 function getStrictFiberLinksExtended(currentAsset) {
   const sameFiberList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
   sameFiberList.sort((a,b) => a.kmNum - b.kmNum);
@@ -373,11 +375,10 @@ function updateExtendedPingBadgesUI(data, links) {
   if(badgeCurr && cardCurr) {
     const ok = data.statusPing === 'ok';
     badgeCurr.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING OK)' : 'OFFLINE (FALHA)'}`;
-    cardCurr.style.borderColor = ok ? 'rgba(52,211,153,.5)' : 'rgba(239,68,68,.8)';
+    badgeCurr.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING GERÊNCIA OK)' : 'OFFLINE (GERÊNCIA SEM RESPOSTA)'}`;
+    cardCurr.style.borderColor = ok ? 'rgba(52,211,153,.6)' : 'rgba(239,68,68,.9)';
   }
 
-  // Atualizar os 3 anteriores
   links.prevList.forEach((item, index) => {
     const badge = document.getElementById(`badgePrev_${index}`);
     const card = document.getElementById(`cardPrev_${index}`);
@@ -385,11 +386,10 @@ function updateExtendedPingBadgesUI(data, links) {
       const ok = item.statusPing === 'ok';
       badge.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
       badge.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? 'rgba(245,158,11,.25)' : 'rgba(239,68,68,.8)';
+      card.style.borderColor = ok ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.8)';
     }
   });
 
-  // Atualizar os 3 posteriores
   links.nextList.forEach((item, index) => {
     const badge = document.getElementById(`badgeNext_${index}`);
     const card = document.getElementById(`cardNext_${index}`);
@@ -397,7 +397,7 @@ function updateExtendedPingBadgesUI(data, links) {
       const ok = item.statusPing === 'ok';
       badge.className = `status-indicator ${ok ? 'status-ok' : 'status-fail'}`;
       badge.innerHTML = `<span class="dot ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE' : 'OFFLINE'}`;
-      card.style.borderColor = ok ? 'rgba(59,130,246,.25)' : 'rgba(239,68,68,.8)';
+      card.style.borderColor = ok ? 'rgba(59,130,246,.3)' : 'rgba(239,68,68,.8)';
     }
   });
 }
@@ -412,17 +412,20 @@ function renderTechnicalConsultation(idx) {
   const container = document.getElementById('topoVisualCard');
   const fibrasArr = data.fibra.split(',').map(s => s.trim());
   const fibraTx = fibrasArr[0] || '-';
-  const fibraRx = fibrasArr[1] || fibraTx;
 
   let htmlPrevCards = '';
   links.prevList.forEach((item, i) => {
     const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
+    const ipDisplay = item.gerencia !== '-' ? item.gerencia : item.ipGer;
     htmlPrevCards += `
-      <div id="cardPrev_${i}" style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);padding:12px;border-radius:12px;font-family:monospace">
-        <span style="font-size:9px;color:#f6ad55;font-weight:900">ANTERIOR #${i+1} (${dist} km)</span>
-        <p style="font-size:13px;font-weight:900;color:#fff;margin:4px 0">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr}</p>
-        <div id="badgePrev_${i}" class="status-indicator status-ok" style="margin-top:6px"><span class="dot dot-ok"></span> VERIFICANDO</div>
+      <div id="cardPrev_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:9px;color:var(--muted);font-weight:900">ANTERIOR #${i+1}</span>
+          <span style="font-size:10px;color:var(--accent);font-weight:900">${dist} km</span>
+        </div>
+        <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
+        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipDisplay}</p>
+        <div id="badgePrev_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
   });
@@ -430,64 +433,60 @@ function renderTechnicalConsultation(idx) {
   let htmlNextCards = '';
   links.nextList.forEach((item, i) => {
     const dist = Math.abs(item.kmNum - data.kmNum).toFixed(3);
+    const ipDisplay = item.gerencia !== '-' ? item.gerencia : item.ipGer;
     htmlNextCards += `
-      <div id="cardNext_${i}" style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.25);padding:12px;border-radius:12px;font-family:monospace">
-        <span style="font-size:9px;color:#60a5fa;font-weight:900">POSTERIOR #${i+1} (${dist} km)</span>
-        <p style="font-size:13px;font-weight:900;color:#fff;margin:4px 0">${item.tag}</p>
-        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr}</p>
-        <div id="badgeNext_${i}" class="status-indicator status-ok" style="margin-top:6px"><span class="dot dot-ok"></span> VERIFICANDO</div>
+      <div id="cardNext_${i}" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);padding:14px;border-radius:14px;font-family:monospace;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:9px;color:var(--muted);font-weight:900">POSTERIOR #${i+1}</span>
+          <span style="font-size:10px;color:#60a5fa;font-weight:900">${dist} km</span>
+        </div>
+        <p style="font-size:14px;font-weight:900;color:#fff">${item.tag}</p>
+        <p style="font-size:10px;color:var(--text3)">KM ${item.kmStr} | Gerência: ${ipDisplay}</p>
+        <div id="badgeNext_${i}" class="status-indicator status-ok" style="align-self:flex-start;margin-top:4px"><span class="dot dot-ok"></span> VERIFICANDO</div>
       </div>
     `;
   });
 
+  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : data.ipGer;
+
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
-      <!-- PAINEL CENTRAL DO ATIVO ATUAL -->
-      <div id="cardCurrFrame" class="card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:24px;transition:all .3s ease">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 Ativo Atual na Fibra ${data.fibra}</span>
-          <div id="badgePingCurr" class="status-indicator status-ok"><span class="dot dot-ok"></span> VERIFICANDO...</div>
-        </div>
+      
+      <!-- RADAR: ATIVO ATUAL EM DESTAQUE ABSOLUTO -->
+      <div id="cardCurrFrame" class="card" style="border:2px solid rgba(52,211,153,.6);background:linear-gradient(145deg,#12201c,#0a1210);text-align:center;padding:28px;box-shadow:0 0 30px rgba(16,185,129,.15)">
+        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.25em;color:#34d399">🎯 VOCÊ ESTÁ NO ATIVO (FIBRA ${data.fibra})</span>
 
-        <h3 style="font-size:clamp(26px,5vw,36px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px">${data.tag}</h3>
-        <p style="font-size:14px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
+        <h3 style="font-size:clamp(30px,6vw,44px);font-weight:900;font-family:monospace;color:var(--accent);margin:8px 0 4px">${data.tag}</h3>
+        <p style="font-size:15px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
-        <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4)">TX: ${fibraTx} / RX: ${fibraRx}</span>
-          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">IP Switch: ${data.switchIp}</span>
+        <div style="margin:14px 0 6px;display:flex;justify-content:center;gap:10px">
+          <div id="badgePingCurr" class="status-indicator status-ok"><span class="dot dot-ok"></span> VERIFICANDO GERÊNCIA...</div>
         </div>
 
-        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:18px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">IP Gerência: ${ipGerenciaAtual}</span>
+          <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Switch IP: ${data.switchIp}</span>
+        </div>
+
+        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:20px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF do Radar</button>
       </div>
 
-      <!-- 3 ANTERIORES -->
-      <div class="card" style="padding:16px;background:linear-gradient(145deg,#121210,#070705)">
-        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#f6ad55;margin-bottom:12px">⬅️ 3 Ativos Anteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+      <!-- RADAR: 3 ANTERIORES -->
+      <div class="card" style="padding:16px;background:linear-gradient(145deg,#15120a,#090805)">
+        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#f6ad55;margin-bottom:12px">⬅️ Radar: 3 Ativos Anteriores na Fibra</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
           ${htmlPrevCards}
         </div>
       </div>
 
-      <!-- 3 POSTERIORES -->
-      <div class="card" style="padding:16px;background:linear-gradient(145deg,#0d131f,#06080d)">
-        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#60a5fa;margin-bottom:12px">➡️ 3 Ativos Posteriores na Fibra</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+      <!-- RADAR: 3 POSTERIORES -->
+      <div class="card" style="padding:16px;background:linear-gradient(145deg,#0a111d,#05080f)">
+        <h4 style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:12px">➡️ Radar: 3 Ativos Posteriores na Fibra</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
           ${htmlNextCards}
         </div>
       </div>
 
-      <!-- DADOS TÉCNICOS DA PLANILHA -->
-      <div class="card" style="padding:20px">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos (ativos 116.csv)</h4>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px;font-family:monospace">
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>TAG:</strong><br><span style="color:#ffd600">${data.tag}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Equipamento:</strong><br><span style="color:#fff">${data.eq}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Hostname:</strong><br><span style="color:#60a5fa">${data.host}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>KM / Sentido:</strong><br><span style="color:#fff">KM ${data.kmStr} (${data.sentido})</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>IP Gerência:</strong><br><span style="color:#ffd600">${data.ipGer}</span></div>
-          <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Switch:</strong><br><span style="color:#fff">${data.switchIp}</span></div>
-        </div>
-      </div>
     </div>
   `;
   lucide.createIcons();
@@ -515,17 +514,18 @@ function capturePhoto() {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
   
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-  ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+  ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
   ctx.fillStyle = '#ffd600';
-  ctx.font = 'bold 24px monospace';
-  ctx.fillText(`KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | Status: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 45);
+  ctx.font = 'bold 22px monospace';
+  const ipDisplay = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : selectedAsset.ipGer) : '';
+  ctx.fillText(`RADAR KM ${currentKmStr} | ${selectedAsset ? selectedAsset.tag : ''} | IP: ${ipDisplay}`, 20, canvas.height - 50);
   ctx.fillStyle = '#ffffff';
-  ctx.font = '16px sans-serif';
-  ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')}`, 20, canvas.height - 18);
+  ctx.font = '15px sans-serif';
+  ctx.fillText(`Data/Hora: ${new Date().toLocaleString('pt-BR')} | Status Gerência: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''}`, 20, canvas.height - 20);
 
   capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-  showToast('Foto capturada com status!');
+  showToast('Foto do radar capturada!');
 }
 
 async function generateAndSaveReport() {
@@ -539,59 +539,64 @@ async function generateAndSaveReport() {
 
   doc.setTextColor(255, 214, 0);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
-  doc.text('Relatório de Conectividade & Ping — BR116', 14, 22);
+  doc.setFontSize(18);
+  doc.text('Relatório de Radar & Gerência — BR116', 14, 20);
 
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
-  doc.text(`TAG do Ativo Atual: ${selectedAsset.tag} [Status: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 34);
-  doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 42);
-  doc.text(`IP Switch / Gerência: ${selectedAsset.switchIp} / ${selectedAsset.ipGer}`, 14, 50);
+  doc.setFontSize(10);
+  const ipDisplayCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : selectedAsset.ipGer;
+  doc.text(`Ativo Atual (Local): ${selectedAsset.tag} [Status Gerência: ${selectedAsset.statusPing.toUpperCase()}]`, 14, 30);
+  doc.text(`Equipamento: ${selectedAsset.eq} (KM ${selectedAsset.kmStr})`, 14, 38);
+  doc.text(`IP Gerência / Switch IP: ${ipDisplayCurr} / ${selectedAsset.switchIp}`, 14, 46);
 
-  let yOffset = 58;
-  doc.text('Anteriores na Fibra:', 14, yOffset);
+  let yOffset = 54;
+  doc.text('Radar - Anteriores na Fibra (IP Gerência):', 14, yOffset);
   links.prevList.forEach((p, idx) => {
     yOffset += 6;
-    doc.text(` - ${p.tag} (KM ${p.kmStr}) [Status: ${p.statusPing.toUpperCase()}]`, 18, yOffset);
+    const dist = Math.abs(selectedAsset.kmNum - p.kmNum).toFixed(3);
+    const ipP = p.gerencia !== '-' ? p.gerencia : p.ipGer;
+    doc.text(` - [${dist} km] ${p.tag} (KM ${p.kmStr}) IP: ${ipP} [Status: ${p.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   yOffset += 8;
-  doc.text('Posteriores na Fibra:', 14, yOffset);
+  doc.text('Radar - Posteriores na Fibra (IP Gerência):', 14, yOffset);
   links.nextList.forEach((n, idx) => {
     yOffset += 6;
-    doc.text(` - ${n.tag} (KM ${n.kmStr}) [Status: ${n.statusPing.toUpperCase()}]`, 18, yOffset);
+    const dist = Math.abs(n.kmNum - selectedAsset.kmNum).toFixed(3);
+    const ipN = n.gerencia !== '-' ? n.gerencia : n.ipGer;
+    doc.text(` - [${dist} km] ${n.tag} (KM ${n.kmStr}) IP: ${ipN} [Status: ${n.statusPing.toUpperCase()}]`, 18, yOffset);
   });
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
     yOffset += 10;
     doc.setTextColor(255, 214, 0);
-    doc.text('Observações Técnicas:', 14, yOffset);
+    doc.text('Observações do Radar:', 14, yOffset);
     yOffset += 6;
     doc.setTextColor(200, 200, 200);
     doc.text(obs, 14, yOffset);
   }
 
   if(capturedImageBase64) {
-    doc.addImage(capturedImageBase64, 'JPEG', 14, yOffset + 10, 182, 102);
+    doc.addImage(capturedImageBase64, 'JPEG', 14, yOffset + 10, 182, 95);
   }
 
   const pdfBlob = doc.output('blob');
   
   if (dirHandle) {
     try {
-      const fileName = `Monitor_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
+      const fileName = `Radar_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
       const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
       await writable.write(pdfBlob);
       await writable.close();
-      showToast('Relatório de Status salvo na pasta!');
+      showToast('Relatório do Radar salvo na pasta!');
     } catch(e) {
-      doc.save(`Monitor_${selectedAsset.tag}.pdf`);
+      doc.save(`Radar_${selectedAsset.tag}.pdf`);
       showToast('Relatório baixado!');
     }
   } else {
-    doc.save(`Monitor_${selectedAsset.tag}.pdf`);
+    doc.save(`Radar_${selectedAsset.tag}.pdf`);
     showToast('Relatório gerado!');
   }
 
