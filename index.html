@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Consulta Técnica & Fibras</title>
+<title>KMReport RioSP — Consulta Técnica Precisa</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -64,7 +64,6 @@ input,select{font-family:var(--font);outline:none}
 /* GATE / INSPEÇÃO */
 #gate{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);overflow-y:auto}
 .gate-box{max-width:400px;width:100%;border-radius:var(--r-xl);border:1px solid var(--border);background:linear-gradient(180deg,var(--surface) 0%,var(--surface2) 100%);padding:36px 24px;text-align:center;box-shadow:var(--shadow-xl)}
-.gate-icon{width:72px;height:72px;border-radius:20px;background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.12);color:var(--accent);display:grid;place-items:center;margin:0 auto}
 .gate-btn-discreet{width:100%;min-height:42px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--text);font-size:11px;font-weight:800;text-transform:uppercase;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:8px}
 .gate-btn-discreet.sec{background:transparent;border-color:transparent;color:var(--muted);margin-top:6px}
 
@@ -81,9 +80,6 @@ input,select{font-family:var(--font);outline:none}
 #settings.open, #settingsUnica.open{opacity:1;visibility:visible;pointer-events:auto}
 .settings-content{width:min(90vw,400px);max-height:85vh;border-radius:var(--r-xl);border:1px solid var(--border2);background:rgba(10,13,17,0.96);padding:24px;overflow-y:auto}
 .settings-close{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:20px;cursor:pointer;border:0;background:none}
-.s-group{margin-top:22px}
-.s-lbl{display:block;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:7px}
-.s-inp{width:100%;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);color:#fff;padding:13px;font-size:13px;font-weight:800}
 canvas#c, canvas#cUnica{display:none}
 .toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:11px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);backdrop-filter:blur(18px);z-index:99998;opacity:0;transition:all .25s var(--ease);pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -206,29 +202,44 @@ window.addEventListener('DOMContentLoaded', () => {
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
 
+function parseKmStringToNum(kmStr) {
+  if (!kmStr) return 0;
+  const s = String(kmStr).trim();
+  if (s.includes('+')) {
+    const parts = s.split('+');
+    return parseFloat(parts[0]) + parseFloat(parts[1]) / 1000.0;
+  }
+  return parseFloat(s.replace(',', '.')) || 0;
+}
+
 let kmDB = [], stream = null, streamUnica = null, capturing = false, buffer = [], lat = '0.000000', lon = '0.000000';
 let currentKm = '---';
+let currentKmNum = 0;
 let dirHandle = null;
 let ativosDatabase = [];
 
 async function loadAtivos116Data() {
   try {
     const rawData = [
-      {tag: "BR116-CF0001", eq: "CFTV DAI", host: "RSP-SA58-N214_728", kmStr: "214+728", kmNum: 214.728, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.138"},
-      {tag: "BR116-CM0001", eq: "CFTV MÓVEL", host: "RSP-SA58-N214_728", kmStr: "214+728", kmNum: 214.728, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.139"},
-      {tag: "SAT 214+860", eq: "SAT", host: "-", kmStr: "214+860", kmNum: 214.860, sentido: "SUL", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.162", gerencia: "172.26.12.111", rede: "10.3.6.80", switchIp: "10.3.6.81", ativoIp: "10.3.6.86"},
-      {tag: "BR116-CF0002", eq: "CFTV DAI", host: "RSP-SA56-N215_129", kmStr: "215+129", kmNum: 215.129, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.165", gerencia: "172.26.12.114", rede: "10.3.6.104", switchIp: "10.3.6.105", ativoIp: "10.3.6.106"},
-      {tag: "BR116-CF0003", eq: "CFTV DAI", host: "RSP-SA57-N215_404", kmStr: "215+404", kmNum: 215.404, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.172", gerencia: "172.26.12.121", rede: "10.3.6.160", switchIp: "10.3.6.161", ativoIp: "10.3.6.162"},
-      {tag: "BR116-CF0004", eq: "CFTV DAI", host: "RSP-SA57-N215_758", kmStr: "215+758", kmNum: 215.758, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.154"},
-      {tag: "BR116-CM0002", eq: "CFTV MÓVEL", host: "RSP-SA57-N215_758", kmStr: "215+758", kmNum: 215.758, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.155"},
-      {tag: "BR116-CF0005", eq: "CFTV DAI", host: "RSP-SA58-N216_163", kmStr: "216+163", kmNum: 216.163, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.178", gerencia: "172.26.12.127", rede: "10.3.6.208", switchIp: "10.3.6.209", ativoIp: "10.3.6.210"},
-      {tag: "BR116-CF0006", eq: "CFTV DAI", host: "RSP-SA57-N216_558", kmStr: "216+558", kmNum: 216.558, sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.180", gerencia: "172.26.12.132", rede: "10.3.7.24", switchIp: "10.3.7.25", ativoIp: "10.3.7.26"},
-      {tag: "BR116-CF0007", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.50"},
-      {tag: "BR116-CF0008", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.51"},
-      {tag: "BR116-CM0003", eq: "CFTV MÓVEL", host: "RSP-SA57-N216_946", kmStr: "216+946", kmNum: 216.946, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.52"},
-      {tag: "BR116-CF0009", eq: "CFTV DAI", host: "RSP-SA56-N217_510", kmStr: "217+510", kmNum: 217.510, sentido: "SUL", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.182", gerencia: "172.26.12.140", rede: "10.3.7.88", switchIp: "10.3.7.89", ativoIp: "10.3.7.90"},
-      {tag: "BR116-CF0010", eq: "CFTV DAI", host: "RSP-SA56-N217_713", kmStr: "217+713", kmNum: 217.713, sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.184", gerencia: "172.26.12.143", rede: "10.3.7.112", switchIp: "10.3.7.113", ativoIp: "10.3.7.114"}
+      {tag: "BR116-CF0001", eq: "CFTV DAI", host: "RSP-SA58-N214_728", kmStr: "214+728", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.138"},
+      {tag: "BR116-CM0001", eq: "CFTV MÓVEL", host: "RSP-SA58-N214_728", kmStr: "214+728", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.139"},
+      {tag: "SAT 214+860", eq: "SAT", host: "-", kmStr: "214+860", sentido: "SUL", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.162", gerencia: "172.26.12.111", rede: "10.3.6.80", switchIp: "10.3.6.81", ativoIp: "10.3.6.86"},
+      {tag: "BR116-CF0002", eq: "CFTV DAI", host: "RSP-SA56-N215_129", kmStr: "215+129", sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.165", gerencia: "172.26.12.114", rede: "10.3.6.104", switchIp: "10.3.6.105", ativoIp: "10.3.6.106"},
+      {tag: "BR116-CF0003", eq: "CFTV DAI", host: "RSP-SA57-N215_404", kmStr: "215+404", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.172", gerencia: "172.26.12.121", rede: "10.3.6.160", switchIp: "10.3.6.161", ativoIp: "10.3.6.162"},
+      {tag: "BR116-CF0004", eq: "CFTV DAI", host: "RSP-SA57-N215_758", kmStr: "215+758", sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.154"},
+      {tag: "BR116-CM0002", eq: "CFTV MÓVEL", host: "RSP-SA57-N215_758", kmStr: "215+758", sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.177", gerencia: "172.26.45.2", rede: "10.3.37.152", switchIp: "10.3.37.153", ativoIp: "10.3.37.155"},
+      {tag: "BR116-CF0005", eq: "CFTV DAI", host: "RSP-SA58-N216_163", kmStr: "216+163", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.178", gerencia: "172.26.12.127", rede: "10.3.6.208", switchIp: "10.3.6.209", ativoIp: "10.3.6.210"},
+      {tag: "BR116-CF0006", eq: "CFTV DAI", host: "RSP-SA57-N216_558", kmStr: "216+558", sentido: "NORTE", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.180", gerencia: "172.26.12.132", rede: "10.3.7.24", switchIp: "10.3.7.25", ativoIp: "10.3.7.26"},
+      {tag: "BR116-CF0007", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.50"},
+      {tag: "BR116-CF0008", eq: "CFTV DAI", host: "RSP-SA57-N216_946", kmStr: "216+946", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.51"},
+      {tag: "BR116-CM0003", eq: "CFTV MÓVEL", host: "RSP-SA57-N216_946", kmStr: "216+946", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.181", gerencia: "172.26.12.135", rede: "10.3.7.48", switchIp: "10.3.7.49", ativoIp: "10.3.7.52"},
+      {tag: "BR116-CF0009", eq: "CFTV DAI", host: "RSP-SA56-N217_510", kmStr: "217+510", sentido: "SUL", fibra: "21, 22", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.182", gerencia: "172.26.12.140", rede: "10.3.7.88", switchIp: "10.3.7.89", ativoIp: "10.3.7.90"},
+      {tag: "BR116-CF0010", eq: "CFTV DAI", host: "RSP-SA56-N217_713", kmStr: "217+713", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.184", gerencia: "172.26.12.143", rede: "10.3.7.112", switchIp: "10.3.7.113", ativoIp: "10.3.7.114"}
     ];
+
+    rawData.forEach(item => {
+      item.kmNum = parseKmStringToNum(item.kmStr);
+    });
     
     rawData.sort((a,b) => a.kmNum - b.kmNum);
 
@@ -263,14 +274,13 @@ function initTechnicalModule() {
 }
 
 function autoSelectNearestNE() {
-  let numKm = parseFloat(currentKm.replace(',', '.'));
-  if (isNaN(numKm)) {
+  if (isNaN(currentKmNum) || currentKmNum === 0) {
     if(ativosDatabase.length) { document.getElementById('topoSelect').value = 0; renderTechnicalConsultation(0); }
     return;
   }
   let bestIdx = 0, minDiff = Infinity;
   ativosDatabase.forEach((item, idx) => {
-    const diff = Math.abs(item.kmNum - numKm);
+    const diff = Math.abs(item.kmNum - currentKmNum);
     if (diff < minDiff) { minDiff = diff; bestIdx = idx; }
   });
   document.getElementById('topoSelect').value = bestIdx;
@@ -284,8 +294,6 @@ function renderTechnicalConsultation(idx) {
   if(!data) return;
   const container = document.getElementById('topoVisualCard');
 
-  // Cálculo das fibras RX e TX interligadas (padrão de transceptor óptico bidirecional / par de fibras)
-  // Se fibra atual é "11, 12", TX sai na fibra 11 e RX entra na fibra 12 (ou vice-versa)
   const fibrasArr = data.fibra.split(',').map(s => s.trim());
   const fibraTx = fibrasArr[0] || '-';
   const fibraRx = fibrasArr[1] || fibrasArr[0] || '-';
@@ -304,7 +312,7 @@ function renderTechnicalConsultation(idx) {
         </div>
       </div>
 
-      <!-- TODOS OS DADOS DA PLANILHA SOBRE ESTE ATIVO -->
+      <!-- DADOS COMPLETOS DA PLANILHA -->
       <div class="top-card" style="padding:20px">
         <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Completos da Planilha</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-size:12px;font-family:monospace">
@@ -326,7 +334,6 @@ function renderTechnicalConsultation(idx) {
       <!-- INTERLIGAÇÃO ÓPTICA: ANTERIOR E POSTERIOR -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         
-        <!-- ANTERIOR -->
         <div class="top-card" style="border-left:4px solid #f59e0b">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase">⬅️ Ativo Anterior</span>
@@ -341,7 +348,6 @@ function renderTechnicalConsultation(idx) {
           </div>
         </div>
 
-        <!-- POSTERIOR -->
         <div class="top-card" style="border-left:4px solid #3b82f6">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <span style="font-size:11px;font-weight:900;color:#3b82f6;text-transform:uppercase">Ativo Posterior ➡️</span>
@@ -410,6 +416,7 @@ if ('geolocation' in navigator) {
       if (d < minD) { minD = d; best = pt; }
     }
     if (best) {
+      currentKmNum = best.km;
       currentKm = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
       document.getElementById('kmTxt').textContent = 'KM ' + currentKm;
       const badge = document.getElementById('topoKmBadge');
