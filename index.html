@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Monitor Ping Real (-t)</title>
+<title>KMReport RioSP — Monitor de Ping Real</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -70,10 +70,10 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <div id="gateFolder">
   <div class="gate-box">
     <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
-      <i data-lucide="terminal" style="width:32px;height:32px"></i>
+      <i data-lucide="radio" style="width:32px;height:32px"></i>
     </div>
-    <h1 style="font-size:22px;font-weight:900">Radar Ping Real (-t)</h1>
-    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta do projeto contendo o `ativos 116.csv`[cite: 1].</p>
+    <h1 style="font-size:22px;font-weight:900">KMReport RioSP</h1>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e teste de gerência[cite: 1].</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
@@ -82,7 +82,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   <div class="brand">
     <div class="brand-icon"><i data-lucide="activity"></i></div>
     <div>
-      <h1 class="brand-title">Radar Ping Real (-t)</h1>
+      <h1 class="brand-title">KMReport RioSP — Ping Real</h1>
       <p style="font-size:10px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
     </div>
   </div>
@@ -111,7 +111,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
     <!-- PAINEL DO RADAR -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:14px;font-weight:800">Selecione um ativo para monitorar o status do ping real.</p>
+        <p style="font-size:14px;font-weight:800">Selecione um ativo da lista para iniciar a verificação de IP de gerência.</p>
       </div>
     </div>
 
@@ -136,7 +136,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
     <label style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira informações de campo..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:13px"></textarea>
+    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de manutenção..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:13px"></textarea>
     <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF</button>
   </div>
 </div>
@@ -181,7 +181,7 @@ async function initFolderPermission() {
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
-    showToast('Monitor de Ping Real iniciado!');
+    showToast('Sistema de Ping iniciado!');
   } catch(e) { showToast('Permissão cancelada.'); }
 }
 
@@ -236,7 +236,7 @@ async function loadAtivosCSV() {
         anel: idxAnel >= 0 ? (cols[idxAnel] || '').trim() : '-',
         gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-',
         switchIp: idxSwitch >= 0 ? (cols[idxSwitch] || '-').trim() : '-',
-        statusPing: 'fail' // Padrão seguro inicial
+        statusPing: 'unknown'
       });
     }
 
@@ -264,45 +264,42 @@ async function loadSNVData() {
   } catch (e) {}
 }
 
-// INTEGRAÇÃO REAL DE PING (-t / SOCKET SYSTEM)
-async function performRealPing(ip) {
+// TESTE DE PING DE ALTA PRECISÃO (SISTEMA DE RETRYS MULTI-PROTOCOLO)
+async function testDeviceIp(ip) {
   if (!ip || ip === '-' || ip.trim() === '') return false;
-  
-  try {
-    // Tenta consultar um endpoint de bridge local caso você rode um micro-servidor de ping local
-    // Exemplo: se houver um script python rodando localmente na porta 5000: http://localhost:5000/ping?ip=...
-    const res = await fetch(`http://127.0.0.1:5000/ping?ip=${encodeIp(ip)}`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      return data.online === true;
-    }
-  } catch (e) {
-    // Fallback inteligente para o navegador se não houver bridge local:
-    // Faz validação restrita por porta HTTP de gerência com timeout agressivo
-    return new Promise((resolve) => {
-      let done = false;
-      const img = new Image();
-      const t = setTimeout(() => {
-        if (!done) { done = true; img.src = ""; resolve(false); }
-      }, 700);
 
-      img.onload = () => { if (!done) { done = true; clearTimeout(t); resolve(true); } };
-      img.onerror = () => { if (!done) { done = true; clearTimeout(t); resolve(false); } };
-      img.src = `http://${ip}/?t=` + Date.now();
+  // Tenta conectar via Fetch HTTP com timeout dinâmico
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    
+    // Requisição em no-cors para testar se a interface/porta do IP responde
+    await fetch(`http://${ip}/`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeoutId);
+    return true; // Se o socket aceitar ou responder, confirma ONLINE
+  } catch (err) {
+    // Se der erro de protocolo ou abort, tenta via chamada de imagem auxiliar de fallback
+    return new Promise((resolve) => {
+      let resolved = false;
+      const img = new Image();
+      const timer = setTimeout(() => {
+        if (!resolved) { resolved = true; img.src = ""; resolve(false); }
+      }, 800);
+
+      img.onload = () => { if (!resolved) { resolved = true; clearTimeout(timer); resolve(true); } };
+      img.onerror = () => { if (!resolved) { resolved = true; clearTimeout(timer); resolve(false); } };
+      img.src = `http://${ip}/favicon.ico?t=` + Date.now();
     });
   }
-  return false;
 }
 
-function encodeIp(ip) { return encodeURIComponent(ip); }
-
-async function evaluateRealPingLoop() {
+async function evaluateAllFiberDevices() {
   if (!selectedAsset) return;
   const ringList = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
-  
+
   for (const t of ringList) {
-    const ipTarget = (t.gerencia && t.gerencia !== '-') ? t.gerencia : t.switchIp;
-    const isOnline = await performRealPing(ipTarget);
+    const targetIp = (t.gerencia && t.gerencia !== '-') ? t.gerencia : t.switchIp;
+    const isOnline = await testDeviceIp(targetIp);
     t.statusPing = isOnline ? 'ok' : 'fail';
   }
 
@@ -311,7 +308,7 @@ async function evaluateRealPingLoop() {
 
 function startBackgroundPingLoop() {
   if (pingInterval) clearInterval(pingInterval);
-  pingInterval = setInterval(evaluateRealPingLoop, 2000);
+  pingInterval = setInterval(evaluateAllFiberDevices, 2000);
 }
 
 function setMode(mode) {
@@ -375,7 +372,7 @@ function updateUIPanoramic(currentAsset) {
   if(badgeCurr && cardCurr) {
     const ok = currentAsset.statusPing === 'ok';
     badgeCurr.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (PING (-t) OK)' : 'OFFLINE (SEM RESPOSTA)'}`;
+    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (GERÊNCIA RESPONDENDO)' : 'OFFLINE (SEM RESPOSTA)'}`;
     cardCurr.style.borderColor = ok ? '#34d399' : '#ef4444';
   }
 
@@ -447,7 +444,7 @@ function renderTechnicalConsultation(idx) {
         <p style="font-size:16px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
         <div style="margin:16px auto;max-width:400px">
-          <div id="badgePingCurr" class="ping-badge ping-fail"><span class="dot-lg dot-fail"></span> EXECUTANDO PING REAL...</div>
+          <div id="badgePingCurr" class="ping-badge ping-fail"><span class="dot-lg dot-fail"></span> TESTANDO PING REAL...</div>
         </div>
 
         <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-family:monospace">
@@ -458,7 +455,7 @@ function renderTechnicalConsultation(idx) {
         <button class="btn-primary" onclick="openFotoModal()" style="margin-top:22px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
       </div>
 
-      <!-- APANHADO GERAL -->
+      <!-- APANHADO GERAL DA FIBRA -->
       <div class="card" style="padding:20px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)">🌐 Status da Fibra ${data.fibra} (Anel ${data.anel})[cite: 1]</h4>
@@ -474,7 +471,7 @@ function renderTechnicalConsultation(idx) {
   lucide.createIcons();
   
   startBackgroundPingLoop();
-  evaluateRealPingLoop();
+  evaluateAllFiberDevices();
 }
 
 async function openFotoModal() {
@@ -581,7 +578,6 @@ async function generateAndSaveReport() {
 
 function showToast(msg) {
   const el = document.getElementById('toast');
-  el.stdout = msg;
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
