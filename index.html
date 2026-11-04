@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Trava de Fibra & Rota Guiada</title>
+<title>KMReport RioSP — Sequência Estrita na Mesma Fibra</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -63,7 +63,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
       <i data-lucide="folder-open" style="width:32px;height:32px"></i>
     </div>
     <h1 style="font-size:20px;font-weight:900">KMReport RioSP</h1>
-    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para salvar relatórios PDF e fotos na mesma fibra.</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Selecione a pasta para salvar relatórios e documentação na mesma fibra.</p>
     <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
   </div>
 </div>
@@ -85,7 +85,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <main style="display:none" id="mainAppContent">
   <div class="container">
     
-    <!-- SELETOR DE ATIVO COM TRAVA DE FIBRA E ROTA GUIADA -->
+    <!-- SELETOR COM FILTRO AUTOMÁTICO DE FIBRA -->
     <div class="card">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -97,18 +97,14 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
           <option value="">Carregando ativos...</option>
         </select>
 
-        <!-- CONTROLES DE TRAVA E ROTA NA MESMA FIBRA -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center;justify-content:space-between">
-          <div style="display:flex;gap:6px">
-            <button id="btnLockFibra" class="btn-sec active" style="font-size:10px;padding:6px 10px" onclick="toggleFibraLock()">🔒 Trava Mesma Fibra (Ativa)</button>
-            <button id="btnSetBase" class="btn-sec" style="font-size:10px;padding:6px 10px;background:rgba(59,130,246,.2);color:#60a5fa;border-color:rgba(59,130,246,.4)" onclick="setAsBaseWork()">⭐ Fixar como Base de Trabalho</button>
-          </div>
-          <span id="baseWorkLbl" style="font-size:10px;color:var(--accent);font-weight:800">Base: Nenhuma</span>
+        <div style="display:flex;gap:6px;align-items:center;justify-content:space-between;margin-top:4px">
+          <button id="btnLockFibra" class="btn-sec active" style="font-size:10px;padding:6px 12px" onclick="toggleFibraLock()">🔒 Restringir Seleção à Mesma Fibra (Ativo)</button>
+          <span id="fibraLabelBadge" style="font-size:11px;font-weight:900;color:var(--accent);background:rgba(255,214,0,.12);padding:4px 10px;border-radius:12px;border:1px solid rgba(255,214,0,.3)">Par Fibra: ---</span>
         </div>
       </div>
     </div>
 
-    <!-- PAINEL CENTRAL DE DADOS E NAVEGAÇÃO NA FIBRA -->
+    <!-- PAINEL CENTRAL DO ATIVO E SEQUÊNCIA NA MESMA FIBRA -->
     <div id="topoVisualCard">
       <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
         <p style="font-size:13px;font-weight:800">Aguardando coordenadas de GPS ou seleção de ativo...</p>
@@ -121,7 +117,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 <!-- MODAL CÂMERA E RELATÓRIO PDF -->
 <div id="modalFoto">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro & Documentação na Fibra</h2>
+    <h2 style="font-size:16px;font-weight:900">Registro & Documentação Técnica</h2>
     <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
   </div>
 
@@ -135,8 +131,8 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
   </div>
 
   <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
-    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações da Fibra / Manutenção</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de fusão, atenuação ou continuidade na fibra..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
+    <label style="font-size:10px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas</label>
+    <textarea id="obsTecnicas" rows="3" placeholder="Dados de emenda, atenuação, conectores ou caixa de fusão..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:12px"></textarea>
     
     <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF na Pasta</button>
   </div>
@@ -148,8 +144,7 @@ main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;paddi
 let kmDB = [];
 let ativosDatabase = [];
 let currentMode = 'gps';
-let fibraLocked = true; // TRAVA DE FIBRA LIGADA POR PADRÃO
-let baseWorkAsset = null; // ATIVO FIXADO COMO BASE DE TRABALHO
+let fibraLocked = true;
 let currentKmNum = null;
 let currentKmStr = "---";
 let selectedAsset = null;
@@ -178,13 +173,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function initFolderPermission() {
   try {
-    if (!window.showDirectoryPicker) { alert('Navegador sem suporte a diretórios.'); return; }
+    if (!window.showDirectoryPicker) { alert('Utilize o Chrome ou Edge para gerenciar pastas.'); return; }
     dirHandle = await window.showDirectoryPicker();
     document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
     document.getElementById('gateFolder').style.display = 'none';
     document.getElementById('mainAppContent').style.display = 'block';
     showToast('Pasta selecionada com sucesso!');
-  } catch(e) { showToast('Permissão cancelada.'); }
+  } catch(e) { showToast('Permissão de pasta cancelada.'); }
 }
 
 async function loadAtivosCSV() {
@@ -224,21 +219,7 @@ async function loadAtivosCSV() {
 
     rawData.forEach(item => { item.kmNum = parseKmStringToNum(item.kmStr); });
     rawData.sort((a,b) => a.kmNum - b.kmNum);
-
-    // Mapeamento sequencial estrito considerando a mesma fibra
-    rawData.forEach((item, idx) => {
-      // Filtrar anterior e posterior estritamente na mesma fibra se travado
-      let sameFibraList = rawData.filter(x => x.fibra === item.fibra);
-      let subIdx = sameFibraList.indexOf(item);
-      let prev = subIdx > 0 ? sameFibraList[subIdx - 1] : rawData[idx > 0 ? idx - 1 : rawData.length - 1];
-      let next = subIdx < sameFibraList.length - 1 ? sameFibraList[subIdx + 1] : rawData[idx < rawData.length - 1 ? idx + 1 : 0];
-
-      ativosDatabase.push({
-        ...item,
-        prevTag: prev.tag, prevKm: prev.kmStr, prevFibra: prev.fibra, prevDist: Math.abs(item.kmNum - prev.kmNum).toFixed(3),
-        nextTag: next.tag, nextKm: next.kmStr, nextFibra: next.fibra, nextDist: Math.abs(next.kmNum - item.kmNum).toFixed(3)
-      });
-    });
+    ativosDatabase = rawData;
 
     updateAssetDropdown();
   } catch(e) { console.error("Erro ao carregar CSV:", e); }
@@ -272,20 +253,8 @@ function toggleFibraLock() {
   fibraLocked = !fibraLocked;
   const btn = document.getElementById('btnLockFibra');
   btn.classList.toggle('active', fibraLocked);
-  btn.textContent = fibraLocked ? '🔒 Trava Mesma Fibra (Ativa)' : '🔓 Trava Mesma Fibra (Desativada)';
+  btn.textContent = fibraLocked ? '🔒 Restringir Seleção à Mesma Fibra (Ativo)' : '🔓 Mostrar Todos os Ativos (Desativado)';
   updateAssetDropdown();
-  showToast(fibraLocked ? 'Filtro restrito à mesma fibra' : 'Mostrando todos os ativos');
-}
-
-function setAsBaseWork() {
-  if(!selectedAsset) return;
-  baseWorkAsset = selectedAsset;
-  document.getElementById('baseWorkLbl').textContent = `Base: ${baseWorkAsset.tag} (Fibra ${baseWorkAsset.fibra})` ;
-  fibraLocked = true; // Garante trava na fibra da base
-  document.getElementById('btnLockFibra').classList.add('active');
-  document.getElementById('btnLockFibra').textContent = '🔒 Trava Mesma Fibra (Ativa)';
-  updateAssetDropdown();
-  showToast(`Base de trabalho fixada na fibra ${baseWorkAsset.fibra}!`);
 }
 
 function updateAssetDropdown() {
@@ -293,15 +262,9 @@ function updateAssetDropdown() {
   if(!sel || !ativosDatabase.length) return;
   
   let list = ativosDatabase;
-  
-  // Se houver base de trabalho ou trava ativa na fibra do ativo selecionado
   if (fibraLocked && selectedAsset) {
     list = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
-  } else if (fibraLocked && baseWorkAsset) {
-    list = ativosDatabase.filter(item => item.fibra === baseWorkAsset.fibra);
   }
-
-  if (!list.length) list = ativosDatabase;
 
   sel.innerHTML = '';
   list.forEach(item => {
@@ -331,7 +294,7 @@ if ('geolocation' in navigator) {
       currentKmNum = parseFloat(best.km);
       currentKmStr = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
       document.getElementById('kmRealTime').textContent = 'KM ' + currentKmStr;
-      if(currentMode === 'gps' && !baseWorkAsset) locateNearestAsset();
+      if(currentMode === 'gps') locateNearestAsset();
     }
   }, null, { enableHighAccuracy: true });
 }
@@ -343,7 +306,6 @@ function locateNearestAsset() {
     const diff = Math.abs(item.kmNum - currentKmNum);
     if (diff < minDiff) { minDiff = diff; bestIdx = idx; }
   });
-  document.getElementById('topoSelect').value = bestIdx;
   renderTechnicalConsultation(bestIdx);
 }
 
@@ -351,25 +313,43 @@ function onAssetSelected(idx) {
   if(idx !== "") renderTechnicalConsultation(parseInt(idx));
 }
 
+// BUSCA ESTRITA DO ANTERIOR E POSTERIOR NA MESMA FIBRA
+function getStrictFiberLinks(currentAsset) {
+  const sameFiberList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
+  sameFiberList.sort((a,b) => a.kmNum - b.kmNum);
+
+  const idx = sameFiberList.findIndex(item => item.tag === currentAsset.tag);
+  
+  let prev = idx > 0 ? sameFiberList[idx - 1] : sameFiberList[sameFiberList.length - 1];
+  let next = idx < sameFiberList.length - 1 ? sameFiberList[idx + 1] : sameFiberList[0];
+
+  return {
+    prevTag: prev.tag, prevKm: prev.kmStr, prevDist: Math.abs(currentAsset.kmNum - prev.kmNum).toFixed(3),
+    nextTag: next.tag, nextKm: next.kmStr, nextDist: Math.abs(next.kmNum - currentAsset.kmNum).toFixed(3)
+  };
+}
+
 function renderTechnicalConsultation(idx) {
   const data = ativosDatabase[idx];
   if(!data) return;
   selectedAsset = data;
+
+  document.getElementById('fibraLabelBadge').textContent = `Par Fibra: ${data.fibra}`;
   updateAssetDropdown();
+
+  // CALCULA APENAS EQUIPAMENTOS QUE COMPARTILHAM O MESMO PAR DE FIBRA
+  const links = getStrictFiberLinks(data);
 
   const container = document.getElementById('topoVisualCard');
   const fibrasArr = data.fibra.split(',').map(s => s.trim());
-  const fibraTx = fibrasArr[0] || '11';
-  const fibraRx = fibrasArr[1] || '12';
-
-  const atenuacaoPrev = (parseFloat(data.prevDist) * 0.25).toFixed(2);
-  const atenuacaoNext = (parseFloat(data.nextDist) * 0.25).toFixed(2);
+  const fibraTx = fibrasArr[0] || '-';
+  const fibraRx = fibrasArr[1] || fibraTx;
 
   container.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:16px">
-      <!-- PAINEL CENTRAL DO ATIVO -->
+      <!-- PAINEL CENTRAL DO ATIVO LOCALIZADO -->
       <div class="card" style="border-color:rgba(59,130,246,.5);background:linear-gradient(145deg,#182338,#0e1524);text-align:center;padding:24px">
-        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 Ativo na Fibra ${data.fibra} ${baseWorkAsset ? '(Base Fixada)' : ''}</span>
+        <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:#60a5fa">📍 ${currentMode === 'gps' ? 'Ativo Mais Próximo (GPS)' : 'Ativo Selecionado (Manual)'}</span>
         <h3 style="font-size:clamp(26px,5vw,36px);font-weight:900;font-family:monospace;color:var(--accent);margin:6px 0 2px">${data.tag}</h3>
         <p style="font-size:14px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
         
@@ -378,46 +358,48 @@ function renderTechnicalConsultation(idx) {
           <span style="font-size:10px;font-weight:900;padding:4px 12px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Cidade: ${data.cidade}</span>
         </div>
 
-        <div style="margin-top:18px;display:flex;gap:10px">
-          <button class="btn-primary" onclick="openFotoModal()" style="flex:2"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
-          <button class="btn-sec" onclick="setAsBaseWork()" style="flex:1;background:rgba(59,130,246,.2);color:#60a5fa;border-color:rgba(59,130,246,.4)">Fixar Base</button>
-        </div>
+        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:18px"><i data-lucide="camera"></i> Registrar Foto & Salvar Relatório PDF</button>
       </div>
 
-      <!-- MAPA DE ENLACE ÓPTICO RESTRITO À MESMA FIBRA -->
+      <!-- MAPA DE CONEXÃO ÓPTICA EXCLUSIVO DO MESMO PAR DE FIBRA -->
       <div class="card" style="padding:20px;background:linear-gradient(145deg,#0e1218,#07090d);border-color:rgba(59,130,246,.3)">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🌐 Sequência na Mesma Fibra (${data.fibra})</h4>
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#60a5fa;margin-bottom:14px">🔗 Sequência Estrita no Par de Fibra ${data.fibra}</h4>
         
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center">
           
+          <!-- ANTERIOR NA MESMA FIBRA -->
           <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);padding:14px;border-radius:12px;font-family:monospace">
-            <span style="font-size:9px;color:#f6ad55;font-weight:900">ANTERIOR (${data.prevDist} km)</span>
-            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.prevTag}</p>
-            <p style="font-size:10px;color:var(--text3)">KM ${data.prevKm}</p>
-            <span style="font-size:9px;background:rgba(245,158,11,.2);color:#f6ad55;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.prevFibra}]</span>
-            <p style="font-size:9px;color:#34d399;margin-top:4px">~${atenuacaoPrev} dB</p>
+            <span style="font-size:9px;color:#f6ad55;font-weight:900">ANTERIOR (${links.prevDist} km)</span>
+            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${links.prevTag}</p>
+            <p style="font-size:10px;color:var(--text3)">KM ${links.prevKm}</p>
+            <span style="font-size:9px;background:rgba(245,158,11,.2);color:#f6ad55;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra ${data.fibra}</span>
           </div>
 
+          <!-- ICONE DE ENLACE -->
           <div style="display:flex;flex-direction:column;align-items:center;color:var(--accent)">
-            <span style="font-size:9px;font-weight:900">ENLACE</span>
+            <span style="font-size:9px;font-weight:900">PAR ${data.fibra}</span>
             <i data-lucide="arrow-left-right" style="width:24px;height:24px"></i>
-            <span style="font-size:9px;color:var(--muted)">TX/RX</span>
+            <span style="font-size:9px;color:var(--muted)">SINAL FO</span>
           </div>
 
+          <!-- POSTERIOR NA MESMA FIBRA -->
           <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);padding:14px;border-radius:12px;font-family:monospace">
-            <span style="font-size:9px;color:#60a5fa;font-weight:900">POSTERIOR (${data.nextDist} km)</span>
-            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${data.nextTag}</p>
-            <p style="font-size:10px;color:var(--text3)">KM ${data.nextKm}</p>
-            <span style="font-size:9px;background:rgba(59,130,246,.2);color:#60a5fa;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra [${data.nextFibra}]</span>
-            <p style="font-size:9px;color:#34d399;margin-top:4px">~${atenuacaoNext} dB</p>
+            <span style="font-size:9px;color:#60a5fa;font-weight:900">POSTERIOR (${links.nextDist} km)</span>
+            <p style="font-size:14px;font-weight:900;color:#fff;margin:4px 0">${links.nextTag}</p>
+            <p style="font-size:10px;color:var(--text3)">KM ${links.nextKm}</p>
+            <span style="font-size:9px;background:rgba(59,130,246,.2);color:#60a5fa;padding:2px 6px;border-radius:6px;display:inline-block;margin-top:6px">Fibra ${data.fibra}</span>
           </div>
 
+        </div>
+
+        <div style="margin-top:14px;padding:10px;background:rgba(0,0,0,.4);border-radius:8px;font-size:11px;font-family:monospace;color:var(--text2)">
+          <strong>Anel FO de Origem:</strong> ${data.anel}
         </div>
       </div>
 
       <!-- DADOS DA PLANILHA -->
       <div class="card" style="padding:20px">
-        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos do Ativo</h4>
+        <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px">📋 Dados Técnicos (ativos 116.csv)</h4>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:12px;font-family:monospace">
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>TAG:</strong><br><span style="color:#ffd600">${data.tag}</span></div>
           <div style="background:rgba(255,255,255,.03);padding:10px;border-radius:8px"><strong>Equipamento:</strong><br><span style="color:#fff">${data.eq}</span></div>
@@ -471,6 +453,7 @@ function capturePhoto() {
 
 async function generateAndSaveReport() {
   if(!selectedAsset) { showToast('Nenhum ativo selecionado'); return; }
+  const links = getStrictFiberLinks(selectedAsset);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -487,10 +470,10 @@ async function generateAndSaveReport() {
   doc.text(`TAG do Ativo: ${selectedAsset.tag}`, 14, 34);
   doc.text(`Equipamento: ${selectedAsset.eq}`, 14, 42);
   doc.text(`Quilometragem: KM ${selectedAsset.kmStr}`, 14, 50);
-  doc.text(`Par de Fibra: ${selectedAsset.fibra}`, 14, 58);
+  doc.text(`Par de Fibra Conectado: ${selectedAsset.fibra}`, 14, 58);
   doc.text(`IP Ativo / Gerência: ${selectedAsset.ativoIp} / ${selectedAsset.ipGer}`, 14, 66);
-  doc.text(`Anterior na Fibra: ${selectedAsset.prevTag} (${selectedAsset.prevDist} km)`, 14, 74);
-  doc.text(`Posterior na Fibra: ${selectedAsset.nextTag} (${selectedAsset.nextDist} km)`, 14, 82);
+  doc.text(`Anterior no Par ${selectedAsset.fibra}: ${links.prevTag} (${links.prevDist} km)`, 14, 74);
+  doc.text(`Posterior no Par ${selectedAsset.fibra}: ${links.nextTag} (${links.nextDist} km)`, 14, 82);
 
   const obs = document.getElementById('obsTecnicas').value;
   if(obs) {
@@ -516,7 +499,7 @@ async function generateAndSaveReport() {
       showToast('Relatório PDF salvo na pasta com sucesso!');
     } catch(e) {
       doc.save(`Relatorio_Fibra_${selectedAsset.tag}.pdf`);
-      showToast('Relatório baixado no dispositivo!');
+      showToast('Relatório baixado!');
     }
   } else {
     doc.save(`Relatorio_Fibra_${selectedAsset.tag}.pdf`);
