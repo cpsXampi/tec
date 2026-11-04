@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#06070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Consulta Técnica & Fibras Precisa</title>
+<title>KMReport RioSP — Sistema Original & Ativos BR116</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -107,14 +107,14 @@ canvas#c, canvas#cUnica{display:none}
 
       <button class="mc top-btn" onclick="openMod('topologia')">
         <span class="mc-i" style="background:linear-gradient(145deg,#3b82f6,#1d4ed8);color:#fff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg></span>
-        <span class="mc-b"><h3>Consulta Ativos 116</h3><p>Dados completos, IPs, Fibras e Interligação</p></span>
+        <span class="mc-b"><h3>Consulta Ativos BR116</h3><p>Dados completos, IPs, Fibras e Interligação</p></span>
         <span class="mc-a"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- MÓDULO CONSULTA TÉCNICA DE ATIVOS -->
+<!-- MÓDULO CONSULTA TÉCNICA DE ATIVOS BR116 -->
 <div id="mod-topologia" class="module">
   <div class="top-header">
     <div style="display:flex;align-items:center;gap:12px">
@@ -122,8 +122,8 @@ canvas#c, canvas#cUnica{display:none}
         <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
       </div>
       <div>
-        <h2 style="font-size:18px;font-weight:900">Consulta Técnica de Ativos & Fibras</h2>
-        <p style="font-size:11px;color:var(--text3)">Sincronizado com sua posição GPS em tempo real</p>
+        <h2 style="font-size:18px;font-weight:900">Consulta Técnica BR116 (Base Completa)</h2>
+        <p style="font-size:11px;color:var(--text3)">Sincronizado rigorosamente com sua posição GPS</p>
       </div>
     </div>
     <button class="top-back" onclick="openMod('menu')">Voltar ao Menu</button>
@@ -133,8 +133,8 @@ canvas#c, canvas#cUnica{display:none}
     <div class="top-card" style="padding:20px">
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Ativo Selecionado</span>
-          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">GPS Sincronizado</span>
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">Ativo Mais Próximo</span>
+          <span id="topoKmBadge" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa">Aguardando GPS</span>
         </div>
         <div style="display:flex;gap:12px;align-items:center">
           <select id="topoSelect" onchange="renderTechnicalConsultation(this.value)" style="flex:1;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700">
@@ -144,6 +144,7 @@ canvas#c, canvas#cUnica{display:none}
       </div>
     </div>
 
+    <!-- PAINEL DE DADOS COMPLETOS E INTERLIGAÇÃO -->
     <div id="topoVisualCard"></div>
   </div>
 </div>
@@ -193,7 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadAtivos116Data();
 });
 
-/* LÓGICA RIGOROSA DO KM REPORT ORIGINAL DE CONVERSÃO DE KM E DISTÂNCIA */
+/* LÓGICA RIGOROSA DO KM REPORT ORIGINAL */
 const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
 function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
 
@@ -217,6 +218,7 @@ let ativosDatabase = [];
 
 async function loadAtivos116Data() {
   try {
+    // Base completa extraída do arquivo ativos 116.xlsx (1453 ativos BR116)
     const rawData = [
       {tag: "BR116-CF0001", eq: "CFTV DAI", host: "RSP-SA58-N214_728", kmStr: "214+728", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.138"},
       {tag: "BR116-CM0001", eq: "CFTV MÓVEL", host: "RSP-SA58-N214_728", kmStr: "214+728", sentido: "NORTE", fibra: "11, 12", cidade: "Seropédica", anel: "223+300 - Balança Paracambi", ipGer: "172.27.0.183", gerencia: "172.26.45.0", rede: "10.3.37.136", switchIp: "10.3.37.137", ativoIp: "10.3.37.139"},
