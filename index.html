@@ -1,208 +1,374 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#06070a">
-<title>KMReport RioSP — Monitor de Ping Real-Time</title>
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-:root{
-  --bg:#06070a;--surface:#0f1216;--surface2:#14181d;
-  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
-  --accent:#ffd600;--text:#f0f0f2;--text-muted:#71717a;
-  
-  /* Cores de Status Ajustadas para Destaque Máximo */
-  --ok:#34d399;--ok-bg:rgba(16,185,129,.25);--ok-border:#10b981;
-  --fail:#ef4444;--fail-bg:rgba(239,68,68,.25);--fail-border:#dc2626;
-  
-  --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font);padding:16px;max-width:960px;margin:0 auto}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor & Diagnóstico de Ativos BR-116</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --online: #22c55e;
+            --offline: #ef4444;
+            --border: #334155;
+        }
 
-header{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:12px;font-weight:900;font-size:18px}
-.logo i{color:var(--accent)}
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
 
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:16px}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.card-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-/* BADGES DE STATUS COM CORES FORTES E PULSO */
-.badge-ping{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:24px;font-size:12px;font-weight:900;border:2px solid;transition:all .3s ease}
-.badge-ping.ok{background:var(--ok-bg);color:#6ee7b7;border-color:var(--ok-border);box-shadow:0 0 15px rgba(52,211,153,.4)}
-.badge-ping.fail{background:var(--fail-bg);color:#fca5a5;border-color:var(--fail-border);box-shadow:0 0 15px rgba(239,68,68,.4)}
+        h1 { font-size: 1.4rem; color: var(--accent); }
 
-.dot{width:10px;height:10px;border-radius:50%}
-.dot.ok{background:var(--ok);box-shadow:0 0 12px var(--ok)}
-.dot.fail{background:var(--fail);box-shadow:0 0 12px var(--fail)}
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
 
-.neighbors-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
-.neighbor-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:all .3s ease}
-.neighbor-card.current{border-color:var(--accent);background:rgba(255,214,0,.08)}
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-.neighbor-tag{font-family:monospace;font-weight:900;font-size:14px;margin:6px 0;color:#fff}
-.neighbor-km{font-size:11px;color:var(--text-muted)}
-.neighbor-ip{font-size:10px;font-family:monospace;color:var(--accent);margin-top:4px}
+        label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: bold; }
+        
+        input, select, button {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+        }
 
-.table-responsive{width:100%;overflow-x:auto;margin-top:12px}
-table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace;text-align:left}
-th,td{padding:10px 12px;border-bottom:1px solid var(--border)}
-th{color:var(--text-muted);text-transform:uppercase;font-size:10px}
-</style>
+        input:focus, select:focus { border-color: var(--accent); }
+
+        button {
+            cursor: pointer;
+            background: #0284c7;
+            border: none;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+
+        .stats-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-card .val { font-size: 1.4rem; font-weight: bold; }
+        .stat-card.online .val { color: var(--online); }
+        .stat-card.offline .val { color: var(--offline); }
+
+        /* Estilo dos Grupos (Fibra / Anel) */
+        .group-container {
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .group-header {
+            background: #111827;
+            padding: 12px 16px;
+            font-weight: bold;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+        th { background: #0f172a; color: var(--text-muted); font-weight: 600; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge.online { background: rgba(34, 197, 94, 0.2); color: var(--online); }
+        .badge.offline { background: rgba(239, 68, 68, 0.2); color: var(--offline); }
+        .badge.pending { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
+        
+        .ip-list { font-family: monospace; font-size: 0.85rem; }
+        .ip-tag { display: inline-block; background: #0f172a; padding: 2px 6px; border-radius: 4px; margin-right: 4px; border: 1px solid var(--border); }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <i data-lucide="activity"></i>
-    <span>KMReport — Monitor Ping Real-Time</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span style="width:8px;height:8px;background:#34d399;border-radius:50%;box-shadow:0 0 8px #34d399"></span>
-    <span style="font-size:11px;color:var(--accent);font-weight:800">Pindamonhangaba (KM 099+263)</span>
-  </div>
-</header>
+    <header>
+        <h1>Painel de Ativos & IPs - Rodovia BR-116</h1>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Carregar CSV Local: <input type="file" id="csvFileInput" accept=".csv" style="display:inline-block; width: auto;">
+        </div>
+    </header>
 
-<!-- ATIVO PRINCIPAL -->
-<div class="card" id="mainAssetCard">
-  <div class="card-header">
-    <span class="card-title">📍 Ativo Principal da Sua Localização</span>
-    <div id="mainPingBadge" class="badge-ping fail"><span class="dot fail"></span> <span id="mainPingTxt">VERIFICANDO PING...</span></div>
-  </div>
+    <div class="controls">
+        <div class="control-group">
+            <label>Agrupar Por</label>
+            <select id="groupMode" onchange="renderData()">
+                <option value="none">Sem Agrupamento (Lista Direta)</option>
+                <option value="anel">Anel FO / NEL (Nó de Enlace)</option>
+                <option value="fibra">Par de Fibra (FO)</option>
+                <option value="equipamento">Tipo de Equipamento</option>
+            </select>
+        </div>
 
-  <div style="text-align:center;padding:10px 0">
-    <h2 id="mainTag" style="font-size:32px;font-weight:900;font-family:monospace;color:var(--accent)">BR116-CF0816</h2>
-    <p id="mainEq" style="font-size:14px;font-weight:800;margin-top:4px">CFTV DAI | KM 099+263 | Sentido Sul</p>
-    <p id="mainIp" style="font-size:12px;font-family:monospace;color:var(--text-muted);margin-top:4px">IP Gerência: 172.26.9.177 | Fibra: 21, 22</p>
-  </div>
-</div>
+        <div class="control-group">
+            <label>Status Online/Offline</label>
+            <select id="statusFilter" onchange="renderData()">
+                <option value="all">Todos os Status</option>
+                <option value="online">Apenas ONLINE</option>
+                <option value="offline">Apenas OFFLINE</option>
+            </select>
+        </div>
 
-<!-- PAINEL DOS VIZINHOS (2 ANTES / 2 DEPOIS) -->
-<div class="card">
-  <div class="card-header">
-    <span class="card-title">🔗 Monitoramento de Enlace (2 Anteriores e 2 Posteriores)</span>
-    <span style="font-size:10px;color:var(--text-muted)">Loop Ativo: a cada 3s</span>
-  </div>
+        <div class="control-group" style="flex-grow: 1;">
+            <label>Buscar (Tag, KM, IP, Equipamento)</label>
+            <input type="text" id="searchInput" placeholder="Digite para buscar..." oninput="renderData()">
+        </div>
 
-  <div class="neighbors-grid" id="neighborsGrid"></div>
-</div>
+        <div class="control-group" style="justify-content: flex-end;">
+            <button onclick="pingAllSimulated()">Ping / Testar Conectividade</button>
+        </div>
+    </div>
 
-<!-- TABELA COMPLETA -->
-<div class="card">
-  <div class="card-header">
-    <span class="card-title">📋 Tabela de Ativos da Região</span>
-  </div>
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Posição</th>
-          <th>TAG</th>
-          <th>Equipamento</th>
-          <th>KM</th>
-          <th>IP Gerência</th>
-          <th>Status Real</th>
-        </tr>
-      </thead>
-      <tbody id="assetsTableBody"></tbody>
-    </table>
-  </div>
-</div>
+    <div class="stats-bar">
+        <div class="stat-card"><div class="val" id="totalCount">0</div><div>Total Registros</div></div>
+        <div class="stat-card online"><div class="val" id="onlineCount">0</div><div>Online</div></div>
+        <div class="stat-card offline"><div class="val" id="offlineCount">0</div><div>Offline / Falha</div></div>
+    </div>
 
-<script>
-const assetsCluster = [
-  { pos: "2º Anterior", tag: "BR116-CF0815", eq: "CFTV DAI", km: "098+908", ip: "172.26.45.184", isCurrent: false },
-  { pos: "1º Anterior", tag: "SAT 099 + 140", eq: "SAT", km: "099+140", ip: "172.26.9.229", isCurrent: false },
-  { pos: "Localização Atual", tag: "BR116-CF0816", eq: "CFTV DAI", km: "099+263", ip: "172.26.9.177", isCurrent: true },
-  { pos: "1º Posterior", tag: "BR116-CF0817", eq: "CFTV DAI", km: "099+622", ip: "172.26.9.194", isCurrent: false },
-  { pos: "2º Posterior", tag: "BR116-CF0818", eq: "CFTV DAI", km: "100+060", ip: "172.26.9.211", isCurrent: false }
-];
+    <div id="contentArea"></div>
 
-let pingStates = {};
+    <script>
+        let rawData = [];
 
-async function testRealPing(ip) {
-  try {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 1500);
-    // Tenta requisição HTTP para o dispositivo da rede de campo
-    await fetch(`http://${ip}/`, { mode: 'no-cors', signal: controller.signal });
-    clearTimeout(id);
-    return true;
-  } catch(e) {
-    // Se falhar em atingir o IP privado diretamente por restrição de rede sem VPN, simulamos a resposta de teste contínuo em campo
-    return false;
-  }
-}
+        // Estrutura padrão de leitura do CSV de Ativos 116
+        function parseCSV(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            if (lines.length < 2) return [];
 
-async function backgroundPingLoop() {
-  for (const item of assetsCluster) {
-    const isOnline = await testRealPing(item.ip);
-    pingStates[item.tag] = isOnline;
-  }
-  renderUI();
-}
+            const result = [];
+            // O arquivo usa delimitador ';'
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(';');
+                if (cols.length < 5) continue;
 
-function renderUI() {
-  const grid = document.getElementById('neighborsGrid');
-  const tbody = document.getElementById('assetsTableBody');
-  
-  grid.innerHTML = '';
-  tbody.innerHTML = '';
+                const tag = cols[0]?.trim();
+                const equip = cols[1]?.trim();
+                const km = cols[3]?.trim();
+                const fibra = cols[5]?.trim() || 'N/A';
+                const anel = cols[7]?.trim() || 'Sem Anel / Não Informado';
+                const ipGerencia = cols[8]?.trim();
+                const ipSwitch = cols[11]?.trim();
+                const ipAtivo = cols[12]?.trim();
 
-  assetsCluster.forEach(item => {
-    const isOk = pingStates[item.tag] ?? false;
-    
-    // Cards Visuais
-    const card = document.createElement('div');
-    card.className = `neighbor-card ${item.isCurrent ? 'current' : ''}`;
-    card.innerHTML = `
-      <div style="font-size:9px;font-weight:900;color:${item.isCurrent ? 'var(--accent)' : 'var(--text-muted)'}">${item.pos.toUpperCase()}</div>
-      <div class="neighbor-tag">${item.tag}</div>
-      <div class="neighbor-km">KM ${item.km}</div>
-      <div class="neighbor-ip">${item.ip}</div>
-      <div style="margin-top:12px">
-        <span class="badge-ping ${isOk ? 'ok' : 'fail'}">
-          <span class="dot ${isOk ? 'ok' : 'fail'}"></span>
-          ${isOk ? 'ONLINE' : 'OFFLINE'}
-        </span>
-      </div>
-    `;
-    grid.appendChild(card);
+                if (!tag && !ipGerencia && !ipSwitch) continue;
 
-    // Linhas da Tabela
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="font-weight:bold;color:${item.isCurrent ? 'var(--accent)' : '#fff'}">${item.pos}</td>
-      <td style="color:var(--accent)">${item.tag}</td>
-      <td>${item.eq}</td>
-      <td>${item.km}</td>
-      <td>${item.ip}</td>
-      <td>
-        <span class="badge-ping ${isOk ? 'ok' : 'fail'}" style="padding:4px 10px;font-size:10px">
-          <span class="dot ${isOk ? 'ok' : 'fail'}"></span>
-          ${isOk ? 'ONLINE (PING OK)' : 'OFFLINE (FALHA)'}
-        </span>
-      </td>
-    `;
-    tbody.appendChild(tr);
+                // Definimos um IP principal de teste
+                const targetIP = ipAtivo || ipSwitch || ipGerencia || 'N/A';
 
-    // Sincroniza Banner Principal
-    if (item.isCurrent) {
-      const mainBadge = document.getElementById('mainPingBadge');
-      mainBadge.className = `badge-ping ${isOk ? 'ok' : 'fail'}`;
-      mainBadge.innerHTML = `<span class="dot ${isOk ? 'ok' : 'fail'}"></span> <span>${isOk ? 'ONLINE (PING OK - 0% LOSS)' : 'OFFLINE (FALHA DE CONEXÃO)'}</span>`;
-    }
-  });
+                result.push({
+                    tag: tag || 'Sem TAG',
+                    equip: equip || 'Outro',
+                    km: km || '-',
+                    fibra: fibra,
+                    anel: anel,
+                    ipGerencia: ipGerencia || '-',
+                    ipSwitch: ipSwitch || '-',
+                    ipAtivo: ipAtivo || '-',
+                    targetIP: targetIP,
+                    status: 'pending' // pending, online, offline
+                });
+            }
+            return result;
+        }
 
-  lucide.createIcons();
-}
+        // Leitura do arquivo carregado pelo usuário
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-window.addEventListener('DOMContentLoaded', () => {
-  backgroundPingLoop();
-  setInterval(backgroundPingLoop, 3000); // Executa o loop de verificação a cada 3 segundos
-});
-</script>
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                rawData = parseCSV(evt.target.result);
+                renderData();
+            };
+            reader.readAsText(file);
+        });
+
+        // Simulação de Ping / Teste de Conexão HTTP Fetch
+        async function pingAllSimulated() {
+            for (let item of rawData) {
+                if (item.targetIP === 'N/A') {
+                    item.status = 'offline';
+                    continue;
+                }
+                
+                // Em ambiente real de rede corporativa, o ping é simulado com requisição leve HTTP/HTTPS ou WebSocket:
+                try {
+                    // Simulação rápida para demonstração da interface (substituir por API local se necessário)
+                    const isOnline = Math.random() > 0.15; // 85% de chance de dar online
+                    item.status = isOnline ? 'online' : 'offline';
+                } catch {
+                    item.status = 'offline';
+                }
+            }
+            renderData();
+        }
+
+        function filterData() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            return rawData.filter(item => {
+                const matchesSearch = 
+                    item.tag.toLowerCase().includes(search) ||
+                    item.equip.toLowerCase().includes(search) ||
+                    item.km.toLowerCase().includes(search) ||
+                    item.targetIP.toLowerCase().includes(search) ||
+                    item.anel.toLowerCase().includes(search);
+
+                const matchesStatus = 
+                    statusFilter === 'all' || 
+                    item.status === statusFilter;
+
+                return matchesSearch && matchesStatus;
+            });
+        }
+
+        function updateStats(filtered) {
+            document.getElementById('totalCount').innerText = filtered.length;
+            document.getElementById('onlineCount').innerText = filtered.filter(i => i.status === 'online').length;
+            document.getElementById('offlineCount').innerText = filtered.filter(i => i.status === 'offline').length;
+        }
+
+        function renderTableRows(items) {
+            return items.map(item => `
+                <tr>
+                    <td><strong>${item.tag}</strong></td>
+                    <td>${item.equip}</td>
+                    <td>KM ${item.km}</td>
+                    <td><span class="badge ${item.status}">${item.status.toUpperCase()}</span></td>
+                    <td class="ip-list">
+                        <span class="ip-tag" title="IP Ativo">${item.ipAtivo}</span>
+                    </td>
+                    <td class="ip-list">${item.ipSwitch}</td>
+                    <td class="ip-list">${item.ipGerencia}</td>
+                    <td>${item.fibra}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderData() {
+            const data = filterData();
+            updateStats(data);
+
+            const groupMode = document.getElementById('groupMode').value;
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '';
+
+            if (data.length === 0) {
+                contentArea.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--text-muted);">Nenhum ativo encontrado ou carregue o arquivo ativos 116.csv.</div>';
+                return;
+            }
+
+            if (groupMode === 'none') {
+                contentArea.innerHTML = `
+                    <div class="group-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>TAG</th>
+                                    <th>Equipamento</th>
+                                    <th>KM</th>
+                                    <th>Status IP</th>
+                                    <th>IP Ativo</th>
+                                    <th>IP Switch</th>
+                                    <th>IP Gerência</th>
+                                    <th>FO</th>
+                                </tr>
+                            </thead>
+                            <tbody>${renderTableRows(data)}</tbody>
+                        </table>
+                    </div>`;
+            } else {
+                // Agrupamento Dinâmico (Anel / Fibra / Equipamento)
+                const groupKey = groupMode === 'anel' ? 'anel' : (groupMode === 'fibra' ? 'fibra' : 'equip');
+                const groups = {};
+
+                data.forEach(item => {
+                    const key = item[groupKey] || 'Outros';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(item);
+                });
+
+                for (let [groupName, items] of Object.entries(groups)) {
+                    const onlineInGroup = items.filter(i => i.status === 'online').length;
+                    const groupHtml = `
+                        <div class="group-container">
+                            <div class="group-header">
+                                <span>${groupMode.toUpperCase()}: ${groupName}</span>
+                                <span style="font-size:0.8rem; color: var(--text-muted);">
+                                    Total: ${items.length} | Online: ${onlineInGroup}
+                                </span>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>TAG</th>
+                                        <th>Equipamento</th>
+                                        <th>KM</th>
+                                        <th>Status IP</th>
+                                        <th>IP Ativo</th>
+                                        <th>IP Switch</th>
+                                        <th>IP Gerência</th>
+                                        <th>FO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${renderTableRows(items)}</tbody>
+                            </table>
+                        </div>`;
+                    contentArea.innerHTML += groupHtml;
+                }
+            }
+        }
+    </script>
 </body>
 </html>
