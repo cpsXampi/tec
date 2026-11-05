@@ -1,442 +1,210 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão & Mapeamento de Rede Óptica</title>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --accent-cyan: #38bdf8;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            padding: 16px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        h1, h2, h3 {
-            color: var(--accent-cyan);
-            margin-top: 0;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        @media (max-width: 600px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: #fff;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-cyan);
-            color: #0f172a;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-        }
-
-        button:active { opacity: 0.8; }
-
-        .btn-secondary {
-            background-color: #334155;
-            color: #fff;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            color: var(--text-sub);
-            background-color: #0f172a;
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.75rem;
-            display: inline-block;
-        }
-
-        .badge-online { background-color: rgba(34, 197, 94, 0.2); color: var(--success); }
-        .badge-offline { background-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .badge-atual { background-color: rgba(56, 189, 248, 0.2); color: var(--accent-cyan); }
-
-        .dio-box {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .dio-port {
-            background: #0f172a;
-            border: 2px dashed var(--border-color);
-            padding: 12px;
-            text-align: center;
-            border-radius: 6px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .dio-port.selected {
-            border-color: var(--accent-cyan);
-            background: rgba(56, 189, 248, 0.1);
-        }
-
-        .alert-box {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .alert-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fca5a5; }
-        .alert-success { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--success); color: #86efac; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>TEC · Ativos BR-116 | KMReport</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--bg:#0b1220;--card:#121b2e;--card2:#18233a;--line:#24324f;--txt:#e6edf7;--mut:#8a9bb8;--acc:#38bdf8;--ok:#34d399;--bad:#ef4444;--warn:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:40px}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#0f1a30,#0b1220);border-bottom:1px solid var(--line);padding:12px 16px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{width:38px;height:38px;border-radius:10px;background:var(--acc);color:#04121f;display:grid;place-items:center}
+.brand h1{font-size:1.05rem;letter-spacing:.5px}
+.brand small{display:block;color:var(--mut);font-size:.72rem}
+.gps{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.8rem}
+.gps b{color:var(--acc);font-variant-numeric:tabular-nums}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn)}
+.dot.on{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.dot.off{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+main{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:18px}
+.sec-t{display:flex;align-items:center;gap:8px;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin-bottom:8px}
+.sec-t svg{width:16px;height:16px}
+.hero{background:linear-gradient(135deg,#123052,#121b2e);border:1px solid var(--acc);border-radius:16px;padding:18px;box-shadow:0 0 24px rgba(56,189,248,.15)}
+.hero .tag{font-size:1.6rem;font-weight:800;letter-spacing:.5px}
+.hero .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.kv{background:rgba(0,0,0,.25);border-radius:10px;padding:10px}
+.kv span{display:block;font-size:.68rem;color:var(--mut);text-transform:uppercase;letter-spacing:.6px}
+.kv b{font-size:.95rem;font-variant-numeric:tabular-nums;word-break:break-all}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-weight:800;font-size:.75rem;letter-spacing:.4px;border:1px solid}
+.badge.ok{color:var(--ok);border-color:var(--ok);background:rgba(52,211,153,.12);box-shadow:0 0 14px rgba(52,211,153,.55);text-shadow:0 0 8px rgba(52,211,153,.9)}
+.badge.bad{color:var(--bad);border-color:var(--bad);background:rgba(239,68,68,.12);box-shadow:0 0 14px rgba(239,68,68,.55);text-shadow:0 0 8px rgba(239,68,68,.9)}
+.badge.wait{color:var(--warn);border-color:var(--warn);background:rgba(245,158,11,.1)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.card.cur{border-color:var(--acc);background:var(--card2)}
+.card .pos{font-size:.68rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.card .pos svg{width:14px;height:14px}
+.card .t{font-weight:800;font-size:1.05rem}
+.card .l{font-size:.8rem;color:var(--mut)}
+.card .l b{color:var(--txt);font-weight:600}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:860px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#0f182a;color:var(--mut);font-size:.7rem;text-transform:uppercase;letter-spacing:.8px}
+tr.cur td{background:rgba(56,189,248,.08)}
+tr:last-child td{border-bottom:0}
+.foot{color:var(--mut);font-size:.72rem;text-align:center}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.8rem;cursor:pointer}
+.btn svg{width:15px;height:15px}
+@media(max-width:520px){.hero .tag{font-size:1.25rem}.gps{width:100%;justify-content:center}}
+</style>
 </head>
 <body>
-
-<div class="container">
-    <h1>📡 Mapeamento & Consulta de Fibra Óptica</h1>
-
-    <!-- 1. PAINEL DE CONSULTA POR VIZINHANÇA E ICMP -->
-    <div class="card">
-        <h2>🔍 Consulta de Proximidade & Status ICMP</h2>
-        <p style="color: var(--text-sub); font-size: 0.85rem;">Localize o ponto atual e analise os 3 equipamentos anteriores e os 3 posteriores.</p>
-        
-        <div class="grid-2">
-            <div>
-                <label for="kmBusca">Quilômetro (KM) Atual / Referência</label>
-                <input type="number" id="kmBusca" step="0.1" placeholder="Ex: 86.0" value="86.0">
-            </div>
-            <div style="display: flex; align-items: flex-end;">
-                <button onclick="executarConsultaVizinhos()">Consultar Vizinhos & ICMP</button>
-            </div>
-        </div>
-
-        <div class="table-responsive" style="margin-top: 12px;">
-            <table id="tabelaVizinhos">
-                <thead>
-                    <tr>
-                        <th>Posição</th>
-                        <th>Equipamento / KM</th>
-                        <th>Anel / Fibra</th>
-                        <th>Portas SC (DIO)</th>
-                        <th>Status ICMP</th>
-                        <th>Latência</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoVizinhos">
-                    <tr><td colspan="6" style="text-align:center; color:var(--text-sub);">Digite um KM e clique em consultar.</td></tr>
-                </tbody>
-            </table>
-        </div>
+<header>
+  <div class="hrow">
+    <div class="brand">
+      <div class="logo"><i data-lucide="radio-tower"></i></div>
+      <div><h1>KMReport · TEC</h1><small>Rodovia Presidente Dutra · BR-116</small></div>
     </div>
+    <div class="gps"><span id="gpsDot" class="dot"></span><i data-lucide="map-pin" style="width:15px;height:15px"></i><span id="gpsTxt">Obtendo GPS…</span> <b id="kmTxt">KM —</b></div>
+  </div>
+</header>
 
-    <!-- 2. SIMULADOR DE TESTE DE BYPASS NO DIO -->
-    <div class="card">
-        <h2>🔌 Teste de Conectividade DIO (Evitar Loopback)</h2>
-        <p style="color: var(--text-sub); font-size: 0.85rem;">Selecione duas portas SC para simular o jumpeamento de bypass em campo.</p>
+<main>
+  <section>
+    <div class="sec-t"><i data-lucide="crosshair"></i>Ativo da posição atual</div>
+    <div class="hero" id="hero"></div>
+  </section>
 
-        <div class="dio-box">
-            <div class="dio-port" id="port-1" onclick="selecionarPorta(1)">
-                <strong>SC 1</strong><br><small>Oeste (Entrada)</small>
-            </div>
-            <div class="dio-port" id="port-2" onclick="selecionarPorta(2)">
-                <strong>SC 2</strong><br><small>Oeste (Saída)</small>
-            </div>
-            <div class="dio-port" id="port-3" onclick="selecionarPorta(3)">
-                <strong>SC 3</strong><br><small>Leste (Saída)</small>
-            </div>
-            <div class="dio-port" id="port-4" onclick="selecionarPorta(4)">
-                <strong>SC 4</strong><br><small>Leste (Entrada)</small>
-            </div>
-        </div>
+  <section>
+    <div class="sec-t"><i data-lucide="git-commit-horizontal"></i>Sequência do trecho</div>
+    <div class="grid" id="grid"></div>
+  </section>
 
-        <div id="msgStatusDio" class="alert-box"></div>
-        <button class="btn-secondary" style="margin-top: 10px;" onclick="resetarSelecaoDio()">Limpar Teste de Portas</button>
+  <section>
+    <div class="sec-t" style="justify-content:space-between">
+      <span style="display:flex;gap:8px;align-items:center"><i data-lucide="table"></i>Detalhamento · Ping ao vivo</span>
+      <button class="btn" id="btnLoc"><i data-lucide="locate-fixed"></i>Atualizar GPS</button>
     </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Posição</th><th>TAG</th><th>Equipamento</th><th>KM</th><th>IP Gerência</th><th>Hostname</th><th>Fibras</th><th>Status Ping</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+  </section>
 
-    <!-- 3. CADASTRO DE NOVO EQUIPAMENTO -->
-    <div class="card">
-        <h2>📝 Cadastrar / Atualizar Ponto de Fibra</h2>
-        <form id="formCadastro" onsubmit="salvarEquipamento(event)">
-            <div class="grid-2">
-                <div>
-                    <label>Identificação do Equipamento</label>
-                    <input type="text" id="cadId" placeholder="Ex: EQ-86 (Poste 142)" required>
-                </div>
-                <div>
-                    <label>Quilômetro (KM)</label>
-                    <input type="number" step="0.1" id="cadKm" placeholder="Ex: 86.0" required>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div>
-                    <label>Anel Pertencente</label>
-                    <select id="cadAnel">
-                        <option value="Anel Principal (Tronco 01)">Anel Principal (Tronco 01)</option>
-                        <option value="Anel Secundário (Redundância)">Anel Secundário (Redundância)</option>
-                        <option value="Anel de Distribuição B">Anel de Distribuição B</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Número do Par de Fibra</label>
-                    <input type="text" id="cadFibra" placeholder="Ex: Fibras #01 e #02 (Verde/Amarelo)" required>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div>
-                    <label>Endereço IP para ICMP</label>
-                    <input type="text" id="cadIp" placeholder="Ex: 192.168.10.86" required>
-                </div>
-                <div>
-                    <label>Conectores SC Associados</label>
-                    <input type="text" id="cadSc" placeholder="Ex: SC1-RX | SC2-TX | SC3-TX | SC4-RX" required>
-                </div>
-            </div>
-
-            <button type="submit">Salvar Registro no Banco Local</button>
-        </form>
-    </div>
-</div>
+  <p class="foot" id="foot">Teste de conectividade a cada 3s · timeout 1.2s</p>
+</main>
 
 <script>
-    // Base inicial de equipamentos na rodovia ordenada por KM
-    let baseEquipamentos = [
-        { id: "EQ-83", km: 83.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.83", sc: "SC1 a SC4", status: true },
-        { id: "EQ-84", km: 84.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.84", sc: "SC1 a SC4", status: true },
-        { id: "EQ-85", km: 85.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.85", sc: "SC1 a SC4", status: true },
-        { id: "EQ-86", km: 86.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.86", sc: "SC1 a SC4", status: false }, // Simulação em falha
-        { id: "EQ-87", km: 87.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.87", sc: "SC1 a SC4", status: true },
-        { id: "EQ-88", km: 88.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.88", sc: "SC1 a SC4", status: true },
-        { id: "EQ-89", km: 89.0, anel: "Anel Principal", fibra: "Fibras #01 e #02", ip: "192.168.10.89", sc: "SC1 a SC4", status: true }
-    ];
+/* ===== Base ativos116.csv (embutida) =====
+   lat/lon aproximados ao longo da BR-116 (Pindamonhangaba) para cálculo de proximidade */
+const ATIVOS_CSV = `tag;equip;km;ip;host;fibra;lat;lon
+BR116-CF0815;CFTV DAI;098+908;172.26.45.184;RSP-SA14-N098_908;11, 12;-22.9395;-45.4385
+SAT 099 + 140;SAT;099+140;172.26.9.229;RSP-ITS-N099_140;11, 12;-22.9381;-45.4405
+BR116-CF0816;CFTV DAI;099+263;172.26.9.177;RSP-SA14-N099_263;21, 22;-22.9374;-45.4416
+BR116-CF0817;CFTV DAI;099+622;172.26.9.194;RSP-SA15-N099_622;11, 12;-22.9353;-45.4447
+BR116-CF0840;CFTV DAI;100+060;172.26.9.211;RSP-SA16-N100_060;21, 22;-22.9327;-45.4485`;
 
-    // Carregar dados salvos no localStorage se existirem
-    function carregarDadosMemoria() {
-        const salvos = localStorage.getItem('rede_fibra_dados');
-        if (salvos) {
-            baseEquipamentos = JSON.parse(salvos);
-        }
-    }
+const ATIVOS = ATIVOS_CSV.trim().split("\n").slice(1).map(l=>{
+  const [tag,equip,km,ip,host,fibra,lat,lon]=l.split(";");
+  return {tag,equip,km,ip,host,fibra,lat:+lat,lon:+lon,kmN:kmToNum(km)};
+}).sort((a,b)=>a.kmN-b.kmN);
 
-    // Executar teste ICMP / Ping simulado
-    function simularPing(statusEquipamento) {
-        if (!statusEquipamento) {
-            return { online: false, ms: '-' };
-        }
-        const ms = Math.floor(Math.random() * 12) + 2;
-        return { online: true, ms: ms + ' ms' };
-    }
+const DEFAULT_IDX = ATIVOS.findIndex(a=>a.tag==="BR116-CF0816");
+const LABELS = ["2º Anterior","1º Anterior","Atual (Localização)","1º Posterior","2º Posterior"];
+const ICONS  = ["chevrons-left","chevron-left","map-pin","chevron-right","chevrons-right"];
+const status = {}; // ip -> "ok" | "bad" | undefined
+let centerIdx = DEFAULT_IDX, currentKm = null;
 
-    // Consulta de vizinhos: 3 Anteriores, Atual, 3 Posteriores
-    function executarConsultaVizinhos() {
-        carregarDadosMemoria();
-        const kmAlvo = parseFloat(document.getElementById('kmBusca').value);
-        const corpoTabela = document.getElementById('corpoVizinhos');
+function kmToNum(k){const [a,b]=k.split("+");return (+a)+(+b)/1000;}
+function numToKm(n){const a=Math.floor(n),b=Math.round((n-a)*1000);return String(a).padStart(3,"0")+"+"+String(b).padStart(3,"0");}
+function dist(lat1,lon1,lat2,lon2){const R=6371e3,r=Math.PI/180,dLat=(lat2-lat1)*r,dLon=(lon2-lon1)*r;
+  const x=Math.sin(dLat/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
 
-        if (isNaN(kmAlvo)) {
-            alert('Por favor, digite um valor de KM válido.');
-            return;
-        }
+function sequence(){
+  const out=[];
+  for(let o=-2;o<=2;o++){const i=centerIdx+o;out.push(ATIVOS[i]||null);}
+  return out;
+}
+function badge(ip){
+  const s=status[ip];
+  if(s==="ok") return `<span class="badge ok"><i data-lucide="wifi"></i>ONLINE (PING OK)</span>`;
+  if(s==="bad") return `<span class="badge bad"><i data-lucide="wifi-off"></i>OFFLINE (TIMEOUT / FALHA)</span>`;
+  return `<span class="badge wait"><i data-lucide="loader"></i>TESTANDO…</span>`;
+}
 
-        // Ordenar equipamentos por KM
-        const listaOrdenada = [...baseEquipamentos].sort((a, b) => a.km - b.km);
-        
-        // Encontrar o equipamento mais próximo do KM buscado
-        let indexAtual = 0;
-        let menorDiferenca = Infinity;
+function render(){
+  const seq=sequence(), cur=seq[2];
+  document.getElementById("hero").innerHTML = cur ? `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+      <div><div class="kv" style="background:none;padding:0"><span>${cur.equip}</span></div><div class="tag">${cur.tag}</div></div>
+      ${badge(cur.ip)}
+    </div>
+    <div class="meta">
+      <div class="kv"><span>KM</span><b>${cur.km}</b></div>
+      <div class="kv"><span>IP Gerência</span><b>${cur.ip}</b></div>
+      <div class="kv"><span>Hostname</span><b>${cur.host}</b></div>
+      <div class="kv"><span>Fibras</span><b>${cur.fibra}</b></div>
+    </div>` : "Sem ativo";
 
-        listaOrdenada.forEach((eq, i) => {
-            const diff = Math.abs(eq.km - kmAlvo);
-            if (diff < menorDiferenca) {
-                menorDiferenca = diff;
-                indexAtual = i;
-            }
-        });
+  document.getElementById("grid").innerHTML = seq.map((a,i)=>a?`
+    <div class="card ${i===2?"cur":""}">
+      <div class="pos"><i data-lucide="${ICONS[i]}"></i>${LABELS[i]}</div>
+      <div class="t">${a.tag}</div>
+      <div class="l">${a.equip} · KM <b>${a.km}</b></div>
+      <div class="l">IP <b>${a.ip}</b></div>
+      <div class="l">Fibras <b>${a.fibra}</b></div>
+      <div style="margin-top:6px">${badge(a.ip)}</div>
+    </div>`:`<div class="card"><div class="pos">${LABELS[i]}</div><div class="l">Sem ativo cadastrado</div></div>`).join("");
 
-        // Pegar 3 anteriores e 3 posteriores
-        const inicio = Math.max(0, indexAtual - 3);
-        const fim = Math.min(listaOrdenada.length, indexAtual + 4);
-        const subLista = listaOrdenada.slice(inicio, fim);
+  document.getElementById("tbody").innerHTML = seq.map((a,i)=>a?`
+    <tr class="${i===2?"cur":""}"><td>${LABELS[i]}</td><td><b>${a.tag}</b></td><td>${a.equip}</td><td>${a.km}</td>
+    <td>${a.ip}</td><td>${a.host}</td><td>${a.fibra}</td><td>${badge(a.ip)}</td></tr>`:"").join("");
+  lucide.createIcons();
+}
 
-        corpoTabela.innerHTML = '';
+/* ===== Geolocalização ===== */
+function onPos(p){
+  const {latitude:la,longitude:lo,accuracy}=p.coords;
+  let best=0,bd=Infinity;
+  ATIVOS.forEach((a,i)=>{const d=dist(la,lo,a.lat,a.lon);if(d<bd){bd=d;best=i;}});
+  // estima KM: ativo mais próximo ± distância projetada ao vizinho
+  currentKm = ATIVOS[best].kmN;
+  const nb = ATIVOS[best+1]||ATIVOS[best-1];
+  if(nb){const dn=dist(la,lo,nb.lat,nb.lon), seg=dist(ATIVOS[best].lat,ATIVOS[best].lon,nb.lat,nb.lon);
+    if(dn<seg) currentKm += (nb.kmN-ATIVOS[best].kmN)*(bd/(bd+dn));}
+  document.getElementById("gpsDot").className="dot on";
+  document.getElementById("gpsTxt").textContent = bd>5000 ? `Fora do trecho (${(bd/1000).toFixed(1)} km)` : `GPS ±${Math.round(accuracy)}m`;
+  document.getElementById("kmTxt").textContent = "KM "+numToKm(currentKm);
+  if(best!==centerIdx){centerIdx=best;render();}
+}
+function onErr(e){
+  document.getElementById("gpsDot").className="dot off";
+  document.getElementById("gpsTxt").textContent="GPS indisponível · referência";
+  document.getElementById("kmTxt").textContent="KM "+ATIVOS[DEFAULT_IDX].km;
+}
+let watchId=null;
+function startGPS(){
+  if(!("geolocation" in navigator)) return onErr();
+  if(watchId!==null) navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+document.getElementById("btnLoc").onclick=startGPS;
 
-        subLista.forEach((eq) => {
-            const ehAtual = (eq.id === listaOrdenada[indexAtual].id);
-            const ping = simularPing(eq.status);
-            
-            let posRotulo = 'Vizinho';
-            if (eq.km < listaOrdenada[indexAtual].km) posRotulo = 'Anterior';
-            if (eq.km > listaOrdenada[indexAtual].km) posRotulo = 'Posterior';
-            if (ehAtual) posRotulo = '📍 MAIS PRÓXIMO';
+/* ===== Ping em segundo plano ===== */
+async function ping(ip){
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),1200);
+  try{ await fetch(`http://${ip}/?_=${Date.now()}`,{mode:"no-cors",cache:"no-store",signal:ctrl.signal}); return true; }
+  catch(e){ return false; }
+  finally{ clearTimeout(t); }
+}
+async function pingLoop(){
+  while(true){
+    const seq=sequence().filter(Boolean);
+    const res=await Promise.all(seq.map(a=>ping(a.ip)));
+    seq.forEach((a,i)=>status[a.ip]=res[i]?"ok":"bad");
+    render();
+    document.getElementById("foot").textContent=`Último teste: ${new Date().toLocaleTimeString("pt-BR")} · ciclo 3s · timeout 1.2s`;
+    await new Promise(r=>setTimeout(r,3000));
+  }
+}
 
-            const badgeStatus = ping.online 
-                ? `<span class="badge badge-online">🟢 ONLINE</span>` 
-                : `<span class="badge badge-offline">🔴 OFFLINE</span>`;
-
-            const badgePosicao = ehAtual 
-                ? `<span class="badge badge-atual">${posRotulo}</span>` 
-                : `<span style="color:var(--text-sub);">${posRotulo}</span>`;
-
-            const tr = document.createElement('tr');
-            if (ehAtual) tr.style.backgroundColor = 'rgba(56, 189, 248, 0.05)';
-
-            tr.innerHTML = `
-                <td>${badgePosicao}</td>
-                <td><strong>${eq.id}</strong> (KM ${eq.km.toFixed(1)})</td>
-                <td><small>${eq.anel}<br><b>${eq.fibra}</b></small></td>
-                <td><small>${eq.sc}</small></td>
-                <td>${badgeStatus}</td>
-                <td style="font-family:monospace;">${ping.ms}</td>
-            `;
-            corpoTabela.appendChild(tr);
-        });
-    }
-
-    // Lógica do Simulador DIO (Prevenção de Loopback)
-    let portasSelecionadas = [];
-
-    function selecionarPorta(numero) {
-        const el = document.getElementById(`port-${numero}`);
-        
-        if (portasSelecionadas.includes(numero)) {
-            portasSelecionadas = portasSelecionadas.filter(p => p !== numero);
-            el.classList.remove('selected');
-        } else {
-            if (portasSelecionadas.length < 2) {
-                portasSelecionadas.push(numero);
-                el.classList.add('selected');
-            }
-        }
-
-        validarConexaoDio();
-    }
-
-    function resetarSelecaoDio() {
-        portasSelecionadas = [];
-        for (let i = 1; i <= 4; i++) {
-            document.getElementById(`port-${i}`).classList.remove('selected');
-        }
-        const box = document.getElementById('msgStatusDio');
-        box.style.display = 'none';
-    }
-
-    function validarConexaoDio() {
-        const box = document.getElementById('msgStatusDio');
-        if (portasSelecionadas.length < 2) {
-            box.style.display = 'none';
-            return;
-        }
-
-        const [p1, p2] = portasSelecionadas.sort();
-        box.style.display = 'block';
-
-        // Regra: Portas do mesmo lado (1 com 2 OU 3 com 4) geram LOOPBACK INDEVIDO!
-        if ((p1 === 1 && p2 === 2) || (p1 === 3 && p2 === 4)) {
-            box.className = 'alert-box alert-danger';
-            box.innerHTML = '⚠️ <strong>ALERTA DE LOOPBACK INDEVIDO!</strong><br>Você conectou o mesmo lado do DIO. Isso faz o sinal voltar para o mesmo par de fibra e derruba o anel!';
-        } else {
-            box.className = 'alert-box alert-success';
-            box.innerHTML = '✅ <strong>BYPASS DE PASSAGEM VÁLIDO!</strong><br>Sinal cruzado com sucesso (Entrada Oeste -> Saída Leste). O sinal óptico continua para o próximo KM sem interromper a malha.';
-        }
-    }
-
-    // Salvamento de Novos Pontos
-    function salvarEquipamento(event) {
-        event.preventDefault();
-        carregarDadosMemoria();
-
-        const novo = {
-            id: document.getElementById('cadId').value,
-            km: parseFloat(document.getElementById('cadKm').value),
-            anel: document.getElementById('cadAnel').value,
-            fibra: document.getElementById('cadFibra').value,
-            ip: document.getElementById('cadIp').value,
-            sc: document.getElementById('cadSc').value,
-            status: true
-        };
-
-        baseEquipamentos.push(novo);
-        localStorage.setItem('rede_fibra_dados', JSON.stringify(baseEquipamentos));
-        
-        alert('Equipamento cadastrado com sucesso!');
-        document.getElementById('formCadastro').reset();
-        executarConsultaVizinhos();
-    }
-
-    // Inicialização ao carregar a página
-    window.onload = () => {
-        executarConsultaVizinhos();
-    };
+render(); startGPS(); pingLoop();
 </script>
-
 </body>
 </html>
