@@ -17,9 +17,16 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}.modes button[aria-pressed=true]{background:var(--acc);color:#000}.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}.rb svg{width:22px;height:22px}.camera-icon{width:24px;height:24px;display:block}#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}#snap{visibility:hidden}#snap.on{visibility:visible}
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}.checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:2px}
 
-/* Estilos do Painel de Ativos e Ping Status */
-#assetsPanel{position:absolute;z-index:5;left:12px;top:calc(132px + var(--st));width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 280px);overflow-y:auto;background:rgba(7,9,12,.92);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px}#assetsPanel[hidden]{display:none}.assetsHead{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:var(--acc);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}.assetRow{padding:8px 6px;border-bottom:1px solid var(--line);line-height:1.35;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.02)}.assetRow.nearest{color:#fff;background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.3)}.assetTitle{font-weight:700;font-size:13px}.assetMeta{color:#c3c6ce;font-size:11px;margin-top:2px}.assetState{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:6px;font-weight:700}
-.badge-ping{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase}
+/* Painel de Ativos e Topologia de Fibra */
+#assetsPanel{position:absolute;z-index:5;left:12px;top:calc(132px + var(--st));width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 280px);overflow-y:auto;background:rgba(7,9,12,.94);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px}#assetsPanel[hidden]{display:none}
+.assetsHead{display:flex;flex-direction:column;gap:2px;font-weight:800;color:var(--acc);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.assetsHead .sub-head{font-size:11px;color:#c3c6ce;font-weight:400}
+.assetRow{padding:8px 8px;border-bottom:1px solid var(--line);line-height:1.35;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,.03)}
+.assetRow.nearest{color:#fff;background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.4)}
+.assetTitle{font-weight:700;font-size:13px}
+.assetMeta{color:#c3c6ce;font-size:11px;margin-top:2px}
+.assetState{font-size:11px;margin-top:5px;display:flex;align-items:center;justify-content:space-between}
+.badge-ping{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase}
 .badge-ping.online{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.4)}
 .badge-ping.offline{background:rgba(239,68,68,.2);color:#ef4444;border:1px solid rgba(239,68,68,.4)}
 .badge-ping.checking{background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)}
@@ -42,7 +49,10 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
   <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
   
   <aside id="assetsPanel" aria-live="polite" hidden>
-    <div class="assetsHead"><span>Ativos Próximos (3 Antes / 3 Depois)</span><span id="assetsKm">—</span></div>
+    <div class="assetsHead">
+      <div>Topologia de Fibra Optica</div>
+      <div class="sub-head" id="fiberInfo">Analisando rota de fibra…</div>
+    </div>
     <div id="assetsList">Carregando ativos…</div>
   </aside>
 
@@ -90,21 +100,53 @@ $('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.v
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
 ['showKm','showDate','showGps','showLabel','showKmFar'].forEach(k=>$(k).addEventListener('change',()=>{persist();updateLocationUI();}));
 
-/* CSV dos marcos de KM */
+/* Leitura e parsing de dados */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
 function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
 function nearest(la,lo){const rad=Math.PI/180,R=6371000;let best=null,min=Infinity;for(const p of S.db){const dLat=(p.lat-la)*rad,dLon=(p.lon-lo)*rad,a=Math.sin(dLat/2)**2+Math.cos(la*rad)*Math.cos(p.lat*rad)*Math.sin(dLon/2)**2,dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
 
-/* Processamento do CSV ativos 116.csv */
+/* Leitura do ativos 116.csv com suporte à coluna "fibra" / "anel" */
 function parseAssetKm(v){const s=String(v??'').trim().replace(/^\uFEFF/,'');const m=s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);if(m)return Number(m[1])+Number(`${m[2]}${m[3]||''}`)/Math.pow(10,(m[3]||'').length+3);return num(s);}
-function parseAssetsCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const lines=t.split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];const h=lines[0].split(';').map(x=>x.replace(/^\s*\uFEFF/,'').replace(/"/g,'').trim().toLowerCase());const find=names=>h.findIndex(x=>names.includes(x));const tag=find(['tag','ativo','equipamento']),equip=find(['equipamento','tipo']),km=find(['km']),ip=find(['ip','endereço ip','endereco ip']);if(km<0)return[];return lines.slice(1).map(line=>{const r=line.split(';').map(x=>x.trim().replace(/^"|"$/g,''));const parsed=parseAssetKm(r[km]);return{tag:tag>=0?r[tag]:'',equip:equip>=0?r[equip]:'',km:parsed,kmLabel:r[km]||'',ip:ip>=0?r[ip]:''};}).filter(a=>Number.isFinite(a.km));}
+function parseAssetsCsv(t){
+  if(!t)return[];
+  if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
+  const lines=t.split(/\r?\n/).filter(x=>x.trim());
+  if(lines.length<2)return[];
+  const h=lines[0].split(';').map(x=>x.replace(/^\s*\uFEFF/,'').replace(/"/g,'').trim().toLowerCase());
+  const find=names=>h.findIndex(x=>names.includes(x));
+  const tag=find(['tag','ativo','equipamento']),equip=find(['equipamento','tipo']),km=find(['km']),ip=find(['ip','endereço ip','endereco ip']),fibra=find(['fibra','anel','tubo','circuito']);
+  if(km<0)return[];
+  return lines.slice(1).map(line=>{
+    const r=line.split(';').map(x=>x.trim().replace(/^"|"$/g,''));
+    const parsed=parseAssetKm(r[km]);
+    return{
+      tag:tag>=0?r[tag]:'',
+      equip:equip>=0?r[equip]:'',
+      km:parsed,
+      kmLabel:r[km]||'',
+      ip:ip>=0?r[ip]:'',
+      fibra:fibra>=0?r[fibra]:'GERAL'
+    };
+  }).filter(a=>Number.isFinite(a.km));
+}
 
-/* Teste de conectividade IP (Ping Web) com timeout e no-cors */
+/* Teste de Conectividade do IP */
 async function pingIp(ip){
   if(!ip) return 'no-ip';
+  
+  // 1. Tenta API local de ping ICMP real caso esteja rodando um mini-server no celular ou roteador
+  try {
+    const apiRes = await fetch(`http://localhost:8080/ping?ip=${ip}`, { cache: 'no-store' });
+    if(apiRes.ok){
+      const data = await apiRes.json();
+      return data.online ? 'online' : 'offline';
+    }
+  } catch(e){}
+
+  // 2. Probing HTTP/Socket fallback direto do navegador
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 1500);
+  const id = setTimeout(() => controller.abort(), 1200);
   try {
     const url = ip.startsWith('http') ? ip : `http://${ip}`;
     await fetch(url, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' });
@@ -112,59 +154,62 @@ async function pingIp(ip){
     return 'online';
   } catch(e) {
     clearTimeout(id);
-    return (e.name === 'AbortError') ? 'offline' : 'online'; // Resposta HTTP mesmo bloqueada por CORS confirma que o IP está ativo
+    return (e.name === 'AbortError') ? 'offline' : 'online';
   }
 }
 
-/* Loop para checagem contínua de pings */
 async function checkAssetPings(displayAssets){
   for(const asset of displayAssets){
-    if(!asset.ip) {
-      S.pingStatus[asset.ip || asset.tag] = 'offline';
-      continue;
-    }
-    const key = asset.ip;
+    if(!asset.ip) continue;
     const res = await pingIp(asset.ip);
-    S.pingStatus[key] = res;
+    S.pingStatus[asset.ip] = res;
   }
   if(S.mode==='ativos') renderAssetsUIOnly();
 }
 
-/* Algoritmo de busca exatamente 3 antes e 3 depois + próximo */
-function getSurroundingAssets(currentKm){
-  const ordered = [...S.assets].sort((a,b)=>a.km - b.km);
-  let nearestAsset = ordered[0];
-  let minDiff = Math.abs(ordered[0].km - currentKm);
+/* Algoritmo de Topologia: Pega a fibra do ativo mais próximo e busca 3 antes e 3 depois na MESMA FIBRA */
+function getSurroundingAssetsByFiber(currentKm){
+  if(!S.assets.length) return { finalGroup:[], nearestAsset:null, currentFiber:'' };
 
-  for(let i=1; i<ordered.length; i++){
-    const diff = Math.abs(ordered[i].km - currentKm);
+  // 1. Achar o equipamento geograficamente mais próximo do KM atual
+  let nearestAsset = S.assets[0];
+  let minDiff = Math.abs(S.assets[0].km - currentKm);
+
+  for(let i=1; i<S.assets.length; i++){
+    const diff = Math.abs(S.assets[i].km - currentKm);
     if(diff < minDiff){
       minDiff = diff;
-      nearestAsset = ordered[i];
+      nearestAsset = S.assets[i];
     }
   }
 
-  const before = ordered.filter(a => a.km <= currentKm).sort((a,b)=>b.km - a.km).slice(0, 3).reverse();
-  const after = ordered.filter(a => a.km > currentKm).sort((a,b)=>a.km - b.km).slice(0, 3);
+  const currentFiber = nearestAsset.fibra || 'GERAL';
 
-  // Combina e remove duplicatas mantendo a ordem por KM
+  // 2. Filtrar SOMENTE ativos pertencentes à MESMA FIBRA
+  const fiberAssets = S.assets.filter(a => (a.fibra || 'GERAL') === currentFiber).sort((a,b)=>a.km - b.km);
+
+  // 3. Selecionar 3 antes e 3 depois dentro dessa mesma fibra
+  const before = fiberAssets.filter(a => a.km <= currentKm).sort((a,b)=>b.km - a.km).slice(0, 3).reverse();
+  const after = fiberAssets.filter(a => a.km > currentKm).sort((a,b)=>a.km - b.km).slice(0, 3);
+
   const map = new Map();
   [...before, nearestAsset, ...after].forEach(a => map.set(`${a.tag}_${a.km}_${a.ip}`, a));
   const finalGroup = Array.from(map.values()).sort((a,b)=>a.km - b.km);
 
-  return { finalGroup, nearestAsset };
+  return { finalGroup, nearestAsset, currentFiber };
 }
 
 function renderAssetsUIOnly(){
   const current = S.kmValue;
   if(!Number.isFinite(current)) return;
-  const { finalGroup, nearestAsset } = getSurroundingAssets(current);
+  const { finalGroup, nearestAsset, currentFiber } = getSurroundingAssetsByFiber(current);
   
+  $('fiberInfo').textContent = `Fibra Atual: ${currentFiber} · KM ${current.toFixed(3)}`;
+
   $('assetsList').innerHTML = finalGroup.map(a => {
     const isNearest = a === nearestAsset;
     const delta = a.km - current;
-    const dir = delta < 0 ? 'antes' : delta > 0 ? 'depois' : 'no KM';
-    const statusKey = a.ip || a.tag;
+    const dir = delta < 0 ? 'antes' : delta > 0 ? 'depois' : 'no ponto';
     const st = S.pingStatus[a.ip] || 'checking';
 
     let badgeClass = 'checking', badgeText = 'CHECANDO...';
@@ -173,10 +218,11 @@ function renderAssetsUIOnly(){
     if(!a.ip){ badgeClass = 'checking'; badgeText = 'SEM IP'; }
 
     return `<div class="assetRow${isNearest ? ' nearest' : ''}">
-      <div class="assetTitle">${isNearest ? '★ MAIS PRÓXIMO · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')} · KM ${escapeHtml(a.kmLabel)}</div>
+      <div class="assetTitle">${isNearest ? '★ VOCÊ ESTÁ AQUI · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')} (KM ${escapeHtml(a.kmLabel)})</div>
       <div class="assetMeta">${escapeHtml(a.equip)}${a.ip ? ' · IP: ' + escapeHtml(a.ip) : ' · Sem IP'} · ${Math.abs(delta).toFixed(3)} km ${dir}</div>
       <div class="assetState">
-        Status Ping: <span class="badge-ping ${badgeClass}">${badgeText}</span>
+        <span>Fibra: <b>${escapeHtml(a.fibra)}</b></span>
+        <span class="badge-ping ${badgeClass}">${badgeText}</span>
       </div>
     </div>`;
   }).join('');
@@ -188,23 +234,21 @@ function renderAssets(){
   if(panel.hidden) return;
 
   const current = S.kmValue;
-  $('assetsKm').textContent = Number.isFinite(current) ? `KM ${current.toFixed(3)}` : 'aguardando KM';
-
   if(!S.assets.length){
-    $('assetsList').textContent = 'Carregando lista de ativos…';
+    $('assetsList').textContent = 'Carregando lista de ativos e fibras…';
     return;
   }
   if(!Number.isFinite(current)){
-    $('assetsList').textContent = 'Aguardando localização GPS e cálculo do KM atual.';
+    $('assetsList').textContent = 'Aguardando sinal GPS para identificar a fibra e o KM local.';
     return;
   }
 
-  const { finalGroup } = getSurroundingAssets(current);
+  const { finalGroup } = getSurroundingAssetsByFiber(current);
   renderAssetsUIOnly();
   checkAssetPings(finalGroup);
 }
 
-/* Reverse Geocoding */
+/* Localização GPS e Geocoding */
 function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
 function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
 function requestAddress(){if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);if(cached){S.address=cached;updateLocationUI();return;}if(S.lastGeoPoint&&Math.hypot(S.lat-S.lastGeoPoint.lat,S.lon-S.lastGeoPoint.lon)<.001)return;clearTimeout(S.geoTimer);const wait=Math.max(0,1100-(Date.now()-S.lastGeoRequest));S.geoTimer=setTimeout(async()=>{if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};try{const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}}catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}},wait);}
@@ -217,12 +261,11 @@ fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text()
 fetch(encodeURI('ativos 116.csv?v='+Date.now()),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.assets=parseAssetsCsv(t);renderAssets();}).catch(()=>{S.assets=[];renderAssets();});
 if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 
-/* Seleção e acesso de Pastas */
+/* Gerenciamento de pastas, câmera e capturas */
 if(!('showDirectoryPicker'in window))$('pick').hidden=true;
 $('pick').onclick=async()=>{if(!('showDirectoryPicker'in window)){toast('Navegador não suporta pasta de destino',1);return;}try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;$('dirHint').hidden=true;$('pick').hidden=true;}catch(e){if(e.name!=='AbortError')toast(e.message||'Não foi possível acessar a pasta',1);}};
 async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true;}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1);}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
 
-/* Operações de Câmera e Modos */
 async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'),cur=S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';}
 $('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
 $('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}};
@@ -232,14 +275,12 @@ $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Fin
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));$('assetsPanel').hidden=S.mode!=='ativos';$('shut').disabled=S.mode==='ativos';$('shut').setAttribute('aria-label',S.mode==='ativos'?'Modo de consulta de ativos':'Capturar');renderAssets();}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
-/* Desenho de Canvas */
 function frame(){const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);const {outside,kmIsShown}=updateLocationUI(),lines=[];if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside)lines.push({text:`KM ${S.km}`,large:true});else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked)lines.push({text:`KM ${S.km}`,large:true});if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});else if($('showDate').checked)lines.push({text:new Date().toLocaleString('pt-BR')});if($('showGps').checked){const accTxt=S.acc!==null?`Precisão do GPS ±${Math.round(S.acc)} m`:'Aguardando GPS…';lines.push({text:`${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`,small:true});}if(lines.length){const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';let y=h-20;for(let i=lines.length-1;i>=0;i--){const line=lines[i];cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');let fontSize=Math.round(bh*.15);if(line.large)fontSize=Math.round(bh*.24);if(line.small)fontSize=Math.round(bh*.12);cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;cx.fillText(line.text,20,y,w-40);y-=line.large?Math.round(bh*.30):(line.small?Math.round(bh*.15):Math.round(bh*.20));}}const lb=$('label').value.trim();if(lb&&$('showLabel').checked){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();}return cv;}
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
 $('shut').onclick=()=>{if(S.mode==='ativos')return; navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
 async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
 $('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
 
-/* Gravação e PDF */
 let vidLoop=0;
 function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
 function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}}
