@@ -16,6 +16,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 .chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}@keyframes blink{50%{opacity:.15}}.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}.modes button[aria-pressed=true]{background:var(--acc);color:#000}.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}.rb svg{width:22px;height:22px}.camera-icon{width:24px;height:24px;display:block}#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}#snap{visibility:hidden}#snap.on{visibility:visible}
 #set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}.checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:2px}
+#assetsPanel{position:absolute;z-index:5;left:12px;top:calc(132px + var(--st));width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 300px);overflow:auto;background:rgba(7,9,12,.88);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:12px}#assetsPanel[hidden]{display:none}.assetsHead{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:var(--acc);margin-bottom:6px}.assetRow{padding:6px 0;border-top:1px solid var(--line);line-height:1.35}.assetRow.nearest{color:#fff;background:rgba(255,214,0,.1)}.assetTitle{font-weight:700}.assetMeta{color:#c3c6ce;font-size:11px}.assetState{color:#ffd600;font-size:10px}
 #toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -32,8 +33,9 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
   <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
+  <aside id="assetsPanel" aria-live="polite" hidden><div class="assetsHead"><span>Ativos próximos · KM</span><span id="assetsKm">—</span></div><div id="assetsList">Carregando ativos…</div></aside>
   <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
-  <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button></div>
+  <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button><button data-m="ativos" aria-pressed="false">Ativos</button></div>
     <div class="row">
       <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
       <button id="shut" aria-label="Capturar"><i></i></button>
@@ -59,7 +61,7 @@ button,input,select{font:inherit;color:inherit}button{border:0;background:none;c
 <div id="toast" role="status"></div><canvas id="c" hidden></canvas>
 <script>
 const $=id=>document.getElementById(id);
-const S={db:[],km:'---',lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
+const S={db:[],assets:[],km:'---',kmValue:null,lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL='';
 const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
@@ -74,54 +76,27 @@ $('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.v
 ['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
 ['showKm','showDate','showGps','showLabel','showKmFar'].forEach(k=>$(k).addEventListener('change',()=>{persist();updateLocationUI();}));
 
-/* CSV: pontos com KM e coordenadas. */
+/* CSV dos marcos de KM com coordenadas GPS. */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
 function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
 function nearest(la,lo){const rad=Math.PI/180,R=6371000;let best=null,min=Infinity;for(const p of S.db){const dLat=(p.lat-la)*rad,dLon=(p.lon-lo)*rad,a=Math.sin(dLat/2)**2+Math.cos(la*rad)*Math.cos(p.lat*rad)*Math.sin(dLon/2)**2,dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
 
+/* Leitura robusta do CSV separado por ponto e vírgula; KM no formato 214+728 vira 214.728. */
+function parseAssetKm(v){const s=String(v??'').trim().replace(/^\uFEFF/,'');const m=s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);if(m)return Number(m[1])+Number(`${m[2]}${m[3]||''}`)/Math.pow(10,(m[3]||'').length+3);return num(s);}
+function parseAssetsCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const lines=t.split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];const h=lines[0].split(';').map(x=>x.replace(/^\s*\uFEFF/,'').replace(/"/g,'').trim().toLowerCase());const find=names=>h.findIndex(x=>names.includes(x));const tag=find(['tag','ativo','equipamento']),equip=find(['equipamento','tipo']),km=find(['km']),ip=find(['ip','endereço ip','endereco ip']);if(km<0)return[];return lines.slice(1).map(line=>{const r=line.split(';').map(x=>x.trim().replace(/^"|"$/g,''));const parsed=parseAssetKm(r[km]);return{tag:tag>=0?r[tag]:'',equip:equip>=0?r[equip]:'',km:parsed,kmLabel:r[km]||'',ip:ip>=0?r[ip]:'',status:'Não verificado'};}).filter(a=>Number.isFinite(a.km));}
+function renderAssets(){const panel=$('assetsPanel');panel.hidden=S.mode!=='ativos';if(panel.hidden)return;const current=S.kmValue;$('assetsKm').textContent=Number.isFinite(current)?`KM ${current.toFixed(3)}`:'aguardando KM';if(!S.assets.length){$('assetsList').textContent='Carregando lista de ativos…';return;}if(!Number.isFinite(current)){$('assetsList').textContent='Aguardando localização GPS e cálculo do KM atual.';return;}const ordered=[...S.assets].sort((a,b)=>a.km-b.km);let nearestIndex=0;for(let i=1;i<ordered.length;i++)if(Math.abs(ordered[i].km-current)<Math.abs(ordered[nearestIndex].km-current))nearestIndex=i;const lo=Math.max(0,nearestIndex-3),hi=Math.min(ordered.length,nearestIndex+4);const rows=ordered.slice(lo,hi);$('assetsList').innerHTML=rows.map((a,i)=>{const isNearest=lo+i===nearestIndex,delta=a.km-current,dir=delta<0?'antes':delta>0?'depois':'no KM atual';return `<div class="assetRow${isNearest?' nearest':''}"><div class="assetTitle">${isNearest?'★ MAIS PRÓXIMO · ':''}${escapeHtml(a.tag||a.equip||'Ativo')} · KM ${escapeHtml(a.kmLabel)}</div><div class="assetMeta">${escapeHtml(a.equip)}${a.ip?' · IP '+escapeHtml(a.ip):' · sem IP'} · ${Math.abs(delta).toFixed(3)} km ${dir}</div><div class="assetState">Status: não verificado — ping não disponível no navegador</div></div>`;}).join('');}
+function toggleAssetsMode(){S.mode=S.mode==='ativos'?'foto':'ativos';updateModeUI();renderAssets();}
+
 /* Reverse geocoding gratuito via Nominatim/OSM. */
 function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
 function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
-function requestAddress(){
-  if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;
-  const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);
-  if(cached){S.address=cached;updateLocationUI();return;}
-  if(S.lastGeoPoint&&Math.hypot(S.lat-S.lastGeoPoint.lat,S.lon-S.lastGeoPoint.lon)<.001)return;
-  clearTimeout(S.geoTimer);
-  const wait=Math.max(0,1100-(Date.now()-S.lastGeoRequest));
-  S.geoTimer=setTimeout(async()=>{
-    if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;
-    const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;
-    S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};
-    try{
-      const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;
-      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});
-      if(!res.ok)throw new Error(`HTTP ${res.status}`);
-      const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';
-      S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);
-      if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}
-    }catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}
-  },wait);
-}
-function refreshNearest(){const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;S.dist=n?n.dist:null;if(n)S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}updateLocationUI();if(S.dist!==null&&S.dist>OUTSIDE_LIMIT_M)requestAddress();}
-
-function updateLocationUI(){
-  const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;
-  const kmIsShown=!outside||showFarKm;
-  $('hud').classList.toggle('outside',outside&&!showFarKm);
-  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
-  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
-  
-  let gpsText = S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
-  $('gps').textContent = gpsText;
-
-  $('address').hidden=!(outside&&S.address);
-  if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;
-  return{outside,kmIsShown};
-}
+function requestAddress(){if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);if(cached){S.address=cached;updateLocationUI();return;}if(S.lastGeoPoint&&Math.hypot(S.lat-S.lastGeoPoint.lat,S.lon-S.lastGeoPoint.lon)<.001)return;clearTimeout(S.geoTimer);const wait=Math.max(0,1100-(Date.now()-S.lastGeoRequest));S.geoTimer=setTimeout(async()=>{if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};try{const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}}catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}},wait);}
+function refreshNearest(){const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;S.dist=n?n.dist:null;if(n){S.kmValue=n.km;S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');}else{S.kmValue=null;S.km='---';}if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}updateLocationUI();renderAssets();if(S.dist!==null&&S.dist>OUTSIDE_LIMIT_M)requestAddress();}
+function updateLocationUI(){const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;const kmIsShown=!outside||showFarKm;$('hud').classList.toggle('outside',outside&&!showFarKm);$('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';$('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);$('gps').textContent=S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;$('address').hidden=!(outside&&S.address);if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;return{outside,kmIsShown};}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);refreshNearest();}).catch(()=>{});
+fetch(encodeURI('ativos 116.csv?v='+Date.now()),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.assets=parseAssetsCsv(t);renderAssets();}).catch(()=>{S.assets=[];renderAssets();});
 if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 
 /* Pasta */
@@ -136,66 +111,13 @@ $('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$(
 function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const t=S.stream?.getVideoTracks?.()[0];z0=t?.getSettings?.().zoom||1;}};v.ontouchmove=e=>{const t=S.stream?.getVideoTracks?.()[0],c=t?.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});}};}
 $('gear').onclick=()=>$('set').classList.add('on');$('closeSet').onclick=()=>$('set').classList.remove('on');
 $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
-function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
+function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));$('assetsPanel').hidden=S.mode!=='ativos';$('shut').disabled=S.mode==='ativos';$('shut').setAttribute('aria-label',S.mode==='ativos'?'Modo de consulta de ativos':'Capturar');renderAssets();}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
 /* Desenho do quadro e informações na imagem (Fotos e Relatórios) */
-function frame(){
-  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
-  const {outside,kmIsShown}=updateLocationUI(),lines=[];
-  
-  if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside) {
-    lines.push({text:`KM ${S.km}`,large:true});
-  } else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked) {
-    lines.push({text:`KM ${S.km}`,large:true});
-  }
-  
-  if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
-  else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
-  
-  if($('showGps').checked) {
-    const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
-    lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, small: true});
-  }
-
-  if(lines.length){
-    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
-    g.addColorStop(0,'rgba(0,0,0,0)');
-    g.addColorStop(.25,'rgba(0,0,0,.55)');
-    g.addColorStop(1,'rgba(0,0,0,.9)');
-    cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
-    
-    let y=h-20;
-    for(let i=lines.length-1;i>=0;i--){
-      const line=lines[i];
-      cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');
-      
-      let fontSize = Math.round(bh*.15);
-      if(line.large) fontSize = Math.round(bh*.24);
-      if(line.small) fontSize = Math.round(bh*.12);
-      
-      cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;
-      cx.fillText(line.text,20,y, w-40);
-      
-      y -= line.large ? Math.round(bh*.30) : (line.small ? Math.round(bh*.15) : Math.round(bh*.20));
-    }
-  }
-
-  const lb=$('label').value.trim();
-  if(lb&&$('showLabel').checked){
-    const fs=Math.round(h*.035);
-    cx.font=`bold ${fs}px Arial,sans-serif`;
-    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
-    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();
-    cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;
-    cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';
-    cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
-  }
-  return cv;
-}
-
+function frame(){const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);const {outside,kmIsShown}=updateLocationUI(),lines=[];if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside)lines.push({text:`KM ${S.km}`,large:true});else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked)lines.push({text:`KM ${S.km}`,large:true});if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});else if($('showDate').checked)lines.push({text:new Date().toLocaleString('pt-BR')});if($('showGps').checked){const accTxt=S.acc!==null?`Precisão do GPS ±${Math.round(S.acc)} m`:'Aguardando GPS…';lines.push({text:`${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`,small:true});}if(lines.length){const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';let y=h-20;for(let i=lines.length-1;i>=0;i--){const line=lines[i];cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');let fontSize=Math.round(bh*.15);if(line.large)fontSize=Math.round(bh*.24);if(line.small)fontSize=Math.round(bh*.12);cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;cx.fillText(line.text,20,y,w-40);y-=line.large?Math.round(bh*.30):(line.small?Math.round(bh*.15):Math.round(bh*.20));}}const lb=$('label').value.trim();if(lb&&$('showLabel').checked){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();}return cv;}
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
+$('shut').onclick=()=>{if(S.mode==='ativos')return; navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
 async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
 $('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
 
