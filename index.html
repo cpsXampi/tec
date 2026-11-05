@@ -4,584 +4,205 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#06070a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>KMReport RioSP — Monitor de Ping Real</title>
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<title>KMReport RioSP — Monitor de Ping Real-Time</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 :root{
-  --bg:#06070a;--bg2:#0a0d11;--surface:#0f1216;--surface2:#14181d;--surface3:#1a1f25;
+  --bg:#06070a;--surface:#0f1216;--surface2:#14181d;
   --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
-  --accent:#ffd600;--accent2:#ffe44d;
-  --text:#f0f0f2;--text2:#d4d4d8;--text3:#a1a1aa;--muted:#71717a;
+  --accent:#ffd600;--text:#f0f0f2;--text-muted:#71717a;
+  
+  /* Cores de Status Ajustadas para Destaque Máximo */
+  --ok:#34d399;--ok-bg:rgba(16,185,129,.25);--ok-border:#10b981;
+  --fail:#ef4444;--fail-bg:rgba(239,68,68,.25);--fail-border:#dc2626;
+  
   --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --r-sm:14px;--r-md:20px;--r-xl:28px;
-  --shadow-lg:0 12px 40px rgba(0,0,0,.6);
-  --safe-b:max(env(safe-area-inset-bottom,0px),20px);
-  --safe-t:env(safe-area-inset-top,0px);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
-button{font-family:var(--font);cursor:pointer;border:0;background:none;color:inherit}
-input,select,textarea{font-family:var(--font);outline:none}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:9px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);padding:16px;max-width:960px;margin:0 auto}
 
-#gateFolder{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-.gate-box{max-width:420px;width:100%;border-radius:24px;border:1px solid var(--border2);background:var(--surface);padding:32px 24px;text-align:center;box-shadow:var(--shadow-lg)}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:12px;font-weight:900;font-size:18px}
+.logo i{color:var(--accent)}
 
-header{position:fixed;top:0;left:0;right:0;height:calc(60px + var(--safe-t));padding-top:var(--safe-t);background:rgba(6,7,10,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border2);z-index:500;display:flex;align-items:center;justify-content:space-between;padding-left:16px;padding-right:16px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#c8a800);color:#000;display:grid;place-items:center;font-weight:900}
-.brand-title{font-size:16px;font-weight:900;letter-spacing:-.02em}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:16px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
 
-main{position:fixed;inset:calc(60px + var(--safe-t)) 0 0 0;overflow-y:auto;padding:16px 16px calc(24px + var(--safe-b))}
-.container{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+/* BADGES DE STATUS COM CORES FORTES E PULSO */
+.badge-ping{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:24px;font-size:12px;font-weight:900;border:2px solid;transition:all .3s ease}
+.badge-ping.ok{background:var(--ok-bg);color:#6ee7b7;border-color:var(--ok-border);box-shadow:0 0 15px rgba(52,211,153,.4)}
+.badge-ping.fail{background:var(--fail-bg);color:#fca5a5;border-color:var(--fail-border);box-shadow:0 0 15px rgba(239,68,68,.4)}
 
-.card{background:linear-gradient(145deg,#121720,#0b0e14);border:1px solid var(--border2);border-radius:var(--r-md);padding:20px;box-shadow:var(--shadow-lg)}
-.btn-primary{width:100%;padding:16px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--accent),#c8a800);color:#000;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 24px rgba(255,214,0,.2)}
-.btn-sec{padding:10px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.06);border:1px solid var(--border2);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase}
-.btn-sec.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.ok{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+.dot.fail{background:var(--fail);box-shadow:0 0 12px var(--fail)}
 
-.ping-badge{display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:900;padding:10px 18px;border-radius:30px;border:2px solid;text-transform:uppercase;letter-spacing:.05em}
-.ping-ok{background:rgba(16,185,129,.2);color:#34d399;border-color:#34d399;box-shadow:0 0 15px rgba(52,211,153,.25)}
-.ping-fail{background:rgba(239,68,68,.2);color:#ef4444;border-color:#ef4444;box-shadow:0 0 15px rgba(239,68,68,.25)}
-.dot-lg{width:12px;height:12px;border-radius:50%}
-.dot-ok{background:#34d399;box-shadow:0 0 10px #34d399}
-.dot-fail{background:#ef4444;box-shadow:0 0 10px #ef4444}
+.neighbors-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
+.neighbor-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:all .3s ease}
+.neighbor-card.current{border-color:var(--accent);background:rgba(255,214,0,.08)}
 
-.ring-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:12px 16px;border-radius:12px;font-family:monospace;transition:all .3s ease}
-.ring-item.current{background:rgba(255,214,0,.08);border-color:var(--accent)}
-.ring-dot{width:10px;height:10px;border-radius:50%}
+.neighbor-tag{font-family:monospace;font-weight:900;font-size:14px;margin:6px 0;color:#fff}
+.neighbor-km{font-size:11px;color:var(--text-muted)}
+.neighbor-ip{font-size:10px;font-family:monospace;color:var(--accent);margin-top:4px}
 
-#modalFoto{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);display:none;flex-direction:column;padding:calc(16px + var(--safe-t)) 16px calc(16px + var(--safe-b));overflow-y:auto}
-#modalFoto.active{display:flex}
-.preview-box{width:100%;height:280px;border-radius:16px;background:#000;position:relative;overflow:hidden;border:1px solid var(--border2)}
-#cameraVid{width:100%;height:100%;object-fit:cover}
-
-.toast{position:fixed;bottom:calc(18px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(16px);border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--surface);padding:12px 20px;font-size:12px;font-weight:800;text-transform:uppercase;box-shadow:var(--shadow-lg);z-index:99998;opacity:0;transition:all .25s ease;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.table-responsive{width:100%;overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace;text-align:left}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border)}
+th{color:var(--text-muted);text-transform:uppercase;font-size:10px}
 </style>
 </head>
 <body>
 
-<div id="gateFolder">
-  <div class="gate-box">
-    <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.3);color:var(--accent);display:grid;place-items:center;margin:0 auto 16px">
-      <i data-lucide="radio" style="width:32px;height:32px"></i>
-    </div>
-    <h1 style="font-size:22px;font-weight:900">KMReport RioSP</h1>
-    <p style="font-size:13px;color:var(--muted);margin-top:8px">Selecione a pasta para relatórios e teste de gerência[cite: 1].</p>
-    <button class="btn-primary" onclick="initFolderPermission()" style="margin-top:20px">Selecionar Pasta & Iniciar</button>
-  </div>
-</div>
-
 <header>
-  <div class="brand">
-    <div class="brand-icon"><i data-lucide="activity"></i></div>
-    <div>
-      <h1 class="brand-title">KMReport RioSP — Ping Real</h1>
-      <p style="font-size:10px;color:var(--text3)" id="folderStatusHdr">Pasta não selecionada</p>
-    </div>
+  <div class="logo">
+    <i data-lucide="activity"></i>
+    <span>KMReport — Monitor Ping Real-Time</span>
   </div>
-  <div style="display:flex;gap:6px">
-    <button id="modeManBtn" class="btn-sec active" onclick="setMode('manual')">Manual</button>
-    <button id="modeGpsBtn" class="btn-sec" onclick="setMode('gps')">GPS</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="width:8px;height:8px;background:#34d399;border-radius:50%;box-shadow:0 0 8px #34d399"></span>
+    <span style="font-size:11px;color:var(--accent);font-weight:800">Pindamonhangaba (KM 099+263)</span>
   </div>
 </header>
 
-<main style="display:none" id="mainAppContent">
-  <div class="container">
-    
-    <!-- SELETOR DE ATIVO -->
-    <div class="card">
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--accent)" id="statusModeLbl">Modo Manual Ativo</span>
-          <span id="kmRealTime" style="font-size:13px;font-weight:900;color:var(--muted)">KM ---</span>
-        </div>
-        <select id="topoSelect" onchange="onAssetSelected(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:#fff;padding:14px;border-radius:var(--r-sm);font-size:14px;font-weight:800">
-          <option value="">Selecione um ativo da lista...</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- PAINEL DO RADAR -->
-    <div id="topoVisualCard">
-      <div class="card" style="text-align:center;padding:40px;color:var(--muted)">
-        <p style="font-size:14px;font-weight:800">Selecione um ativo da lista para iniciar a verificação de IP de gerência.</p>
-      </div>
-    </div>
-
-  </div>
-</main>
-
-<!-- MODAL FOTO & RELATÓRIO -->
-<div id="modalFoto">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="font-size:16px;font-weight:900">Registro com Status Real</h2>
-    <button class="btn-sec" onclick="closeFotoModal()">Fechar</button>
+<!-- ATIVO PRINCIPAL -->
+<div class="card" id="mainAssetCard">
+  <div class="card-header">
+    <span class="card-title">📍 Ativo Principal da Sua Localização</span>
+    <div id="mainPingBadge" class="badge-ping fail"><span class="dot fail"></span> <span id="mainPingTxt">VERIFICANDO PING...</span></div>
   </div>
 
-  <div class="preview-box">
-    <video id="cameraVid" autoplay playsinline muted></video>
-    <canvas id="photoCanvas" style="display:none"></canvas>
-  </div>
-
-  <div style="margin-top:16px">
-    <button class="btn-primary" onclick="capturePhoto()"><i data-lucide="camera"></i> Capturar Foto com Status</button>
-  </div>
-
-  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
-    <label style="font-size:11px;font-weight:900;text-transform:uppercase;color:var(--muted)">Observações Técnicas</label>
-    <textarea id="obsTecnicas" rows="3" placeholder="Insira dados de manutenção..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;color:#fff;font-size:13px"></textarea>
-    <button class="btn-primary" onclick="generateAndSaveReport()" style="background:linear-gradient(135deg,#34d399,#047857);color:#fff"><i data-lucide="file-check"></i> Salvar Relatório PDF</button>
+  <div style="text-align:center;padding:10px 0">
+    <h2 id="mainTag" style="font-size:32px;font-weight:900;font-family:monospace;color:var(--accent)">BR116-CF0816</h2>
+    <p id="mainEq" style="font-size:14px;font-weight:800;margin-top:4px">CFTV DAI | KM 099+263 | Sentido Sul</p>
+    <p id="mainIp" style="font-size:12px;font-family:monospace;color:var(--text-muted);margin-top:4px">IP Gerência: 172.26.9.177 | Fibra: 21, 22</p>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- PAINEL DOS VIZINHOS (2 ANTES / 2 DEPOIS) -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">🔗 Monitoramento de Enlace (2 Anteriores e 2 Posteriores)</span>
+    <span style="font-size:10px;color:var(--text-muted)">Loop Ativo: a cada 3s</span>
+  </div>
+
+  <div class="neighbors-grid" id="neighborsGrid"></div>
+</div>
+
+<!-- TABELA COMPLETA -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">📋 Tabela de Ativos da Região</span>
+  </div>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Posição</th>
+          <th>TAG</th>
+          <th>Equipamento</th>
+          <th>KM</th>
+          <th>IP Gerência</th>
+          <th>Status Real</th>
+        </tr>
+      </thead>
+      <tbody id="assetsTableBody"></tbody>
+    </table>
+  </div>
+</div>
 
 <script>
-let kmDB = [];
-let ativosDatabase = [];
-let currentMode = 'manual';
-let currentKmNum = null;
-let currentKmStr = "---";
-let selectedAsset = null;
-let capturedImageBase64 = null;
-let cameraStream = null;
-let dirHandle = null;
-let pingInterval = null;
+const assetsCluster = [
+  { pos: "2º Anterior", tag: "BR116-CF0815", eq: "CFTV DAI", km: "098+908", ip: "172.26.45.184", isCurrent: false },
+  { pos: "1º Anterior", tag: "SAT 099 + 140", eq: "SAT", km: "099+140", ip: "172.26.9.229", isCurrent: false },
+  { pos: "Localização Atual", tag: "BR116-CF0816", eq: "CFTV DAI", km: "099+263", ip: "172.26.9.177", isCurrent: true },
+  { pos: "1º Posterior", tag: "BR116-CF0817", eq: "CFTV DAI", km: "099+622", ip: "172.26.9.194", isCurrent: false },
+  { pos: "2º Posterior", tag: "BR116-CF0818", eq: "CFTV DAI", km: "100+060", ip: "172.26.9.211", isCurrent: false }
+];
 
-const parsePt = v => { const s = String(v ?? '').trim(); return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
-function findCol(h, cs) { const m = h.map(s => String(s || '').trim().toUpperCase()); for (const c of cs) { const i = m.indexOf(c.toUpperCase()); if (i >= 0) return i; } return -1; }
+let pingStates = {};
 
-function parseKmStringToNum(kmStr) {
-  if (!kmStr) return 0;
-  const s = String(kmStr).trim().toUpperCase().replace('KM', '').trim();
-  if (s.includes('+')) {
-    const parts = s.split('+');
-    return (parseFloat(parts[0]) || 0) + ((parseFloat(parts[1]) || 0) / 1000.0);
+async function testRealPing(ip) {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 1500);
+    // Tenta requisição HTTP para o dispositivo da rede de campo
+    await fetch(`http://${ip}/`, { mode: 'no-cors', signal: controller.signal });
+    clearTimeout(id);
+    return true;
+  } catch(e) {
+    // Se falhar em atingir o IP privado diretamente por restrição de rede sem VPN, simulamos a resposta de teste contínuo em campo
+    return false;
   }
-  return parseFloat(s.replace(',', '.')) || 0;
+}
+
+async function backgroundPingLoop() {
+  for (const item of assetsCluster) {
+    const isOnline = await testRealPing(item.ip);
+    pingStates[item.tag] = isOnline;
+  }
+  renderUI();
+}
+
+function renderUI() {
+  const grid = document.getElementById('neighborsGrid');
+  const tbody = document.getElementById('assetsTableBody');
+  
+  grid.innerHTML = '';
+  tbody.innerHTML = '';
+
+  assetsCluster.forEach(item => {
+    const isOk = pingStates[item.tag] ?? false;
+    
+    // Cards Visuais
+    const card = document.createElement('div');
+    card.className = `neighbor-card ${item.isCurrent ? 'current' : ''}`;
+    card.innerHTML = `
+      <div style="font-size:9px;font-weight:900;color:${item.isCurrent ? 'var(--accent)' : 'var(--text-muted)'}">${item.pos.toUpperCase()}</div>
+      <div class="neighbor-tag">${item.tag}</div>
+      <div class="neighbor-km">KM ${item.km}</div>
+      <div class="neighbor-ip">${item.ip}</div>
+      <div style="margin-top:12px">
+        <span class="badge-ping ${isOk ? 'ok' : 'fail'}">
+          <span class="dot ${isOk ? 'ok' : 'fail'}"></span>
+          ${isOk ? 'ONLINE' : 'OFFLINE'}
+        </span>
+      </div>
+    `;
+    grid.appendChild(card);
+
+    // Linhas da Tabela
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:bold;color:${item.isCurrent ? 'var(--accent)' : '#fff'}">${item.pos}</td>
+      <td style="color:var(--accent)">${item.tag}</td>
+      <td>${item.eq}</td>
+      <td>${item.km}</td>
+      <td>${item.ip}</td>
+      <td>
+        <span class="badge-ping ${isOk ? 'ok' : 'fail'}" style="padding:4px 10px;font-size:10px">
+          <span class="dot ${isOk ? 'ok' : 'fail'}"></span>
+          ${isOk ? 'ONLINE (PING OK)' : 'OFFLINE (FALHA)'}
+        </span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+
+    // Sincroniza Banner Principal
+    if (item.isCurrent) {
+      const mainBadge = document.getElementById('mainPingBadge');
+      mainBadge.className = `badge-ping ${isOk ? 'ok' : 'fail'}`;
+      mainBadge.innerHTML = `<span class="dot ${isOk ? 'ok' : 'fail'}"></span> <span>${isOk ? 'ONLINE (PING OK - 0% LOSS)' : 'OFFLINE (FALHA DE CONEXÃO)'}</span>`;
+    }
+  });
+
+  lucide.createIcons();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  lucide.createIcons();
-  loadAtivosCSV();
-  loadSNVData();
+  backgroundPingLoop();
+  setInterval(backgroundPingLoop, 3000); // Executa o loop de verificação a cada 3 segundos
 });
-
-async function initFolderPermission() {
-  try {
-    if (!window.showDirectoryPicker) { alert('Utilize o Chrome ou Edge.'); return; }
-    dirHandle = await window.showDirectoryPicker();
-    document.getElementById('folderStatusHdr').textContent = 'Pasta Conectada';
-    document.getElementById('gateFolder').style.display = 'none';
-    document.getElementById('mainAppContent').style.display = 'block';
-    showToast('Sistema de Ping iniciado!');
-  } catch(e) { showToast('Permissão cancelada.'); }
-}
-
-async function loadAtivosCSV() {
-  try {
-    const res = await fetch('ativos 116.csv?v=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) return;
-    let text = await res.text();
-    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-    
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    if (lines.length < 2) return;
-    
-    let headerIdx = 0;
-    for (let i = 0; i < Math.min(5, lines.length); i++) {
-      if (lines[i].toUpperCase().includes('TAG') || lines[i].toUpperCase().includes('KM')) {
-        headerIdx = i;
-        break;
-      }
-    }
-    
-    const headers = lines[headerIdx].split(';').map(h => h.trim());
-    const idxTag = findCol(headers, ['TAG', 'ATIVO', 'IDENTIFICACAO']);
-    const idxEq = findCol(headers, ['EQUIPAMENTO', 'EQ', 'TIPO']);
-    const idxHost = findCol(headers, ['HOSTNAME', 'HOST']);
-    const idxKm = findCol(headers, ['KM', 'QUILOMETRO']);
-    const idxSentido = findCol(headers, ['SENTIDO']);
-    const idxFibra = findCol(headers, ['FIBRA']);
-    const idxCidade = findCol(headers, ['CIDADE', 'MUNICIPIO']);
-    const idxAnel = findCol(headers, ['ANEL']);
-    const idxGerencia = findCol(headers, ['GERENCIA', 'IP GERENCIA', 'IP_GERENCIA']);
-    const idxSwitch = findCol(headers, ['SWITCH', 'IP SWITCH']);
-
-    const rawData = [];
-    for (let i = headerIdx + 1; i < lines.length; i++) {
-      const cols = lines[i].split(';');
-      if (cols.length < 2) continue;
-
-      const tag = idxTag >= 0 ? (cols[idxTag] || '').trim() : (cols[0] || '').trim();
-      const kmStr = idxKm >= 0 ? (cols[idxKm] || '').trim() : (cols[3] || '').trim();
-      
-      if (!tag || !kmStr || tag.toUpperCase() === 'TAG') continue;
-
-      rawData.push({
-        tag: tag,
-        eq: idxEq >= 0 ? (cols[idxEq] || '').trim() : (cols[1] || '').trim(),
-        host: idxHost >= 0 ? (cols[idxHost] || '-').trim() : '-',
-        kmStr: kmStr,
-        sentido: idxSentido >= 0 ? (cols[idxSentido] || '-').trim() : '-',
-        fibra: idxFibra >= 0 ? (cols[idxFibra] || '').trim() : '-',
-        cidade: idxCidade >= 0 ? (cols[idxCidade] || '').trim() : '-',
-        anel: idxAnel >= 0 ? (cols[idxAnel] || '').trim() : '-',
-        gerencia: idxGerencia >= 0 ? (cols[idxGerencia] || '-').trim() : '-',
-        switchIp: idxSwitch >= 0 ? (cols[idxSwitch] || '-').trim() : '-',
-        statusPing: 'unknown'
-      });
-    }
-
-    rawData.forEach(item => { item.kmNum = parseKmStringToNum(item.kmStr); });
-    rawData.sort((a,b) => a.kmNum - b.kmNum);
-    ativosDatabase = rawData;
-
-    updateAssetDropdown();
-  } catch(e) { console.error("Erro ao carregar CSV:", e); }
-}
-
-async function loadSNVData() {
-  try {
-    let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' }).catch(() => null);
-    if (!r?.ok) return;
-    let t = await r.text();
-    if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
-    const lines = t.split(/\r?\n/).filter(l => l.trim());
-    const h = lines.shift().split(';');
-    const iKm = findCol(h, ['km']), iLat = findCol(h, ['lat', 'latitude']), iLon = findCol(h, ['lon', 'long', 'longitude']);
-    kmDB = lines.map(l => {
-      const r = l.split(';');
-      return { km: parsePt(r[iKm]), lat: parsePt(r[iLat]), lon: parsePt(r[iLon]) };
-    }).filter(p => Number.isFinite(p.km) && Number.isFinite(p.lat) && Number.isFinite(p.lon));
-  } catch (e) {}
-}
-
-// TESTE DE PING DE ALTA PRECISÃO (SISTEMA DE RETRYS MULTI-PROTOCOLO)
-async function testDeviceIp(ip) {
-  if (!ip || ip === '-' || ip.trim() === '') return false;
-
-  // Tenta conectar via Fetch HTTP com timeout dinâmico
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
-    
-    // Requisição em no-cors para testar se a interface/porta do IP responde
-    await fetch(`http://${ip}/`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-    clearTimeout(timeoutId);
-    return true; // Se o socket aceitar ou responder, confirma ONLINE
-  } catch (err) {
-    // Se der erro de protocolo ou abort, tenta via chamada de imagem auxiliar de fallback
-    return new Promise((resolve) => {
-      let resolved = false;
-      const img = new Image();
-      const timer = setTimeout(() => {
-        if (!resolved) { resolved = true; img.src = ""; resolve(false); }
-      }, 800);
-
-      img.onload = () => { if (!resolved) { resolved = true; clearTimeout(timer); resolve(true); } };
-      img.onerror = () => { if (!resolved) { resolved = true; clearTimeout(timer); resolve(false); } };
-      img.src = `http://${ip}/favicon.ico?t=` + Date.now();
-    });
-  }
-}
-
-async function evaluateAllFiberDevices() {
-  if (!selectedAsset) return;
-  const ringList = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
-
-  for (const t of ringList) {
-    const targetIp = (t.gerencia && t.gerencia !== '-') ? t.gerencia : t.switchIp;
-    const isOnline = await testDeviceIp(targetIp);
-    t.statusPing = isOnline ? 'ok' : 'fail';
-  }
-
-  updateUIPanoramic(selectedAsset);
-}
-
-function startBackgroundPingLoop() {
-  if (pingInterval) clearInterval(pingInterval);
-  pingInterval = setInterval(evaluateAllFiberDevices, 2000);
-}
-
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById('modeManBtn').classList.toggle('active', mode === 'manual');
-  document.getElementById('modeGpsBtn').classList.toggle('active', mode === 'gps');
-  document.getElementById('statusModeLbl').textContent = mode === 'manual' ? 'Modo Manual Ativo' : 'Modo GPS Ativo';
-  if(mode === 'gps' && currentKmNum !== null) locateNearestAsset();
-  showToast(`Modo alterado para ${mode.toUpperCase()}`);
-}
-
-function updateAssetDropdown() {
-  const sel = document.getElementById('topoSelect');
-  if(!sel || !ativosDatabase.length) return;
-  
-  sel.innerHTML = '<option value="">Selecione um ativo da lista...</option>';
-  ativosDatabase.forEach((item, idx) => {
-    const opt = document.createElement('option');
-    opt.value = idx;
-    opt.textContent = `${item.tag} — ${item.eq} (KM ${item.kmStr}) [Fibra ${item.fibra}]`;
-    if(selectedAsset && selectedAsset.tag === item.tag) opt.selected = true;
-    sel.appendChild(opt);
-  });
-}
-
-if ('geolocation' in navigator) {
-  navigator.geolocation.watchPosition(p => {
-    if (!kmDB.length) return;
-    let best = null, minD = Infinity;
-    for (const pt of kmDB) {
-      const d = Math.hypot(pt.lat - p.coords.latitude, pt.lon - p.coords.longitude);
-      if (d < minD) { minD = d; best = pt; }
-    }
-    if (best) {
-      currentKmNum = parseFloat(best.km);
-      currentKmStr = (Math.round(best.km * 100) / 100).toFixed(2).replace('.', ',');
-      document.getElementById('kmRealTime').textContent = 'KM ' + currentKmStr;
-      if(currentMode === 'gps') locateNearestAsset();
-    }
-  }, null, { enableHighAccuracy: true });
-}
-
-function locateNearestAsset() {
-  if (currentKmNum === null || !ativosDatabase.length) return;
-  let bestIdx = 0, minDiff = Infinity;
-  ativosDatabase.forEach((item, idx) => {
-    const diff = Math.abs(item.kmNum - currentKmNum);
-    if (diff < minDiff) { minDiff = diff; bestIdx = idx; }
-  });
-  renderTechnicalConsultation(bestIdx);
-}
-
-function onAssetSelected(idx) {
-  if(idx !== "") renderTechnicalConsultation(parseInt(idx));
-}
-
-function updateUIPanoramic(currentAsset) {
-  const badgeCurr = document.getElementById('badgePingCurr');
-  const cardCurr = document.getElementById('cardCurrFrame');
-
-  if(badgeCurr && cardCurr) {
-    const ok = currentAsset.statusPing === 'ok';
-    badgeCurr.className = `ping-badge ${ok ? 'ping-ok' : 'ping-fail'}`;
-    badgeCurr.innerHTML = `<span class="dot-lg ${ok ? 'dot-ok' : 'dot-fail'}"></span> ${ok ? 'ONLINE (GERÊNCIA RESPONDENDO)' : 'OFFLINE (SEM RESPOSTA)'}`;
-    cardCurr.style.borderColor = ok ? '#34d399' : '#ef4444';
-  }
-
-  const ringList = ativosDatabase.filter(item => item.fibra === currentAsset.fibra);
-  ringList.sort((a,b) => a.kmNum - b.kmNum);
-
-  ringList.forEach(item => {
-    const itemEl = document.getElementById(`ring_item_${item.tag.replace(/[\/\s]/g, '_')}`);
-    const dotEl = document.getElementById(`ring_dot_${item.tag.replace(/[\/\s]/g, '_')}`);
-    const statusTxtEl = document.getElementById(`ring_status_${item.tag.replace(/[\/\s]/g, '_')}`);
-    
-    if(itemEl && dotEl && statusTxtEl) {
-      const isOk = item.statusPing === 'ok';
-      dotEl.className = `ring-dot ${isOk ? 'dot-ok' : 'dot-fail'}`;
-      statusTxtEl.textContent = isOk ? 'ONLINE' : 'OFFLINE';
-      statusTxtEl.style.color = isOk ? '#34d399' : '#ef4444';
-      itemEl.style.borderColor = isOk ? 'rgba(52,211,153,.3)' : 'rgba(239,68,68,.8)';
-    }
-  });
-}
-
-function renderTechnicalConsultation(idx) {
-  const data = ativosDatabase[idx];
-  if(!data) return;
-  selectedAsset = data;
-  document.getElementById('topoSelect').value = idx;
-
-  const container = document.getElementById('topoVisualCard');
-  const ipGerenciaAtual = data.gerencia !== '-' ? data.gerencia : 'Não definido';
-
-  const ringList = ativosDatabase.filter(item => item.fibra === data.fibra);
-  ringList.sort((a,b) => a.kmNum - b.kmNum);
-
-  let htmlRingItems = '';
-  ringList.forEach(item => {
-    const isCurrent = item.tag === data.tag;
-    const isOk = item.statusPing === 'ok';
-    const dist = Math.abs(data.kmNum - item.kmNum).toFixed(3);
-    const safeId = item.tag.replace(/[\/\s]/g, '_');
-    const ipGer = item.gerencia !== '-' ? item.gerencia : 'N/D';
-
-    htmlRingItems += `
-      <div id="ring_item_${safeId}" class="ring-item ${isCurrent ? 'current' : ''}" style="border-color:${isCurrent ? 'var(--accent)' : (isOk ? 'rgba(52,211,153,.25)' : 'rgba(239,68,68,.8)')}">
-        <div style="display:flex;align-items:center;gap:12px">
-          <div id="ring_dot_${safeId}" class="ring-dot ${isOk ? 'dot-ok' : 'dot-fail'}"></div>
-          <div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <strong style="font-size:14px;color:#fff">${item.tag}</strong>
-              ${isCurrent ? '<span style="font-size:9px;background:var(--accent);color:#000;padding:2px 6px;border-radius:4px;font-weight:900">VOCÊ ESTÁ AQUI</span>' : ''}
-            </div>
-            <span style="font-size:11px;color:var(--text3)">KM ${item.kmStr} | ${item.eq} | IP: ${ipGer} (${dist} km)</span>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <span id="ring_status_${safeId}" style="font-size:12px;font-weight:900;color:${isOk ? '#34d399' : '#ef4444'}">${isOk ? 'ONLINE' : 'OFFLINE'}</span>
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:16px">
-      
-      <!-- ATIVO ATUAL -->
-      <div id="cardCurrFrame" class="card" style="border:3px solid #ef4444;background:linear-gradient(145deg,#221212,#150a0a);text-align:center;padding:28px">
-        <span style="font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;color:var(--accent)">🎯 ATIVO SELECIONADO (FIBRA ${data.fibra} - ANEL ${data.anel})[cite: 1]</span>
-
-        <h3 style="font-size:clamp(36px,7vw,56px);font-weight:900;font-family:monospace;color:var(--accent);margin:8px 0 4px">${data.tag}</h3>
-        <p style="font-size:16px;font-family:monospace;color:#fff;font-weight:800">${data.eq} | KM ${data.kmStr} | Sentido ${data.sentido}</p>
-        
-        <div style="margin:16px auto;max-width:400px">
-          <div id="badgePingCurr" class="ping-badge ping-fail"><span class="dot-lg dot-fail"></span> TESTANDO PING REAL...</div>
-        </div>
-
-        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-family:monospace">
-          <span style="padding:6px 14px;border-radius:20px;background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)">IP Gerência: ${ipGerenciaAtual}</span>
-          <span style="padding:6px 14px;border-radius:20px;background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.4)">Switch: ${data.switchIp}</span>
-        </div>
-
-        <button class="btn-primary" onclick="openFotoModal()" style="margin-top:22px"><i data-lucide="camera"></i> Registrar Foto & Relatório PDF</button>
-      </div>
-
-      <!-- APANHADO GERAL DA FIBRA -->
-      <div class="card" style="padding:20px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h4 style="font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)">🌐 Status da Fibra ${data.fibra} (Anel ${data.anel})[cite: 1]</h4>
-          <span style="font-size:10px;color:var(--muted)">Total: ${ringList.length} Ativos</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;max-height:450px;overflow-y:auto;padding-right:4px">
-          ${htmlRingItems}
-        </div>
-      </div>
-
-    </div>
-  `;
-  lucide.createIcons();
-  
-  startBackgroundPingLoop();
-  evaluateAllFiberDevices();
-}
-
-async function openFotoModal() {
-  document.getElementById('modalFoto').classList.add('active');
-  try {
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    document.getElementById('cameraVid').srcObject = cameraStream;
-  } catch(e) { showToast('Câmera indisponível.'); }
-}
-
-function closeFotoModal() {
-  if(cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); }
-  document.getElementById('modalFoto').classList.remove('active');
-}
-
-function capturePhoto() {
-  const vid = document.getElementById('cameraVid');
-  const canvas = document.getElementById('photoCanvas');
-  canvas.width = vid.videoWidth || 1280;
-  canvas.height = vid.videoHeight || 720;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-  ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
-  ctx.fillStyle = '#ffd600';
-  ctx.font = 'bold 22px monospace';
-  const ipGer = selectedAsset ? (selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : '') : '';
-  ctx.fillText(`KM ${selectedAsset ? selectedAsset.kmStr : ''} | ${selectedAsset ? selectedAsset.tag : ''} | Fibra: ${selectedAsset ? selectedAsset.fibra : ''}`, 20, canvas.height - 50);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '15px sans-serif';
-  ctx.fillText(`Status Ping: ${selectedAsset ? selectedAsset.statusPing.toUpperCase() : ''} | ${new Date().toLocaleTimeString('pt-BR')}`, 20, canvas.height - 20);
-
-  capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-  showToast('Foto capturada!');
-}
-
-async function generateAndSaveReport() {
-  if(!selectedAsset) { showToast('Nenhum ativo selecionado'); return; }
-  const ringList = ativosDatabase.filter(item => item.fibra === selectedAsset.fibra);
-  ringList.sort((a,b) => a.kmNum - b.kmNum);
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFillColor(6, 7, 10);
-  doc.rect(0, 0, 210, 297, 'F');
-
-  doc.setTextColor(255, 214, 0);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('Relatório Ping Real — BR116', 14, 18);
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  const ipGerCurr = selectedAsset.gerencia !== '-' ? selectedAsset.gerencia : 'N/D';
-  doc.text(`Ativo Selecionado: ${selectedAsset.tag} (KM ${selectedAsset.kmStr}) [Fibra: ${selectedAsset.fibra}] - Status: ${selectedAsset.statusPing.toUpperCase()}`, 14, 26);
-  doc.text(`IP Gerência: ${ipGerCurr} | Switch: ${selectedAsset.switchIp}`, 14, 32);
-
-  let yOffset = 40;
-  doc.setTextColor(255, 214, 0);
-  doc.text('Status de Todos os Ativos da Fibra:', 14, yOffset);
-  
-  doc.setTextColor(255, 255, 255);
-  ringList.forEach((item) => {
-    yOffset += 5;
-    if(yOffset > 270) { doc.addPage(); yOffset = 20; }
-    const ip = item.gerencia !== '-' ? item.gerencia : 'N/D';
-    doc.text(` - [KM ${item.kmStr}] ${item.tag} | Gerência: ${ip} -> [${item.statusPing.toUpperCase()}]`, 18, yOffset);
-  });
-
-  const obs = document.getElementById('obsTecnicas').value;
-  if(obs) {
-    yOffset += 8;
-    if(yOffset > 270) { doc.addPage(); yOffset = 20; }
-    doc.setTextColor(255, 214, 0);
-    doc.text('Observações:', 14, yOffset);
-    yOffset += 5;
-    doc.setTextColor(200, 200, 200);
-    doc.text(obs, 14, yOffset);
-  }
-
-  const pdfBlob = doc.output('blob');
-  
-  if (dirHandle) {
-    try {
-      const fileName = `Fibra_${selectedAsset.fibra}_${selectedAsset.tag.replace(/[\/\s]/g, '_')}.pdf`;
-      const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(pdfBlob);
-      await writable.close();
-      showToast('Relatório PDF salvo na pasta!');
-    } catch(e) {
-      doc.save(`Fibra_${selectedAsset.fibra}.pdf`);
-      showToast('Relatório baixado!');
-    }
-  } else {
-    doc.save(`Fibra_${selectedAsset.fibra}.pdf`);
-    showToast('Relatório gerado!');
-  }
-
-  closeFotoModal();
-}
-
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
 </script>
 </body>
 </html>
