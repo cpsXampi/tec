@@ -52,159 +52,97 @@ tr:last-child td{border-bottom:0}
 .btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.8rem;cursor:pointer}
 .btn svg{width:15px;height:15px}
 @media(max-width:520px){.hero .tag{font-size:1.25rem}.gps{width:100%;justify-content:center}}
-</style>
-</head>
+.alert{border-radius:14px;padding:14px;font-weight:800;display:flex;gap:10px;align-items:center;border:1px solid var(--warn);background:rgba(245,158,11,.12);color:var(--warn)}.alert.near{border-color:var(--ok);color:var(--ok);background:rgba(52,211,153,.12);box-shadow:0 0 18px rgba(52,211,153,.4);animation:pl 1.2s infinite}@keyframes pl{50%{box-shadow:0 0 4px rgba(52,211,153,.2)}}select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px}</style>
 <body>
-<header>
-  <div class="hrow">
-    <div class="brand">
-      <div class="logo"><i data-lucide="radio-tower"></i></div>
-      <div><h1>KMReport · TEC</h1><small>Rodovia Presidente Dutra · BR-116</small></div>
-    </div>
-    <div class="gps"><span id="gpsDot" class="dot"></span><i data-lucide="map-pin" style="width:15px;height:15px"></i><span id="gpsTxt">Obtendo GPS…</span> <b id="kmTxt">KM —</b></div>
-  </div>
-</header>
-
+<header><div class="hrow">
+ <div class="brand"><div class="logo"><i data-lucide="radio-tower"></i></div><div><h1>KMReport · TEC</h1><small>Ativos por fibra · BR-116</small></div></div>
+ <div class="gps"><span id="gpsDot" class="dot"></span><span id="gpsTxt">Obtendo GPS…</span> <b id="kmTxt">KM —</b></div>
+</div></header>
 <main>
-  <section>
-    <div class="sec-t"><i data-lucide="crosshair"></i>Ativo da posição atual</div>
-    <div class="hero" id="hero"></div>
-  </section>
-
-  <section>
-    <div class="sec-t"><i data-lucide="git-commit-horizontal"></i>Sequência do trecho</div>
-    <div class="grid" id="grid"></div>
-  </section>
-
-  <section>
-    <div class="sec-t" style="justify-content:space-between">
-      <span style="display:flex;gap:8px;align-items:center"><i data-lucide="table"></i>Detalhamento · Ping ao vivo</span>
-      <button class="btn" id="btnLoc"><i data-lucide="locate-fixed"></i>Atualizar GPS</button>
-    </div>
-    <div class="tbl"><table>
-      <thead><tr><th>Posição</th><th>TAG</th><th>Equipamento</th><th>KM</th><th>IP Gerência</th><th>Hostname</th><th>Fibras</th><th>Status Ping</th></tr></thead>
-      <tbody id="tbody"></tbody>
-    </table></div>
-  </section>
-
-  <p class="foot" id="foot">Teste de conectividade a cada 3s · timeout 1.2s</p>
+ <div class="alert" id="alert"><i data-lucide="loader"></i><span>Carregando bases…</span></div>
+ <section><div class="sec-t"><i data-lucide="crosshair"></i>Ativo mais próximo</div><div class="hero" id="hero"></div></section>
+ <section><div class="sec-t" style="justify-content:space-between"><span style="display:flex;gap:8px;align-items:center"><i data-lucide="cable"></i><span id="fibTit">Mesma fibra</span></span>
+   <select id="selFib"><option value="">Fibra do ativo atual</option></select></div>
+   <div class="grid" id="grid"></div></section>
+ <section><div class="sec-t"><i data-lucide="table"></i>Detalhamento · Ping ao vivo</div>
+  <div class="tbl"><table><thead><tr><th>Posição</th><th>TAG</th><th>Equip.</th><th>KM</th><th>Dist.</th><th>IP</th><th>Hostname</th><th>Fibras</th><th>Status</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+ <p class="foot" id="foot"></p>
 </main>
-
 <script>
-/* ===== Base ativos116.csv (embutida) =====
-   lat/lon aproximados ao longo da BR-116 (Pindamonhangaba) para cálculo de proximidade */
-const ATIVOS_CSV = `tag;equip;km;ip;host;fibra;lat;lon
-BR116-CF0815;CFTV DAI;098+908;172.26.45.184;RSP-SA14-N098_908;11, 12;-22.9395;-45.4385
-SAT 099 + 140;SAT;099+140;172.26.9.229;RSP-ITS-N099_140;11, 12;-22.9381;-45.4405
-BR116-CF0816;CFTV DAI;099+263;172.26.9.177;RSP-SA14-N099_263;21, 22;-22.9374;-45.4416
-BR116-CF0817;CFTV DAI;099+622;172.26.9.194;RSP-SA15-N099_622;11, 12;-22.9353;-45.4447
-BR116-CF0840;CFTV DAI;100+060;172.26.9.211;RSP-SA16-N100_060;21, 22;-22.9327;-45.4485`;
+const NEAR_M=150;           // distância para considerar "no ativo"
+const norm=s=>String(s||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9_ ]+/g,' ').replace(/\s+/g,' ');
+const parsePt=v=>{const s=String(v??'').trim();return/,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s)};
+const hav=(a,b,c,d)=>{const p=Math.PI/180,x=.5-Math.cos((c-a)*p)/2+Math.cos(a*p)*Math.cos(c*p)*(1-Math.cos((d-b)*p))/2;return 12742000*Math.asin(Math.sqrt(x))};
+function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}for(const c of cs){const i=m.findIndex(x=>x.includes(norm(c)));if(i>=0)return i}return-1}
+function kmNum(v){const s=String(v||'').trim();if(s.includes('+')){const[a,b]=s.split('+');return(+a.replace(/\D/g,''))+(+b.replace(/\D/g,''))/1000}return parsePt(s)}
+const kmFmt=n=>{if(!Number.isFinite(n))return'—';const a=Math.floor(n),b=Math.round((n-a)*1000);return String(a).padStart(3,'0')+'+'+String(b).padStart(3,'0')};
+const fibKey=f=>String(f||'').replace(/\s/g,'').replace(/[;\/]/g,',');
 
-const ATIVOS = ATIVOS_CSV.trim().split("\n").slice(1).map(l=>{
-  const [tag,equip,km,ip,host,fibra,lat,lon]=l.split(";");
-  return {tag,equip,km,ip,host,fibra,lat:+lat,lon:+lon,kmN:kmToNum(km)};
-}).sort((a,b)=>a.kmN-b.kmN);
+let kmDB=[],ATIVOS=[],pos=null,curKm=null,center=null,status={},lastNear=null;
+const FALLBACK=[["BR116-CF0815","CFTV DAI","098+908","172.26.45.184","RSP-SA14-N098_908","11, 12"],["SAT 099 + 140","SAT","099+140","172.26.9.229","RSP-ITS-N099_140","11, 12"],["BR116-CF0816","CFTV DAI","099+263","172.26.9.177","RSP-SA14-N099_263","21, 22"],["BR116-CF0817","CFTV DAI","099+622","172.26.9.194","RSP-SA15-N099_622","11, 12"],["BR116-CF0840","CFTV DAI","100+060","172.26.9.211","RSP-SA16-N100_060","21, 22"]].map(([tag,equip,km,ip,host,fibra])=>({tag,equip,km,ip,host,fibra,kmN:kmNum(km)}));
 
-const DEFAULT_IDX = ATIVOS.findIndex(a=>a.tag==="BR116-CF0816");
-const LABELS = ["2º Anterior","1º Anterior","Atual (Localização)","1º Posterior","2º Posterior"];
-const ICONS  = ["chevrons-left","chevron-left","map-pin","chevron-right","chevrons-right"];
-const status = {}; // ip -> "ok" | "bad" | undefined
-let centerIdx = DEFAULT_IDX, currentKm = null;
+async function getText(names){for(const n of names){for(const pre of ['./','../','/']){try{const r=await fetch(pre+encodeURIComponent(n)+'?v='+Date.now(),{cache:'no-store'});if(r.ok){let t=await r.text();if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);return t}}catch(e){}}}return null}
+function rows(t){const L=t.split(/\r?\n/).filter(l=>l.trim());const sep=(L[0].split(';').length>=L[0].split(',').length)?';':',';return{h:L.shift().split(sep),r:L.map(l=>l.split(sep))}}
 
-function kmToNum(k){const [a,b]=k.split("+");return (+a)+(+b)/1000;}
-function numToKm(n){const a=Math.floor(n),b=Math.round((n-a)*1000);return String(a).padStart(3,"0")+"+"+String(b).padStart(3,"0");}
-function dist(lat1,lon1,lat2,lon2){const R=6371e3,r=Math.PI/180,dLat=(lat2-lat1)*r,dLon=(lon2-lon1)*r;
-  const x=Math.sin(dLat/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+async function loadKm(){const t=await getText(['SNVBR116SPRJ.csv']);if(!t)return;const{h,r}=rows(t);
+ const a=findCol(h,['km']),b=findCol(h,['lat','latitude']),c=findCol(h,['long','lon','longitude']);
+ kmDB=r.map(x=>({km:parsePt(x[a]),lat:parsePt(x[b]),lon:parsePt(x[c])})).filter(p=>Number.isFinite(p.km)&&Number.isFinite(p.lat));}
+function kmAt(lat,lon){let best=null,bd=Infinity;for(const p of kmDB){const d=hav(lat,lon,p.lat,p.lon);if(d<bd){bd=d;best=p}}return best?{km:best.km,d:bd}:null}
 
-function sequence(){
-  const out=[];
-  for(let o=-2;o<=2;o++){const i=centerIdx+o;out.push(ATIVOS[i]||null);}
-  return out;
-}
-function badge(ip){
-  const s=status[ip];
-  if(s==="ok") return `<span class="badge ok"><i data-lucide="wifi"></i>ONLINE (PING OK)</span>`;
-  if(s==="bad") return `<span class="badge bad"><i data-lucide="wifi-off"></i>OFFLINE (TIMEOUT / FALHA)</span>`;
-  return `<span class="badge wait"><i data-lucide="loader"></i>TESTANDO…</span>`;
-}
+async function loadAtivos(){const t=await getText(['ativos 116.csv','ativos116.csv','ativos_116.csv']);
+ if(!t){ATIVOS=FALLBACK;return'base embutida (ativos 116.csv não encontrado)'}
+ const{h,r}=rows(t);const ix={tag:findCol(h,['tag']),equip:findCol(h,['equipamento','equip','tipo']),km:findCol(h,['km']),ip:findCol(h,['ip gerencia','ip']),host:findCol(h,['hostname','host']),fibra:findCol(h,['fibras','fibra']),lat:findCol(h,['latitude','lat']),lon:findCol(h,['longitude','long','lon'])};
+ const g=(x,k)=>ix[k]>=0?String(x[ix[k]]??'').trim():'';
+ ATIVOS=r.map(x=>{const o={tag:g(x,'tag'),equip:g(x,'equip'),km:g(x,'km'),ip:g(x,'ip'),host:g(x,'host'),fibra:g(x,'fibra')};o.kmN=kmNum(o.km);
+   if(!Number.isFinite(o.kmN)&&ix.lat>=0&&kmDB.length){const k=kmAt(parsePt(x[ix.lat]),parsePt(x[ix.lon]));if(k){o.kmN=k.km;o.km=kmFmt(k.km)}}return o})
+  .filter(o=>o.tag&&Number.isFinite(o.kmN)).sort((a,b)=>a.kmN-b.kmN);
+ if(!ATIVOS.length){ATIVOS=FALLBACK;return'base embutida (colunas não reconhecidas)'}
+ return ATIVOS.length+' ativos carregados';}
 
-function render(){
-  const seq=sequence(), cur=seq[2];
-  document.getElementById("hero").innerHTML = cur ? `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
-      <div><div class="kv" style="background:none;padding:0"><span>${cur.equip}</span></div><div class="tag">${cur.tag}</div></div>
-      ${badge(cur.ip)}
-    </div>
-    <div class="meta">
-      <div class="kv"><span>KM</span><b>${cur.km}</b></div>
-      <div class="kv"><span>IP Gerência</span><b>${cur.ip}</b></div>
-      <div class="kv"><span>Hostname</span><b>${cur.host}</b></div>
-      <div class="kv"><span>Fibras</span><b>${cur.fibra}</b></div>
-    </div>` : "Sem ativo";
+function fibras(){const s=[...new Set(ATIVOS.map(a=>fibKey(a.fibra)).filter(Boolean))].sort();const sel=document.getElementById('selFib');sel.innerHTML='<option value="">Fibra do ativo atual</option>'+s.map(f=>`<option>${f}</option>`).join('')}
+function nearest(km){let b=null,bd=Infinity;for(const a of ATIVOS){const d=Math.abs(a.kmN-km);if(d<bd){bd=d;b=a}}return b}
+function sequence(){if(!center)return[];const fk=document.getElementById('selFib').value||fibKey(center.fibra);
+ const list=ATIVOS.filter(a=>fibKey(a.fibra)===fk);let i=list.indexOf(center);
+ if(i<0){const ref=curKm??center.kmN;i=list.findIndex(a=>a.kmN>=ref);if(i<0)i=list.length-1}
+ document.getElementById('fibTit').textContent=`Fibra ${fk||'—'} · ${list.length} ativos`;
+ return[-2,-1,0,1,2].map(o=>list[i+o]||null)}
+const LBL=["2º Anterior","1º Anterior","Atual","1º Posterior","2º Posterior"],ICO=["chevrons-left","chevron-left","map-pin","chevron-right","chevrons-right"];
+const distM=a=>curKm==null?'—':Math.round(Math.abs(a.kmN-curKm)*1000)+' m';
+function badge(ip){const s=status[ip];if(!ip)return'<span class="badge wait">SEM IP</span>';
+ if(s==='ok')return'<span class="badge ok"><i data-lucide="wifi"></i>ONLINE (PING OK)</span>';
+ if(s==='bad')return'<span class="badge bad"><i data-lucide="wifi-off"></i>OFFLINE (TIMEOUT / FALHA)</span>';
+ return'<span class="badge wait"><i data-lucide="loader"></i>TESTANDO…</span>'}
+function render(){const seq=sequence(),c=center,al=document.getElementById('alert');
+ if(c&&curKm!=null){const d=Math.abs(c.kmN-curKm)*1000;
+   if(d<=NEAR_M){al.className='alert near';al.innerHTML=`<i data-lucide="bell-ring"></i><span>VOCÊ ESTÁ NO ATIVO ${c.tag} · ${Math.round(d)} m</span>`;
+     if(lastNear!==c.tag){lastNear=c.tag;navigator.vibrate?.([200,100,200])}}
+   else{al.className='alert';al.innerHTML=`<i data-lucide="navigation"></i><span>Próximo ativo: ${c.tag} a ${Math.round(d)} m</span>`;lastNear=null}}
+ document.getElementById('hero').innerHTML=c?`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div class="kv" style="background:none;padding:0"><span>${c.equip}</span></div><div class="tag">${c.tag}</div></div>${badge(c.ip)}</div>
+  <div class="meta"><div class="kv"><span>KM</span><b>${c.km}</b></div><div class="kv"><span>Distância</span><b>${distM(c)}</b></div><div class="kv"><span>IP</span><b>${c.ip}</b></div><div class="kv"><span>Hostname</span><b>${c.host}</b></div><div class="kv"><span>Fibras</span><b>${c.fibra}</b></div></div>`:'Aguardando posição…';
+ document.getElementById('grid').innerHTML=seq.map((a,i)=>a?`<div class="card ${i==2?'cur':''}"><div class="pos"><i data-lucide="${ICO[i]}"></i>${LBL[i]}</div><div class="t">${a.tag}</div><div class="l">${a.equip} · KM <b>${a.km}</b> · ${distM(a)}</div><div class="l">IP <b>${a.ip}</b></div><div class="l">Fibras <b>${a.fibra}</b></div><div style="margin-top:6px">${badge(a.ip)}</div></div>`:`<div class="card"><div class="pos">${LBL[i]}</div><div class="l">Sem ativo nesta fibra</div></div>`).join('');
+ document.getElementById('tbody').innerHTML=seq.map((a,i)=>a?`<tr class="${i==2?'cur':''}"><td>${LBL[i]}</td><td><b>${a.tag}</b></td><td>${a.equip}</td><td>${a.km}</td><td>${distM(a)}</td><td>${a.ip}</td><td>${a.host}</td><td>${a.fibra}</td><td>${badge(a.ip)}</td></tr>`:'').join('');
+ lucide.createIcons()}
 
-  document.getElementById("grid").innerHTML = seq.map((a,i)=>a?`
-    <div class="card ${i===2?"cur":""}">
-      <div class="pos"><i data-lucide="${ICONS[i]}"></i>${LABELS[i]}</div>
-      <div class="t">${a.tag}</div>
-      <div class="l">${a.equip} · KM <b>${a.km}</b></div>
-      <div class="l">IP <b>${a.ip}</b></div>
-      <div class="l">Fibras <b>${a.fibra}</b></div>
-      <div style="margin-top:6px">${badge(a.ip)}</div>
-    </div>`:`<div class="card"><div class="pos">${LABELS[i]}</div><div class="l">Sem ativo cadastrado</div></div>`).join("");
+function onPos(p){pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};
+ const k=kmDB.length?kmAt(pos.lat,pos.lon):null;const dot=document.getElementById('gpsDot'),tx=document.getElementById('gpsTxt');
+ dot.className='dot '+(pos.acc<=15?'on':'');
+ if(k&&k.d<1500){curKm=k.km;tx.textContent='GPS ±'+Math.round(pos.acc)+'m';document.getElementById('kmTxt').textContent='KM '+curKm.toFixed(2).replace('.',',');center=nearest(curKm)}
+ else{tx.textContent=k?`Fora da rodovia (${(k.d/1000).toFixed(1)} km)`:'Base KM indisponível'}
+ render()}
+function onErr(e){document.getElementById('gpsDot').className='dot off';document.getElementById('gpsTxt').textContent='GPS indisponível';render()}
 
-  document.getElementById("tbody").innerHTML = seq.map((a,i)=>a?`
-    <tr class="${i===2?"cur":""}"><td>${LABELS[i]}</td><td><b>${a.tag}</b></td><td>${a.equip}</td><td>${a.km}</td>
-    <td>${a.ip}</td><td>${a.host}</td><td>${a.fibra}</td><td>${badge(a.ip)}</td></tr>`:"").join("");
-  lucide.createIcons();
-}
+async function ping(ip){const c=new AbortController(),t=setTimeout(()=>c.abort(),1200);
+ try{await fetch('http://'+ip+'/?_='+Date.now(),{mode:'no-cors',cache:'no-store',signal:c.signal});return true}catch(e){return false}finally{clearTimeout(t)}}
+async function loop(){while(true){const s=sequence().filter(a=>a&&a.ip);const r=await Promise.all(s.map(a=>ping(a.ip)));
+ s.forEach((a,i)=>status[a.ip]=r[i]?'ok':'bad');render();
+ document.getElementById('foot').textContent='Último teste '+new Date().toLocaleTimeString('pt-BR')+' · ciclo 3s · timeout 1.2s · '+window._info;
+ await new Promise(r=>setTimeout(r,3000))}}
+document.getElementById('selFib').onchange=render;
 
-/* ===== Geolocalização ===== */
-function onPos(p){
-  const {latitude:la,longitude:lo,accuracy}=p.coords;
-  let best=0,bd=Infinity;
-  ATIVOS.forEach((a,i)=>{const d=dist(la,lo,a.lat,a.lon);if(d<bd){bd=d;best=i;}});
-  // estima KM: ativo mais próximo ± distância projetada ao vizinho
-  currentKm = ATIVOS[best].kmN;
-  const nb = ATIVOS[best+1]||ATIVOS[best-1];
-  if(nb){const dn=dist(la,lo,nb.lat,nb.lon), seg=dist(ATIVOS[best].lat,ATIVOS[best].lon,nb.lat,nb.lon);
-    if(dn<seg) currentKm += (nb.kmN-ATIVOS[best].kmN)*(bd/(bd+dn));}
-  document.getElementById("gpsDot").className="dot on";
-  document.getElementById("gpsTxt").textContent = bd>5000 ? `Fora do trecho (${(bd/1000).toFixed(1)} km)` : `GPS ±${Math.round(accuracy)}m`;
-  document.getElementById("kmTxt").textContent = "KM "+numToKm(currentKm);
-  if(best!==centerIdx){centerIdx=best;render();}
-}
-function onErr(e){
-  document.getElementById("gpsDot").className="dot off";
-  document.getElementById("gpsTxt").textContent="GPS indisponível · referência";
-  document.getElementById("kmTxt").textContent="KM "+ATIVOS[DEFAULT_IDX].km;
-}
-let watchId=null;
-function startGPS(){
-  if(!("geolocation" in navigator)) return onErr();
-  if(watchId!==null) navigator.geolocation.clearWatch(watchId);
-  watchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
-}
-document.getElementById("btnLoc").onclick=startGPS;
-
-/* ===== Ping em segundo plano ===== */
-async function ping(ip){
-  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),1200);
-  try{ await fetch(`http://${ip}/?_=${Date.now()}`,{mode:"no-cors",cache:"no-store",signal:ctrl.signal}); return true; }
-  catch(e){ return false; }
-  finally{ clearTimeout(t); }
-}
-async function pingLoop(){
-  while(true){
-    const seq=sequence().filter(Boolean);
-    const res=await Promise.all(seq.map(a=>ping(a.ip)));
-    seq.forEach((a,i)=>status[a.ip]=res[i]?"ok":"bad");
-    render();
-    document.getElementById("foot").textContent=`Último teste: ${new Date().toLocaleTimeString("pt-BR")} · ciclo 3s · timeout 1.2s`;
-    await new Promise(r=>setTimeout(r,3000));
-  }
-}
-
-render(); startGPS(); pingLoop();
+(async()=>{await loadKm();window._info=await loadAtivos();fibras();
+ center=ATIVOS.find(a=>a.tag==='BR116-CF0816')||ATIVOS[0];
+ document.getElementById('alert').innerHTML='<i data-lucide="satellite"></i><span>'+window._info+' · '+kmDB.length+' pontos KM · aguardando GPS</span>';render();
+ if('geolocation'in navigator)navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true,maximumAge:0,timeout:10000});else onErr();
+ loop()})();
 </script>
-</body>
-</html>
+</body></html>
