@@ -4,242 +4,315 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<title>Localizador de Ativos & Fibra</title>
 <style>
-:root{--bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}.card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}.brand{display:inline-block;margin-left:5px;font-size:8px;font-weight:400;color:var(--mu);opacity:.45;vertical-align:baseline}
-.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}.btn:active{transform:scale(.98)}.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}.dir-hint{margin:20px 0 0;color:var(--acc);font-size:13px;font-weight:700;text-align:center}.dir-hint[hidden],#pick[hidden]{display:none}
-#cam{flex-direction:column;background:#000}video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hud{position:absolute;z-index:5;max-width:min(75vw,360px);background:rgba(4,90,64,.82);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 14px;top:calc(14px + var(--st));left:12px}.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{display:block;font-size:25px;line-height:1.15;overflow-wrap:anywhere}.hud .acc{font-size:11px;color:#bbf7d0;margin-top:3px;line-height:1.35}.hud .address{font-size:12px;color:#fff;margin-top:4px;line-height:1.3}.hud .address a{color:#bbf7d0;font-size:9px}.hud.outside b{font-size:17px}
-.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}@keyframes blink{50%{opacity:.15}}.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}body.clean .bar,body.clean .lbl{opacity:0;pointer-events:none}.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}.modes button[aria-pressed=true]{background:var(--acc);color:#000}.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}.rb svg{width:22px;height:22px}.camera-icon{width:24px;height:24px;display:block}#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}#snap{visibility:hidden}#snap.on{visibility:visible}
-#set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}.checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:2px}
+:root {
+  --bg: #07090c;
+  --s1: #10141a;
+  --s2: #171c24;
+  --line: rgba(255, 255, 255, 0.12);
+  --acc: #ffd600;
+  --ok: #34d399;
+  --bad: #ef4444;
+  --tx: #f2f2f4;
+  --mu: #8b8f98;
+  --sb: max(env(safe-area-inset-bottom), 16px);
+  --st: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--tx); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
 
-/* Painel de Ativos e Topologia de Fibra */
-#assetsPanel{position:absolute;z-index:5;left:12px;top:calc(132px + var(--st));width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 280px);overflow-y:auto;background:rgba(7,9,12,.94);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px}#assetsPanel[hidden]{display:none}
-.assetsHead{display:flex;flex-direction:column;gap:2px;font-weight:800;color:var(--acc);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-.assetsHead .sub-head{font-size:11px;color:#c3c6ce;font-weight:400}
-.assetRow{padding:8px 8px;border-bottom:1px solid var(--line);line-height:1.35;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,.03)}
-.assetRow.nearest{color:#fff;background:rgba(255,214,0,.15);border:1px solid rgba(255,214,0,.4)}
-.assetTitle{font-weight:700;font-size:13px}
-.assetMeta{color:#c3c6ce;font-size:11px;margin-top:2px}
-.assetState{font-size:11px;margin-top:5px;display:flex;align-items:center;justify-content:space-between}
-.badge-ping{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase}
-.badge-ping.online{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.4)}
-.badge-ping.offline{background:rgba(239,68,68,.2);color:#ef4444;border:1px solid rgba(239,68,68,.4)}
-.badge-ping.checking{background:rgba(255,214,0,.2);color:#ffd600;border:1px solid rgba(255,214,0,.4)}
+/* Layout Principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: calc(12px + var(--st)) 14px var(--sb);
+  gap: 12px;
+}
 
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Header de Localização / KM HUD */
+.hud-card {
+  background: rgba(4, 90, 64, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+  flex: none;
+}
+.hud-card small { display: block; font-size: 11px; color: #bbf7d0; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.hud-card b { display: block; font-size: 28px; line-height: 1.1; color: #fff; margin-top: 2px; }
+.hud-card .meta { font-size: 12px; color: #bbf7d0; margin-top: 4px; display: flex; justify-content: space-between; }
+
+/* Cabeçalho da Topologia */
+.fiber-header {
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: none;
+}
+.fiber-header .title { font-size: 13px; font-weight: 800; color: var(--acc); }
+.fiber-header .fiber-tag { font-size: 11px; background: rgba(255,214,0,0.15); color: var(--acc); padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,214,0,0.3); font-weight: 700; }
+
+/* Lista de Ativos (3 Antes e 3 Depois) */
+.assets-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 2px;
+}
+.asset-card {
+  background: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.1s ease;
+}
+.asset-card.nearest {
+  background: rgba(255, 214, 0, 0.12);
+  border-color: rgba(255, 214, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 214, 0, 0.08);
+}
+.asset-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.asset-title { font-size: 14px; font-weight: 800; color: #fff; }
+.asset-card.nearest .asset-title { color: var(--acc); }
+.asset-km { font-size: 12px; font-weight: 700; color: var(--mu); }
+
+.asset-details { font-size: 12px; color: #c3c6ce; display: flex; gap: 12px; }
+.asset-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 11px; }
+
+/* Badges de Status de Ping */
+.badge-ping {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.badge-ping.online { background: rgba(52, 211, 153, 0.2); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.4); }
+.badge-ping.offline { background: rgba(239, 68, 68, 0.2); color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.4); }
+.badge-ping.checking { background: rgba(255, 214, 0, 0.2); color: var(--acc); border: 1px solid rgba(255, 214, 0, 0.4); }
+.badge-ping::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.empty-state { text-align: center; color: var(--mu); margin: auto; font-size: 14px; padding: 20px; }
 </style>
 </head>
 <body>
-<main id="start" class="screen on"><div class="card">
-  <h1>KM Report<small class="brand">By CPS sistems</small></h1>
-  <p class="sub">Fotos, vídeos e relatórios em PDF com KM, data e GPS gravados na imagem.</p>
-  <p class="dir-hint" id="dirHint">Selecione a pasta para salvar os arquivos</p>
-  <button class="btn" id="pick">Escolher pasta de destino</button>
-  <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Sem pasta: os arquivos serão baixados.</span></p>
-  <button class="btn pri" id="go">Ativar câmera</button>
-</div></main>
-<section id="cam" class="screen">
-  <video id="v" autoplay playsinline muted></video>
-  <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
-  
-  <aside id="assetsPanel" aria-live="polite" hidden>
-    <div class="assetsHead">
-      <div>Topologia de Fibra Optica</div>
-      <div class="sub-head" id="fiberInfo">Analisando rota de fibra…</div>
-    </div>
-    <div id="assetsList">Carregando ativos…</div>
-  </aside>
 
-  <div class="chip"><div class="pill rec" id="rec">Gravando</div><input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80"></div>
-  <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button><button data-m="ativos" aria-pressed="false">Ativos</button></div>
-    <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
-      <button id="shut" aria-label="Capturar"><i></i></button>
-      <button class="rb" id="snap" aria-label="Tirar foto durante o relatório" title="Tirar foto"><svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
-    </div><button class="pill" id="back">Voltar</button>
+<div class="app-container">
+  <!-- HUD Localizador de KM -->
+  <div class="hud-card">
+    <small id="locTitle">Localizando Via GPS…</small>
+    <b id="kmLabel">KM ---</b>
+    <div class="meta">
+      <span id="gpsAcc">Precisão GPS: --</span>
+      <span id="coords">--</span>
+    </div>
   </div>
-</section>
-<div id="set"><div class="card">
-  <h1 style="font-size:20px">Ajustes</h1>
-  <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
-  <div class="checkgroup"><div class="checkgroup-title">Informações na imagem e no vídeo</div>
-    <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM</span></label>
-    <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
-    <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir localização (GPS/endereço)</span></label>
-    <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta</span></label>
+
+  <!-- Identificador da Fibra -->
+  <div class="fiber-header">
+    <span class="title">Ativos na Fibra Local</span>
+    <span class="fiber-tag" id="fiberTag">Buscando Fibra...</span>
   </div>
-  <div class="checkgroup"><div class="checkgroup-title">Exibição do KM</div><label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar o KM mais próximo mesmo fora da rodovia (&gt; 300 m)</span></label></div>
-  <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
-  <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-  <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-  <button class="btn pri" id="closeSet">Fechar</button>
-</div></div>
-<div id="toast" role="status"></div><canvas id="c" hidden></canvas>
+
+  <!-- Lista dos 3 antes e 3 depois -->
+  <div class="assets-container" id="assetsList">
+    <div class="empty-state">Aguardando coordenadas GPS do veículo…</div>
+  </div>
+</div>
 
 <script>
-const $=id=>document.getElementById(id);
-const S={db:[],assets:[],pingStatus:{},km:'---',kmValue:null,lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0};
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
-const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
-const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+const S = {
+  db: [],
+  assets: [],
+  pingStatus: {},
+  kmValue: null,
+  kmText: '---',
+  lat: 0,
+  lon: 0,
+  acc: null
+};
 
-function toast(m,err=false){const t=$('toast');t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',1800);}
-function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showDate:$('showDate').checked,showGps:$('showGps').checked,showLabel:$('showLabel').checked,showKmFar:$('showKmFar').checked}));}catch(e){}}
-const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr')||'{}');}catch{return {};}})();
-['label','int','lote'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
-const oldMeta=typeof cfg.showMeta==='boolean'?cfg.showMeta:true;
-['showKm','showDate','showGps','showLabel'].forEach(k=>$(k).checked=typeof cfg[k]==='boolean'?cfg[k]:oldMeta);
-if(typeof cfg.showKmFar==='boolean')$('showKmFar').checked=cfg.showKmFar;
-$('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist();};
-['label','int','lote'].forEach(k=>$(k).addEventListener('input',persist));
-['showKm','showDate','showGps','showLabel','showKmFar'].forEach(k=>$(k).addEventListener('change',()=>{persist();updateLocationUI();}));
+const $ = id => document.getElementById(id);
+const num = v => { const s = String(v ?? '').trim(); if (!s) return NaN; return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/* Leitura e parsing de dados */
-const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
-const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
-function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
-function nearest(la,lo){const rad=Math.PI/180,R=6371000;let best=null,min=Infinity;for(const p of S.db){const dLat=(p.lat-la)*rad,dLon=(p.lon-lo)*rad,a=Math.sin(dLat/2)**2+Math.cos(la*rad)*Math.cos(p.lat*rad)*Math.sin(dLon/2)**2,dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
-
-/* Leitura do ativos 116.csv com suporte à coluna "fibra" / "anel" */
-function parseAssetKm(v){const s=String(v??'').trim().replace(/^\uFEFF/,'');const m=s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);if(m)return Number(m[1])+Number(`${m[2]}${m[3]||''}`)/Math.pow(10,(m[3]||'').length+3);return num(s);}
-function parseAssetsCsv(t){
-  if(!t)return[];
-  if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);
-  const lines=t.split(/\r?\n/).filter(x=>x.trim());
-  if(lines.length<2)return[];
-  const h=lines[0].split(';').map(x=>x.replace(/^\s*\uFEFF/,'').replace(/"/g,'').trim().toLowerCase());
-  const find=names=>h.findIndex(x=>names.includes(x));
-  const tag=find(['tag','ativo','equipamento']),equip=find(['equipamento','tipo']),km=find(['km']),ip=find(['ip','endereço ip','endereco ip']),fibra=find(['fibra','anel','tubo','circuito']);
-  if(km<0)return[];
-  return lines.slice(1).map(line=>{
-    const r=line.split(';').map(x=>x.trim().replace(/^"|"$/g,''));
-    const parsed=parseAssetKm(r[km]);
-    return{
-      tag:tag>=0?r[tag]:'',
-      equip:equip>=0?r[equip]:'',
-      km:parsed,
-      kmLabel:r[km]||'',
-      ip:ip>=0?r[ip]:'',
-      fibra:fibra>=0?r[fibra]:'GERAL'
-    };
-  }).filter(a=>Number.isFinite(a.km));
+/* 1. Cálculo geográfico de marcos de KM */
+function parseKmCsv(t) {
+  if (!t) return [];
+  if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
+  const L = t.split(/\r?\n/).filter(l => l.trim());
+  if (!L.length) return [];
+  const sep = L[0].includes(';') ? ';' : ',';
+  const h = L.shift().split(sep).map(x => x.trim().toLowerCase());
+  const a = h.findIndex(x => ['km'].includes(x));
+  const b = h.findIndex(x => ['lat', 'latitude'].includes(x));
+  const c = h.findIndex(x => ['lon', 'long', 'longitude'].includes(x));
+  if (a < 0 || b < 0 || c < 0) return [];
+  return L.map(l => {
+    const r = l.split(sep);
+    return { km: num(r[a]), lat: num(r[b]), lon: num(r[c]) };
+  }).filter(p => [p.km, p.lat, p.lon].every(Number.isFinite));
 }
 
-/* Teste de Conectividade do IP */
-async function pingIp(ip){
-  if(!ip) return 'no-ip';
-  
-  // 1. Tenta API local de ping ICMP real caso esteja rodando um mini-server no celular ou roteador
+function nearestKm(la, lo) {
+  const rad = Math.PI / 180, R = 6371000;
+  let best = null, min = Infinity;
+  for (const p of S.db) {
+    const dLat = (p.lat - la) * rad, dLon = (p.lon - lo) * rad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
+    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (dist < min) { min = dist; best = p; }
+  }
+  return best ? { km: best.km, dist: min } : null;
+}
+
+/* 2. Parsing do ativos 116.csv (KM, IP, Fibra) */
+function parseAssetKm(v) {
+  const s = String(v ?? '').trim().replace(/^\uFEFF/, '');
+  const m = s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);
+  if (m) return Number(m[1]) + Number(`${m[2]}${m[3] || ''}`) / Math.pow(10, (m[3] || '').length + 3);
+  return num(s);
+}
+
+function parseAssetsCsv(t) {
+  if (!t) return [];
+  if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
+  const lines = t.split(/\r?\n/).filter(x => x.trim());
+  if (lines.length < 2) return [];
+  const h = lines[0].split(';').map(x => x.replace(/^\s*\uFEFF/, '').replace(/"/g, '').trim().toLowerCase());
+  const find = names => h.findIndex(x => names.includes(x));
+  const tag = find(['tag', 'ativo', 'equipamento']), equip = find(['equipamento', 'tipo']), km = find(['km']), ip = find(['ip', 'endereço ip', 'endereco ip']), fibra = find(['fibra', 'anel', 'tubo', 'circuito']);
+  if (km < 0) return [];
+  return lines.slice(1).map(line => {
+    const r = line.split(';').map(x => x.trim().replace(/^"|"$/g, ''));
+    return {
+      tag: tag >= 0 ? r[tag] : '',
+      equip: equip >= 0 ? r[equip] : '',
+      km: parseAssetKm(r[km]),
+      kmLabel: r[km] || '',
+      ip: ip >= 0 ? r[ip] : '',
+      fibra: fibra >= 0 ? r[fibra] : 'FIBRA-PRINCIPAL'
+    };
+  }).filter(a => Number.isFinite(a.km));
+}
+
+/* 3. Teste de Conectividade do IP */
+async function pingIp(ip) {
+  if (!ip) return 'no-ip';
   try {
     const apiRes = await fetch(`http://localhost:8080/ping?ip=${ip}`, { cache: 'no-store' });
-    if(apiRes.ok){
+    if (apiRes.ok) {
       const data = await apiRes.json();
       return data.online ? 'online' : 'offline';
     }
-  } catch(e){}
+  } catch (e) {}
 
-  // 2. Probing HTTP/Socket fallback direto do navegador
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 1200);
   try {
-    const url = ip.startsWith('http') ? ip : `http://${ip}`;
-    await fetch(url, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' });
+    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' });
     clearTimeout(id);
     return 'online';
-  } catch(e) {
+  } catch (e) {
     clearTimeout(id);
     return (e.name === 'AbortError') ? 'offline' : 'online';
   }
 }
 
-async function checkAssetPings(displayAssets){
-  for(const asset of displayAssets){
-    if(!asset.ip) continue;
+async function checkAssetPings(displayAssets) {
+  for (const asset of displayAssets) {
+    if (!asset.ip) continue;
     const res = await pingIp(asset.ip);
     S.pingStatus[asset.ip] = res;
   }
-  if(S.mode==='ativos') renderAssetsUIOnly();
+  renderAssetsUIOnly();
 }
 
-/* Algoritmo de Topologia: Pega a fibra do ativo mais próximo e busca 3 antes e 3 depois na MESMA FIBRA */
-function getSurroundingAssetsByFiber(currentKm){
-  if(!S.assets.length) return { finalGroup:[], nearestAsset:null, currentFiber:'' };
+/* 4. Filtragem por Fibra e Seleção (3 Antes / 3 Depois) */
+function getSurroundingAssetsByFiber(currentKm) {
+  if (!S.assets.length) return { finalGroup: [], nearestAsset: null, currentFiber: 'SEM DADOS' };
 
-  // 1. Achar o equipamento geograficamente mais próximo do KM atual
   let nearestAsset = S.assets[0];
   let minDiff = Math.abs(S.assets[0].km - currentKm);
 
-  for(let i=1; i<S.assets.length; i++){
+  for (let i = 1; i < S.assets.length; i++) {
     const diff = Math.abs(S.assets[i].km - currentKm);
-    if(diff < minDiff){
+    if (diff < minDiff) {
       minDiff = diff;
       nearestAsset = S.assets[i];
     }
   }
 
-  const currentFiber = nearestAsset.fibra || 'GERAL';
+  const currentFiber = nearestAsset.fibra || 'FIBRA-PRINCIPAL';
+  const fiberAssets = S.assets.filter(a => (a.fibra || 'FIBRA-PRINCIPAL') === currentFiber).sort((a, b) => a.km - b.km);
 
-  // 2. Filtrar SOMENTE ativos pertencentes à MESMA FIBRA
-  const fiberAssets = S.assets.filter(a => (a.fibra || 'GERAL') === currentFiber).sort((a,b)=>a.km - b.km);
-
-  // 3. Selecionar 3 antes e 3 depois dentro dessa mesma fibra
-  const before = fiberAssets.filter(a => a.km <= currentKm).sort((a,b)=>b.km - a.km).slice(0, 3).reverse();
-  const after = fiberAssets.filter(a => a.km > currentKm).sort((a,b)=>a.km - b.km).slice(0, 3);
+  const before = fiberAssets.filter(a => a.km <= currentKm).sort((a, b) => b.km - a.km).slice(0, 3).reverse();
+  const after = fiberAssets.filter(a => a.km > currentKm).sort((a, b) => a.km - b.km).slice(0, 3);
 
   const map = new Map();
   [...before, nearestAsset, ...after].forEach(a => map.set(`${a.tag}_${a.km}_${a.ip}`, a));
-  const finalGroup = Array.from(map.values()).sort((a,b)=>a.km - b.km);
+  const finalGroup = Array.from(map.values()).sort((a, b) => a.km - b.km);
 
   return { finalGroup, nearestAsset, currentFiber };
 }
 
-function renderAssetsUIOnly(){
+function renderAssetsUIOnly() {
   const current = S.kmValue;
-  if(!Number.isFinite(current)) return;
+  if (!Number.isFinite(current)) return;
+
   const { finalGroup, nearestAsset, currentFiber } = getSurroundingAssetsByFiber(current);
-  
-  $('fiberInfo').textContent = `Fibra Atual: ${currentFiber} · KM ${current.toFixed(3)}`;
+  $('fiberTag').textContent = currentFiber;
 
   $('assetsList').innerHTML = finalGroup.map(a => {
     const isNearest = a === nearestAsset;
     const delta = a.km - current;
-    const dir = delta < 0 ? 'antes' : delta > 0 ? 'depois' : 'no ponto';
+    const dir = delta < 0 ? 'atrás' : delta > 0 ? 'à frente' : 'no ponto';
     const st = S.pingStatus[a.ip] || 'checking';
 
-    let badgeClass = 'checking', badgeText = 'CHECANDO...';
-    if(st === 'online'){ badgeClass = 'online'; badgeText = 'ONLINE'; }
-    else if(st === 'offline'){ badgeClass = 'offline'; badgeText = 'OFFLINE'; }
-    if(!a.ip){ badgeClass = 'checking'; badgeText = 'SEM IP'; }
+    let badgeClass = 'checking', badgeText = 'CHECANDO';
+    if (st === 'online') { badgeClass = 'online'; badgeText = 'ONLINE'; }
+    else if (st === 'offline') { badgeClass = 'offline'; badgeText = 'OFFLINE'; }
+    if (!a.ip) { badgeClass = 'checking'; badgeText = 'SEM IP'; }
 
-    return `<div class="assetRow${isNearest ? ' nearest' : ''}">
-      <div class="assetTitle">${isNearest ? '★ VOCÊ ESTÁ AQUI · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')} (KM ${escapeHtml(a.kmLabel)})</div>
-      <div class="assetMeta">${escapeHtml(a.equip)}${a.ip ? ' · IP: ' + escapeHtml(a.ip) : ' · Sem IP'} · ${Math.abs(delta).toFixed(3)} km ${dir}</div>
-      <div class="assetState">
-        <span>Fibra: <b>${escapeHtml(a.fibra)}</b></span>
+    return `<div class="asset-card${isNearest ? ' nearest' : ''}">
+      <div class="asset-head">
+        <span class="asset-title">${isNearest ? '★ ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')}</span>
+        <span class="asset-km">KM ${escapeHtml(a.kmLabel)}</span>
+      </div>
+      <div class="asset-details">
+        <span><b>Tipo:</b> ${escapeHtml(a.equip)}</span>
+        <span><b>IP:</b> ${a.ip ? escapeHtml(a.ip) : 'Não informado'}</span>
+      </div>
+      <div class="asset-foot">
+        <span>${Math.abs(delta).toFixed(3)} km (${dir})</span>
         <span class="badge-ping ${badgeClass}">${badgeText}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderAssets(){
-  const panel = $('assetsPanel');
-  panel.hidden = S.mode !== 'ativos';
-  if(panel.hidden) return;
-
+function renderAssets() {
   const current = S.kmValue;
-  if(!S.assets.length){
-    $('assetsList').textContent = 'Carregando lista de ativos e fibras…';
+  if (!S.assets.length) {
+    $('assetsList').innerHTML = '<div class="empty-state">Carregando lista de ativos e fibras…</div>';
     return;
   }
-  if(!Number.isFinite(current)){
-    $('assetsList').textContent = 'Aguardando sinal GPS para identificar a fibra e o KM local.';
+  if (!Number.isFinite(current)) {
+    $('assetsList').innerHTML = '<div class="empty-state">Aguardando sinal GPS para identificar o KM atual…</div>';
     return;
   }
 
@@ -248,55 +321,45 @@ function renderAssets(){
   checkAssetPings(finalGroup);
 }
 
-/* Localização GPS e Geocoding */
-function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
-function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
-function requestAddress(){if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);if(cached){S.address=cached;updateLocationUI();return;}if(S.lastGeoPoint&&Math.hypot(S.lat-S.lastGeoPoint.lat,S.lon-S.lastGeoPoint.lon)<.001)return;clearTimeout(S.geoTimer);const wait=Math.max(0,1100-(Date.now()-S.lastGeoRequest));S.geoTimer=setTimeout(async()=>{if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};try{const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}}catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}},wait);}
+function updateLocationUI() {
+  $('kmLabel').textContent = S.kmText === '---' ? 'KM ---' : `KM ${S.kmText}`;
+  $('locTitle').textContent = S.acc !== null ? 'KM Atual Na Rodovia' : 'Buscando sinal GPS…';
+  $('gpsAcc').textContent = S.acc !== null ? `GPS ±${Math.round(S.acc)} m` : 'GPS: Aguardando';
+  $('coords').textContent = S.acc !== null ? `${S.lat.toFixed(5)}, ${S.lon.toFixed(5)}` : '--';
+}
 
-function refreshNearest(){const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;S.dist=n?n.dist:null;if(n){S.kmValue=n.km;S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');}else{S.kmValue=null;S.km='---';}if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}updateLocationUI();renderAssets();if(S.dist!==null&&S.dist>OUTSIDE_LIMIT_M)requestAddress();}
-function updateLocationUI(){const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;const kmIsShown=!outside||showFarKm;$('hud').classList.toggle('outside',outside&&!showFarKm);$('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';$('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);$('gps').textContent=S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;$('address').hidden=!(outside&&S.address);if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;return{outside,kmIsShown};}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function refreshNearest() {
+  const n = S.db.length && S.acc !== null ? nearestKm(S.lat, S.lon) : null;
+  if (n) {
+    S.kmValue = n.km;
+    S.kmText = (Math.round(n.km * 100) / 100).toFixed(2).replace('.', ',');
+  } else {
+    S.kmValue = null;
+    S.kmText = '---';
+  }
+  updateLocationUI();
+  renderAssets();
+}
 
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);refreshNearest();}).catch(()=>{});
-fetch(encodeURI('ativos 116.csv?v='+Date.now()),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.assets=parseAssetsCsv(t);renderAssets();}).catch(()=>{S.assets=[];renderAssets();});
-if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+/* Inicialização e Leitura */
+fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' })
+  .then(r => r.ok ? r.text() : '')
+  .then(t => { S.db = parseKmCsv(t); refreshNearest(); });
 
-/* Gerenciamento de pastas, câmera e capturas */
-if(!('showDirectoryPicker'in window))$('pick').hidden=true;
-$('pick').onclick=async()=>{if(!('showDirectoryPicker'in window)){toast('Navegador não suporta pasta de destino',1);return;}try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;$('dirHint').hidden=true;$('pick').hidden=true;}catch(e){if(e.name!=='AbortError')toast(e.message||'Não foi possível acessar a pasta',1);}};
-async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true;}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1);}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
+fetch(encodeURI('ativos 116.csv?v=' + Date.now()), { cache: 'no-store' })
+  .then(r => r.ok ? r.text() : '')
+  .then(t => { S.assets = parseAssetsCsv(t); renderAssets(); });
 
-async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'),cur=S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';}
-$('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
-$('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}};
-function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const t=S.stream?.getVideoTracks?.()[0];z0=t?.getSettings?.().zoom||1;}};v.ontouchmove=e=>{const t=S.stream?.getVideoTracks?.()[0],c=t?.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});}};}
-$('gear').onclick=()=>$('set').classList.add('on');$('closeSet').onclick=()=>$('set').classList.remove('on');
-$('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
-function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));$('assetsPanel').hidden=S.mode!=='ativos';$('shut').disabled=S.mode==='ativos';$('shut').setAttribute('aria-label',S.mode==='ativos'?'Modo de consulta de ativos':'Capturar');renderAssets();}
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
-
-function frame(){const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);const {outside,kmIsShown}=updateLocationUI(),lines=[];if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside)lines.push({text:`KM ${S.km}`,large:true});else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked)lines.push({text:`KM ${S.km}`,large:true});if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});else if($('showDate').checked)lines.push({text:new Date().toLocaleString('pt-BR')});if($('showGps').checked){const accTxt=S.acc!==null?`Precisão do GPS ±${Math.round(S.acc)} m`:'Aguardando GPS…';lines.push({text:`${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`,small:true});}if(lines.length){const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,.9)');cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';let y=h-20;for(let i=lines.length-1;i>=0;i--){const line=lines[i];cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');let fontSize=Math.round(bh*.15);if(line.large)fontSize=Math.round(bh*.24);if(line.small)fontSize=Math.round(bh*.12);cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;cx.fillText(line.text,20,y,w-40);y-=line.large?Math.round(bh*.30):(line.small?Math.round(bh*.15):Math.round(bh*.20));}}const lb=$('label').value.trim();if(lb&&$('showLabel').checked){const fs=Math.round(h*.035);cx.font=`bold ${fs}px Arial,sans-serif`;const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();}return cv;}
-const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-$('shut').onclick=()=>{if(S.mode==='ativos')return; navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
-async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
-
-let vidLoop=0;
-function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
-function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}}
-
-const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
-function togglePdf(){S.cap?stopPdf():startPdf();}
-function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
-function loop(){if(!S.cap)return;const start=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));}
-function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
-async function stopPdf(){if(!S.cap)return;S.cap=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);}
-async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0));}}catch(e){console.error(e);toast('Falha ao gerar PDF',1);}finally{S.busy=false;}}
-async function makePdf({p,n}){const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
-$('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
-window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
-updateModeUI();updateLocationUI();
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(p => {
+    S.lat = p.coords.latitude;
+    S.lon = p.coords.longitude;
+    S.acc = p.coords.accuracy;
+    refreshNearest();
+  }, () => {
+    $('locTitle').textContent = 'Sinal GPS Indisponível';
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 20000 });
+}
 </script>
 </body>
 </html>
