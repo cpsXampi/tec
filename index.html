@@ -52,7 +52,7 @@ tr:last-child td{border-bottom:0}
 .btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.8rem;cursor:pointer}
 .btn svg{width:15px;height:15px}
 @media(max-width:520px){.hero .tag{font-size:1.25rem}.gps{width:100%;justify-content:center}}
-.alert{border-radius:14px;padding:14px;font-weight:800;display:flex;gap:10px;align-items:center;border:1px solid var(--warn);background:rgba(245,158,11,.12);color:var(--warn)}.alert.near{border-color:var(--ok);color:var(--ok);background:rgba(52,211,153,.12);box-shadow:0 0 18px rgba(52,211,153,.4);animation:pl 1.2s infinite}@keyframes pl{50%{box-shadow:0 0 4px rgba(52,211,153,.2)}}select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px}</style>
+.alert{border-radius:14px;padding:14px;font-weight:800;display:flex;gap:10px;align-items:center;border:1px solid var(--warn);background:rgba(245,158,11,.12);color:var(--warn)}.alert.near{border-color:var(--ok);color:var(--ok);background:rgba(52,211,153,.12);box-shadow:0 0 18px rgba(52,211,153,.4);animation:pl 1.2s infinite}@keyframes pl{50%{box-shadow:0 0 4px rgba(52,211,153,.2)}}select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px}.blink{animation:bk 1s infinite}@keyframes bk{0%,100%{opacity:1;box-shadow:0 0 18px rgba(52,211,153,.9)}50%{opacity:.35;box-shadow:0 0 2px rgba(52,211,153,.2)}}</style>
 <body>
 <header><div class="hrow">
  <div class="brand"><div class="logo"><i data-lucide="radio-tower"></i></div><div><h1>KMReport · TEC</h1><small>Ativos por fibra · BR-116</small></div></div>
@@ -76,24 +76,29 @@ const hav=(a,b,c,d)=>{const p=Math.PI/180,x=.5-Math.cos((c-a)*p)/2+Math.cos(a*p)
 function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}for(const c of cs){const i=m.findIndex(x=>x.includes(norm(c)));if(i>=0)return i}return-1}
 function kmNum(v){const s=String(v||'').trim();if(s.includes('+')){const[a,b]=s.split('+');return(+a.replace(/\D/g,''))+(+b.replace(/\D/g,''))/1000}return parsePt(s)}
 const kmFmt=n=>{if(!Number.isFinite(n))return'—';const a=Math.floor(n),b=Math.round((n-a)*1000);return String(a).padStart(3,'0')+'+'+String(b).padStart(3,'0')};
-const fibKey=f=>String(f||'').replace(/\s/g,'').replace(/[;\/]/g,',');
+const fibKey=f=>String(f||'').replace(/\s/g,'').replace(/[;\/]/g,',');const okIp=ip=>/^\d+\.\d+\.\d+\.\d+$/.test(ip)&&!/\.0$/.test(ip);
 
 let kmDB=[],ATIVOS=[],pos=null,curKm=null,center=null,status={},lastNear=null;
 const FALLBACK=[["BR116-CF0815","CFTV DAI","098+908","172.26.45.184","RSP-SA14-N098_908","11, 12"],["SAT 099 + 140","SAT","099+140","172.26.9.229","RSP-ITS-N099_140","11, 12"],["BR116-CF0816","CFTV DAI","099+263","172.26.9.177","RSP-SA14-N099_263","21, 22"],["BR116-CF0817","CFTV DAI","099+622","172.26.9.194","RSP-SA15-N099_622","11, 12"],["BR116-CF0840","CFTV DAI","100+060","172.26.9.211","RSP-SA16-N100_060","21, 22"]].map(([tag,equip,km,ip,host,fibra])=>({tag,equip,km,ip,host,fibra,kmN:kmNum(km)}));
 
 async function getText(names){for(const n of names){for(const pre of ['./','../','/']){try{const r=await fetch(pre+encodeURIComponent(n)+'?v='+Date.now(),{cache:'no-store'});if(r.ok){let t=await r.text();if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);return t}}catch(e){}}}return null}
-function rows(t){const L=t.split(/\r?\n/).filter(l=>l.trim());const sep=(L[0].split(';').length>=L[0].split(',').length)?';':',';return{h:L.shift().split(sep),r:L.map(l=>l.split(sep))}}
+function rows(t){const f=t.split(/\r?\n/).find(l=>l.trim())||'';const sep=[';','\t',','].sort((a,b)=>f.split(b).length-f.split(a).length)[0];
+ const out=[];let row=[],cell='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch=='"'){if(t[i+1]=='"'){cell+='"';i++}else q=false}else cell+=ch}
+  else if(ch=='"')q=true;else if(ch==sep){row.push(cell);cell=''}
+  else if(ch=='\n'||ch=='\r'){if(ch=='\r'&&t[i+1]=='\n')i++;row.push(cell);cell='';if(row.some(c=>c.trim()))out.push(row);row=[]}else cell+=ch}
+ row.push(cell);if(row.some(c=>c.trim()))out.push(row);const h=out.shift().map(x=>x.replace(/\s+/g,' ').trim());return{h,r:out}}
 
 async function loadKm(){const t=await getText(['SNVBR116SPRJ.csv']);if(!t)return;const{h,r}=rows(t);
  const a=findCol(h,['km']),b=findCol(h,['lat','latitude']),c=findCol(h,['long','lon','longitude']);
  kmDB=r.map(x=>({km:parsePt(x[a]),lat:parsePt(x[b]),lon:parsePt(x[c])})).filter(p=>Number.isFinite(p.km)&&Number.isFinite(p.lat));}
 function kmAt(lat,lon){let best=null,bd=Infinity;for(const p of kmDB){const d=hav(lat,lon,p.lat,p.lon);if(d<bd){bd=d;best=p}}return best?{km:best.km,d:bd}:null}
 
-async function loadAtivos(){const t=await getText(['ativos 116.csv','ativos116.csv','ativos_116.csv']);
+async function loadAtivos(){const t=await getText(['ativos 116.csv','ativos.csv','ativos116.csv','ativos_116.csv']);
  if(!t){ATIVOS=FALLBACK;return'base embutida (ativos 116.csv não encontrado)'}
- const{h,r}=rows(t);const ix={tag:findCol(h,['tag']),equip:findCol(h,['equipamento','equip','tipo']),km:findCol(h,['km']),ip:findCol(h,['ip gerencia','ip']),host:findCol(h,['hostname','host']),fibra:findCol(h,['fibras','fibra']),lat:findCol(h,['latitude','lat']),lon:findCol(h,['longitude','long','lon'])};
+ const{h,r}=rows(t);const ix={sw:findCol(h,['codigo switch','switch']),sent:findCol(h,['sentido']),cid:findCol(h,['cidade']),anel:findCol(h,['anel fo','anel']),tag:findCol(h,['tag']),equip:findCol(h,['equipamento','equip','tipo']),km:findCol(h,['km']),ip:findCol(h,['ip gerencia','ip']),host:findCol(h,['hostname','host']),fibra:findCol(h,['fibras','fibra']),lat:findCol(h,['latitude','lat']),lon:findCol(h,['longitude','long','lon'])};
  const g=(x,k)=>ix[k]>=0?String(x[ix[k]]??'').trim():'';
- ATIVOS=r.map(x=>{const o={tag:g(x,'tag'),equip:g(x,'equip'),km:g(x,'km'),ip:g(x,'ip'),host:g(x,'host'),fibra:g(x,'fibra')};o.kmN=kmNum(o.km);
+ ATIVOS=r.map(x=>{const o={tag:g(x,'tag'),equip:g(x,'equip'),km:g(x,'km'),ip:g(x,'ip'),host:g(x,'host'),fibra:g(x,'fibra'),sent:g(x,'sent'),cid:g(x,'cid'),anel:g(x,'anel')};if(!o.host)o.host=g(x,'sw');o.kmN=kmNum(o.km);if(!o.tag)o.tag=(o.equip||'ATIVO')+' '+o.km+(o.sent?' '+o.sent[0]:'');
    if(!Number.isFinite(o.kmN)&&ix.lat>=0&&kmDB.length){const k=kmAt(parsePt(x[ix.lat]),parsePt(x[ix.lon]));if(k){o.kmN=k.km;o.km=kmFmt(k.km)}}return o})
   .filter(o=>o.tag&&Number.isFinite(o.kmN)).sort((a,b)=>a.kmN-b.kmN);
  if(!ATIVOS.length){ATIVOS=FALLBACK;return'base embutida (colunas não reconhecidas)'}
@@ -108,8 +113,8 @@ function sequence(){if(!center)return[];const fk=document.getElementById('selFib
  return[-2,-1,0,1,2].map(o=>list[i+o]||null)}
 const LBL=["2º Anterior","1º Anterior","Atual","1º Posterior","2º Posterior"],ICO=["chevrons-left","chevron-left","map-pin","chevron-right","chevrons-right"];
 const distM=a=>curKm==null?'—':Math.round(Math.abs(a.kmN-curKm)*1000)+' m';
-function badge(ip){const s=status[ip];if(!ip)return'<span class="badge wait">SEM IP</span>';
- if(s==='ok')return'<span class="badge ok"><i data-lucide="wifi"></i>ONLINE (PING OK)</span>';
+function badge(ip){const s=status[ip];if(!ip)return'<span class="badge wait">SEM IP</span>';if(!okIp(ip))return'<span class="badge wait">IP INVÁLIDO</span>';
+ if(s==='ok')return'<span class="badge ok blink"><i data-lucide="wifi"></i>ONLINE (PING OK)</span>';
  if(s==='bad')return'<span class="badge bad"><i data-lucide="wifi-off"></i>OFFLINE (TIMEOUT / FALHA)</span>';
  return'<span class="badge wait"><i data-lucide="loader"></i>TESTANDO…</span>'}
 function render(){const seq=sequence(),c=center,al=document.getElementById('alert');
@@ -118,8 +123,8 @@ function render(){const seq=sequence(),c=center,al=document.getElementById('aler
      if(lastNear!==c.tag){lastNear=c.tag;navigator.vibrate?.([200,100,200])}}
    else{al.className='alert';al.innerHTML=`<i data-lucide="navigation"></i><span>Próximo ativo: ${c.tag} a ${Math.round(d)} m</span>`;lastNear=null}}
  document.getElementById('hero').innerHTML=c?`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div class="kv" style="background:none;padding:0"><span>${c.equip}</span></div><div class="tag">${c.tag}</div></div>${badge(c.ip)}</div>
-  <div class="meta"><div class="kv"><span>KM</span><b>${c.km}</b></div><div class="kv"><span>Distância</span><b>${distM(c)}</b></div><div class="kv"><span>IP</span><b>${c.ip}</b></div><div class="kv"><span>Hostname</span><b>${c.host}</b></div><div class="kv"><span>Fibras</span><b>${c.fibra}</b></div></div>`:'Aguardando posição…';
- document.getElementById('grid').innerHTML=seq.map((a,i)=>a?`<div class="card ${i==2?'cur':''}"><div class="pos"><i data-lucide="${ICO[i]}"></i>${LBL[i]}</div><div class="t">${a.tag}</div><div class="l">${a.equip} · KM <b>${a.km}</b> · ${distM(a)}</div><div class="l">IP <b>${a.ip}</b></div><div class="l">Fibras <b>${a.fibra}</b></div><div style="margin-top:6px">${badge(a.ip)}</div></div>`:`<div class="card"><div class="pos">${LBL[i]}</div><div class="l">Sem ativo nesta fibra</div></div>`).join('');
+  <div class="meta"><div class="kv"><span>KM</span><b>${c.km}</b></div><div class="kv"><span>Distância</span><b>${distM(c)}</b></div><div class="kv"><span>IP</span><b>${c.ip}</b></div><div class="kv"><span>Hostname</span><b>${c.host}</b></div><div class="kv"><span>Fibras</span><b>${c.fibra}</b></div><div class="kv"><span>Sentido</span><b>${c.sent||'—'}</b></div><div class="kv"><span>Cidade</span><b>${c.cid||'—'}</b></div><div class="kv"><span>Anel FO</span><b>${c.anel||'—'}</b></div></div>`:'Aguardando posição…';
+ document.getElementById('grid').innerHTML=seq.map((a,i)=>a?`<div class="card ${i==2?'cur':''}"><div class="pos"><i data-lucide="${ICO[i]}"></i>${LBL[i]}</div><div class="t">${a.tag}</div><div class="l">${a.equip} · KM <b>${a.km}</b> · ${a.sent||''} · ${distM(a)}</div><div class="l">IP <b>${a.ip}</b></div><div class="l">Fibras <b>${a.fibra}</b></div><div style="margin-top:6px">${badge(a.ip)}</div></div>`:`<div class="card"><div class="pos">${LBL[i]}</div><div class="l">Sem ativo nesta fibra</div></div>`).join('');
  document.getElementById('tbody').innerHTML=seq.map((a,i)=>a?`<tr class="${i==2?'cur':''}"><td>${LBL[i]}</td><td><b>${a.tag}</b></td><td>${a.equip}</td><td>${a.km}</td><td>${distM(a)}</td><td>${a.ip}</td><td>${a.host}</td><td>${a.fibra}</td><td>${badge(a.ip)}</td></tr>`:'').join('');
  lucide.createIcons()}
 
@@ -133,7 +138,7 @@ function onErr(e){document.getElementById('gpsDot').className='dot off';document
 
 async function ping(ip){const c=new AbortController(),t=setTimeout(()=>c.abort(),1200);
  try{await fetch('http://'+ip+'/?_='+Date.now(),{mode:'no-cors',cache:'no-store',signal:c.signal});return true}catch(e){return false}finally{clearTimeout(t)}}
-async function loop(){while(true){const s=sequence().filter(a=>a&&a.ip);const r=await Promise.all(s.map(a=>ping(a.ip)));
+async function loop(){while(true){const s=sequence().filter(a=>a&&okIp(a.ip));const r=await Promise.all(s.map(a=>ping(a.ip)));
  s.forEach((a,i)=>status[a.ip]=r[i]?'ok':'bad');render();
  document.getElementById('foot').textContent='Último teste '+new Date().toLocaleTimeString('pt-BR')+' · ciclo 3s · timeout 1.2s · '+window._info;
  await new Promise(r=>setTimeout(r,3000))}}
