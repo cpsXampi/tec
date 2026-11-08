@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0a0e14">
-<title>INDEX - Backbone & Fibra (Sequencial)</title>
+<title>INDEX - Monitor de Campo & Backbone</title>
 <style>
 :root {
   --bg: #0a0e14;
@@ -16,7 +16,6 @@
   --text: #ffffff;
   --sub: #94a3b8;
   --line: rgba(255, 255, 255, 0.15);
-  --fiber-glow: rgba(16, 185, 129, 0.5);
   --sb: max(env(safe-area-inset-bottom), 16px);
   --st: env(safe-area-inset-top, 0px);
 }
@@ -29,21 +28,66 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   flex-direction: column;
   height: 100vh;
   padding: calc(10px + var(--st)) 12px var(--sb);
-  gap: 10px;
+  gap: 8px;
 }
 
-/* HUD PRINCIPAL DE POSIÇÃO GPS */
+/* HUD PRINCIPAL - VERDE */
 .hud-card {
   background: linear-gradient(135deg, #064e3b, #022c22);
   border: 2px solid #059669;
   border-radius: 16px;
-  padding: 12px 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  padding: 10px 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
   flex: none;
 }
-.hud-top { font-size: 11px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.hud-km { font-size: 34px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
-.hud-meta { display: flex; justify-content: space-between; font-size: 11px; color: #a7f3d0; font-weight: 600; }
+.hud-top { font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+.hud-km { font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
+.hud-meta { display: flex; justify-content: space-between; font-size: 10px; color: #a7f3d0; font-weight: 600; }
+
+/* JANELINHA DO ATIVO EM QUE VOCÊ PROVAVELMENTE ESTÁ (BASE) */
+.current-asset-box {
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.2), rgba(255, 214, 0, 0.05));
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  padding: 10px 14px;
+  flex: none;
+  box-shadow: 0 0 14px rgba(255, 214, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.current-asset-title {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.current-asset-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.current-asset-tag { font-size: 17px; font-weight: 900; color: #fff; }
+.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
+
+.current-asset-ip {
+  font-family: monospace;
+  font-size: 14px;
+  color: #10b981;
+  font-weight: 800;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 /* BARRA DE PESQUISA RÁPIDA */
 .search-box {
@@ -52,7 +96,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   gap: 8px;
   background: var(--card);
   border: 2px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 6px 12px;
   align-items: center;
 }
@@ -62,21 +106,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border: none;
   outline: none;
   color: #fff;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 .search-box input::placeholder { color: var(--sub); font-weight: 500; }
 
-/* SEÇÃO DE CONTROLES E FILTROS (BOTÕES GRANDES COM SETAS APENAS) */
+/* SEÇÃO DE BOTÕES */
 .big-buttons-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex: none;
 }
 
 .button-group-label {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--sub);
   font-weight: 800;
   text-transform: uppercase;
@@ -93,9 +137,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--card);
   border: 2px solid var(--line);
   color: #fff;
-  border-radius: 12px;
-  padding: 10px 4px;
-  font-size: 13px;
+  border-radius: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   text-align: center;
@@ -112,11 +156,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--accent);
   color: #000;
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(255, 214, 0, 0.4);
+  box-shadow: 0 0 10px rgba(255, 214, 0, 0.4);
 }
-.btn-big small { font-size: 10px; opacity: 0.85; font-weight: 700; }
+.btn-big small { font-size: 9px; opacity: 0.85; font-weight: 700; }
 
-/* LISTA SEQUENCIAL ESTILO BACKBONE (TREM DE FIBRAS E VAGÕES) */
+/* CONTAINER DO BACKBONE E VAGÕES */
 .assets-container {
   flex: 1;
   overflow-y: auto;
@@ -126,7 +170,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   padding: 4px 0 10px 0;
 }
 
-/* LINHA DE FIBRA QUE CONECTA OS VAGÕES */
 .backbone-line {
   position: relative;
   display: flex;
@@ -141,9 +184,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: stretch;
 }
 
-/* CABO DE FIBRA CONECTOR ENTRE VAGÕES */
 .fiber-link {
-  height: 24px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,7 +198,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   width: 4px;
   height: 100%;
   background: linear-gradient(180deg, #10b981, #059669);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
 }
 
 .fiber-label {
@@ -169,26 +211,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   padding: 1px 8px;
   border-radius: 10px;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-/* CARD DO VAGÃO / ATIVO */
 .asset-card {
   background: var(--card);
   border: 2px solid var(--line);
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   position: relative;
   z-index: 2;
 }
 
 .asset-card.nearest {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.22), rgba(255, 214, 0, 0.05));
-  border: 3px solid var(--accent);
-  box-shadow: 0 0 16px rgba(255, 214, 0, 0.35);
+  border: 2px solid var(--accent);
 }
 
 .asset-header {
@@ -197,39 +235,35 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
 }
 
-.asset-tag { font-size: 15px; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 6px; }
-.asset-card.nearest .asset-tag { color: var(--accent); }
-
+.asset-tag { font-size: 14px; font-weight: 900; color: #fff; }
 .asset-km-badge {
   background: rgba(255, 214, 0, 0.18);
   color: var(--accent);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
-  padding: 3px 8px;
-  border-radius: 8px;
-  border: 1px solid var(--accent);
+  padding: 2px 6px;
+  border-radius: 6px;
 }
 
-/* CAIXA DE IP EM DESTAQUE TOTAL */
 .asset-ip-box {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1.5px dashed #10b981;
-  border-radius: 10px;
-  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px dashed #10b981;
+  border-radius: 8px;
+  padding: 6px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.asset-ip-box span { font-size: 11px; color: var(--sub); font-weight: 700; }
-.asset-ip-box b { font-size: 17px; font-family: monospace; color: #10b981; font-weight: 900; letter-spacing: 0.8px; }
+.asset-ip-box span { font-size: 10px; color: var(--sub); font-weight: 700; }
+.asset-ip-box b { font-size: 15px; font-family: monospace; color: #10b981; font-weight: 900; }
 
 .asset-info {
-  font-size: 11px;
+  font-size: 10px;
   color: #cbd5e1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 2px;
 }
 
 .asset-footer {
@@ -238,28 +272,28 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
   padding-top: 4px;
   border-top: 1px solid var(--line);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .badge-status {
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
 }
-.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
-.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
-.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1.5px solid var(--accent); }
+.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1px solid #10b981; }
+.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1px solid #ef4444; }
+.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1px solid var(--accent); }
 
-.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 14px; padding: 20px; font-weight: 600; }
+.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 13px; padding: 20px; font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
 
-  <!-- HUD DE KM E GPS -->
+  <!-- HUD DE KM E GPS (VERDE) -->
   <div class="hud-card">
     <div class="hud-top" id="gpsStatusTitle">Localizando GPS em Tempo Real...</div>
     <div class="hud-km" id="kmDisplay">KM ---</div>
@@ -269,13 +303,30 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
+  <!-- JANELINHA DO ATIVO EM QUE VOCÊ PROVAVELMENTE ESTÁ (PONTO DE BASE) -->
+  <div class="current-asset-box" id="baseAssetBox">
+    <div class="current-asset-title">
+      <span>📍 Ativo Mais Próximo da Posição (Base)</span>
+      <span id="baseDist">0m de você</span>
+    </div>
+    <div class="current-asset-body">
+      <span class="current-asset-tag" id="baseTag">Buscando...</span>
+      <span class="current-asset-km" id="baseKm">KM ---</span>
+    </div>
+    <div class="current-asset-ip">
+      <span style="font-size:10px; color:var(--sub);">IP:</span>
+      <b id="baseIp">0.0.0.0</b>
+      <span id="baseStatus" class="badge-status checking">CHECANDO</span>
+    </div>
+  </div>
+
   <!-- CAMPO DE BUSCA RÁPIDA -->
   <div class="search-box">
     <span style="font-size:16px;">🔍</span>
     <input type="text" id="searchInput" placeholder="Buscar por Tag, IP ou KM..." oninput="onSearchChange()">
   </div>
 
-  <!-- BOTÕES DE CONTROLE (SENTIDO APENAS POR SETAS E SELEÇÃO DE FIBRA) -->
+  <!-- SEÇÃO DE BOTÕES -->
   <div class="big-buttons-section">
     <div class="button-group-label">1. Sentido de Leitura da Via:</div>
     <div class="grid-buttons" id="dirButtons">
@@ -293,7 +344,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </button>
     </div>
 
-    <div class="button-group-label" style="margin-top:2px;">2. Circuito / Fibra Ativa do Backbone:</div>
+    <div class="button-group-label" style="margin-top:2px;">2. Filtrar Circuito de Fibra:</div>
     <div class="grid-buttons" id="fiberButtons">
       <button class="btn-big active" onclick="selectFiber('all', this)">
         <span>⚡ TODAS</span>
@@ -307,7 +358,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- LISTA DE ATIVOS ESTILO VAGÕES DE TREM / BACKBONE SEQUENCIAL -->
+  <!-- LISTA DE ATIVOS RESTANTES (BACKBONE / VAGÕES) -->
   <div class="assets-container" id="assetsContainer">
     <div class="empty-msg">Iniciando leitor de GPS e alinhando rede de fibras...</div>
   </div>
@@ -330,7 +381,6 @@ const STATE = {
 
 const $ = id => document.getElementById(id);
 
-/* CONVERSOR DE KM */
 function parseKm(val) {
   if (val === null || val === undefined) return NaN;
   let s = String(val).trim().replace(/^\uFEFF/, '').replace(/^"/, '').replace(/"$/, '');
@@ -350,7 +400,6 @@ function parseKm(val) {
 
 const escapeH = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/* PARSER SNV (KM, LAT, LONG) */
 function parseSnvCsv(txt) {
   if (!txt) return [];
   const lines = txt.split(/\r?\n/).filter(l => l.trim());
@@ -378,7 +427,6 @@ function parseSnvCsv(txt) {
   return list;
 }
 
-/* PARSER ATIVOS */
 function parseAssetsCsv(txt) {
   if (!txt) return [];
   const lines = txt.split(/\r?\n/).filter(l => l.trim());
@@ -412,7 +460,6 @@ function parseAssetsCsv(txt) {
   return list.sort((a, b) => a.km - b.km);
 }
 
-/* CALCULA O KM MAIS PRÓXIMO DO GPS */
 function calcNearestKm(la, lo) {
   if (!STATE.snv.length) return null;
   let best = STATE.snv[0], minD = Infinity;
@@ -424,242 +471,3 @@ function calcNearestKm(la, lo) {
     const dLon = (p.lon - lo) * rad;
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
     const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    if (dist < minD) {
-      minD = dist;
-      best = p;
-    }
-  }
-  return { km: best.km, dist: minD };
-}
-
-/* BOTÕES DE FILTRO */
-function selectDir(dir, btn) {
-  STATE.dirFilter = dir;
-  document.querySelectorAll('#dirButtons .btn-big').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAssets();
-}
-
-function selectFiber(fiber, btn) {
-  STATE.fiberFilter = fiber;
-  document.querySelectorAll('#fiberButtons .btn-big').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAssets();
-}
-
-function onSearchChange() {
-  STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
-  renderAssets();
-}
-
-/* PING EM SEGUNDO PLANO */
-async function pingIp(ip) {
-  if (!ip) return 'no-ip';
-  const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), 1000);
-  try {
-    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-store' });
-    clearTimeout(id);
-    return 'online';
-  } catch (e) {
-    clearTimeout(id);
-    return (e.name === 'AbortError') ? 'offline' : 'online';
-  }
-}
-
-async function runPings(visibleList) {
-  for (const item of visibleList) {
-    if (!item.ip) continue;
-    const st = await pingIp(item.ip);
-    STATE.pingCache[item.ip] = st;
-  }
-  updateUIOnly();
-}
-
-/* MONTA A SEQUÊNCIA DE BACKBONE (ESTILO VAGÕES CONECTADOS POR FIBRA) */
-function getDisplayList() {
-  const km = STATE.currentKm;
-  if (!STATE.assets.length || !Number.isFinite(km)) return { list: [], nearest: null };
-
-  let pool = STATE.assets;
-
-  // 1. Filtro por Fibra
-  if (STATE.fiberFilter !== 'all') {
-    pool = pool.filter(a => a.fibra === STATE.fiberFilter);
-    if (!pool.length) pool = STATE.assets;
-  }
-
-  // 2. Filtro de Pesquisa manual por texto
-  if (STATE.searchQuery) {
-    pool = pool.filter(a => 
-      a.tag.toLowerCase().includes(STATE.searchQuery) || 
-      a.ip.toLowerCase().includes(STATE.searchQuery) || 
-      a.rawKm.toLowerCase().includes(STATE.searchQuery) ||
-      a.equip.toLowerCase().includes(STATE.searchQuery)
-    );
-  }
-
-  if (!pool.length) return { list: [], nearest: null };
-
-  // 3. Ativo Mais Próximo da posição
-  let nearest = pool[0];
-  let minDiff = Math.abs(pool[0].km - km);
-  for (let i = 1; i < pool.length; i++) {
-    const diff = Math.abs(pool[i].km - km);
-    if (diff < minDiff) {
-      minDiff = diff;
-      nearest = pool[i];
-    }
-  }
-
-  // 4. Monta a lista sequencial encadeada
-  let list = [];
-  if (STATE.dirFilter === 'crescente') {
-    list = pool.filter(a => a.km >= km).slice(0, 5);
-  } else if (STATE.dirFilter === 'decrescente') {
-    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 5);
-  } else {
-    // Modo geral: Pega os 2 anteriores e os 3 posteriores para criar o encadeamento do ponto atual
-    const behind = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 2).reverse();
-    const ahead = pool.filter(a => a.km > km).sort((a, b) => a.km - b.km).slice(0, 3);
-    const set = new Map();
-    [...behind, nearest, ...ahead].forEach(a => set.set(a.tag + a.km + a.ip, a));
-    list = Array.from(set.values()).sort((a,b) => a.km - b.km);
-  }
-
-  return { list, nearest };
-}
-
-function updateUIOnly() {
-  const km = STATE.currentKm;
-  if (!Number.isFinite(km)) return;
-
-  const { list, nearest } = getDisplayList();
-  const container = $('assetsContainer');
-
-  if (!list.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.</div>';
-    return;
-  }
-
-  // Renderiza no formato de Backbone com cabos de fibra interligando os vagões
-  let html = '<div class="backbone-line">';
-  for (let i = 0; i < list.length; i++) {
-    const a = list[i];
-    const isNearest = a === nearest;
-    const diff = a.km - km;
-    const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás (⬇️ KM Menor)' : diff > 0 ? 'à frente (⬆️ KM Maior)' : 'no ponto atual';
-    const ping = STATE.pingCache[a.ip] || 'checking';
-
-    let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE (PING OK)'; }
-    else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
-    if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
-
-    html += `<div class="vagon-wrapper">`;
-    
-    // Card do Ativo (Vagão)
-    html += `<div class="asset-card${isNearest ? ' nearest' : ''}">
-      <div class="asset-header">
-        <span class="asset-tag">📦 ${isNearest ? '★ MAIS PRÓXIMO · ' : ''}${escapeH(a.tag)}</span>
-        <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
-      </div>
-
-      <div class="asset-ip-box">
-        <span>IP DO ATIVO:</span>
-        <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
-      </div>
-
-      <div class="asset-info">
-        <span><b>Equipamento:</b> ${escapeH(a.equip)}</span>
-        <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
-      </div>
-
-      <div class="asset-footer">
-        <span>Distância: <b>${distM}m</b> (${dirTxt})</span>
-        <span class="badge-status ${badgeCls}">${badgeTxt}</span>
-      </div>
-    </div>`;
-
-    // Conector visual de fibra ligando ao próximo vagão do backbone
-    if (i < list.length - 1) {
-      const nextAsset = list[i + 1];
-      const spanKm = Math.abs((nextAsset.km - a.km) * 1000).toFixed(0);
-      html += `<div class="fiber-link">
-        <div class="fiber-cable"></div>
-        <div class="fiber-label">🧵 FIBRA [${escapeH(a.fibra)}] · LANÇAMENTO: ${spanKm}m ➔</div>
-      </div>`;
-    }
-
-    html += `</div>`;
-  }
-  html += '</div>';
-
-  container.innerHTML = html;
-}
-
-function renderAssets() {
-  const km = STATE.currentKm;
-  if (!STATE.assets.length || !Number.isFinite(km)) return;
-  const { list } = getDisplayList();
-  updateUIOnly();
-  runPings(list);
-}
-
-function updateGpsUI() {
-  $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
-  $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
-  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
-  $('coords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
-}
-
-function refreshAll() {
-  if (!STATE.snv.length || !STATE.lat) return;
-  const res = calcNearestKm(STATE.lat, STATE.lon);
-  if (res) {
-    STATE.currentKm = res.km;
-    updateGpsUI();
-    renderAssets();
-  }
-}
-
-/* CARGA DOS DADOS CSV */
-async function loadFiles() {
-  try {
-    let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now());
-    if (r.ok) STATE.snv = parseSnvCsv(await r.text());
-
-    const names = ['ativos 116 (1).csv', 'ativos 116.csv', 'ativos_116.csv'];
-    for (const name of names) {
-      try {
-        r = await fetch(encodeURI(name + '?v=' + Date.now()));
-        if (r.ok) {
-          const list = parseAssetsCsv(await r.text());
-          if (list.length) {
-            STATE.assets = list;
-            break;
-          }
-        }
-      } catch(e) {}
-    }
-    refreshAll();
-  } catch(e) {}
-}
-
-loadFiles();
-
-/* GEOLOCALIZAÇÃO EM TEMPO REAL */
-if ('geolocation' in navigator) {
-  navigator.geolocation.watchPosition(p => {
-    STATE.lat = p.coords.latitude;
-    STATE.lon = p.coords.longitude;
-    STATE.acc = p.coords.accuracy;
-    refreshAll();
-  }, err => {
-    $('gpsStatusTitle').textContent = 'Erro: Permita o acesso ao GPS do celular';
-  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
-}
-</script>
-</body>
-</html>
