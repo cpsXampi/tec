@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>Monitor de Ativos & Fibra</title>
+<title>Monitor de Ativos & Fibra - KM Localizar</title>
 <style>
 :root {
   --bg: #07090c;
@@ -109,7 +109,7 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 .asset-card.nearest .asset-title { color: var(--acc); }
 .asset-km { font-size: 11px; font-weight: 700; color: var(--mu); }
 
-.asset-details { font-size: 11px; color: #c3c6ce; display: flex; gap: 10px; }
+.asset-details { font-size: 11px; color: #c3c6ce; display: flex; flex-direction: column; gap: 2px; }
 .asset-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 11px; }
 
 /* Status Visuais */
@@ -139,7 +139,7 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 <div class="app-container">
   <!-- HUD de KM Local -->
   <div class="hud-card">
-    <small id="locTitle">Obtendo coordenadas…</small>
+    <small id="locTitle">Obtendo coordenadas GPS...</small>
     <b id="kmLabel">KM ---</b>
     <div class="meta">
       <span id="gpsAcc">GPS: Conectando</span>
@@ -207,7 +207,7 @@ function toggleBipAlert() {
   if(S.bipActive) playBeep(1200, 200);
 }
 
-/* Leitura SNV (KM) */
+/* Leitura SNV (KM por latitude/longitude) */
 function parseKmCsv(t) {
   if (!t) return [];
   if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
@@ -229,7 +229,6 @@ function nearestKm(la, lo) {
   if (!S.db.length) return null;
   let best = S.db[0], min = Infinity;
   const rad = Math.PI / 180, R = 6371000;
-  // Acha o mais próximo sem travar por distância máxima
   for (const p of S.db) {
     const dLat = (p.lat - la) * rad, dLon = (p.lon - lo) * rad;
     const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
@@ -254,7 +253,13 @@ function parseAssetsCsv(t) {
   if (lines.length < 2) return [];
   const h = lines[0].split(';').map(x => x.replace(/^\s*\uFEFF/, '').replace(/"/g, '').trim().toLowerCase());
   const find = names => h.findIndex(x => names.includes(x));
-  const tag = find(['tag', 'ativo', 'equipamento']), equip = find(['equipamento', 'tipo']), km = find(['km']), ip = find(['ip', 'endereço ip', 'endereco ip']), fibra = find(['fibra', 'anel', 'tubo', 'circuito']);
+  
+  const tag = find(['tag', 'ativo', 'equipamento', 'nome']);
+  const equip = find(['equipamento', 'tipo', 'descricao']);
+  const km = find(['km', 'quilometro']);
+  const ip = find(['ip', 'endereço ip', 'endereco ip']);
+  const fibra = find(['fibra', 'anel', 'tubo', 'circuito']);
+
   if (km < 0) return [];
   return lines.slice(1).map(line => {
     const r = line.split(';').map(x => x.trim().replace(/^"|"$/g, ''));
@@ -269,7 +274,7 @@ function parseAssetsCsv(t) {
   }).filter(a => Number.isFinite(a.km));
 }
 
-/* Ping / Teste VPN */
+/* Validação de IP via HTTP Request */
 async function pingIp(ip) {
   if (!ip) return 'no-ip';
   const controller = new AbortController();
@@ -299,7 +304,7 @@ async function checkAssetPings(displayAssets) {
   renderAssetsUIOnly();
 }
 
-/* Seleção de Fibra (3 Antes e 3 Depois) baseada no KM mais próximo */
+/* Busca do Ativo mais próximo com base na posição atual e circuito de fibra */
 function getSurroundingAssetsByFiber(currentKm) {
   if (!S.assets.length) return { finalGroup: [], nearestAsset: null, currentFiber: 'SEM DADOS' };
 
@@ -347,12 +352,12 @@ function renderAssetsUIOnly() {
 
     return `<div class="asset-card${isNearest ? ' nearest' : ''}">
       <div class="asset-head">
-        <span class="asset-title">${isNearest ? '★ VOCÊ ESTÁ AQUI · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')}</span>
+        <span class="asset-title">${isNearest ? '★ MAIS PRÓXIMO · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo')}</span>
         <span class="asset-km">KM ${escapeHtml(a.kmLabel)}</span>
       </div>
       <div class="asset-details">
-        <span><b>Tipo:</b> ${escapeHtml(a.equip)}</span>
-        <span><b>IP:</b> ${a.ip ? escapeHtml(a.ip) : 'Não informado'}</span>
+        <span><b>Equipamento:</b> ${escapeHtml(a.equip || 'N/A')}</span>
+        <span><b>Endereço IP:</b> ${a.ip ? escapeHtml(a.ip) : 'Não informado'}</span>
       </div>
       <div class="asset-foot">
         <span>${Math.abs(delta).toFixed(3)} km (${dir})</span>
@@ -396,7 +401,7 @@ function refreshNearest() {
   }
 }
 
-/* Carregamento automático imediato */
+/* Inicialização e leitura dos arquivos CSV */
 fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' })
   .then(r => r.ok ? r.text() : '')
   .then(t => { S.db = parseKmCsv(t); refreshNearest(); });
