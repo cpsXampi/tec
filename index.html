@@ -4,24 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0a0e14">
-<title>Motiva INDEX - Monitor de Campo & Backbone</title>
+<title>Monitor de Campo & Backbone</title>
 <style>
-/* =========================================================
-   PALETA MOTIVA
-   --roxo / --roxo-escuro = identidade visual corporativa Motiva
-   --green / --red / --amarelo-status = cores funcionais de status
-   (mantidas por universalidade: verde=ok, vermelho=problema)
-   ========================================================= */
 :root {
   --bg: #0a0e14;
   --card: #141a24;
   --card-active: #1e2636;
-  --roxo: #5E22F3;
-  --roxo-claro: #8b5cf6;
-  --roxo-escuro: #2d0f80;
+  --accent: #ffd600;
   --green: #10b981;
   --red: #ef4444;
-  --status-check: #ffb020;
   --text: #ffffff;
   --sub: #94a3b8;
   --line: rgba(255, 255, 255, 0.15);
@@ -36,79 +27,62 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: calc(8px + var(--st)) 12px var(--sb);
+  padding: calc(10px + var(--st)) 12px var(--sb);
   gap: 8px;
 }
 
-/* ---------- CABEÇALHO DE MARCA MOTIVA ---------- */
-.brand-bar {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
-  border-radius: 14px;
-  padding: 8px 14px;
-  box-shadow: 0 4px 14px rgba(94, 34, 243, 0.35);
-}
-.brand-left { display: flex; align-items: center; gap: 8px; }
-.brand-logo {
-  width: 26px; height: 26px; border-radius: 7px;
-  background: #fff; color: var(--roxo); font-weight: 900;
-  display: flex; align-items: center; justify-content: center; font-size: 14px;
-}
-.brand-name { font-size: 15px; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
-.brand-sub { font-size: 9px; color: #e9e1ff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.brand-help {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(255,255,255,0.18); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 13px; cursor: pointer; border: none;
-}
-
-/* ---------- LEGENDA RÁPIDA (explica os status) ---------- */
-.legend-panel {
-  display: none;
-  flex: none;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 11px;
-  color: var(--sub);
-  line-height: 1.7;
-}
-.legend-panel.open { display: block; }
-.legend-panel b { color: #fff; }
-.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.dot.on { background: var(--green); }
-.dot.off { background: var(--red); }
-.dot.chk { background: var(--status-check); }
-.dot.base { background: var(--roxo-claro); }
-
-/* ---------- HUD PRINCIPAL DE KM / GPS ---------- */
+/* ===================== HUD PRINCIPAL ===================== */
 .hud-card {
   background: linear-gradient(135deg, #064e3b, #022c22);
   border: 2px solid #059669;
   border-radius: 16px;
-  padding: 10px 14px;
+  padding: 12px 14px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.6);
   flex: none;
+  position: relative;
 }
+.hud-top-row { display:flex; justify-content:space-between; align-items:center; }
 .hud-top { font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.hud-km { font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
+.help-btn {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: 1px solid #a7f3d0;
+  color: #a7f3d0; font-size: 12px; font-weight: 900;
+  display:flex; align-items:center; justify-content:center;
+  cursor: pointer; flex: none;
+}
+.hud-km { font-size: 36px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 4px 0; letter-spacing: -0.5px; }
+.hud-sub { font-size: 11px; color: #a7f3d0; font-weight: 600; margin-bottom: 2px; }
 .hud-meta { display: flex; justify-content: space-between; font-size: 10px; color: #a7f3d0; font-weight: 600; }
-.hud-update { font-size: 9px; color: #6ee7b7; margin-top: 2px; }
 
-/* ---------- ATIVO MAIS PRÓXIMO (BASE) - agora em roxo Motiva ---------- */
+/* ===================== PAINEL DE AJUDA / LEGENDA ===================== */
+.help-panel {
+  display: none;
+  flex: none;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 11px;
+  color: var(--sub);
+  line-height: 1.6;
+}
+.help-panel.open { display: block; }
+.help-panel b { color: #fff; }
+.help-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.dot { width:10px; height:10px; border-radius:50%; flex:none; }
+.dot.online { background: var(--green); }
+.dot.offline { background: var(--red); }
+.dot.checking { background: var(--accent); }
+.dot.nearest { background: transparent; border: 2px solid var(--accent); }
+
+/* ===================== JANELINHA DO ATIVO DE BASE ===================== */
 .current-asset-box {
-  background: linear-gradient(135deg, rgba(94, 34, 243, 0.22), rgba(94, 34, 243, 0.06));
-  border: 2px solid var(--roxo-claro);
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.2), rgba(255, 214, 0, 0.05));
+  border: 2px solid var(--accent);
   border-radius: 14px;
   padding: 10px 14px;
   flex: none;
-  box-shadow: 0 0 14px rgba(94, 34, 243, 0.3);
+  box-shadow: 0 0 14px rgba(255, 214, 0, 0.25);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -116,7 +90,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .current-asset-title {
   font-size: 10px;
-  color: var(--roxo-claro);
+  color: var(--accent);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -131,7 +105,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 .current-asset-tag { font-size: 17px; font-weight: 900; color: #fff; }
-.current-asset-km { background: rgba(139, 92, 246, 0.22); color: var(--roxo-claro); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
+.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
 
 .current-asset-ip {
   font-family: monospace;
@@ -146,7 +120,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
 }
 
-/* ---------- BARRA DE PESQUISA ---------- */
+/* ===================== BARRA DE PESQUISA ===================== */
 .search-box {
   flex: none;
   display: flex;
@@ -154,7 +128,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--card);
   border: 2px solid var(--line);
   border-radius: 12px;
-  padding: 6px 12px;
+  padding: 8px 12px;
   align-items: center;
 }
 .search-box input {
@@ -163,27 +137,59 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border: none;
   outline: none;
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 .search-box input::placeholder { color: var(--sub); font-weight: 500; }
-.search-clear {
-  border: none; background: var(--line); color: #fff;
-  width: 20px; height: 20px; border-radius: 50%; font-size: 12px;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
+.clear-btn {
+  background: var(--line);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
   flex: none;
 }
+.clear-btn.show { display: flex; }
 
-/* ---------- BOTÕES DE FILTRO ---------- */
-.big-buttons-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* ===================== SEÇÃO DE FILTROS ===================== */
+.filters-toggle {
   flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
 }
+.filters-toggle .chevron { color: var(--sub); font-size: 12px; transition: transform 0.15s ease; }
+.filters-toggle.open .chevron { transform: rotate(180deg); }
+
+.big-buttons-section {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  flex: none;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: -2px;
+}
+.big-buttons-section.open { display: flex; }
 
 .button-group-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--sub);
   font-weight: 800;
   text-transform: uppercase;
@@ -197,11 +203,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 .btn-big {
-  background: var(--card);
+  background: var(--card-active);
   border: 2px solid var(--line);
   color: #fff;
   border-radius: 10px;
-  padding: 8px 4px;
+  padding: 10px 4px;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
@@ -216,14 +222,24 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .btn-big:active { transform: scale(0.96); }
 .btn-big.active {
-  background: var(--roxo);
-  color: #fff;
-  border-color: var(--roxo);
-  box-shadow: 0 0 10px rgba(94, 34, 243, 0.5);
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(255, 214, 0, 0.4);
 }
 .btn-big small { font-size: 9px; opacity: 0.85; font-weight: 700; }
 
-/* ---------- LISTA DE ATIVOS / BACKBONE ---------- */
+/* ===================== LISTA DE ATIVOS / BACKBONE ===================== */
+.list-header {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2px 2px 0 2px;
+}
+.list-header span { font-size: 11px; color: var(--sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.list-header b { color: #fff; font-size: 11px; }
+
 .assets-container {
   flex: 1;
   overflow-y: auto;
@@ -274,6 +290,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   padding: 1px 8px;
   border-radius: 10px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .asset-card {
@@ -289,7 +306,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 .asset-card.nearest {
-  border: 2px solid var(--roxo-claro);
+  border: 2px solid var(--accent);
 }
 
 .asset-header {
@@ -300,8 +317,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .asset-tag { font-size: 14px; font-weight: 900; color: #fff; }
 .asset-km-badge {
-  background: rgba(139, 92, 246, 0.2);
-  color: var(--roxo-claro);
+  background: rgba(255, 214, 0, 0.18);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 900;
   padding: 2px 6px;
@@ -347,7 +364,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
 .badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
-.badge-status.checking { background: rgba(255, 176, 32, 0.22); color: var(--status-check); border: 1.5px solid var(--status-check); }
+.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1.5px solid var(--accent); }
 
 .empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 13px; padding: 20px; font-weight: 600; }
 </style>
@@ -356,41 +373,33 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 <div class="app-container">
 
-  <!-- CABEÇALHO COM IDENTIDADE MOTIVA -->
-  <div class="brand-bar">
-    <div class="brand-left">
-      <div class="brand-logo">M</div>
-      <div>
-        <div class="brand-name">MOTIVA</div>
-        <div class="brand-sub">Monitor de Campo &amp; Backbone</div>
-      </div>
-    </div>
-    <button class="brand-help" onclick="toggleLegend()" title="O que significam os status?">?</button>
-  </div>
-
-  <!-- LEGENDA: explica os status de cor para quem nunca usou o app -->
-  <div class="legend-panel" id="legendPanel">
-    <div class="legend-row"><span class="dot on"></span><b>Online</b> — ping respondeu, ativo acessível na rede.</div>
-    <div class="legend-row"><span class="dot off"></span><b>Offline</b> — ping não respondeu, verificar o ativo em campo.</div>
-    <div class="legend-row"><span class="dot chk"></span><b>Checando</b> — teste de conexão em andamento.</div>
-    <div class="legend-row"><span class="dot base"></span><b>Base (roxo)</b> — ativo mais próximo da sua posição GPS agora.</div>
-  </div>
-
   <!-- HUD DE KM E GPS -->
   <div class="hud-card">
-    <div class="hud-top" id="gpsStatusTitle">Localizando GPS em Tempo Real...</div>
+    <div class="hud-top-row">
+      <div class="hud-top" id="gpsStatusTitle">Localizando GPS em tempo real...</div>
+      <div class="help-btn" id="helpBtn" onclick="toggleHelp()">?</div>
+    </div>
+    <div class="hud-sub">Sua posição estimada na via</div>
     <div class="hud-km" id="kmDisplay">KM ---</div>
     <div class="hud-meta">
       <span id="gpsPrecision">Precisão: ...</span>
       <span id="gpsCoords">0.0000, 0.0000</span>
     </div>
-    <div class="hud-update" id="hudUpdate">Aguardando primeira leitura de GPS...</div>
   </div>
 
-  <!-- ATIVO MAIS PRÓXIMO DA POSIÇÃO (BASE) -->
+  <!-- PAINEL DE AJUDA (LEGENDA) -->
+  <div class="help-panel" id="helpPanel">
+    <div class="help-row"><span class="dot online"></span><span><b>Online</b> — ativo respondeu ao teste de conexão.</span></div>
+    <div class="help-row"><span class="dot offline"></span><span><b>Offline</b> — ativo não respondeu ao teste de conexão.</span></div>
+    <div class="help-row"><span class="dot checking"></span><span><b>Checando</b> — teste de conexão em andamento.</span></div>
+    <div class="help-row"><span class="dot nearest"></span><span><b>Borda amarela</b> — ativo mais próximo da sua posição atual.</span></div>
+    <div>Use a barra de busca para achar um ativo por nome, IP ou KM. Use os filtros para restringir sentido da via ou circuito de fibra.</div>
+  </div>
+
+  <!-- JANELINHA DO ATIVO DE BASE -->
   <div class="current-asset-box" id="baseAssetBox">
     <div class="current-asset-title">
-      <span>📍 Ativo mais próximo de você (Base)</span>
+      <span>📍 Ativo mais próximo (base)</span>
       <span id="baseDist">0m de você</span>
     </div>
     <div class="current-asset-body">
@@ -407,29 +416,35 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   <!-- BARRA DE PESQUISA RÁPIDA -->
   <div class="search-box">
     <span style="font-size:16px;">🔍</span>
-    <input type="text" id="searchInput" placeholder="Buscar por Tag, IP ou KM..." oninput="onSearchChange()">
-    <button class="search-clear" id="searchClearBtn" style="display:none;" onclick="clearSearch()">✕</button>
+    <input type="text" id="searchInput" placeholder="Buscar por tag, IP ou KM..." oninput="onSearchChange()">
+    <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+  </div>
+
+  <!-- TOGGLE DE FILTROS -->
+  <div class="filters-toggle" id="filtersToggle" onclick="toggleFilters()">
+    <span id="filtersSummary">Filtros: Todos os sentidos · Todas as fibras</span>
+    <span class="chevron">▾</span>
   </div>
 
   <!-- BOTÕES DE CONTROLE -->
-  <div class="big-buttons-section">
-    <div class="button-group-label">1. Direção de leitura na via (a partir da sua posição):</div>
+  <div class="big-buttons-section" id="filtersSection">
+    <div class="button-group-label">Sentido de leitura da via</div>
     <div class="grid-buttons" id="dirButtons">
       <button class="btn-big active" onclick="selectDir('all', this)">
         <span>↕️ Todos</span>
-        <small>Antes e depois</small>
+        <small>Sequência geral</small>
       </button>
       <button class="btn-big" onclick="selectDir('crescente', this)">
-        <span>⬆️ Km maior</span>
-        <small>Só à frente</small>
+        <span>⬆️ KM maior</span>
+        <small>Crescente</small>
       </button>
       <button class="btn-big" onclick="selectDir('decrescente', this)">
-        <span>⬇️ Km menor</span>
-        <small>Só atrás</small>
+        <span>⬇️ KM menor</span>
+        <small>Decrescente</small>
       </button>
     </div>
 
-    <div class="button-group-label" style="margin-top:2px;">2. Filtrar por circuito de fibra:</div>
+    <div class="button-group-label" style="margin-top:4px;">Circuito de fibra</div>
     <div class="grid-buttons" id="fiberButtons">
       <button class="btn-big active" onclick="selectFiber('all', this)">
         <span>⚡ Todas</span>
@@ -443,6 +458,12 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
+  <!-- CABEÇALHO DA LISTA -->
+  <div class="list-header">
+    <span>Ativos próximos</span>
+    <b id="listCount">0 encontrados</b>
+  </div>
+
   <!-- LISTA DE ATIVOS -->
   <div class="assets-container" id="assetsContainer">
     <div class="empty-msg">Iniciando leitor de GPS e alinhando rede de fibras...</div>
@@ -451,14 +472,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 </div>
 
 <script>
-/* =========================================================
-   ESTADO GLOBAL DA APLICAÇÃO
-   ========================================================= */
 const STATE = {
-  snv: [],            // pontos de referencia KM x Lat/Lon (arquivo SNV)
-  assets: [],         // ativos de campo (equipamentos de fibra)
-  pingCache: {},      // cache de status de ping por IP
-  currentKm: null,    // KM atual calculado a partir do GPS
+  snv: [],
+  assets: [],
+  pingCache: {},
+  currentKm: null,
   lat: 0,
   lon: 0,
   acc: null,
@@ -468,18 +486,6 @@ const STATE = {
 };
 
 const $ = id => document.getElementById(id);
-
-/* Alterna a exibicao da legenda de status (ajuda novos usuarios) */
-function toggleLegend() {
-  $('legendPanel').classList.toggle('open');
-}
-
-function clearSearch() {
-  $('searchInput').value = '';
-  STATE.searchQuery = '';
-  $('searchClearBtn').style.display = 'none';
-  renderAssets();
-}
 
 function parseKm(val) {
   if (val === null || val === undefined) return NaN;
@@ -579,10 +585,26 @@ function calcNearestKm(la, lo) {
   return { km: best.km, dist: minD };
 }
 
+function toggleHelp() {
+  $('helpPanel').classList.toggle('open');
+}
+
+function toggleFilters() {
+  $('filtersSection').classList.toggle('open');
+  $('filtersToggle').classList.toggle('open');
+}
+
+function updateFiltersSummary() {
+  const dirMap = { all: 'Todos os sentidos', crescente: 'KM crescente', decrescente: 'KM decrescente' };
+  const fiberMap = { all: 'Todas as fibras', '11, 12': 'Fibra 11, 12', '21, 22': 'Fibra 21, 22' };
+  $('filtersSummary').textContent = `Filtros: ${dirMap[STATE.dirFilter]} · ${fiberMap[STATE.fiberFilter]}`;
+}
+
 function selectDir(dir, btn) {
   STATE.dirFilter = dir;
   document.querySelectorAll('#dirButtons .btn-big').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  updateFiltersSummary();
   renderAssets();
 }
 
@@ -590,12 +612,20 @@ function selectFiber(fiber, btn) {
   STATE.fiberFilter = fiber;
   document.querySelectorAll('#fiberButtons .btn-big').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  updateFiltersSummary();
   renderAssets();
 }
 
 function onSearchChange() {
   STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
-  $('searchClearBtn').style.display = STATE.searchQuery ? 'flex' : 'none';
+  $('clearSearchBtn').classList.toggle('show', STATE.searchQuery.length > 0);
+  renderAssets();
+}
+
+function clearSearch() {
+  $('searchInput').value = '';
+  STATE.searchQuery = '';
+  $('clearSearchBtn').classList.remove('show');
   renderAssets();
 }
 
@@ -615,14 +645,14 @@ async function pingIp(ip) {
 }
 
 async function runPings(visibleList, absoluteNearest) {
-  // Executa pings de forma sequencial leve para nao travar a thread principal do celular
+  // Executa pings de forma sequencial leve para não travar a thread principal do celular
   const targets = [];
   if (absoluteNearest && absoluteNearest.ip) targets.push(absoluteNearest);
   for (const item of visibleList) {
     if (item.ip && !targets.includes(item)) targets.push(item);
   }
 
-  for (const item of targets.slice(0, 5)) { // Limita a no maximo 5 pings por ciclo para poupar o WebView
+  for (const item of targets.slice(0, 5)) { // Limita a no máximo 5 pings por ciclo para poupar o WebView
     if (!STATE.pingCache[item.ip]) {
       STATE.pingCache[item.ip] = await pingIp(item.ip);
       updateUIOnly();
@@ -701,14 +731,15 @@ function updateUIOnly() {
     const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
     const baseSt = $('baseStatus');
     baseSt.className = `badge-status ${st}`;
-    baseSt.textContent = st === 'online' ? 'ONLINE (PING OK)' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
+    baseSt.textContent = st === 'online' ? 'ONLINE' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
   }
 
   const { list } = getDisplayList(absoluteNearest);
   const container = $('assetsContainer');
+  $('listCount').textContent = `${list.length} encontrado${list.length === 1 ? '' : 's'}`;
 
   if (!list.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.<br>Tente limpar a busca ou trocar o filtro de fibra.</div>';
+    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.</div>';
     return;
   }
 
@@ -718,11 +749,11 @@ function updateUIOnly() {
     const isNearest = absoluteNearest && a.tag === absoluteNearest.tag && a.km === absoluteNearest.km;
     const diff = a.km - km;
     const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás (⬇️ Km menor)' : diff > 0 ? 'à frente (⬆️ Km maior)' : 'no ponto de base';
+    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'no ponto de base';
     const ping = STATE.pingCache[a.ip] || 'checking';
 
     let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE (PING OK)'; }
+    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE'; }
     else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
     if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
 
@@ -730,22 +761,22 @@ function updateUIOnly() {
 
     html += `<div class="asset-card${isNearest ? ' nearest' : ''}">
       <div class="asset-header">
-        <span class="asset-tag">📦 ${isNearest ? '★ BASE · ' : ''}${escapeH(a.tag)}</span>
+        <span class="asset-tag">📦 ${isNearest ? '★ ' : ''}${escapeH(a.tag)}</span>
         <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
       </div>
 
       <div class="asset-ip-box">
-        <span>IP do ativo:</span>
+        <span>IP:</span>
         <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
       </div>
 
       <div class="asset-info">
-        <span><b>Equipamento:</b> ${escapeH(a.equip)}</span>
+        <span><b>Equip.:</b> ${escapeH(a.equip)}</span>
         <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
       </div>
 
       <div class="asset-footer">
-        <span>Distância: <b>${distM}m</b> (${dirTxt})</span>
+        <span>${distM}m · ${dirTxt}</span>
         <span class="badge-status ${badgeCls}">${badgeTxt}</span>
       </div>
     </div>`;
@@ -755,7 +786,7 @@ function updateUIOnly() {
       const spanKm = Math.abs((nextAsset.km - a.km) * 1000).toFixed(0);
       html += `<div class="fiber-link">
         <div class="fiber-cable"></div>
-        <div class="fiber-label">🧵 Fibra [${escapeH(a.fibra)}] · lançamento: ${spanKm}m ➔</div>
+        <div class="fiber-label">🧵 Fibra ${escapeH(a.fibra)} · ${spanKm}m</div>
       </div>`;
     }
 
@@ -778,16 +809,15 @@ function renderAssets() {
 function updateGpsUI() {
   $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
   $('gpsStatusTitle').textContent = 'KM localizado em tempo real';
-  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
+  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS ativo';
   $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
-  $('hudUpdate').textContent = 'Última leitura: ' + new Date().toLocaleTimeString('pt-BR');
 }
 
 let lastRefreshTime = 0;
 function refreshAll() {
   if (!STATE.snv.length || !STATE.lat) return;
 
-  // Throttle de seguranca: impede recalculos excessivos se o GPS pulsar rapido demais (minimo 1s entre atualizacoes)
+  // Throttle de segurança: impede recálculos excessivos se o GPS pulsar rápido demais (mínimo 1 segundo entre atualizações)
   const now = Date.now();
   if (now - lastRefreshTime < 1000) return;
   lastRefreshTime = now;
@@ -819,14 +849,13 @@ async function loadFiles() {
       } catch (e) {}
     }
     refreshAll();
-  } catch (e) {
-    $('gpsStatusTitle').textContent = 'Erro ao carregar os arquivos de referência (CSV)';
-  }
+  } catch (e) {}
 }
 
+updateFiltersSummary();
 loadFiles();
 
-/* GEOLOCALIZACAO BLINDADA COM THROTTLE */
+/* GEOLOCALIZAÇÃO BLINDADA COM THROTTLE */
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
     STATE.lat = p.coords.latitude;
@@ -837,7 +866,7 @@ if ('geolocation' in navigator) {
     $('gpsStatusTitle').textContent = 'Erro: permita o acesso ao GPS do celular';
   }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 });
 } else {
-  $('gpsStatusTitle').textContent = 'GPS não disponível neste dispositivo/navegador';
+  $('gpsStatusTitle').textContent = 'GPS não disponível neste dispositivo';
 }
 </script>
 </body>
