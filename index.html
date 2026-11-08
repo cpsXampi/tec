@@ -1,169 +1,594 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <script>self["MonacoEnvironment"] = (function (paths) {
-          return {
-            globalAPI: false,
-            getWorkerUrl : function (moduleId, label) {
-              var result =  paths[label];
-              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
-                var currentUrl = String(window.location);
-                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
-                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
-                  var js = '/*' + label + '*/importScripts("' + result + '");';
-                  var blob = new Blob([js], { type: 'application/javascript' });
-                  return URL.createObjectURL(blob);
-                }
-              }
-              return result;
-            }
-          };
-        })({
-  "editorWorkerService": "/monacoeditorwork/editor.worker.bundle.js",
-  "typescript": "/monacoeditorwork/ts.worker.bundle.js",
-  "json": "/monacoeditorwork/json.worker.bundle.js",
-  "css": "/monacoeditorwork/css.worker.bundle.js",
-  "html": "/monacoeditorwork/html.worker.bundle.js",
-  "javascript": "/monacoeditorwork/ts.worker.bundle.js",
-  "less": "/monacoeditorwork/css.worker.bundle.js",
-  "scss": "/monacoeditorwork/css.worker.bundle.js",
-  "handlebars": "/monacoeditorwork/html.worker.bundle.js",
-  "razor": "/monacoeditorwork/html.worker.bundle.js"
-});</script>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0a0e14">
+<title>INDEX - Monitor Simplificado</title>
+<style>
+:root {
+  --bg: #0a0e14;
+  --card: #141a24;
+  --card-active: #1e2636;
+  --accent: #ffd600;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #ffffff;
+  --sub: #94a3b8;
+  --line: rgba(255, 255, 255, 0.15);
+  --sb: max(env(safe-area-inset-bottom), 16px);
+  --st: env(safe-area-inset-top, 0px);
+}
 
-    <!-- Runtime config — must execute before the Vite module scripts read
-         window.__APP_CONFIG__. `defer` keeps that order (deferred classic
-         scripts and module scripts run in document order after parsing) while
-         unblocking the HTML parser, so asset preloads start immediately
-         instead of stalling ~160ms (p75) on this API round trip.
-         Back on the .js path: Render's extension-keyed edge cache rule twice
-         pinned a wrong body under this URL despite `no-store` (2026-08-20 and
-         2026-08-24); Render has since removed that cache rule for us, so the
-         suffix is safe again. If poisoning recurs: bump the `?v=` cache key,
-         or switch the src to the extension-less /api/frontend-config route
-         (kept serving as an escape hatch). -->
-    <script src="/api/frontend-config.js?v=3" defer></script>
-    <script src="https://accounts.google.com/gsi/client" async></script>
-    <meta charset="utf-8" />
-    <!-- Platform favicon: a real multi-size ICO (16/32/48) of the current sun
-         mark, served from public/. This is the ONLY rel="icon" link, and it
-         must stay that way — App.js rewrites the first match for backoffice.
-         Crawlers and link scrapers read this tag (and probe /favicon.ico
-         directly) with no JS, so the brand has to be correct statically. -->
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <script>
-      // Pre-paint theme stamp for the Appearance (appearance-themes) cohort: on
-      // a hard load the theme is applied by React (AppearanceThemeApplier) only after
-      // auth resolves, so the document boots light — a white flash,
-      // then light route skeletons (the FOUC this removes). AppearanceThemeApplier
-      // persists 'appearance-theme-applied' only while the feature is active,
-      // so every other cohort (flag-off, native, backoffice, runtime apps)
-      // never sets it and this stays a no-op. React stays the source of truth
-      // after mount: AppearanceThemeApplier
-      // re-applies or clears these exact attributes. Keys must stay byte-identical
-      // with components/settings/useAppearanceTheme.ts — BOOT_STAMP_CONTRACT there is
-      // asserted against this file by useAppearanceTheme.spec.ts, so update both.
-      //
-      // Kill-switch caveat: the marker is written while the feature is active and
-      // only cleared once /me resolves. On the FIRST load after a user loses the
-      // flag — or after the kill switch is flipped mid-incident — this still
-      // stamps dark, then React settles to light: one dark→light flash, which
-      // self-heals from the next load on. Flipping the switch does not repaint
-      // already-open tabs pre-paint; it collapses them on their next load.
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: calc(10px + var(--st)) 12px var(--sb);
+  gap: 12px;
+}
+
+/* CARDS E HUD PRINCIPAL */
+.hud-card {
+  background: linear-gradient(135deg, #064e3b, #022c22);
+  border: 2px solid #059669;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  flex: none;
+}
+.hud-top { font-size: 12px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+.hud-km { font-size: 38px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 4px 0; }
+.hud-meta { display: flex; justify-content: space-between; font-size: 12px; color: #a7f3d0; font-weight: 600; }
+
+/* BARRA DE PESQUISA RÁPIDA */
+.search-box {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 6px 12px;
+  align-items: center;
+}
+.search-box input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+.search-box input::placeholder { color: var(--sub); font-weight: 500; }
+
+/* BOTÕES GRANDES DE SENTIDO E FIBRA */
+.big-buttons-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: none;
+}
+
+.button-group-label {
+  font-size: 11px;
+  color: var(--sub);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.grid-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.btn-big {
+  background: var(--card);
+  border: 2px solid var(--line);
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 6px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-big:active { transform: scale(0.96); }
+.btn-big.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(255, 214, 0, 0.4);
+}
+
+.btn-big small { font-size: 10px; opacity: 0.8; font-weight: 700; }
+
+/* LISTA DE ATIVOS PRÓXIMOS */
+.assets-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 2px;
+}
+
+.asset-card {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asset-card.nearest {
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.22), rgba(255, 214, 0, 0.05));
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 18px rgba(255, 214, 0, 0.3);
+}
+
+.asset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.asset-tag { font-size: 16px; font-weight: 900; color: #fff; }
+.asset-card.nearest .asset-tag { color: var(--accent); }
+.asset-km-badge {
+  background: rgba(255, 214, 0, 0.18);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+}
+
+/* CAIXA DE IP EM DESTAQUE TOTAL */
+.asset-ip-box {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px dashed #10b981;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.asset-ip-box span { font-size: 12px; color: var(--sub); font-weight: 700; }
+.asset-ip-box b { font-size: 18px; font-family: monospace; color: #10b981; font-weight: 900; letter-spacing: 0.8px; }
+
+.asset-info {
+  font-size: 12px;
+  color: #cbd5e1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.asset-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.badge-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
+.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
+.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1.5px solid var(--accent); }
+
+.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 14px; padding: 20px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- HUD DE KM E GPS -->
+  <div class="hud-card">
+    <div class="hud-top" id="gpsStatusTitle">Localizando GPS em Tempo Real...</div>
+    <div class="hud-km" id="kmDisplay">KM ---</div>
+    <div class="hud-meta">
+      <span id="gpsPrecision">Precisão: ...</span>
+      <span id="gpsCoords">0.0000, 0.0000</span>
+    </div>
+  </div>
+
+  <!-- CAMPO DE BUSCA RÁPIDA -->
+  <div class="search-box">
+    <span style="font-size:18px;">🔍</span>
+    <input type="text" id="searchInput" placeholder="Buscar por Tag, IP ou KM..." oninput="onSearchChange()">
+  </div>
+
+  <!-- SELEÇÃO DE SENTIDO E FIBRAS (BOTÕES GRANDES) -->
+  <div class="big-buttons-section">
+    <div class="button-group-label">1. Sentido da Via:</div>
+    <div class="grid-buttons" id="dirButtons">
+      <button class="btn-big active" onclick="selectDir('all', this)">
+        <span>↔️ TODOS</span>
+        <small>Ambos lados</small>
+      </button>
+      <button class="btn-big" onclick="selectDir('crescente', this)">
+        <span>↗️ RIO</span>
+        <small>KM Aumenta</small>
+      </button>
+      <button class="btn-big" onclick="selectDir('decrescente', this)">
+        <span>↙️ SP</span>
+        <small>KM Diminui</small>
+      </button>
+    </div>
+
+    <div class="button-group-label" style="margin-top:2px;">2. Circuito / Fibra:</div>
+    <div class="grid-buttons" id="fiberButtons">
+      <button class="btn-big active" onclick="selectFiber('all', this)">
+        <span>⚡ TODAS</span>
+      </button>
+      <button class="btn-big" onclick="selectFiber('11, 12', this)">
+        <span>🧵 11, 12</span>
+      </button>
+      <button class="btn-big" onclick="selectFiber('21, 22', this)">
+        <span>🧵 21, 22</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LISTA DE ATIVOS -->
+  <div class="assets-container" id="assetsContainer">
+    <div class="empty-msg">Iniciando leitor de GPS e carregando banco de ativos...</div>
+  </div>
+
+</div>
+
+<script>
+const STATE = {
+  snv: [],
+  assets: [],
+  pingCache: {},
+  currentKm: null,
+  lat: 0,
+  lon: 0,
+  acc: null,
+  dirFilter: 'all',
+  fiberFilter: 'all',
+  searchQuery: ''
+};
+
+const $ = id => document.getElementById(id);
+
+/* CONVERSOR DE KM ultra amigável */
+function parseKm(val) {
+  if (val === null || val === undefined) return NaN;
+  let s = String(val).trim().replace(/^\uFEFF/, '').replace(/^"/, '').replace(/"$/, '');
+  if (!s) return NaN;
+
+  // Formato rodoviário ex: 214+728
+  const m = s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);
+  if (m) {
+    const km = Number(m[1]);
+    const mt = (m[2] + (m[3] || '')).padEnd(3, '0').slice(0, 3);
+    return km + (Number(mt) / 1000);
+  }
+
+  s = s.replace(/\./g, '').replace(',', '.');
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+const escapeH = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* PARSER SNV (KM, LAT, LONG) */
+function parseSnvCsv(txt) {
+  if (!txt) return [];
+  const lines = txt.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return [];
+
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const h = lines[0].split(sep).map(x => x.trim().toLowerCase().replace(/[^a-z]/g, ''));
+  const iKm = h.findIndex(x => x.includes('km'));
+  const iLat = h.findIndex(x => x.includes('lat'));
+  const iLon = h.findIndex(x => x.includes('lon') || x.includes('long'));
+
+  if (iKm < 0 || iLat < 0 || iLon < 0) return [];
+
+  const list = [];
+  for (let i = 1; i < lines.length; i++) {
+    const r = lines[i].split(sep).map(x => x.trim().replace(/^"|"$/g, ''));
+    if (r.length <= Math.max(iKm, iLat, iLon)) continue;
+    const k = parseKm(r[iKm]);
+    const la = Number(r[iLat].replace(',', '.'));
+    const lo = Number(r[iLon].replace(',', '.'));
+    if (Number.isFinite(k) && Number.isFinite(la) && Number.isFinite(lo)) {
+      list.push({ km: k, lat: la, lon: lo });
+    }
+  }
+  return list;
+}
+
+/* PARSER ATIVOS */
+function parseAssetsCsv(txt) {
+  if (!txt) return [];
+  const lines = txt.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 3) return [];
+
+  const list = [];
+  for (let i = 2; i < lines.length; i++) {
+    const r = lines[i].split(';').map(x => x.trim().replace(/^"|"$/g, ''));
+    if (r.length < 9) continue;
+
+    const tag = r[0] || 'Ativo';
+    const equip = r[1] || 'Equipamento';
+    const rawKm = r[3] || '';
+    const km = parseKm(rawKm);
+    const sentido = r[4] || '';
+    const fibra = r[5] || '11, 12';
+    const ip = r[8] || '';
+
+    if (Number.isFinite(km)) {
+      list.push({
+        tag: tag,
+        equip: equip,
+        km: km,
+        rawKm: rawKm || km.toFixed(3),
+        sentido: sentido,
+        fibra: fibra.trim(),
+        ip: ip
+      });
+    }
+  }
+  return list.sort((a, b) => a.km - b.km);
+}
+
+/* CALCULA O KM MAIS PRÓXIMO DAS COORDENADAS GPS */
+function calcNearestKm(la, lo) {
+  if (!STATE.snv.length) return null;
+  let best = STATE.snv[0], minD = Infinity;
+  const rad = Math.PI / 180, R = 6371000;
+
+  for (let i = 0; i < STATE.snv.length; i++) {
+    const p = STATE.snv[i];
+    const dLat = (p.lat - la) * rad;
+    const dLon = (p.lon - lo) * rad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
+    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (dist < minD) {
+      minD = dist;
+      best = p;
+    }
+  }
+  return { km: best.km, dist: minD };
+}
+
+/* CONTROLES DOS BOTÕES GRANDES */
+function selectDir(dir, btn) {
+  STATE.dirFilter = dir;
+  document.querySelectorAll('#dirButtons .btn-big').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAssets();
+}
+
+function selectFiber(fiber, btn) {
+  STATE.fiberFilter = fiber;
+  document.querySelectorAll('#fiberButtons .btn-big').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAssets();
+}
+
+function onSearchChange() {
+  STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
+  renderAssets();
+}
+
+/* PING REAL EM SEGUNDO PLANO */
+async function pingIp(ip) {
+  if (!ip) return 'no-ip';
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), 1000);
+  try {
+    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-store' });
+    clearTimeout(id);
+    return 'online';
+  } catch (e) {
+    clearTimeout(id);
+    return (e.name === 'AbortError') ? 'offline' : 'online';
+  }
+}
+
+async function runPings(visibleList) {
+  for (const item of visibleList) {
+    if (!item.ip) continue;
+    const st = await pingIp(item.ip);
+    STATE.pingCache[item.ip] = st;
+  }
+  updateUIOnly();
+}
+
+/* FILTRAGEM E EXIBIÇÃO */
+function getDisplayList() {
+  const km = STATE.currentKm;
+  if (!STATE.assets.length || !Number.isFinite(km)) return { list: [], nearest: null };
+
+  let pool = STATE.assets;
+
+  // 1. Filtro por Fibra
+  if (STATE.fiberFilter !== 'all') {
+    pool = pool.filter(a => a.fibra === STATE.fiberFilter);
+    if (!pool.length) pool = STATE.assets;
+  }
+
+  // 2. Filtro de Pesquisa manual por texto
+  if (STATE.searchQuery) {
+    pool = pool.filter(a => 
+      a.tag.toLowerCase().includes(STATE.searchQuery) || 
+      a.ip.toLowerCase().includes(STATE.searchQuery) || 
+      a.rawKm.toLowerCase().includes(STATE.searchQuery) ||
+      a.equip.toLowerCase().includes(STATE.searchQuery)
+    );
+  }
+
+  if (!pool.length) return { list: [], nearest: null };
+
+  // 3. Acha o mais próximo no pool
+  let nearest = pool[0];
+  let minDiff = Math.abs(pool[0].km - km);
+  for (let i = 1; i < pool.length; i++) {
+    const diff = Math.abs(pool[i].km - km);
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearest = pool[i];
+    }
+  }
+
+  // 4. Filtro por Sentido
+  let list = [];
+  if (STATE.dirFilter === 'crescente') {
+    list = pool.filter(a => a.km >= km).slice(0, 5);
+  } else if (STATE.dirFilter === 'decrescente') {
+    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 5);
+  } else {
+    const behind = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 2).reverse();
+    const ahead = pool.filter(a => a.km > km).sort((a, b) => a.km - b.km).slice(0, 3);
+    const set = new Map();
+    [...behind, nearest, ...ahead].forEach(a => set.set(a.tag + a.km + a.ip, a));
+    list = Array.from(set.values()).sort((a,b) => a.km - b.km);
+  }
+
+  return { list, nearest };
+}
+
+function updateUIOnly() {
+  const km = STATE.currentKm;
+  if (!Number.isFinite(km)) return;
+
+  const { list, nearest } = getDisplayList();
+  const container = $('assetsContainer');
+
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para essa busca/filtro.</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(a => {
+    const isNearest = a === nearest;
+    const diff = a.km - km;
+    const distM = Math.abs(diff * 1000).toFixed(0);
+    const dirTxt = diff < 0 ? 'atrás (Sentido SP)' : diff > 0 ? 'à frente (Sentido Rio)' : 'aqui no local';
+    const ping = STATE.pingCache[a.ip] || 'checking';
+
+    let badgeCls = 'checking', badgeTxt = 'CHECANDO';
+    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE (PING OK)'; }
+    else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
+    if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
+
+    return `<div class="asset-card${isNearest ? ' nearest' : ''}">
+      <div class="asset-header">
+        <span class="asset-tag">${isNearest ? '★ MAIS PRÓXIMO · ' : ''}${escapeH(a.tag)}</span>
+        <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
+      </div>
+
+      <div class="asset-ip-box">
+        <span>IP DO ATIVO:</span>
+        <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
+      </div>
+
+      <div class="asset-info">
+        <span><b>Tipo:</b> ${escapeH(a.equip)}</span>
+        <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
+      </div>
+
+      <div class="asset-footer">
+        <span>Distância: <b>${distM} metros</b> (${dirTxt})</span>
+        <span class="badge-status ${badgeCls}">${badgeTxt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAssets() {
+  const km = STATE.currentKm;
+  if (!STATE.assets.length || !Number.isFinite(km)) return;
+  const { list } = getDisplayList();
+  updateUIOnly();
+  runPings(list);
+}
+
+function updateGpsUI() {
+  $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
+  $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
+  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
+  $('coords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
+}
+
+function refreshAll() {
+  if (!STATE.snv.length || !STATE.lat) return;
+  const res = calcNearestKm(STATE.lat, STATE.lon);
+  if (res) {
+    STATE.currentKm = res.km;
+    updateGpsUI();
+    renderAssets();
+  }
+}
+
+/* CARGA DOS DADOS CSV */
+async function loadFiles() {
+  try {
+    let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now());
+    if (r.ok) STATE.snv = parseSnvCsv(await r.text());
+
+    const names = ['ativos 116 (1).csv', 'ativos 116.csv', 'ativos_116.csv'];
+    for (const name of names) {
       try {
-        if ((localStorage.getItem('appearance-theme-applied') || localStorage.getItem('demo-display-theme-applied')) === '1') {
-          var appearanceTheme = localStorage.getItem('appearance-theme') || localStorage.getItem('demo-display-theme');
-          var appearanceDark = appearanceTheme === 'dark' ||
-            (appearanceTheme !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-          if (appearanceDark) {
-            var appearanceRoot = document.documentElement;
-            appearanceRoot.setAttribute('data-ds', 'base44');
-            appearanceRoot.setAttribute('data-theme', 'dark');
-            appearanceRoot.classList.add('dark');
-            // Kill the pre-CSS white document flash; the app paints over it.
-            appearanceRoot.style.backgroundColor = '#09090b';
+        r = await fetch(encodeURI(name + '?v=' + Date.now()));
+        if (r.ok) {
+          const list = parseAssetsCsv(await r.text());
+          if (list.length) {
+            STATE.assets = list;
+            break;
           }
         }
-      } catch (e) {}
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+      } catch(e) {}
+    }
+    refreshAll();
+  } catch(e) {}
+}
 
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Build useful apps, fast with Base44."
-    />
+loadFiles();
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Base44">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json" />
-    <title>Base44</title>
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://app.base44.com" />
-    <meta property="og:title" content="Base44" />
-    <meta property="og:site_name" content="Base44" />
-    <meta property="og:description" content="Build useful apps, fast with Base44." />
-    <meta property="og:image" content="https://app.base44.com/link_preview_v3.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Base44 link preview" />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://app.base44.com" />
-    <meta name="twitter:title" content="Base44" />
-    <meta name="twitter:description" content="Build useful apps, fast with Base44." />
-    <meta name="twitter:image" content="https://app.base44.com/link_preview_v3.png" />
-    <meta name="twitter:image:alt" content="Base44 link preview" />
-    <script type="module" crossorigin src="/static/index-CW9_z2dx.js"></script>
-    <link rel="modulepreload" crossorigin href="/static/rolldown-runtime-C0FnF6B9.js">
-    <link rel="modulepreload" crossorigin href="/static/runtime-DdIC7kqw.js">
-    <link rel="modulepreload" crossorigin href="/static/backend-B-kMO6p1.js">
-    <link rel="modulepreload" crossorigin href="/static/vendor-react-CsmJD3cz.js">
-    <link rel="modulepreload" crossorigin href="/static/preload-helper-BZ1Pz5am.js">
-    <link rel="modulepreload" crossorigin href="/static/vendor-data-Bcmgbf-W.js">
-    <link rel="modulepreload" crossorigin href="/static/errorReporting-BNRHTjef.js">
-    <link rel="modulepreload" crossorigin href="/static/i18n-BH51gS-9.js">
-    <link rel="modulepreload" crossorigin href="/static/vendor-utils-avec06h0.js">
-    <link rel="modulepreload" crossorigin href="/static/mixpanelUtils-CLbrckDy.js">
-    <link rel="modulepreload" crossorigin href="/static/use-toast--OgxAUc4.js">
-    <link rel="modulepreload" crossorigin href="/static/bridge-Cq_Szqk4.js">
-    <link rel="modulepreload" crossorigin href="/static/axiosClient-CmTwF6E4.js">
-    <link rel="modulepreload" crossorigin href="/static/I18nProvider-DneZ21KP.js">
-    <link rel="modulepreload" crossorigin href="/static/dist-DBtlVRZs.js">
-    <link rel="modulepreload" crossorigin href="/static/base-zPWgDw8Z.js">
-    <link rel="modulepreload" crossorigin href="/static/AuthAPI-BCuUQYQL.js">
-    <link rel="modulepreload" crossorigin href="/static/useDesignSystem-DStR7eie.js">
-    <link rel="modulepreload" crossorigin href="/static/logoutReturnPath-HjtsxsFd.js">
-    <link rel="modulepreload" crossorigin href="/static/AuthContext-DcduamNZ.js">
-    <link rel="modulepreload" crossorigin href="/static/vendor-ui-egc1Hb3n.js">
-    <link rel="modulepreload" crossorigin href="/static/dist-Dd5GUXZ4.js">
-    <link rel="modulepreload" crossorigin href="/static/useHideNativeBottomTabs-CvZWIjid.js">
-    <link rel="modulepreload" crossorigin href="/static/native-mobile-app-MJcxGV-L.js">
-    <link rel="modulepreload" crossorigin href="/static/prop-types-D9WxI36-.js">
-    <link rel="modulepreload" crossorigin href="/static/esm-0uQNWtkT.js">
-    <link rel="modulepreload" crossorigin href="/static/use-mobile-BOFIpJzP.js">
-    <link rel="modulepreload" crossorigin href="/static/create-zustand-store-DjBL0aBO.js">
-    <link rel="modulepreload" crossorigin href="/static/persist-to-storage-BO7qihDS.js">
-    <link rel="modulepreload" crossorigin href="/static/actions.middleware-D_eRWZoy.js">
-    <link rel="modulepreload" crossorigin href="/static/WorkspaceAPI-eLxGOGFm.js">
-    <link rel="modulepreload" crossorigin href="/static/useWorkspaceUnlockState-Cg67Ec9B.js">
-    <link rel="modulepreload" crossorigin href="/static/WorkspaceContext-BI5-CkI8.js">
-    <link rel="modulepreload" crossorigin href="/static/react-D60gXSvz.js">
-    <link rel="modulepreload" crossorigin href="/static/useFeatureFlags-CU0t5_CB.js">
-    <link rel="modulepreload" crossorigin href="/static/utils-SteRBaZv.js">
-    <link rel="modulepreload" crossorigin href="/static/toast-Czi0VCYq.js">
-    <link rel="modulepreload" crossorigin href="/static/moment-CbrR2L3o.js">
-    <link rel="modulepreload" crossorigin href="/static/SubdomainContext-BzrrSAmr.js">
-    <link rel="stylesheet" crossorigin href="/static/index-CD4jDvim.css">
-    <meta name="bundle-commit" content="51c1eef9854f9777fac6054e088a863a2ac3a960">
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+/* GEOLOCALIZAÇÃO EM TEMPO REAL */
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(p => {
+    STATE.lat = p.coords.latitude;
+    STATE.lon = p.coords.longitude;
+    STATE.acc = p.coords.accuracy;
+    refreshAll();
+  }, err => {
+    $('gpsStatusTitle').textContent = 'Erro: Permita o acesso ao GPS do celular';
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+}
+</script>
+</body>
 </html>
