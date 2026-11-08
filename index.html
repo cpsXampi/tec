@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>INDEX Pro · Monitor de Ativos & Fibra (ITS)</title>
+<title>INDEX - Localizador de Ativos & IP</title>
 <style>
 :root {
   --bg: #07090c;
@@ -44,73 +44,45 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 .hud-card b { display: block; font-size: 28px; line-height: 1.1; color: #fff; margin-top: 2px; font-weight: 900; }
 .hud-card .meta { font-size: 11px; color: #bbf7d0; margin-top: 6px; display: flex; justify-content: space-between; font-weight: 500; }
 
-/* Barra de Topologia de Fibra e Controles */
+/* Controles de Som e Status de Diagnóstico */
 .control-bar {
   display: flex;
   gap: 8px;
   flex: none;
 }
-.fiber-badge {
+.status-badge {
   flex: 1;
   background: var(--s1);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.fiber-badge small { font-size: 10px; color: var(--mu); text-transform: uppercase; font-weight: 700; }
-.fiber-badge b { font-size: 13px; color: var(--acc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-badge small { font-size: 10px; color: var(--mu); text-transform: uppercase; font-weight: 700; }
+.status-badge b { font-size: 12px; color: var(--acc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .btn-bip {
   background: var(--s2);
   border: 1px solid var(--line);
   color: var(--tx);
   border-radius: 12px;
-  padding: 0 16px;
+  padding: 0 14px;
   font-size: 12px;
   font-weight: 800;
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 .btn-bip.active {
   background: rgba(52, 211, 153, 0.2);
   border-color: var(--ok);
   color: var(--ok);
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
 }
 
-/* Filtros Rápidos */
-.filter-bar {
-  display: flex;
-  gap: 6px;
-  flex: none;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-.filter-btn {
-  background: var(--s1);
-  border: 1px solid var(--line);
-  color: var(--mu);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.filter-btn.active {
-  background: var(--acc);
-  color: #000;
-  border-color: var(--acc);
-}
-
-/* Lista dos Ativos */
+/* Lista de Ativos */
 .assets-container {
   flex: 1;
   overflow-y: auto;
@@ -127,22 +99,32 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: transform 0.1s ease;
 }
 .asset-card.nearest {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15), rgba(255, 214, 0, 0.05));
-  border: 1px solid rgba(255, 214, 0, 0.7);
-  box-shadow: 0 0 15px rgba(255, 214, 0, 0.15);
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.18), rgba(255, 214, 0, 0.05));
+  border: 2px solid var(--acc);
+  box-shadow: 0 0 16px rgba(255, 214, 0, 0.25);
 }
 .asset-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.asset-title { font-size: 13px; font-weight: 800; color: #fff; }
+.asset-title { font-size: 14px; font-weight: 800; color: #fff; }
 .asset-card.nearest .asset-title { color: var(--acc); }
-.asset-km { font-size: 12px; font-weight: 800; color: var(--acc); background: rgba(255,214,0,0.1); padding: 2px 8px; border-radius: 6px; }
+.asset-km { font-size: 12px; font-weight: 800; color: var(--acc); background: rgba(255,214,0,0.12); padding: 2px 8px; border-radius: 6px; }
+
+.asset-ip-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0;
+}
+.asset-ip-box b { font-size: 14px; font-family: monospace; color: #34d399; letter-spacing: 0.5px; }
 
 .asset-details { font-size: 11px; color: #c3c6ce; display: flex; flex-direction: column; gap: 3px; }
-.asset-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 11px; pt: 4px; border-top: 1px solid rgba(255,255,255,0.05); }
+.asset-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; }
 
-/* Status Visuais */
 .badge-ping {
   display: inline-flex;
   align-items: center;
@@ -157,54 +139,43 @@ html, body { height: 100%; background: var(--bg); color: var(--tx); font-family:
 .badge-ping.offline { background: rgba(239, 68, 68, 0.25); color: var(--bad); border: 1px solid rgba(239, 68, 68, 0.6); }
 .badge-ping.checking { background: rgba(255, 214, 0, 0.2); color: var(--acc); border: 1px solid rgba(255, 214, 0, 0.4); }
 .badge-ping::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.badge-ping.online::before { box-shadow: 0 0 6px var(--ok); }
-.badge-ping.offline::before { box-shadow: 0 0 6px var(--bad); animation: blink 0.8s infinite; }
-@keyframes blink { 50% { opacity: 0.2; } }
 
-.empty-state { text-align: center; color: var(--mu); margin: auto; font-size: 13px; padding: 20px; }
+.empty-state { text-align: center; color: var(--mu); margin: auto; font-size: 13px; padding: 20px; line-height: 1.5; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-  <!-- HUD de KM Local com GPS Pro -->
+  <!-- HUD de Posição GPS e KM -->
   <div class="hud-card">
-    <small id="locTitle">Calculando Posição Rodoviária...</small>
+    <small id="locTitle">Obtendo Sinal de GPS...</small>
     <b id="kmLabel">KM ---</b>
     <div class="meta">
-      <span id="gpsAcc">GPS: Conectando...</span>
+      <span id="gpsAcc">GPS: Aguardando permissão</span>
       <span id="coords">0.00000, 0.00000</span>
     </div>
   </div>
 
-  <!-- Fibra Ativa e Controle Sonoro -->
   <div class="control-bar">
-    <div class="fiber-badge">
-      <small>Anel / Circuito Ativo</small>
-      <b id="fiberTag">Buscando Ativos...</b>
+    <div class="status-badge">
+      <small>Status dos Dados</small>
+      <b id="dbStatus">Carregando tabelas...</b>
     </div>
     <button class="btn-bip" id="btnBip" onclick="toggleBipAlert()">
       <span id="bipIcon">🔔</span> <span id="bipText">Alerta: OFF</span>
     </button>
   </div>
 
-  <!-- Filtros Rápidos de Exibição -->
-  <div class="filter-bar">
-    <button class="filter-btn active" id="fAll" onclick="setFilter('all')">Todos Próximos</button>
-    <button class="filter-btn" id="fFiber" onclick="setFilter('fiber')">Mesmo Circuito</button>
-    <button class="filter-btn" id="fOffline" onclick="setFilter('offline')">Somente Offline</button>
-  </div>
-
-  <!-- Lista Otimizada dos Ativos -->
+  <!-- Lista de Ativos Próximos -->
   <div class="assets-container" id="assetsList">
-    <div class="empty-state">Iniciando engine de geolocalização e carregando tabelas…</div>
+    <div class="empty-state">Iniciando sistema e buscando localização GPS…</div>
   </div>
 </div>
 
 <script>
 const S = {
-  db: [],          // Base SNV ordenada
-  assets: [],      // Ativos ordenados por KM
+  db: [],          // Registros SNV (km, lat, lon)
+  assets: [],      // Lista de ativos com IP e KM
   pingStatus: {},
   kmValue: null,
   kmText: '---',
@@ -212,13 +183,281 @@ const S = {
   lon: 0,
   acc: null,
   bipActive: false,
-  audioCtx: null,
-  currentFilter: 'all'
+  audioCtx: null
 };
 
 const $ = id => document.getElementById(id);
-const num = v => { const s = String(v ?? '').trim(); if (!s) return NaN; return /,\d+$/.test(s) ? Number(s.replace(/\./g, '').replace(',', '.')) : Number(s); };
-const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* Conversão robusta de números e KM */
+function num(v) {
+  if (v === null || v === undefined) return NaN;
+  let s = String(v).trim().replace(/^\uFEFF/, '').replace(/^"/, '').replace(/"$/, '');
+  if (!s) return NaN;
+  if (/^\d{1,3}\s*\+\s*\d{1,3}/.test(s)) {
+    const m = s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?/);
+    if (m) {
+      const parteInteira = Number(m[1]);
+      const metros = Number(`${m[2]}${m[3] || ''}`);
+      const divisor = Math.pow(10, (m[3] || '').length + 3);
+      return parteInteira + (metros / divisor);
+    }
+  }
+  s = s.replace(/\./g, '').replace(',', '.');
+  return Number(s);
+}
+
+const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* Parser robusto de CSV lidando com aspas e delimitadores */
+function parseCSV(text) {
+  if (!text) return [];
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  
+  const lines = [];
+  let curLine = [];
+  let curVal = '';
+  let insideQuotes = false;
+  
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i+1];
+    
+    if (c === '"') {
+      if (insideQuotes && next === '"') {
+        curVal += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if ((c === ';' || c === ',') && !insideQuotes) {
+      curLine.push(curVal.trim());
+      curVal = '';
+    } else if ((c === '\r' || c === '\n') && !insideQuotes) {
+      if (c === '\r' && next === '\n') i++;
+      curLine.push(curVal.trim());
+      if (curLine.some(x => x.length > 0)) lines.push(curLine);
+      curLine = [];
+      curVal = '';
+    } else {
+      curVal += c;
+    }
+  }
+  if (curVal.length > 0 || curLine.length > 0) {
+    curLine.push(curVal.trim());
+    lines.push(curLine);
+  }
+  return lines;
+}
+
+/* Leitura e parsing do SNV (KM x Latitude/Longitude) */
+function parseKmCsv(t) {
+  const rows = parseCSV(t);
+  if (rows.length < 2) return [];
+  
+  const header = rows[0].map(x => x.toLowerCase().replace(/[^a-z]/g, ''));
+  const idxKm = header.findIndex(x => x.includes('km'));
+  const idxLat = header.findIndex(x => x.includes('lat'));
+  const idxLon = header.findIndex(x => x.includes('lon') || x.includes('long'));
+  
+  if (idxKm < 0 || idxLat < 0 || idxLon < 0) return [];
+  
+  const res = [];
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    const k = num(r[idxKm]);
+    const la = num(r[idxLat]);
+    const lo = num(r[idxLon]);
+    if (Number.isFinite(k) && Number.isFinite(la) && Number.isFinite(lo)) {
+      res.push({ km: k, lat: la, lon: lo });
+    }
+  }
+  return res;
+}
+
+/* Leitura dos Ativos (com Tag, Equipamento, KM, IP, Fibra) */
+function parseAssetsCsv(t) {
+  const rows = parseCSV(t);
+  if (rows.length < 2) return [];
+  
+  const header = rows[0].map(x => x.toLowerCase().replace(/[^a-z]/g, ''));
+  const idxTag = header.findIndex(x => x === 'tag' || x.includes('ativo') || x.includes('nome'));
+  const idxEquip = header.findIndex(x => x.includes('equip') || x.includes('tipo'));
+  const idxKm = header.findIndex(x => x === 'km' || x.includes('quilomet'));
+  const idxIp = header.findIndex(x => x === 'ip' || x.includes('enderecoip') || x.includes('enderecip'));
+  const idxFibra = header.findIndex(x => x.includes('fibra') || x.includes('anel') || x.includes('circuito'));
+  
+  if (idxKm < 0) return [];
+  
+  const res = [];
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    const rawKm = r[idxKm] || '';
+    const parsedKm = num(rawKm);
+    if (Number.isFinite(parsedKm)) {
+      res.push({
+        tag: idxTag >= 0 ? r[idxTag] : 'Ativo',
+        equip: idxEquip >= 0 ? r[idxEquip] : 'Equipamento',
+        km: parsedKm,
+        kmLabel: rawKm || parsedKm.toFixed(3),
+        ip: idxIp >= 0 ? r[idxIp] : '',
+        fibra: idxFibra >= 0 ? r[idxFibra] : 'FIBRA-PRINCIPAL'
+      });
+    }
+  }
+  return res.sort((a, b) => a.km - b.km);
+}
+
+/* Encontrar KM da rodovia mais próximo das coordenadas do celular */
+function nearestKm(la, lo) {
+  if (!S.db.length) return null;
+  let best = S.db[0], minDist = Infinity;
+  const rad = Math.PI / 180, R = 6371000;
+  
+  for (let i = 0; i < S.db.length; i++) {
+    const p = S.db[i];
+    const dLat = (p.lat - la) * rad;
+    const dLon = (p.lon - lo) * rad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
+    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (dist < minDist) {
+      minDist = dist;
+      best = p;
+    }
+  }
+  return { km: best.km, dist: minDist };
+}
+
+/* Busca binária para achar o ativo com KM mais próximo da posição atual */
+function findNearestAssetIndex(currentKm) {
+  if (!S.assets.length) return -1;
+  let low = 0, high = S.assets.length - 1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    if (S.assets[mid].km < currentKm) low = mid + 1;
+    else high = mid - 1;
+  }
+  if (low >= S.assets.length) return S.assets.length - 1;
+  if (low <= 0) return 0;
+  return Math.abs(S.assets[low].km - currentKm) < Math.abs(S.assets[low - 1].km - currentKm) ? low : low - 1;
+}
+
+/* Pega os 4 ativos mais próximos em torno do KM atual */
+function getNearestAssets(currentKm) {
+  if (!S.assets.length) return { list: [], nearestAsset: null };
+  const centerIdx = findNearestAssetIndex(currentKm);
+  const nearestAsset = S.assets[centerIdx];
+  
+  const start = Math.max(0, centerIdx - 1);
+  const list = S.assets.slice(start, start + 4);
+  return { list, nearestAsset };
+}
+
+/* Simulação / Teste de IP */
+async function pingIp(ip) {
+  if (!ip) return 'no-ip';
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 1000);
+  try {
+    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' });
+    clearTimeout(id);
+    return 'online';
+  } catch (e) {
+    clearTimeout(id);
+    return (e.name === 'AbortError') ? 'offline' : 'online';
+  }
+}
+
+async function checkAssetPings(displayAssets) {
+  let hasOffline = false;
+  for (const asset of displayAssets) {
+    if (!asset.ip) continue;
+    const res = await pingIp(asset.ip);
+    S.pingStatus[asset.ip] = res;
+    if (res === 'offline') hasOffline = true;
+  }
+  if (S.bipActive && hasOffline) playBeep(440, 300);
+  renderAssetsUI();
+}
+
+function renderAssetsUI() {
+  const current = S.kmValue;
+  if (!Number.isFinite(current)) {
+    $('assetsList').innerHTML = '<div class="empty-state">Aguardando coordenadas GPS para calcular o KM e localizar os ativos mais próximos...</div>';
+    return;
+  }
+  
+  if (!S.assets.length) {
+    $('assetsList').innerHTML = '<div class="empty-state">Nenhum ativo carregado da planilha. Verifique o arquivo CSV de ativos.</div>';
+    return;
+  }
+
+  const { list, nearestAsset } = getNearestAssets(current);
+
+  $('assetsList').innerHTML = list.map(a => {
+    const isNearest = a === nearestAsset;
+    const deltaKm = a.km - current;
+    const distMetros = Math.abs(deltaKm * 1000).toFixed(0);
+    const dir = deltaKm < 0 ? 'atrás' : deltaKm > 0 ? 'à frente' : 'exatamente no local';
+    const st = S.pingStatus[a.ip] || 'checking';
+
+    let badgeClass = 'checking', badgeText = 'CHECANDO';
+    if (st === 'online') { badgeClass = 'online'; badgeText = 'ONLINE'; }
+    else if (st === 'offline') { badgeClass = 'offline'; badgeText = 'OFFLINE'; }
+    if (!a.ip) { badgeClass = 'checking'; badgeText = 'SEM IP'; }
+
+    return `<div class="asset-card${isNearest ? ' nearest' : ''}">
+      <div class="asset-head">
+        <span class="asset-title">${isNearest ? '★ ATIVO MAIS PRÓXIMO · ' : ''}${escapeHtml(a.tag || a.equip)}</span>
+        <span class="asset-km">KM ${escapeHtml(a.kmLabel)}</span>
+      </div>
+      
+      <div class="asset-ip-box">
+        <small style="color: var(--mu); font-size: 11px;">IP DO ATIVO:</small>
+        <b>${a.ip ? escapeHtml(a.ip) : 'NÃO CONFIGURADO'}</b>
+      </div>
+
+      <div class="asset-details">
+        <span><b>Equipamento:</b> ${escapeHtml(a.equip)}</span>
+        <span><b>Circuito/Fibra:</b> ${escapeHtml(a.fibra)}</span>
+      </div>
+
+      <div class="asset-foot">
+        <span>Distância: <b>${distMetros} metros</b> (${dir})</span>
+        <span class="badge-ping ${badgeClass}">${badgeText}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAssets() {
+  const current = S.kmValue;
+  if (!S.assets.length || !Number.isFinite(current)) return;
+  const { list } = getNearestAssets(current);
+  renderAssetsUI();
+  checkAssetPings(list);
+}
+
+function updateLocationUI() {
+  $('kmLabel').textContent = S.kmText === '---' ? 'KM ---' : `KM ${S.kmText}`;
+  $('locTitle').textContent = 'KM Localizado (GPS Ativo)';
+  $('gpsAcc').textContent = S.acc !== null ? `Precisão GPS ±${Math.round(S.acc)} m` : 'GPS Ativo';
+  $('coords').textContent = `${S.lat.toFixed(5)}, ${S.lon.toFixed(5)}`;
+}
+
+function refreshNearest() {
+  if (!S.db.length || !S.lat) return;
+  const n = nearestKm(S.lat, S.lon);
+  if (n) {
+    S.kmValue = n.km;
+    S.kmText = (Math.round(n.km * 100) / 100).toFixed(2).replace('.', ',');
+    updateLocationUI();
+    renderAssets();
+  }
+}
+
+function updateDbStatus() {
+  $('dbStatus').textContent = `SNV: ${S.db.length} Pts | Ativos: ${S.assets.length}`;
+}
 
 function playBeep(freq = 880, duration = 150) {
   try {
@@ -245,234 +484,42 @@ function toggleBipAlert() {
   if(S.bipActive) playBeep(1200, 200);
 }
 
-function setFilter(f) {
-  S.currentFilter = f;
-  ['fAll', 'fFiber', 'fOffline'].forEach(id => $(id).classList.remove('active'));
-  if (f === 'all') $('fAll').classList.add('active');
-  if (f === 'fiber') $('fFiber').classList.add('active');
-  if (f === 'offline') $('fOffline').classList.add('active');
-  renderAssets();
-}
-
-/* Leitura de KM do SNV com pré-indexação espacial leve */
-function parseKmCsv(t) {
-  if (!t) return [];
-  if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
-  const L = t.split(/
-?
-/).filter(l => l.trim());
-  if (!L.length) return [];
-  const sep = L[0].includes(';') ? ';' : ',';
-  const h = L.shift().split(sep).map(x => x.trim().toLowerCase());
-  const a = h.findIndex(x => ['km'].includes(x));
-  const b = h.findIndex(x => ['lat', 'latitude'].includes(x));
-  const c = h.findIndex(x => ['lon', 'long', 'longitude'].includes(x));
-  if (a < 0 || b < 0 || c < 0) return [];
-  return L.map(l => {
-    const r = l.split(sep);
-    return { km: num(r[a]), lat: num(r[b]), lon: num(r[c]) };
-  }).filter(p => [p.km, p.lat, p.lon].every(Number.isFinite));
-}
-
-/* Busca rápida do KM do SNV com base em Haversine otimizado */
-function nearestKm(la, lo) {
-  if (!S.db.length) return null;
-  let best = S.db[0], min = Infinity;
-  const rad = Math.PI / 180, R = 6371000;
-  for (let i = 0; i < S.db.length; i++) {
-    const p = S.db[i];
-    const dLat = (p.lat - la) * rad, dLon = (p.lon - lo) * rad;
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
-    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    if (dist < min) { min = dist; best = p; }
-  }
-  return { km: best.km, dist: min };
-}
-
-/* Tratamento e ordenação binária de ativos */
-function parseAssetKm(v) {
-  const s = String(v ?? '').trim().replace(/^﻿/, '');
-  const m = s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);
-  if (m) return Number(m[1]) + Number(`${m[2]}${m[3] || ''}`) / Math.pow(10, (m[3] || '').length + 3);
-  return num(s);
-}
-
-function parseAssetsCsv(t) {
-  if (!t) return [];
-  if (t.charCodeAt(0) === 0xFEFF) t = t.slice(1);
-  const lines = t.split(/
-?
-/).filter(x => x.trim());
-  if (lines.length < 2) return [];
-  const h = lines[0].split(';').map(x => x.replace(/^\s*﻿/, '').replace(/"/g, '').trim().toLowerCase());
-  const find = names => h.findIndex(x => names.includes(x));
-
-  const tag = find(['tag', 'ativo', 'equipamento', 'nome']);
-  const equip = find(['equipamento', 'tipo', 'descricao']);
-  const km = find(['km', 'quilometro']);
-  const ip = find(['ip', 'endereço ip', 'endereco ip']);
-  const fibra = find(['fibra', 'anel', 'tubo', 'circuito']);
-
-  if (km < 0) return [];
-  const parsed = lines.slice(1).map(line => {
-    const r = line.split(';').map(x => x.trim().replace(/^"|"$/g, ''));
-    return {
-      tag: tag >= 0 ? r[tag] : '',
-      equip: equip >= 0 ? r[equip] : '',
-      km: parseAssetKm(r[km]),
-      kmLabel: r[km] || '',
-      ip: ip >= 0 ? r[ip] : '',
-      fibra: fibra >= 0 ? r[fibra] : 'FIBRA-PRINCIPAL'
-    };
-  }).filter(a => Number.isFinite(a.km));
-
-  // Ordena uma única vez na carga para garantir busca binária instantânea
-  return parsed.sort((a, b) => a.km - b.km);
-}
-
-/* Busca Binária O(log N) */
-function findNearestAssetIndex(currentKm) {
-  let low = 0, high = S.assets.length - 1;
-  while (low <= high) {
-    const mid = (low + high) >> 1;
-    if (S.assets[mid].km < currentKm) low = mid + 1;
-    else high = mid - 1;
-  }
-  if (low >= S.assets.length) return S.assets.length - 1;
-  if (low <= 0) return 0;
-  return Math.abs(S.assets[low].km - currentKm) < Math.abs(S.assets[low - 1].km - currentKm) ? low : low - 1;
-}
-
-/* Seleção Inteligente de 4 Ativos Próximos */
-function getDisplayAssets(currentKm) {
-  if (!S.assets.length) return { list: [], nearestAsset: null, currentFiber: 'SEM DADOS' };
-
-  const centerIdx = findNearestAssetIndex(currentKm);
-  const nearestAsset = S.assets[centerIdx];
-  const currentFiber = nearestAsset ? (nearestAsset.fibra || 'FIBRA-PRINCIPAL') : 'SEM DADOS';
-
-  let candidateGroup = [];
-
-  if (S.currentFilter === 'fiber') {
-    const fiberAssets = S.assets.filter(a => (a.fibra || 'FIBRA-PRINCIPAL') === currentFiber);
-    const subIdx = fiberAssets.findIndex(a => a === nearestAsset);
-    const start = Math.max(0, subIdx - 2);
-    candidateGroup = fiberAssets.slice(start, start + 4);
-  } else if (S.currentFilter === 'offline') {
-    candidateGroup = S.assets.filter(a => S.pingStatus[a.ip] === 'offline').slice(0, 4);
-  } else {
-    // 'all' -> 2 antes e 2 depois do ponto central (máximo 4 itens visíveis)
-    const start = Math.max(0, centerIdx - 1);
-    candidateGroup = S.assets.slice(start, start + 4);
-  }
-
-  return { list: candidateGroup, nearestAsset, currentFiber };
-}
-
-/* Validação leve de IP apenas dos cards visíveis */
-async function pingIp(ip) {
-  if (!ip) return 'no-ip';
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 1000);
+/* Carregamento automático dos CSVs tentando nomes padrão */
+async function loadData() {
   try {
-    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: controller.signal, cache: 'no-store' });
-    clearTimeout(id);
-    return 'online';
-  } catch (e) {
-    clearTimeout(id);
-    return (e.name === 'AbortError') ? 'offline' : 'online';
+    // 1. Tenta carregar SNV
+    let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now());
+    if (r.ok) {
+      const txt = await r.text();
+      S.db = parseKmCsv(txt);
+    }
+    
+    // 2. Tenta carregar Ativos em possíveis variações de nome de arquivo
+    const assetFiles = ['ativos 116.csv', 'ativos 116 (1).csv', 'ativos_116.csv', 'ativos.csv'];
+    for (const file of assetFiles) {
+      try {
+        r = await fetch(encodeURI(file + '?v=' + Date.now()));
+        if (r.ok) {
+          const txt = await r.text();
+          const parsed = parseAssetsCsv(txt);
+          if (parsed.length > 0) {
+            S.assets = parsed;
+            break;
+          }
+        }
+      } catch(e) {}
+    }
+    
+    updateDbStatus();
+    refreshNearest();
+  } catch(e) {
+    console.error("Erro na carga de dados:", e);
   }
 }
 
-async function checkAssetPings(displayAssets) {
-  let hasOffline = false;
-  for (const asset of displayAssets) {
-    if (!asset.ip) continue;
-    const res = await pingIp(asset.ip);
-    S.pingStatus[asset.ip] = res;
-    if (res === 'offline') hasOffline = true;
-  }
-  if (S.bipActive && hasOffline) playBeep(440, 300);
-  renderAssetsUIOnly();
-}
+loadData();
 
-function renderAssetsUIOnly() {
-  const current = S.kmValue;
-  if (!Number.isFinite(current)) return;
-
-  const { list, nearestAsset, currentFiber } = getDisplayAssets(current);
-  $('fiberTag').textContent = currentFiber;
-
-  if (!list.length) {
-    $('assetsList').innerHTML = '<div class="empty-state">Nenhum ativo encontrado para o filtro selecionado.</div>';
-    return;
-  }
-
-  $('assetsList').innerHTML = list.map(a => {
-    const isNearest = a === nearestAsset;
-    const delta = a.km - current;
-    const dir = delta < 0 ? 'atrás' : delta > 0 ? 'à frente' : 'no ponto';
-    const st = S.pingStatus[a.ip] || 'checking';
-
-    let badgeClass = 'checking', badgeText = 'CHECANDO';
-    if (st === 'online') { badgeClass = 'online'; badgeText = 'ONLINE'; }
-    else if (st === 'offline') { badgeClass = 'offline'; badgeText = 'OFFLINE'; }
-    if (!a.ip) { badgeClass = 'checking'; badgeText = 'SEM IP'; }
-
-    return `<div class="asset-card${isNearest ? ' nearest' : ''}">
-      <div class="asset-head">
-        <span class="asset-title">${isNearest ? '★ MAIS PRÓXIMO · ' : ''}${escapeHtml(a.tag || a.equip || 'Ativo ITS')}</span>
-        <span class="asset-km">KM ${escapeHtml(a.kmLabel)}</span>
-      </div>
-      <div class="asset-details">
-        <span><b>Equipamento:</b> ${escapeHtml(a.equip || 'N/A')}</span>
-        <span><b>Endereço IP:</b> ${a.ip ? escapeHtml(a.ip) : 'Não cadastrado'}</span>
-        <span><b>Circuito:</b> ${escapeHtml(a.fibra || 'FIBRA-PRINCIPAL')}</span>
-      </div>
-      <div class="asset-foot">
-        <span>Distância: <b>${Math.abs(delta).toFixed(3)} km</b> (${dir})</span>
-        <span class="badge-ping ${badgeClass}">${badgeText}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderAssets() {
-  const current = S.kmValue;
-  if (!S.assets.length || !Number.isFinite(current)) return;
-  const { list } = getDisplayAssets(current);
-  renderAssetsUIOnly();
-  checkAssetPings(list);
-}
-
-function updateLocationUI() {
-  $('kmLabel').textContent = S.kmText === '---' ? 'KM ---' : `KM ${S.kmText}`;
-  $('locTitle').textContent = 'KM Mais Próximo (GPS Ativo)';
-  $('gpsAcc').textContent = S.acc !== null ? `Precisão GPS ±${Math.round(S.acc)} m` : 'GPS Ativo';
-  $('coords').textContent = `${S.lat.toFixed(5)}, ${S.lon.toFixed(5)}`;
-}
-
-function refreshNearest() {
-  if (!S.db.length || !S.lat) return;
-  const n = nearestKm(S.lat, S.lon);
-  if (n) {
-    S.kmValue = n.km;
-    S.kmText = (Math.round(n.km * 100) / 100).toFixed(2).replace('.', ',');
-    updateLocationUI();
-    renderAssets();
-  }
-}
-
-/* Carga assíncrona otimizada sem cache */
-fetch('SNVBR116SPRJ.csv?v=' + Date.now(), { cache: 'no-store' })
-  .then(r => r.ok ? r.text() : '')
-  .then(t => { S.db = parseKmCsv(t); refreshNearest(); });
-
-fetch(encodeURI('ativos 116.csv?v=' + Date.now()), { cache: 'no-store' })
-  .then(r => r.ok ? r.text() : '')
-  .then(t => { S.assets = parseAssetsCsv(t); renderAssets(); });
-
-/* GPS de alta precisão com throttling nativo do navegador */
+/* Monitoramento GPS Contínuo do Dispositivo Móvel */
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
     S.lat = p.coords.latitude;
@@ -480,8 +527,10 @@ if ('geolocation' in navigator) {
     S.acc = p.coords.accuracy;
     refreshNearest();
   }, (err) => {
-    $('locTitle').textContent = 'Erro de GPS: Ative a localização';
-  }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 });
+    $('locTitle').textContent = 'Permissão de GPS necessária no celular!';
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+} else {
+  $('locTitle').textContent = 'Dispositivo sem suporte a GPS';
 }
 </script>
 </body>
