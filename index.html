@@ -1,873 +1,169 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#0a0e14">
-<title>Monitor de Campo & Backbone</title>
-<style>
-:root {
-  --bg: #0a0e14;
-  --card: #141a24;
-  --card-active: #1e2636;
-  --accent: #ffd600;
-  --green: #10b981;
-  --red: #ef4444;
-  --text: #ffffff;
-  --sub: #94a3b8;
-  --line: rgba(255, 255, 255, 0.15);
-  --sb: max(env(safe-area-inset-bottom), 16px);
-  --st: env(safe-area-inset-top, 0px);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
-
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding: calc(10px + var(--st)) 12px var(--sb);
-  gap: 8px;
-}
-
-/* ===================== HUD PRINCIPAL ===================== */
-.hud-card {
-  background: linear-gradient(135deg, #064e3b, #022c22);
-  border: 2px solid #059669;
-  border-radius: 16px;
-  padding: 12px 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-  flex: none;
-  position: relative;
-}
-.hud-top-row { display:flex; justify-content:space-between; align-items:center; }
-.hud-top { font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.help-btn {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: rgba(255,255,255,0.12); border: 1px solid #a7f3d0;
-  color: #a7f3d0; font-size: 12px; font-weight: 900;
-  display:flex; align-items:center; justify-content:center;
-  cursor: pointer; flex: none;
-}
-.hud-km { font-size: 36px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 4px 0; letter-spacing: -0.5px; }
-.hud-sub { font-size: 11px; color: #a7f3d0; font-weight: 600; margin-bottom: 2px; }
-.hud-meta { display: flex; justify-content: space-between; font-size: 10px; color: #a7f3d0; font-weight: 600; }
-
-/* ===================== PAINEL DE AJUDA / LEGENDA ===================== */
-.help-panel {
-  display: none;
-  flex: none;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 11px;
-  color: var(--sub);
-  line-height: 1.6;
-}
-.help-panel.open { display: block; }
-.help-panel b { color: #fff; }
-.help-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
-.dot { width:10px; height:10px; border-radius:50%; flex:none; }
-.dot.online { background: var(--green); }
-.dot.offline { background: var(--red); }
-.dot.checking { background: var(--accent); }
-.dot.nearest { background: transparent; border: 2px solid var(--accent); }
-
-/* ===================== JANELINHA DO ATIVO DE BASE ===================== */
-.current-asset-box {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.2), rgba(255, 214, 0, 0.05));
-  border: 2px solid var(--accent);
-  border-radius: 14px;
-  padding: 10px 14px;
-  flex: none;
-  box-shadow: 0 0 14px rgba(255, 214, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.current-asset-title {
-  font-size: 10px;
-  color: var(--accent);
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.current-asset-body {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.current-asset-tag { font-size: 17px; font-weight: 900; color: #fff; }
-.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
-
-.current-asset-ip {
-  font-family: monospace;
-  font-size: 14px;
-  color: #10b981;
-  font-weight: 800;
-  background: rgba(0,0,0,0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* ===================== BARRA DE PESQUISA ===================== */
-.search-box {
-  flex: none;
-  display: flex;
-  gap: 8px;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 8px 12px;
-  align-items: center;
-}
-.search-box input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-}
-.search-box input::placeholder { color: var(--sub); font-weight: 500; }
-.clear-btn {
-  background: var(--line);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 22px; height: 22px;
-  font-size: 13px;
-  font-weight: 900;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-}
-.clear-btn.show { display: flex; }
-
-/* ===================== SEÇÃO DE FILTROS ===================== */
-.filters-toggle {
-  flex: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 10px;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 800;
-  color: #fff;
-}
-.filters-toggle .chevron { color: var(--sub); font-size: 12px; transition: transform 0.15s ease; }
-.filters-toggle.open .chevron { transform: rotate(180deg); }
-
-.big-buttons-section {
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-  flex: none;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 10px;
-  margin-top: -2px;
-}
-.big-buttons-section.open { display: flex; }
-
-.button-group-label {
-  font-size: 10px;
-  color: var(--sub);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.grid-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.btn-big {
-  background: var(--card-active);
-  border: 2px solid var(--line);
-  color: #fff;
-  border-radius: 10px;
-  padding: 10px 4px;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.15s ease-in-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-
-.btn-big:active { transform: scale(0.96); }
-.btn-big.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(255, 214, 0, 0.4);
-}
-.btn-big small { font-size: 9px; opacity: 0.85; font-weight: 700; }
-
-/* ===================== LISTA DE ATIVOS / BACKBONE ===================== */
-.list-header {
-  flex: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 2px 2px 0 2px;
-}
-.list-header span { font-size: 11px; color: var(--sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.list-header b { color: #fff; font-size: 11px; }
-
-.assets-container {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 4px 0 10px 0;
-}
-
-.backbone-line {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-}
-
-.vagon-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.fiber-link {
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin: -2px 0;
-  z-index: 1;
-}
-
-.fiber-cable {
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(180deg, #10b981, #059669);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
-}
-
-.fiber-label {
-  position: absolute;
-  background: #064e3b;
-  border: 1px solid #10b981;
-  color: #a7f3d0;
-  font-size: 9px;
-  font-weight: 900;
-  padding: 1px 8px;
-  border-radius: 10px;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.asset-card {
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  position: relative;
-  z-index: 2;
-}
-
-.asset-card.nearest {
-  border: 2px solid var(--accent);
-}
-
-.asset-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.asset-tag { font-size: 14px; font-weight: 900; color: #fff; }
-.asset-km-badge {
-  background: rgba(255, 214, 0, 0.18);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 900;
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-
-.asset-ip-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px dashed #10b981;
-  border-radius: 8px;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.asset-ip-box span { font-size: 10px; color: var(--sub); font-weight: 700; }
-.asset-ip-box b { font-size: 15px; font-family: monospace; color: #10b981; font-weight: 900; }
-
-.asset-info {
-  font-size: 10px;
-  color: #cbd5e1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-}
-
-.asset-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 4px;
-  border-top: 1px solid var(--line);
-  font-size: 10px;
-}
-
-.badge-status {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
-.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
-.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1.5px solid var(--accent); }
-
-.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 13px; padding: 20px; font-weight: 600; }
-</style>
-</head>
-<body>
-
-<div class="app-container">
-
-  <!-- HUD DE KM E GPS -->
-  <div class="hud-card">
-    <div class="hud-top-row">
-      <div class="hud-top" id="gpsStatusTitle">Localizando GPS em tempo real...</div>
-      <div class="help-btn" id="helpBtn" onclick="toggleHelp()">?</div>
-    </div>
-    <div class="hud-sub">Sua posição estimada na via</div>
-    <div class="hud-km" id="kmDisplay">KM ---</div>
-    <div class="hud-meta">
-      <span id="gpsPrecision">Precisão: ...</span>
-      <span id="gpsCoords">0.0000, 0.0000</span>
-    </div>
-  </div>
-
-  <!-- PAINEL DE AJUDA (LEGENDA) -->
-  <div class="help-panel" id="helpPanel">
-    <div class="help-row"><span class="dot online"></span><span><b>Online</b> — ativo respondeu ao teste de conexão.</span></div>
-    <div class="help-row"><span class="dot offline"></span><span><b>Offline</b> — ativo não respondeu ao teste de conexão.</span></div>
-    <div class="help-row"><span class="dot checking"></span><span><b>Checando</b> — teste de conexão em andamento.</span></div>
-    <div class="help-row"><span class="dot nearest"></span><span><b>Borda amarela</b> — ativo mais próximo da sua posição atual.</span></div>
-    <div>Use a barra de busca para achar um ativo por nome, IP ou KM. Use os filtros para restringir sentido da via ou circuito de fibra.</div>
-  </div>
-
-  <!-- JANELINHA DO ATIVO DE BASE -->
-  <div class="current-asset-box" id="baseAssetBox">
-    <div class="current-asset-title">
-      <span>📍 Ativo mais próximo (base)</span>
-      <span id="baseDist">0m de você</span>
-    </div>
-    <div class="current-asset-body">
-      <span class="current-asset-tag" id="baseTag">Buscando...</span>
-      <span class="current-asset-km" id="baseKm">KM ---</span>
-    </div>
-    <div class="current-asset-ip">
-      <span style="font-size:10px; color:var(--sub);">IP:</span>
-      <b id="baseIp">0.0.0.0</b>
-      <span id="baseStatus" class="badge-status checking">CHECANDO</span>
-    </div>
-  </div>
-
-  <!-- BARRA DE PESQUISA RÁPIDA -->
-  <div class="search-box">
-    <span style="font-size:16px;">🔍</span>
-    <input type="text" id="searchInput" placeholder="Buscar por tag, IP ou KM..." oninput="onSearchChange()">
-    <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
-  </div>
-
-  <!-- TOGGLE DE FILTROS -->
-  <div class="filters-toggle" id="filtersToggle" onclick="toggleFilters()">
-    <span id="filtersSummary">Filtros: Todos os sentidos · Todas as fibras</span>
-    <span class="chevron">▾</span>
-  </div>
-
-  <!-- BOTÕES DE CONTROLE -->
-  <div class="big-buttons-section" id="filtersSection">
-    <div class="button-group-label">Sentido de leitura da via</div>
-    <div class="grid-buttons" id="dirButtons">
-      <button class="btn-big active" onclick="selectDir('all', this)">
-        <span>↕️ Todos</span>
-        <small>Sequência geral</small>
-      </button>
-      <button class="btn-big" onclick="selectDir('crescente', this)">
-        <span>⬆️ KM maior</span>
-        <small>Crescente</small>
-      </button>
-      <button class="btn-big" onclick="selectDir('decrescente', this)">
-        <span>⬇️ KM menor</span>
-        <small>Decrescente</small>
-      </button>
-    </div>
-
-    <div class="button-group-label" style="margin-top:4px;">Circuito de fibra</div>
-    <div class="grid-buttons" id="fiberButtons">
-      <button class="btn-big active" onclick="selectFiber('all', this)">
-        <span>⚡ Todas</span>
-      </button>
-      <button class="btn-big" onclick="selectFiber('11, 12', this)">
-        <span>🧵 11, 12</span>
-      </button>
-      <button class="btn-big" onclick="selectFiber('21, 22', this)">
-        <span>🧵 21, 22</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- CABEÇALHO DA LISTA -->
-  <div class="list-header">
-    <span>Ativos próximos</span>
-    <b id="listCount">0 encontrados</b>
-  </div>
-
-  <!-- LISTA DE ATIVOS -->
-  <div class="assets-container" id="assetsContainer">
-    <div class="empty-msg">Iniciando leitor de GPS e alinhando rede de fibras...</div>
-  </div>
-
-</div>
-
-<script>
-const STATE = {
-  snv: [],
-  assets: [],
-  pingCache: {},
-  currentKm: null,
-  lat: 0,
-  lon: 0,
-  acc: null,
-  dirFilter: 'all',
-  fiberFilter: 'all',
-  searchQuery: ''
-};
-
-const $ = id => document.getElementById(id);
-
-function parseKm(val) {
-  if (val === null || val === undefined) return NaN;
-  let s = String(val).trim().replace(/^\uFEFF/, '').replace(/^"/, '').replace(/"$/, '');
-  if (!s) return NaN;
-
-  const m = s.match(/^(\d{1,3})\s*\+\s*(\d{1,3})(?:[,.](\d+))?$/);
-  if (m) {
-    const km = Number(m[1]);
-    const mt = (m[2] + (m[3] || '')).padEnd(3, '0').slice(0, 3);
-    return km + (Number(mt) / 1000);
-  }
-
-  s = s.replace(/\./g, '').replace(',', '.');
-  const n = Number(s);
-  return Number.isFinite(n) ? n : NaN;
-}
-
-const escapeH = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-function parseSnvCsv(txt) {
-  if (!txt) return [];
-  const lines = txt.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) return [];
-
-  const sep = lines[0].includes(';') ? ';' : ',';
-  const h = lines[0].split(sep).map(x => x.trim().toLowerCase().replace(/[^a-z]/g, ''));
-  const iKm = h.findIndex(x => x.includes('km'));
-  const iLat = h.findIndex(x => x.includes('lat'));
-  const iLon = h.findIndex(x => x.includes('lon') || x.includes('long'));
-
-  if (iKm < 0 || iLat < 0 || iLon < 0) return [];
-
-  const list = [];
-  for (let i = 1; i < lines.length; i++) {
-    const r = lines[i].split(sep).map(x => x.trim().replace(/^"|"$/g, ''));
-    if (r.length <= Math.max(iKm, iLat, iLon)) continue;
-    const k = parseKm(r[iKm]);
-    const la = Number(r[iLat].replace(',', '.'));
-    const lo = Number(r[iLon].replace(',', '.'));
-    if (Number.isFinite(k) && Number.isFinite(la) && Number.isFinite(lo)) {
-      list.push({ km: k, lat: la, lon: lo });
-    }
-  }
-  return list;
-}
-
-function parseAssetsCsv(txt) {
-  if (!txt) return [];
-  const lines = txt.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 3) return [];
-
-  const list = [];
-  for (let i = 2; i < lines.length; i++) {
-    const r = lines[i].split(';').map(x => x.trim().replace(/^"|"$/g, ''));
-    if (r.length < 9) continue;
-
-    const tag = r[0] || 'Ativo';
-    const equip = r[1] || 'Equipamento';
-    const rawKm = r[3] || '';
-    const km = parseKm(rawKm);
-    const sentido = r[4] || '';
-    const fibra = r[5] || '11, 12';
-    const ip = r[8] || '';
-
-    if (Number.isFinite(km)) {
-      list.push({
-        tag: tag,
-        equip: equip,
-        km: km,
-        rawKm: rawKm || km.toFixed(3),
-        sentido: sentido,
-        fibra: fibra.trim(),
-        ip: ip
-      });
-    }
-  }
-  return list.sort((a, b) => a.km - b.km);
-}
-
-function calcNearestKm(la, lo) {
-  if (!STATE.snv.length) return null;
-  let best = STATE.snv[0], minD = Infinity;
-  const rad = Math.PI / 180, R = 6371000;
-
-  for (let i = 0; i < STATE.snv.length; i++) {
-    const p = STATE.snv[i];
-    const dLat = (p.lat - la) * rad;
-    const dLon = (p.lon - lo) * rad;
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
-    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    if (dist < minD) {
-      minD = dist;
-      best = p;
-    }
-  }
-  return { km: best.km, dist: minD };
-}
-
-function toggleHelp() {
-  $('helpPanel').classList.toggle('open');
-}
-
-function toggleFilters() {
-  $('filtersSection').classList.toggle('open');
-  $('filtersToggle').classList.toggle('open');
-}
-
-function updateFiltersSummary() {
-  const dirMap = { all: 'Todos os sentidos', crescente: 'KM crescente', decrescente: 'KM decrescente' };
-  const fiberMap = { all: 'Todas as fibras', '11, 12': 'Fibra 11, 12', '21, 22': 'Fibra 21, 22' };
-  $('filtersSummary').textContent = `Filtros: ${dirMap[STATE.dirFilter]} · ${fiberMap[STATE.fiberFilter]}`;
-}
-
-function selectDir(dir, btn) {
-  STATE.dirFilter = dir;
-  document.querySelectorAll('#dirButtons .btn-big').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateFiltersSummary();
-  renderAssets();
-}
-
-function selectFiber(fiber, btn) {
-  STATE.fiberFilter = fiber;
-  document.querySelectorAll('#fiberButtons .btn-big').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateFiltersSummary();
-  renderAssets();
-}
-
-function onSearchChange() {
-  STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
-  $('clearSearchBtn').classList.toggle('show', STATE.searchQuery.length > 0);
-  renderAssets();
-}
-
-function clearSearch() {
-  $('searchInput').value = '';
-  STATE.searchQuery = '';
-  $('clearSearchBtn').classList.remove('show');
-  renderAssets();
-}
-
-/* BLINDAGEM DE PING: Timeout rápido e controle para evitar crash de rede */
-async function pingIp(ip) {
-  if (!ip) return 'no-ip';
-  const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), 800);
-  try {
-    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-store' });
-    clearTimeout(id);
-    return 'online';
-  } catch (e) {
-    clearTimeout(id);
-    return (e.name === 'AbortError') ? 'offline' : 'online';
-  }
-}
-
-async function runPings(visibleList, absoluteNearest) {
-  // Executa pings de forma sequencial leve para não travar a thread principal do celular
-  const targets = [];
-  if (absoluteNearest && absoluteNearest.ip) targets.push(absoluteNearest);
-  for (const item of visibleList) {
-    if (item.ip && !targets.includes(item)) targets.push(item);
-  }
-
-  for (const item of targets.slice(0, 5)) { // Limita a no máximo 5 pings por ciclo para poupar o WebView
-    if (!STATE.pingCache[item.ip]) {
-      STATE.pingCache[item.ip] = await pingIp(item.ip);
-      updateUIOnly();
-    }
-  }
-}
-
-function getAbsoluteNearest(km) {
-  if (!STATE.assets.length || !Number.isFinite(km)) return null;
-  let best = STATE.assets[0];
-  let minDiff = Math.abs(STATE.assets[0].km - km);
-
-  for (let i = 1; i < STATE.assets.length; i++) {
-    const diff = Math.abs(STATE.assets[i].km - km);
-    if (diff < minDiff) {
-      minDiff = diff;
-      best = STATE.assets[i];
-    }
-  }
-  return best;
-}
-
-function getDisplayList(absoluteNearest) {
-  const km = STATE.currentKm;
-  if (!STATE.assets.length || !Number.isFinite(km)) return { list: [] };
-
-  let pool = STATE.assets;
-
-  if (STATE.fiberFilter !== 'all') {
-    pool = pool.filter(a => a.fibra === STATE.fiberFilter);
-    if (!pool.length) pool = STATE.assets;
-  }
-
-  if (STATE.searchQuery) {
-    pool = pool.filter(a =>
-      a.tag.toLowerCase().includes(STATE.searchQuery) ||
-      a.ip.toLowerCase().includes(STATE.searchQuery) ||
-      a.rawKm.toLowerCase().includes(STATE.searchQuery) ||
-      a.equip.toLowerCase().includes(STATE.searchQuery)
-    );
-  }
-
-  if (!pool.length) return { list: [] };
-
-  let list = [];
-  if (STATE.dirFilter === 'crescente') {
-    list = pool.filter(a => a.km >= km).slice(0, 5);
-  } else if (STATE.dirFilter === 'decrescente') {
-    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 5);
-  } else {
-    const behind = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 2).reverse();
-    const ahead = pool.filter(a => a.km > km).sort((a, b) => a.km - b.km).slice(0, 3);
-    const set = new Map();
-    [...behind, absoluteNearest, ...ahead].forEach(a => {
-      if (a) set.set(a.tag + a.km + a.ip, a);
-    });
-    list = Array.from(set.values()).sort((a, b) => a.km - b.km);
-  }
-
-  return { list };
-}
-
-function updateUIOnly() {
-  const km = STATE.currentKm;
-  if (!Number.isFinite(km)) return;
-
-  const absoluteNearest = getAbsoluteNearest(km);
-
-  if (absoluteNearest) {
-    const distM = Math.abs((absoluteNearest.km - km) * 1000).toFixed(0);
-    $('baseTag').textContent = absoluteNearest.tag;
-    $('baseKm').textContent = `KM ${absoluteNearest.rawKm}`;
-    $('baseIp').textContent = absoluteNearest.ip || 'SEM IP';
-    $('baseDist').textContent = `${distM}m de você`;
-
-    const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
-    const baseSt = $('baseStatus');
-    baseSt.className = `badge-status ${st}`;
-    baseSt.textContent = st === 'online' ? 'ONLINE' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
-  }
-
-  const { list } = getDisplayList(absoluteNearest);
-  const container = $('assetsContainer');
-  $('listCount').textContent = `${list.length} encontrado${list.length === 1 ? '' : 's'}`;
-
-  if (!list.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.</div>';
-    return;
-  }
-
-  let html = '<div class="backbone-line">';
-  for (let i = 0; i < list.length; i++) {
-    const a = list[i];
-    const isNearest = absoluteNearest && a.tag === absoluteNearest.tag && a.km === absoluteNearest.km;
-    const diff = a.km - km;
-    const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'no ponto de base';
-    const ping = STATE.pingCache[a.ip] || 'checking';
-
-    let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE'; }
-    else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
-    if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
-
-    html += `<div class="vagon-wrapper">`;
-
-    html += `<div class="asset-card${isNearest ? ' nearest' : ''}">
-      <div class="asset-header">
-        <span class="asset-tag">📦 ${isNearest ? '★ ' : ''}${escapeH(a.tag)}</span>
-        <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
-      </div>
-
-      <div class="asset-ip-box">
-        <span>IP:</span>
-        <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
-      </div>
-
-      <div class="asset-info">
-        <span><b>Equip.:</b> ${escapeH(a.equip)}</span>
-        <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
-      </div>
-
-      <div class="asset-footer">
-        <span>${distM}m · ${dirTxt}</span>
-        <span class="badge-status ${badgeCls}">${badgeTxt}</span>
-      </div>
-    </div>`;
-
-    if (i < list.length - 1) {
-      const nextAsset = list[i + 1];
-      const spanKm = Math.abs((nextAsset.km - a.km) * 1000).toFixed(0);
-      html += `<div class="fiber-link">
-        <div class="fiber-cable"></div>
-        <div class="fiber-label">🧵 Fibra ${escapeH(a.fibra)} · ${spanKm}m</div>
-      </div>`;
-    }
-
-    html += `</div>`;
-  }
-  html += '</div>';
-
-  container.innerHTML = html;
-}
-
-function renderAssets() {
-  const km = STATE.currentKm;
-  if (!STATE.assets.length || !Number.isFinite(km)) return;
-  const absoluteNearest = getAbsoluteNearest(km);
-  const { list } = getDisplayList(absoluteNearest);
-  updateUIOnly();
-  runPings(list, absoluteNearest);
-}
-
-function updateGpsUI() {
-  $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
-  $('gpsStatusTitle').textContent = 'KM localizado em tempo real';
-  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS ativo';
-  $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
-}
-
-let lastRefreshTime = 0;
-function refreshAll() {
-  if (!STATE.snv.length || !STATE.lat) return;
-
-  // Throttle de segurança: impede recálculos excessivos se o GPS pulsar rápido demais (mínimo 1 segundo entre atualizações)
-  const now = Date.now();
-  if (now - lastRefreshTime < 1000) return;
-  lastRefreshTime = now;
-
-  const res = calcNearestKm(STATE.lat, STATE.lon);
-  if (res) {
-    STATE.currentKm = res.km;
-    updateGpsUI();
-    renderAssets();
-  }
-}
-
-async function loadFiles() {
-  try {
-    let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now());
-    if (r.ok) STATE.snv = parseSnvCsv(await r.text());
-
-    const names = ['ativos 116 (1).csv', 'ativos 116.csv', 'ativos_116.csv'];
-    for (const name of names) {
+<html lang="en">
+  <head>
+    <script>self["MonacoEnvironment"] = (function (paths) {
+          return {
+            globalAPI: false,
+            getWorkerUrl : function (moduleId, label) {
+              var result =  paths[label];
+              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
+                var currentUrl = String(window.location);
+                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
+                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
+                  var js = '/*' + label + '*/importScripts("' + result + '");';
+                  var blob = new Blob([js], { type: 'application/javascript' });
+                  return URL.createObjectURL(blob);
+                }
+              }
+              return result;
+            }
+          };
+        })({
+  "editorWorkerService": "/monacoeditorwork/editor.worker.bundle.js",
+  "typescript": "/monacoeditorwork/ts.worker.bundle.js",
+  "json": "/monacoeditorwork/json.worker.bundle.js",
+  "css": "/monacoeditorwork/css.worker.bundle.js",
+  "html": "/monacoeditorwork/html.worker.bundle.js",
+  "javascript": "/monacoeditorwork/ts.worker.bundle.js",
+  "less": "/monacoeditorwork/css.worker.bundle.js",
+  "scss": "/monacoeditorwork/css.worker.bundle.js",
+  "handlebars": "/monacoeditorwork/html.worker.bundle.js",
+  "razor": "/monacoeditorwork/html.worker.bundle.js"
+});</script>
+
+    <!-- Runtime config — must execute before the Vite module scripts read
+         window.__APP_CONFIG__. `defer` keeps that order (deferred classic
+         scripts and module scripts run in document order after parsing) while
+         unblocking the HTML parser, so asset preloads start immediately
+         instead of stalling ~160ms (p75) on this API round trip.
+         Back on the .js path: Render's extension-keyed edge cache rule twice
+         pinned a wrong body under this URL despite `no-store` (2026-08-20 and
+         2026-08-24); Render has since removed that cache rule for us, so the
+         suffix is safe again. If poisoning recurs: bump the `?v=` cache key,
+         or switch the src to the extension-less /api/frontend-config route
+         (kept serving as an escape hatch). -->
+    <script src="/api/frontend-config.js?v=3" defer></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <meta charset="utf-8" />
+    <!-- Platform favicon: a real multi-size ICO (16/32/48) of the current sun
+         mark, served from public/. This is the ONLY rel="icon" link, and it
+         must stay that way — App.js rewrites the first match for backoffice.
+         Crawlers and link scrapers read this tag (and probe /favicon.ico
+         directly) with no JS, so the brand has to be correct statically. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <script>
+      // Pre-paint theme stamp for the Appearance (appearance-themes) cohort: on
+      // a hard load the theme is applied by React (AppearanceThemeApplier) only after
+      // auth resolves, so the document boots light — a white flash,
+      // then light route skeletons (the FOUC this removes). AppearanceThemeApplier
+      // persists 'appearance-theme-applied' only while the feature is active,
+      // so every other cohort (flag-off, native, backoffice, runtime apps)
+      // never sets it and this stays a no-op. React stays the source of truth
+      // after mount: AppearanceThemeApplier
+      // re-applies or clears these exact attributes. Keys must stay byte-identical
+      // with components/settings/useAppearanceTheme.ts — BOOT_STAMP_CONTRACT there is
+      // asserted against this file by useAppearanceTheme.spec.ts, so update both.
+      //
+      // Kill-switch caveat: the marker is written while the feature is active and
+      // only cleared once /me resolves. On the FIRST load after a user loses the
+      // flag — or after the kill switch is flipped mid-incident — this still
+      // stamps dark, then React settles to light: one dark→light flash, which
+      // self-heals from the next load on. Flipping the switch does not repaint
+      // already-open tabs pre-paint; it collapses them on their next load.
       try {
-        r = await fetch(encodeURI(name + '?v=' + Date.now()));
-        if (r.ok) {
-          const list = parseAssetsCsv(await r.text());
-          if (list.length) {
-            STATE.assets = list;
-            break;
+        if ((localStorage.getItem('appearance-theme-applied') || localStorage.getItem('demo-display-theme-applied')) === '1') {
+          var appearanceTheme = localStorage.getItem('appearance-theme') || localStorage.getItem('demo-display-theme');
+          var appearanceDark = appearanceTheme === 'dark' ||
+            (appearanceTheme !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (appearanceDark) {
+            var appearanceRoot = document.documentElement;
+            appearanceRoot.setAttribute('data-ds', 'base44');
+            appearanceRoot.setAttribute('data-theme', 'dark');
+            appearanceRoot.classList.add('dark');
+            // Kill the pre-CSS white document flash; the app paints over it.
+            appearanceRoot.style.backgroundColor = '#09090b';
           }
         }
       } catch (e) {}
-    }
-    refreshAll();
-  } catch (e) {}
-}
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-updateFiltersSummary();
-loadFiles();
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Build useful apps, fast with Base44."
+    />
 
-/* GEOLOCALIZAÇÃO BLINDADA COM THROTTLE */
-if ('geolocation' in navigator) {
-  navigator.geolocation.watchPosition(p => {
-    STATE.lat = p.coords.latitude;
-    STATE.lon = p.coords.longitude;
-    STATE.acc = p.coords.accuracy;
-    refreshAll();
-  }, err => {
-    $('gpsStatusTitle').textContent = 'Erro: permita o acesso ao GPS do celular';
-  }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 });
-} else {
-  $('gpsStatusTitle').textContent = 'GPS não disponível neste dispositivo';
-}
-</script>
-</body>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Base44">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json" />
+    <title>Base44</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://app.base44.com" />
+    <meta property="og:title" content="Base44" />
+    <meta property="og:site_name" content="Base44" />
+    <meta property="og:description" content="Build useful apps, fast with Base44." />
+    <meta property="og:image" content="https://app.base44.com/link_preview_v3.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Base44 link preview" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://app.base44.com" />
+    <meta name="twitter:title" content="Base44" />
+    <meta name="twitter:description" content="Build useful apps, fast with Base44." />
+    <meta name="twitter:image" content="https://app.base44.com/link_preview_v3.png" />
+    <meta name="twitter:image:alt" content="Base44 link preview" />
+    <script type="module" crossorigin src="/static/index-CW9_z2dx.js"></script>
+    <link rel="modulepreload" crossorigin href="/static/rolldown-runtime-C0FnF6B9.js">
+    <link rel="modulepreload" crossorigin href="/static/runtime-DdIC7kqw.js">
+    <link rel="modulepreload" crossorigin href="/static/backend-B-kMO6p1.js">
+    <link rel="modulepreload" crossorigin href="/static/vendor-react-CsmJD3cz.js">
+    <link rel="modulepreload" crossorigin href="/static/preload-helper-BZ1Pz5am.js">
+    <link rel="modulepreload" crossorigin href="/static/vendor-data-Bcmgbf-W.js">
+    <link rel="modulepreload" crossorigin href="/static/errorReporting-BNRHTjef.js">
+    <link rel="modulepreload" crossorigin href="/static/i18n-BH51gS-9.js">
+    <link rel="modulepreload" crossorigin href="/static/vendor-utils-avec06h0.js">
+    <link rel="modulepreload" crossorigin href="/static/mixpanelUtils-CLbrckDy.js">
+    <link rel="modulepreload" crossorigin href="/static/use-toast--OgxAUc4.js">
+    <link rel="modulepreload" crossorigin href="/static/bridge-Cq_Szqk4.js">
+    <link rel="modulepreload" crossorigin href="/static/axiosClient-CmTwF6E4.js">
+    <link rel="modulepreload" crossorigin href="/static/I18nProvider-DneZ21KP.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-DBtlVRZs.js">
+    <link rel="modulepreload" crossorigin href="/static/base-zPWgDw8Z.js">
+    <link rel="modulepreload" crossorigin href="/static/AuthAPI-BCuUQYQL.js">
+    <link rel="modulepreload" crossorigin href="/static/useDesignSystem-DStR7eie.js">
+    <link rel="modulepreload" crossorigin href="/static/logoutReturnPath-HjtsxsFd.js">
+    <link rel="modulepreload" crossorigin href="/static/AuthContext-DcduamNZ.js">
+    <link rel="modulepreload" crossorigin href="/static/vendor-ui-egc1Hb3n.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-Dd5GUXZ4.js">
+    <link rel="modulepreload" crossorigin href="/static/useHideNativeBottomTabs-CvZWIjid.js">
+    <link rel="modulepreload" crossorigin href="/static/native-mobile-app-MJcxGV-L.js">
+    <link rel="modulepreload" crossorigin href="/static/prop-types-D9WxI36-.js">
+    <link rel="modulepreload" crossorigin href="/static/esm-0uQNWtkT.js">
+    <link rel="modulepreload" crossorigin href="/static/use-mobile-BOFIpJzP.js">
+    <link rel="modulepreload" crossorigin href="/static/create-zustand-store-DjBL0aBO.js">
+    <link rel="modulepreload" crossorigin href="/static/persist-to-storage-BO7qihDS.js">
+    <link rel="modulepreload" crossorigin href="/static/actions.middleware-D_eRWZoy.js">
+    <link rel="modulepreload" crossorigin href="/static/WorkspaceAPI-eLxGOGFm.js">
+    <link rel="modulepreload" crossorigin href="/static/useWorkspaceUnlockState-Cg67Ec9B.js">
+    <link rel="modulepreload" crossorigin href="/static/WorkspaceContext-BI5-CkI8.js">
+    <link rel="modulepreload" crossorigin href="/static/react-D60gXSvz.js">
+    <link rel="modulepreload" crossorigin href="/static/useFeatureFlags-CU0t5_CB.js">
+    <link rel="modulepreload" crossorigin href="/static/utils-SteRBaZv.js">
+    <link rel="modulepreload" crossorigin href="/static/toast-Czi0VCYq.js">
+    <link rel="modulepreload" crossorigin href="/static/moment-CbrR2L3o.js">
+    <link rel="modulepreload" crossorigin href="/static/SubdomainContext-BzrrSAmr.js">
+    <link rel="stylesheet" crossorigin href="/static/index-CD4jDvim.css">
+    <meta name="bundle-commit" content="51c1eef9854f9777fac6054e088a863a2ac3a960">
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>
