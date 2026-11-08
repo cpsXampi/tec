@@ -3,19 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#000000">
-<title>INDEX - Monitor de Campo & Backbone</title>
+<meta name="theme-color" content="#0a0e14">
+<title>Motiva INDEX - Monitor de Campo & Backbone</title>
 <style>
+/* =========================================================
+   PALETA MOTIVA
+   --roxo / --roxo-escuro = identidade visual corporativa Motiva
+   --green / --red / --amarelo-status = cores funcionais de status
+   (mantidas por universalidade: verde=ok, vermelho=problema)
+   ========================================================= */
 :root {
-  --bg: #000000;
-  --card: #0f141c;
-  --card-active: #182232;
-  --accent: #ffd600;
+  --bg: #0a0e14;
+  --card: #141a24;
+  --card-active: #1e2636;
+  --roxo: #5E22F3;
+  --roxo-claro: #8b5cf6;
+  --roxo-escuro: #2d0f80;
   --green: #10b981;
   --red: #ef4444;
+  --status-check: #ffb020;
   --text: #ffffff;
   --sub: #94a3b8;
-  --line: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.15);
   --sb: max(env(safe-area-inset-bottom), 16px);
   --st: env(safe-area-inset-top, 0px);
 }
@@ -27,43 +36,90 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: calc(8px + var(--st)) 10px var(--sb);
-  gap: 6px;
-  background: #000000;
+  padding: calc(8px + var(--st)) 12px var(--sb);
+  gap: 8px;
 }
 
-/* HUD PRINCIPAL - VERDE COMPACTO */
+/* ---------- CABEÇALHO DE MARCA MOTIVA ---------- */
+.brand-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
+  border-radius: 14px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 14px rgba(94, 34, 243, 0.35);
+}
+.brand-left { display: flex; align-items: center; gap: 8px; }
+.brand-logo {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: #fff; color: var(--roxo); font-weight: 900;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.brand-name { font-size: 15px; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
+.brand-sub { font-size: 9px; color: #e9e1ff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.brand-help {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 13px; cursor: pointer; border: none;
+}
+
+/* ---------- LEGENDA RÁPIDA (explica os status) ---------- */
+.legend-panel {
+  display: none;
+  flex: none;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--sub);
+  line-height: 1.7;
+}
+.legend-panel.open { display: block; }
+.legend-panel b { color: #fff; }
+.legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.dot.on { background: var(--green); }
+.dot.off { background: var(--red); }
+.dot.chk { background: var(--status-check); }
+.dot.base { background: var(--roxo-claro); }
+
+/* ---------- HUD PRINCIPAL DE KM / GPS ---------- */
 .hud-card {
-  background: linear-gradient(135deg, #04392a, #011c15);
-  border: 1.5px solid #059669;
-  border-radius: 12px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  background: linear-gradient(135deg, #064e3b, #022c22);
+  border: 2px solid #059669;
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
   flex: none;
 }
-.hud-top { font-size: 9px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.hud-km { font-size: 26px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
-.hud-meta { display: flex; justify-content: space-between; font-size: 9px; color: #a7f3d0; font-weight: 600; }
+.hud-top { font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+.hud-km { font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
+.hud-meta { display: flex; justify-content: space-between; font-size: 10px; color: #a7f3d0; font-weight: 600; }
+.hud-update { font-size: 9px; color: #6ee7b7; margin-top: 2px; }
 
-/* JANELINHA DO ATIVO DE BASE (MOSTRANDO FIBRA) */
+/* ---------- ATIVO MAIS PRÓXIMO (BASE) - agora em roxo Motiva ---------- */
 .current-asset-box {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15), rgba(255, 214, 0, 0.03));
-  border: 1.5px solid var(--accent);
-  border-radius: 12px;
-  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(94, 34, 243, 0.22), rgba(94, 34, 243, 0.06));
+  border: 2px solid var(--roxo-claro);
+  border-radius: 14px;
+  padding: 10px 14px;
   flex: none;
-  box-shadow: 0 0 10px rgba(255, 214, 0, 0.15);
+  box-shadow: 0 0 14px rgba(94, 34, 243, 0.3);
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .current-asset-title {
-  font-size: 9px;
-  color: var(--accent);
+  font-size: 10px;
+  color: var(--roxo-claro);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   display: flex;
   justify-content: space-between;
 }
@@ -74,37 +130,31 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
 }
 
-.current-asset-tag { font-size: 15px; font-weight: 900; color: #fff; }
-.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 11px; }
-
-.current-asset-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 10px;
-  color: #cbd5e1;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
+.current-asset-tag { font-size: 17px; font-weight: 900; color: #fff; }
+.current-asset-km { background: rgba(139, 92, 246, 0.22); color: var(--roxo-claro); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
 
 .current-asset-ip {
   font-family: monospace;
-  font-size: 13px;
+  font-size: 14px;
   color: #10b981;
   font-weight: 800;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* BARRA DE PESQUISA RÁPIDA COMPACTA */
+/* ---------- BARRA DE PESQUISA ---------- */
 .search-box {
   flex: none;
   display: flex;
-  gap: 6px;
-  background: #0d1117;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  padding: 5px 10px;
+  gap: 8px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 6px 12px;
   align-items: center;
 }
 .search-box input {
@@ -113,21 +163,27 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border: none;
   outline: none;
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 .search-box input::placeholder { color: var(--sub); font-weight: 500; }
+.search-clear {
+  border: none; background: var(--line); color: #fff;
+  width: 20px; height: 20px; border-radius: 50%; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  flex: none;
+}
 
-/* CONTROLES E FILTROS COMPACTOS */
+/* ---------- BOTÕES DE FILTRO ---------- */
 .big-buttons-section {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: none;
 }
 
 .button-group-label {
-  font-size: 8.5px;
+  font-size: 9px;
   color: var(--sub);
   font-weight: 800;
   text-transform: uppercase;
@@ -137,43 +193,44 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .grid-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 6px;
 }
 
 .btn-big {
-  background: #0d1117;
-  border: 1.5px solid var(--line);
+  background: var(--card);
+  border: 2px solid var(--line);
   color: #fff;
-  border-radius: 8px;
-  padding: 6px 3px;
-  font-size: 11px;
+  border-radius: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   text-align: center;
+  transition: all 0.15s ease-in-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
 }
 
 .btn-big:active { transform: scale(0.96); }
 .btn-big.active {
-  background: var(--accent);
-  color: #000;
-  border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(255, 214, 0, 0.3);
+  background: var(--roxo);
+  color: #fff;
+  border-color: var(--roxo);
+  box-shadow: 0 0 10px rgba(94, 34, 243, 0.5);
 }
-.btn-big small { font-size: 8px; opacity: 0.85; font-weight: 700; }
+.btn-big small { font-size: 9px; opacity: 0.85; font-weight: 700; }
 
-/* MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO */
+/* ---------- LISTA DE ATIVOS / BACKBONE ---------- */
 .assets-container {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 2px 0 10px 0;
-  background: #000000;
+  padding: 4px 0 10px 0;
 }
 
 .backbone-line {
@@ -190,101 +247,134 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: stretch;
 }
 
-/* LINHA CONECTORA DISCRETA E LIMPA */
-.clean-connector {
-  height: 12px;
+.fiber-link {
+  height: 22px;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-.clean-connector-line {
-  width: 2px;
-  height: 100%;
-  background: rgba(16, 185, 129, 0.6);
-  box-shadow: 0 0 4px #10b981;
+  justify-content: center;
+  position: relative;
+  margin: -2px 0;
+  z-index: 1;
 }
 
-/* CARDS E ÍCONES MENORES E SEQUENCIAIS */
-.mini-asset-card {
-  background: #0b0f17;
-  border: 1.5px solid var(--line);
+.fiber-cable {
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #10b981, #059669);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+}
+
+.fiber-label {
+  position: absolute;
+  background: #064e3b;
+  border: 1px solid #10b981;
+  color: #a7f3d0;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 8px;
   border-radius: 10px;
-  padding: 8px 10px;
+  letter-spacing: 0.5px;
+}
+
+.asset-card {
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  position: relative;
-}
-
-.mini-asset-card.nearest {
-  border: 1.5px solid var(--accent);
-  background: linear-gradient(135deg, #161b26, #0b0f17);
-}
-
-.mini-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mini-tag {
-  font-size: 13px;
-  font-weight: 900;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
   gap: 4px;
+  position: relative;
+  z-index: 2;
 }
 
-.mini-km {
-  background: rgba(255, 214, 0, 0.15);
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 900;
-  padding: 1px 6px;
-  border-radius: 4px;
+.asset-card.nearest {
+  border: 2px solid var(--roxo-claro);
 }
 
-.mini-body {
+.asset-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 10px;
-  color: #94a3b8;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 3px 6px;
+}
+
+.asset-tag { font-size: 14px; font-weight: 900; color: #fff; }
+.asset-km-badge {
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--roxo-claro);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 2px 6px;
   border-radius: 6px;
 }
 
-.mini-ip { font-family: monospace; font-size: 12px; color: #10b981; font-weight: 800; }
-.mini-fiber { color: var(--accent); font-weight: 800; font-size: 10px; }
-
-.mini-footer {
+.asset-ip-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px dashed #10b981;
+  border-radius: 8px;
+  padding: 6px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 9.5px;
-  color: #64748b;
-  margin-top: 1px;
+}
+
+.asset-ip-box span { font-size: 10px; color: var(--sub); font-weight: 700; }
+.asset-ip-box b { font-size: 15px; font-family: monospace; color: #10b981; font-weight: 900; }
+
+.asset-info {
+  font-size: 10px;
+  color: #cbd5e1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.asset-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
 }
 
 .badge-status {
-  padding: 1px 6px;
-  border-radius: 6px;
-  font-size: 8.5px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
 }
-.badge-status.online { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
-.badge-status.offline { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
-.badge-status.checking { background: rgba(255, 214, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
+.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
+.badge-status.checking { background: rgba(255, 176, 32, 0.22); color: var(--status-check); border: 1.5px solid var(--status-check); }
 
-.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 12px; padding: 20px; font-weight: 600; }
+.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 13px; padding: 20px; font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
+
+  <!-- CABEÇALHO COM IDENTIDADE MOTIVA -->
+  <div class="brand-bar">
+    <div class="brand-left">
+      <div class="brand-logo">M</div>
+      <div>
+        <div class="brand-name">MOTIVA</div>
+        <div class="brand-sub">Monitor de Campo &amp; Backbone</div>
+      </div>
+    </div>
+    <button class="brand-help" onclick="toggleLegend()" title="O que significam os status?">?</button>
+  </div>
+
+  <!-- LEGENDA: explica os status de cor para quem nunca usou o app -->
+  <div class="legend-panel" id="legendPanel">
+    <div class="legend-row"><span class="dot on"></span><b>Online</b> — ping respondeu, ativo acessível na rede.</div>
+    <div class="legend-row"><span class="dot off"></span><b>Offline</b> — ping não respondeu, verificar o ativo em campo.</div>
+    <div class="legend-row"><span class="dot chk"></span><b>Checando</b> — teste de conexão em andamento.</div>
+    <div class="legend-row"><span class="dot base"></span><b>Base (roxo)</b> — ativo mais próximo da sua posição GPS agora.</div>
+  </div>
 
   <!-- HUD DE KM E GPS -->
   <div class="hud-card">
@@ -294,53 +384,55 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <span id="gpsPrecision">Precisão: ...</span>
       <span id="gpsCoords">0.0000, 0.0000</span>
     </div>
+    <div class="hud-update" id="hudUpdate">Aguardando primeira leitura de GPS...</div>
   </div>
 
-  <!-- JANELINHA DO ATIVO DE BASE COM DETALHE DA FIBRA -->
+  <!-- ATIVO MAIS PRÓXIMO DA POSIÇÃO (BASE) -->
   <div class="current-asset-box" id="baseAssetBox">
     <div class="current-asset-title">
-      <span>📍 Ativo Mais Próximo da Posição (Base)</span>
+      <span>📍 Ativo mais próximo de você (Base)</span>
       <span id="baseDist">0m de você</span>
     </div>
     <div class="current-asset-body">
       <span class="current-asset-tag" id="baseTag">Buscando...</span>
       <span class="current-asset-km" id="baseKm">KM ---</span>
     </div>
-    <div class="current-asset-meta">
-      <span>FIBRA: <b id="baseFiber" style="color:var(--accent);">--</b></span>
-      <span class="current-asset-ip" id="baseIp">0.0.0.0</span>
+    <div class="current-asset-ip">
+      <span style="font-size:10px; color:var(--sub);">IP:</span>
+      <b id="baseIp">0.0.0.0</b>
       <span id="baseStatus" class="badge-status checking">CHECANDO</span>
     </div>
   </div>
 
   <!-- BARRA DE PESQUISA RÁPIDA -->
   <div class="search-box">
-    <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Buscar Tag, IP ou KM..." oninput="onSearchChange()">
+    <span style="font-size:16px;">🔍</span>
+    <input type="text" id="searchInput" placeholder="Buscar por Tag, IP ou KM..." oninput="onSearchChange()">
+    <button class="search-clear" id="searchClearBtn" style="display:none;" onclick="clearSearch()">✕</button>
   </div>
 
-  <!-- BOTÕES DE FILTRO -->
+  <!-- BOTÕES DE CONTROLE -->
   <div class="big-buttons-section">
-    <div class="button-group-label">1. Sentido de Leitura:</div>
+    <div class="button-group-label">1. Direção de leitura na via (a partir da sua posição):</div>
     <div class="grid-buttons" id="dirButtons">
       <button class="btn-big active" onclick="selectDir('all', this)">
-        <span>↕️ TODOS</span>
-        <small>Sequência Geral</small>
+        <span>↕️ Todos</span>
+        <small>Antes e depois</small>
       </button>
       <button class="btn-big" onclick="selectDir('crescente', this)">
-        <span>⬆️ KM MAIOR</span>
-        <small>Crescente</small>
+        <span>⬆️ Km maior</span>
+        <small>Só à frente</small>
       </button>
       <button class="btn-big" onclick="selectDir('decrescente', this)">
-        <span>⬇️ KM MENOR</span>
-        <small>Decrescente</small>
+        <span>⬇️ Km menor</span>
+        <small>Só atrás</small>
       </button>
     </div>
 
-    <div class="button-group-label" style="margin-top:1px;">2. Circuito de Fibra:</div>
+    <div class="button-group-label" style="margin-top:2px;">2. Filtrar por circuito de fibra:</div>
     <div class="grid-buttons" id="fiberButtons">
       <button class="btn-big active" onclick="selectFiber('all', this)">
-        <span>⚡ TODAS</span>
+        <span>⚡ Todas</span>
       </button>
       <button class="btn-big" onclick="selectFiber('11, 12', this)">
         <span>🧵 11, 12</span>
@@ -351,19 +443,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO -->
+  <!-- LISTA DE ATIVOS -->
   <div class="assets-container" id="assetsContainer">
-    <div class="empty-msg">Iniciando GPS e alinhando mapa de fibras...</div>
+    <div class="empty-msg">Iniciando leitor de GPS e alinhando rede de fibras...</div>
   </div>
 
 </div>
 
 <script>
+/* =========================================================
+   ESTADO GLOBAL DA APLICAÇÃO
+   ========================================================= */
 const STATE = {
-  snv: [],
-  assets: [],
-  pingCache: {},
-  currentKm: null,
+  snv: [],            // pontos de referencia KM x Lat/Lon (arquivo SNV)
+  assets: [],         // ativos de campo (equipamentos de fibra)
+  pingCache: {},      // cache de status de ping por IP
+  currentKm: null,    // KM atual calculado a partir do GPS
   lat: 0,
   lon: 0,
   acc: null,
@@ -373,6 +468,18 @@ const STATE = {
 };
 
 const $ = id => document.getElementById(id);
+
+/* Alterna a exibicao da legenda de status (ajuda novos usuarios) */
+function toggleLegend() {
+  $('legendPanel').classList.toggle('open');
+}
+
+function clearSearch() {
+  $('searchInput').value = '';
+  STATE.searchQuery = '';
+  $('searchClearBtn').style.display = 'none';
+  renderAssets();
+}
 
 function parseKm(val) {
   if (val === null || val === undefined) return NaN;
@@ -488,9 +595,11 @@ function selectFiber(fiber, btn) {
 
 function onSearchChange() {
   STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
+  $('searchClearBtn').style.display = STATE.searchQuery ? 'flex' : 'none';
   renderAssets();
 }
 
+/* BLINDAGEM DE PING: Timeout rápido e controle para evitar crash de rede */
 async function pingIp(ip) {
   if (!ip) return 'no-ip';
   const ctrl = new AbortController();
@@ -506,13 +615,14 @@ async function pingIp(ip) {
 }
 
 async function runPings(visibleList, absoluteNearest) {
+  // Executa pings de forma sequencial leve para nao travar a thread principal do celular
   const targets = [];
   if (absoluteNearest && absoluteNearest.ip) targets.push(absoluteNearest);
   for (const item of visibleList) {
     if (item.ip && !targets.includes(item)) targets.push(item);
   }
 
-  for (const item of targets.slice(0, 5)) {
+  for (const item of targets.slice(0, 5)) { // Limita a no maximo 5 pings por ciclo para poupar o WebView
     if (!STATE.pingCache[item.ip]) {
       STATE.pingCache[item.ip] = await pingIp(item.ip);
       updateUIOnly();
@@ -547,9 +657,9 @@ function getDisplayList(absoluteNearest) {
   }
 
   if (STATE.searchQuery) {
-    pool = pool.filter(a => 
-      a.tag.toLowerCase().includes(STATE.searchQuery) || 
-      a.ip.toLowerCase().includes(STATE.searchQuery) || 
+    pool = pool.filter(a =>
+      a.tag.toLowerCase().includes(STATE.searchQuery) ||
+      a.ip.toLowerCase().includes(STATE.searchQuery) ||
       a.rawKm.toLowerCase().includes(STATE.searchQuery) ||
       a.equip.toLowerCase().includes(STATE.searchQuery)
     );
@@ -559,17 +669,17 @@ function getDisplayList(absoluteNearest) {
 
   let list = [];
   if (STATE.dirFilter === 'crescente') {
-    list = pool.filter(a => a.km >= km).slice(0, 6);
+    list = pool.filter(a => a.km >= km).slice(0, 5);
   } else if (STATE.dirFilter === 'decrescente') {
-    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 6);
+    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 5);
   } else {
     const behind = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 2).reverse();
     const ahead = pool.filter(a => a.km > km).sort((a, b) => a.km - b.km).slice(0, 3);
     const set = new Map();
     [...behind, absoluteNearest, ...ahead].forEach(a => {
-      if(a) set.set(a.tag + a.km + a.ip, a);
+      if (a) set.set(a.tag + a.km + a.ip, a);
     });
-    list = Array.from(set.values()).sort((a,b) => a.km - b.km);
+    list = Array.from(set.values()).sort((a, b) => a.km - b.km);
   }
 
   return { list };
@@ -581,26 +691,24 @@ function updateUIOnly() {
 
   const absoluteNearest = getAbsoluteNearest(km);
 
-  // Atualiza Janelinha de Base (Com Fibra visível)
   if (absoluteNearest) {
     const distM = Math.abs((absoluteNearest.km - km) * 1000).toFixed(0);
     $('baseTag').textContent = absoluteNearest.tag;
     $('baseKm').textContent = `KM ${absoluteNearest.rawKm}`;
     $('baseIp').textContent = absoluteNearest.ip || 'SEM IP';
-    $('baseFiber').textContent = absoluteNearest.fibra || 'N/A';
     $('baseDist').textContent = `${distM}m de você`;
 
     const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
     const baseSt = $('baseStatus');
     baseSt.className = `badge-status ${st}`;
-    baseSt.textContent = st === 'online' ? 'ONLINE' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
+    baseSt.textContent = st === 'online' ? 'ONLINE (PING OK)' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
   }
 
   const { list } = getDisplayList(absoluteNearest);
   const container = $('assetsContainer');
 
   if (!list.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para os filtros selecionados.</div>';
+    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.<br>Tente limpar a busca ou trocar o filtro de fibra.</div>';
     return;
   }
 
@@ -610,38 +718,44 @@ function updateUIOnly() {
     const isNearest = absoluteNearest && a.tag === absoluteNearest.tag && a.km === absoluteNearest.km;
     const diff = a.km - km;
     const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'ponto base';
+    const dirTxt = diff < 0 ? 'atrás (⬇️ Km menor)' : diff > 0 ? 'à frente (⬆️ Km maior)' : 'no ponto de base';
     const ping = STATE.pingCache[a.ip] || 'checking';
 
     let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE'; }
+    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE (PING OK)'; }
     else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
     if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
 
     html += `<div class="vagon-wrapper">`;
-    
-    html += `<div class="mini-asset-card${isNearest ? ' nearest' : ''}">
-      <div class="mini-header">
-        <span class="mini-tag">📦 ${isNearest ? '★ ' : ''}${escapeH(a.tag)}</span>
-        <span class="mini-km">KM ${escapeH(a.rawKm)}</span>
+
+    html += `<div class="asset-card${isNearest ? ' nearest' : ''}">
+      <div class="asset-header">
+        <span class="asset-tag">📦 ${isNearest ? '★ BASE · ' : ''}${escapeH(a.tag)}</span>
+        <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
       </div>
 
-      <div class="mini-body">
-        <span>FIBRA: <b class="mini-fiber">${escapeH(a.fibra)}</b></span>
-        <span class="mini-ip">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
+      <div class="asset-ip-box">
+        <span>IP do ativo:</span>
+        <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
       </div>
 
-      <div class="mini-footer">
-        <span>Equipamento: <b>${escapeH(a.equip)}</b></span>
-        <span><b>${distM}m</b> (${dirTxt})</span>
+      <div class="asset-info">
+        <span><b>Equipamento:</b> ${escapeH(a.equip)}</span>
+        <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
+      </div>
+
+      <div class="asset-footer">
+        <span>Distância: <b>${distM}m</b> (${dirTxt})</span>
         <span class="badge-status ${badgeCls}">${badgeTxt}</span>
       </div>
     </div>`;
 
-    // Linha limpa de conexão sem o rótulo de lançamento
     if (i < list.length - 1) {
-      html += `<div class="clean-connector">
-        <div class="clean-connector-line"></div>
+      const nextAsset = list[i + 1];
+      const spanKm = Math.abs((nextAsset.km - a.km) * 1000).toFixed(0);
+      html += `<div class="fiber-link">
+        <div class="fiber-cable"></div>
+        <div class="fiber-label">🧵 Fibra [${escapeH(a.fibra)}] · lançamento: ${spanKm}m ➔</div>
       </div>`;
     }
 
@@ -663,15 +777,17 @@ function renderAssets() {
 
 function updateGpsUI() {
   $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
-  $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
+  $('gpsStatusTitle').textContent = 'KM localizado em tempo real';
   $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
   $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
+  $('hudUpdate').textContent = 'Última leitura: ' + new Date().toLocaleTimeString('pt-BR');
 }
 
 let lastRefreshTime = 0;
 function refreshAll() {
   if (!STATE.snv.length || !STATE.lat) return;
-  
+
+  // Throttle de seguranca: impede recalculos excessivos se o GPS pulsar rapido demais (minimo 1s entre atualizacoes)
   const now = Date.now();
   if (now - lastRefreshTime < 1000) return;
   lastRefreshTime = now;
@@ -700,14 +816,17 @@ async function loadFiles() {
             break;
           }
         }
-      } catch(e) {}
+      } catch (e) {}
     }
     refreshAll();
-  } catch(e) {}
+  } catch (e) {
+    $('gpsStatusTitle').textContent = 'Erro ao carregar os arquivos de referência (CSV)';
+  }
 }
 
 loadFiles();
 
+/* GEOLOCALIZACAO BLINDADA COM THROTTLE */
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
     STATE.lat = p.coords.latitude;
@@ -715,8 +834,10 @@ if ('geolocation' in navigator) {
     STATE.acc = p.coords.accuracy;
     refreshAll();
   }, err => {
-    $('gpsStatusTitle').textContent = 'Erro: Permita o acesso ao GPS do celular';
+    $('gpsStatusTitle').textContent = 'Erro: permita o acesso ao GPS do celular';
   }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 });
+} else {
+  $('gpsStatusTitle').textContent = 'GPS não disponível neste dispositivo/navegador';
 }
 </script>
 </body>
