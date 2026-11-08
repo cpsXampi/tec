@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#0a0e14">
+<meta name="theme-color" content="#000000">
 <title>INDEX - Monitor de Campo & Backbone</title>
 <style>
 :root {
-  --bg: #0a0e14;
-  --card: #141a24;
-  --card-active: #1e2636;
+  --bg: #000000;
+  --card: #0f141c;
+  --card-active: #182232;
   --accent: #ffd600;
   --green: #10b981;
   --red: #ef4444;
   --text: #ffffff;
   --sub: #94a3b8;
-  --line: rgba(255, 255, 255, 0.15);
+  --line: rgba(255, 255, 255, 0.12);
   --sb: max(env(safe-area-inset-bottom), 16px);
   --st: env(safe-area-inset-top, 0px);
 }
@@ -27,42 +27,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: calc(10px + var(--st)) 12px var(--sb);
-  gap: 8px;
+  padding: calc(8px + var(--st)) 10px var(--sb);
+  gap: 6px;
+  background: #000000;
 }
 
-/* HUD PRINCIPAL - VERDE */
+/* HUD PRINCIPAL - VERDE COMPACTO */
 .hud-card {
-  background: linear-gradient(135deg, #064e3b, #022c22);
-  border: 2px solid #059669;
-  border-radius: 16px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  background: linear-gradient(135deg, #04392a, #011c15);
+  border: 1.5px solid #059669;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.8);
   flex: none;
 }
-.hud-top { font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.hud-km { font-size: 32px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
-.hud-meta { display: flex; justify-content: space-between; font-size: 10px; color: #a7f3d0; font-weight: 600; }
+.hud-top { font-size: 9px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+.hud-km { font-size: 26px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
+.hud-meta { display: flex; justify-content: space-between; font-size: 9px; color: #a7f3d0; font-weight: 600; }
 
-/* JANELINHA DO ATIVO DE BASE */
+/* JANELINHA DO ATIVO DE BASE (MOSTRANDO FIBRA) */
 .current-asset-box {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.2), rgba(255, 214, 0, 0.05));
-  border: 2px solid var(--accent);
-  border-radius: 14px;
-  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15), rgba(255, 214, 0, 0.03));
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  padding: 8px 12px;
   flex: none;
-  box-shadow: 0 0 14px rgba(255, 214, 0, 0.25);
+  box-shadow: 0 0 10px rgba(255, 214, 0, 0.15);
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .current-asset-title {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--accent);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   display: flex;
   justify-content: space-between;
 }
@@ -73,31 +74,37 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
 }
 
-.current-asset-tag { font-size: 17px; font-weight: 900; color: #fff; }
-.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 12px; }
+.current-asset-tag { font-size: 15px; font-weight: 900; color: #fff; }
+.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 11px; }
 
-.current-asset-ip {
-  font-family: monospace;
-  font-size: 14px;
-  color: #10b981;
-  font-weight: 800;
-  background: rgba(0,0,0,0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
+.current-asset-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 10px;
+  color: #cbd5e1;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* BARRA DE PESQUISA RÁPIDA */
+.current-asset-ip {
+  font-family: monospace;
+  font-size: 13px;
+  color: #10b981;
+  font-weight: 800;
+}
+
+/* BARRA DE PESQUISA RÁPIDA COMPACTA */
 .search-box {
   flex: none;
   display: flex;
-  gap: 8px;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 6px 12px;
+  gap: 6px;
+  background: #0d1117;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 5px 10px;
   align-items: center;
 }
 .search-box input {
@@ -106,21 +113,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border: none;
   outline: none;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 .search-box input::placeholder { color: var(--sub); font-weight: 500; }
 
-/* SEÇÃO DE BOTÕES */
+/* CONTROLES E FILTROS COMPACTOS */
 .big-buttons-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   flex: none;
 }
 
 .button-group-label {
-  font-size: 9px;
+  font-size: 8.5px;
   color: var(--sub);
   font-weight: 800;
   text-transform: uppercase;
@@ -130,25 +137,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .grid-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 5px;
 }
 
 .btn-big {
-  background: var(--card);
-  border: 2px solid var(--line);
+  background: #0d1117;
+  border: 1.5px solid var(--line);
   color: #fff;
-  border-radius: 10px;
-  padding: 8px 4px;
-  font-size: 12px;
+  border-radius: 8px;
+  padding: 6px 3px;
+  font-size: 11px;
   font-weight: 800;
   cursor: pointer;
   text-align: center;
-  transition: all 0.15s ease-in-out;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
 }
 
 .btn-big:active { transform: scale(0.96); }
@@ -156,18 +161,19 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   background: var(--accent);
   color: #000;
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(255, 214, 0, 0.4);
+  box-shadow: 0 0 8px rgba(255, 214, 0, 0.3);
 }
-.btn-big small { font-size: 9px; opacity: 0.85; font-weight: 700; }
+.btn-big small { font-size: 8px; opacity: 0.85; font-weight: 700; }
 
-/* CONTAINER DO BACKBONE E VAGÕES */
+/* MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO */
 .assets-container {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 4px 0 10px 0;
+  padding: 2px 0 10px 0;
+  background: #000000;
 }
 
 .backbone-line {
@@ -184,109 +190,96 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: stretch;
 }
 
-.fiber-link {
-  height: 22px;
+/* LINHA CONECTORA DISCRETA E LIMPA */
+.clean-connector {
+  height: 12px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  position: relative;
-  margin: -2px 0;
-  z-index: 1;
+  align-items: center;
 }
-
-.fiber-cable {
-  width: 4px;
+.clean-connector-line {
+  width: 2px;
   height: 100%;
-  background: linear-gradient(180deg, #10b981, #059669);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+  background: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 4px #10b981;
 }
 
-.fiber-label {
-  position: absolute;
-  background: #064e3b;
-  border: 1px solid #10b981;
-  color: #a7f3d0;
-  font-size: 9px;
-  font-weight: 900;
-  padding: 1px 8px;
+/* CARDS E ÍCONES MENORES E SEQUENCIAIS */
+.mini-asset-card {
+  background: #0b0f17;
+  border: 1.5px solid var(--line);
   border-radius: 10px;
-  letter-spacing: 0.5px;
-}
-
-.asset-card {
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   position: relative;
-  z-index: 2;
 }
 
-.asset-card.nearest {
-  border: 2px solid var(--accent);
+.mini-asset-card.nearest {
+  border: 1.5px solid var(--accent);
+  background: linear-gradient(135deg, #161b26, #0b0f17);
 }
 
-.asset-header {
+.mini-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.asset-tag { font-size: 14px; font-weight: 900; color: #fff; }
-.asset-km-badge {
-  background: rgba(255, 214, 0, 0.18);
-  color: var(--accent);
-  font-size: 12px;
+.mini-tag {
+  font-size: 13px;
   font-weight: 900;
-  padding: 2px 6px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-km {
+  background: rgba(255, 214, 0, 0.15);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.mini-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 6px;
   border-radius: 6px;
 }
 
-.asset-ip-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px dashed #10b981;
-  border-radius: 8px;
-  padding: 6px 10px;
+.mini-ip { font-family: monospace; font-size: 12px; color: #10b981; font-weight: 800; }
+.mini-fiber { color: var(--accent); font-weight: 800; font-size: 10px; }
+
+.mini-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.asset-ip-box span { font-size: 10px; color: var(--sub); font-weight: 700; }
-.asset-ip-box b { font-size: 15px; font-family: monospace; color: #10b981; font-weight: 900; }
-
-.asset-info {
-  font-size: 10px;
-  color: #cbd5e1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-}
-
-.asset-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 4px;
-  border-top: 1px solid var(--line);
-  font-size: 10px;
+  font-size: 9.5px;
+  color: #64748b;
+  margin-top: 1px;
 }
 
 .badge-status {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 8.5px;
   font-weight: 900;
   text-transform: uppercase;
 }
-.badge-status.online { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1.5px solid #10b981; }
-.badge-status.offline { background: rgba(239, 68, 68, 0.3); color: #ef4444; border: 1.5px solid #ef4444; }
-.badge-status.checking { background: rgba(255, 214, 0, 0.25); color: var(--accent); border: 1.5px solid #accent; }
+.badge-status.online { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+.badge-status.offline { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
+.badge-status.checking { background: rgba(255, 214, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
 
-.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 13px; padding: 20px; font-weight: 600; }
+.empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 12px; padding: 20px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -303,7 +296,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- JANELINHA DO ATIVO DE BASE -->
+  <!-- JANELINHA DO ATIVO DE BASE COM DETALHE DA FIBRA -->
   <div class="current-asset-box" id="baseAssetBox">
     <div class="current-asset-title">
       <span>📍 Ativo Mais Próximo da Posição (Base)</span>
@@ -313,22 +306,22 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       <span class="current-asset-tag" id="baseTag">Buscando...</span>
       <span class="current-asset-km" id="baseKm">KM ---</span>
     </div>
-    <div class="current-asset-ip">
-      <span style="font-size:10px; color:var(--sub);">IP:</span>
-      <b id="baseIp">0.0.0.0</b>
+    <div class="current-asset-meta">
+      <span>FIBRA: <b id="baseFiber" style="color:var(--accent);">--</b></span>
+      <span class="current-asset-ip" id="baseIp">0.0.0.0</span>
       <span id="baseStatus" class="badge-status checking">CHECANDO</span>
     </div>
   </div>
 
   <!-- BARRA DE PESQUISA RÁPIDA -->
   <div class="search-box">
-    <span style="font-size:16px;">🔍</span>
-    <input type="text" id="searchInput" placeholder="Buscar por Tag, IP ou KM..." oninput="onSearchChange()">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Buscar Tag, IP ou KM..." oninput="onSearchChange()">
   </div>
 
-  <!-- BOTÕES DE CONTROLE -->
+  <!-- BOTÕES DE FILTRO -->
   <div class="big-buttons-section">
-    <div class="button-group-label">1. Sentido de Leitura da Via:</div>
+    <div class="button-group-label">1. Sentido de Leitura:</div>
     <div class="grid-buttons" id="dirButtons">
       <button class="btn-big active" onclick="selectDir('all', this)">
         <span>↕️ TODOS</span>
@@ -344,7 +337,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </button>
     </div>
 
-    <div class="button-group-label" style="margin-top:2px;">2. Filtrar Circuito de Fibra:</div>
+    <div class="button-group-label" style="margin-top:1px;">2. Circuito de Fibra:</div>
     <div class="grid-buttons" id="fiberButtons">
       <button class="btn-big active" onclick="selectFiber('all', this)">
         <span>⚡ TODAS</span>
@@ -358,9 +351,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- LISTA DE ATIVOS -->
+  <!-- MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO -->
   <div class="assets-container" id="assetsContainer">
-    <div class="empty-msg">Iniciando leitor de GPS e alinhando rede de fibras...</div>
+    <div class="empty-msg">Iniciando GPS e alinhando mapa de fibras...</div>
   </div>
 
 </div>
@@ -498,7 +491,6 @@ function onSearchChange() {
   renderAssets();
 }
 
-/* BLINDAGEM DE PING: Timeout rápido e controle para evitar crash de rede */
 async function pingIp(ip) {
   if (!ip) return 'no-ip';
   const ctrl = new AbortController();
@@ -514,14 +506,13 @@ async function pingIp(ip) {
 }
 
 async function runPings(visibleList, absoluteNearest) {
-  // Executa pings de forma sequencial leve para não travar a thread principal do celular
   const targets = [];
   if (absoluteNearest && absoluteNearest.ip) targets.push(absoluteNearest);
   for (const item of visibleList) {
     if (item.ip && !targets.includes(item)) targets.push(item);
   }
 
-  for (const item of targets.slice(0, 5)) { // Limita a no máximo 5 pings por ciclo para poupar o WebView
+  for (const item of targets.slice(0, 5)) {
     if (!STATE.pingCache[item.ip]) {
       STATE.pingCache[item.ip] = await pingIp(item.ip);
       updateUIOnly();
@@ -568,9 +559,9 @@ function getDisplayList(absoluteNearest) {
 
   let list = [];
   if (STATE.dirFilter === 'crescente') {
-    list = pool.filter(a => a.km >= km).slice(0, 5);
+    list = pool.filter(a => a.km >= km).slice(0, 6);
   } else if (STATE.dirFilter === 'decrescente') {
-    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 5);
+    list = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 6);
   } else {
     const behind = pool.filter(a => a.km <= km).sort((a, b) => b.km - a.km).slice(0, 2).reverse();
     const ahead = pool.filter(a => a.km > km).sort((a, b) => a.km - b.km).slice(0, 3);
@@ -590,24 +581,26 @@ function updateUIOnly() {
 
   const absoluteNearest = getAbsoluteNearest(km);
 
+  // Atualiza Janelinha de Base (Com Fibra visível)
   if (absoluteNearest) {
     const distM = Math.abs((absoluteNearest.km - km) * 1000).toFixed(0);
     $('baseTag').textContent = absoluteNearest.tag;
     $('baseKm').textContent = `KM ${absoluteNearest.rawKm}`;
     $('baseIp').textContent = absoluteNearest.ip || 'SEM IP';
+    $('baseFiber').textContent = absoluteNearest.fibra || 'N/A';
     $('baseDist').textContent = `${distM}m de você`;
 
     const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
     const baseSt = $('baseStatus');
     baseSt.className = `badge-status ${st}`;
-    baseSt.textContent = st === 'online' ? 'ONLINE (PING OK)' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
+    baseSt.textContent = st === 'online' ? 'ONLINE' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
   }
 
   const { list } = getDisplayList(absoluteNearest);
   const container = $('assetsContainer');
 
   if (!list.length) {
-    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para o filtro selecionado.</div>';
+    container.innerHTML = '<div class="empty-msg">Nenhum ativo encontrado para os filtros selecionados.</div>';
     return;
   }
 
@@ -617,44 +610,38 @@ function updateUIOnly() {
     const isNearest = absoluteNearest && a.tag === absoluteNearest.tag && a.km === absoluteNearest.km;
     const diff = a.km - km;
     const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás (⬇️ KM Menor)' : diff > 0 ? 'à frente (⬆️ KM Maior)' : 'no ponto de base';
+    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'ponto base';
     const ping = STATE.pingCache[a.ip] || 'checking';
 
     let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE (PING OK)'; }
+    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE'; }
     else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
     if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
 
     html += `<div class="vagon-wrapper">`;
     
-    html += `<div class="asset-card${isNearest ? ' nearest' : ''}">
-      <div class="asset-header">
-        <span class="asset-tag">📦 ${isNearest ? '★ SUPOSTA BASE · ' : ''}${escapeH(a.tag)}</span>
-        <span class="asset-km-badge">KM ${escapeH(a.rawKm)}</span>
+    html += `<div class="mini-asset-card${isNearest ? ' nearest' : ''}">
+      <div class="mini-header">
+        <span class="mini-tag">📦 ${isNearest ? '★ ' : ''}${escapeH(a.tag)}</span>
+        <span class="mini-km">KM ${escapeH(a.rawKm)}</span>
       </div>
 
-      <div class="asset-ip-box">
-        <span>IP DO ATIVO:</span>
-        <b>${a.ip ? escapeH(a.ip) : 'NÃO CONFIGURADO'}</b>
+      <div class="mini-body">
+        <span>FIBRA: <b class="mini-fiber">${escapeH(a.fibra)}</b></span>
+        <span class="mini-ip">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
       </div>
 
-      <div class="asset-info">
-        <span><b>Equipamento:</b> ${escapeH(a.equip)}</span>
-        <span><b>Fibra:</b> ${escapeH(a.fibra)}</span>
-      </div>
-
-      <div class="asset-footer">
-        <span>Distância: <b>${distM}m</b> (${dirTxt})</span>
+      <div class="mini-footer">
+        <span>Equipamento: <b>${escapeH(a.equip)}</b></span>
+        <span><b>${distM}m</b> (${dirTxt})</span>
         <span class="badge-status ${badgeCls}">${badgeTxt}</span>
       </div>
     </div>`;
 
+    // Linha limpa de conexão sem o rótulo de lançamento
     if (i < list.length - 1) {
-      const nextAsset = list[i + 1];
-      const spanKm = Math.abs((nextAsset.km - a.km) * 1000).toFixed(0);
-      html += `<div class="fiber-link">
-        <div class="fiber-cable"></div>
-        <div class="fiber-label">🧵 FIBRA [${escapeH(a.fibra)}] · LANÇAMENTO: ${spanKm}m ➔</div>
+      html += `<div class="clean-connector">
+        <div class="clean-connector-line"></div>
       </div>`;
     }
 
@@ -678,14 +665,13 @@ function updateGpsUI() {
   $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
   $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
   $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
-  $('coords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
+  $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
 }
 
 let lastRefreshTime = 0;
 function refreshAll() {
   if (!STATE.snv.length || !STATE.lat) return;
   
-  // Throttle de segurança: impede recálculos excessivos se o GPS pulsar rápido demais (mínimo 1 segundo entre atualizações)
   const now = Date.now();
   if (now - lastRefreshTime < 1000) return;
   lastRefreshTime = now;
@@ -722,7 +708,6 @@ async function loadFiles() {
 
 loadFiles();
 
-/* GEOLOCALIZAÇÃO BLINDADA COM THROTTLE */
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
     STATE.lat = p.coords.latitude;
