@@ -286,21 +286,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 <div class="app-container">
 
-  <!-- HUD DE KM E REFERÊNCIA NO PC -->
+  <!-- HUD DE KM E GPS -->
   <div class="hud-card">
-    <div class="hud-top" id="gpsStatusTitle">Monitoramento em Tempo Real (Modo PC)</div>
-    <div class="hud-km" id="kmDisplay">KM 0,000</div>
+    <div class="hud-top" id="gpsStatusTitle">Localizando GPS em Tempo Real...</div>
+    <div class="hud-km" id="kmDisplay">KM ---</div>
     <div class="hud-meta">
-      <span id="gpsPrecision">Digite o KM na busca para posicionar</span>
-      <span id="gpsCoords">BR-116</span>
+      <span id="gpsPrecision">Precisão: ...</span>
+      <span id="gpsCoords">0.0000, 0.0000</span>
     </div>
   </div>
 
   <!-- JANELINHA DO ATIVO DE BASE COM DETALHE DA FIBRA -->
   <div class="current-asset-box" id="baseAssetBox">
     <div class="current-asset-title">
-      <span>📍 Ativo Mais Próximo da Posição Base</span>
-      <span id="baseDist">0m</span>
+      <span>📍 Ativo Mais Próximo da Posição (Base)</span>
+      <span id="baseDist">0m de você</span>
     </div>
     <div class="current-asset-body">
       <span class="current-asset-tag" id="baseTag">Buscando...</span>
@@ -313,10 +313,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- BARRA DE PESQUISA RÁPIDA (Também serve para alterar o KM atual digitando ex: 210 ou 210.5) -->
+  <!-- BARRA DE PESQUISA RÁPIDA -->
   <div class="search-box">
     <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Digite KM (ex: 210), Tag ou IP..." oninput="onSearchChange()">
+    <input type="text" id="searchInput" placeholder="Buscar Tag, IP ou KM..." oninput="onSearchChange()">
   </div>
 
   <!-- BOTÕES DE FILTRO -->
@@ -353,7 +353,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
   <!-- MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO -->
   <div class="assets-container" id="assetsContainer">
-    <div class="empty-msg">Carregando base de ativos...</div>
+    <div class="empty-msg">Iniciando GPS e alinhando mapa de fibras...</div>
   </div>
 
 </div>
@@ -363,7 +363,10 @@ const STATE = {
   snv: [],
   assets: [],
   pingCache: {},
-  currentKm: 0.0,
+  currentKm: null,
+  lat: 0,
+  lon: 0,
+  acc: null,
   dirFilter: 'all',
   fiberFilter: 'all',
   searchQuery: ''
@@ -450,6 +453,25 @@ function parseAssetsCsv(txt) {
   return list.sort((a, b) => a.km - b.km);
 }
 
+function calcNearestKm(la, lo) {
+  if (!STATE.snv.length) return null;
+  let best = STATE.snv[0], minD = Infinity;
+  const rad = Math.PI / 180, R = 6371000;
+
+  for (let i = 0; i < STATE.snv.length; i++) {
+    const p = STATE.snv[i];
+    const dLat = (p.lat - la) * rad;
+    const dLon = (p.lon - lo) * rad;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la * rad) * Math.cos(p.lat * rad) * Math.sin(dLon / 2) ** 2;
+    const dist = 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (dist < minD) {
+      minD = dist;
+      best = p;
+    }
+  }
+  return { km: best.km, dist: minD };
+}
+
 function selectDir(dir, btn) {
   STATE.dirFilter = dir;
   document.querySelectorAll('#dirButtons .btn-big').forEach(b => b.classList.remove('active'));
@@ -465,31 +487,20 @@ function selectFiber(fiber, btn) {
 }
 
 function onSearchChange() {
-  const query = $('searchInput').value.trim();
-  STATE.searchQuery = query.toLowerCase();
-  
-  // Se o usuário digitar um KM direto na busca (ex: "210" ou "210+500"), atualiza a posição instantaneamente no PC
-  const numericKm = parseKm(query);
-  if (Number.isFinite(numericKm) && query.length <= 8) {
-    STATE.currentKm = numericKm;
-    $('kmDisplay').textContent = `KM ${numericKm.toFixed(3).replace('.', ',')}`;
-  }
-  
+  STATE.searchQuery = $('searchInput').value.trim().toLowerCase();
   renderAssets();
 }
 
-// Função de ping otimizada para o ambiente web/PC com timeout rápido
 async function pingIp(ip) {
   if (!ip) return 'no-ip';
   const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), 900);
+  const id = setTimeout(() => ctrl.abort(), 800);
   try {
     await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(id);
     return 'online';
   } catch (e) {
     clearTimeout(id);
-    // Se abortou por tempo, considera offline; caso contrário (erro de CORS mas respondeu), considera online
     return (e.name === 'AbortError') ? 'offline' : 'online';
   }
 }
@@ -501,7 +512,7 @@ async function runPings(visibleList, absoluteNearest) {
     if (item.ip && !targets.includes(item)) targets.push(item);
   }
 
-  for (const item of targets.slice(0, 6)) {
+  for (const item of targets.slice(0, 5)) {
     if (!STATE.pingCache[item.ip]) {
       STATE.pingCache[item.ip] = await pingIp(item.ip);
       updateUIOnly();
@@ -577,7 +588,7 @@ function updateUIOnly() {
     $('baseKm').textContent = `KM ${absoluteNearest.rawKm}`;
     $('baseIp').textContent = absoluteNearest.ip || 'SEM IP';
     $('baseFiber').textContent = absoluteNearest.fibra || 'N/A';
-    $('baseDist').textContent = `${distM}m da ref.`;
+    $('baseDist').textContent = `${distM}m de você`;
 
     const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
     const baseSt = $('baseStatus');
@@ -599,7 +610,7 @@ function updateUIOnly() {
     const isNearest = absoluteNearest && a.tag === absoluteNearest.tag && a.km === absoluteNearest.km;
     const diff = a.km - km;
     const distM = Math.abs(diff * 1000).toFixed(0);
-    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'base';
+    const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'ponto base';
     const ping = STATE.pingCache[a.ip] || 'checking';
 
     let badgeCls = 'checking', badgeTxt = 'CHECANDO';
@@ -627,6 +638,7 @@ function updateUIOnly() {
       </div>
     </div>`;
 
+    // Linha limpa de conexão sem o rótulo de lançamento
     if (i < list.length - 1) {
       html += `<div class="clean-connector">
         <div class="clean-connector-line"></div>
@@ -649,6 +661,29 @@ function renderAssets() {
   runPings(list, absoluteNearest);
 }
 
+function updateGpsUI() {
+  $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
+  $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
+  $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
+  $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
+}
+
+let lastRefreshTime = 0;
+function refreshAll() {
+  if (!STATE.snv.length || !STATE.lat) return;
+  
+  const now = Date.now();
+  if (now - lastRefreshTime < 1000) return;
+  lastRefreshTime = now;
+
+  const res = calcNearestKm(STATE.lat, STATE.lon);
+  if (res) {
+    STATE.currentKm = res.km;
+    updateGpsUI();
+    renderAssets();
+  }
+}
+
 async function loadFiles() {
   try {
     let r = await fetch('SNVBR116SPRJ.csv?v=' + Date.now());
@@ -667,18 +702,22 @@ async function loadFiles() {
         }
       } catch(e) {}
     }
-
-    if (STATE.assets.length > 0) {
-      STATE.currentKm = STATE.assets[0].km;
-      $('kmDisplay').textContent = `KM ${STATE.assets[0].rawKm}`;
-    }
-    renderAssets();
-  } catch(e) {
-    $('assetsContainer').innerHTML = '<div class="empty-msg">Erro ao carregar os arquivos CSV na pasta.</div>';
-  }
+    refreshAll();
+  } catch(e) {}
 }
 
 loadFiles();
+
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(p => {
+    STATE.lat = p.coords.latitude;
+    STATE.lon = p.coords.longitude;
+    STATE.acc = p.coords.accuracy;
+    refreshAll();
+  }, err => {
+    $('gpsStatusTitle').textContent = 'Erro: Permita o acesso ao GPS do celular';
+  }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 });
+}
 </script>
 </body>
 </html>
