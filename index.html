@@ -94,7 +94,43 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-size: 13px;
   color: #10b981;
   font-weight: 800;
+  cursor: pointer;
 }
+
+/* PAINEL DE TESTE DIRETO DE IP */
+.ping-tester-box {
+  background: #0f172a;
+  border: 1.5px solid #3b82f6;
+  border-radius: 10px;
+  padding: 6px 10px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex: none;
+}
+.ping-tester-box input {
+  flex: 1;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  color: #38bdf8;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 5px 8px;
+  outline: none;
+}
+.ping-tester-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.ping-tester-btn:active { transform: scale(0.95); }
 
 /* BARRA DE PESQUISA RÁPIDA COMPACTA */
 .search-box {
@@ -256,7 +292,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border-radius: 6px;
 }
 
-.mini-ip { font-family: monospace; font-size: 12px; color: #10b981; font-weight: 800; }
+.mini-ip { font-family: monospace; font-size: 12px; color: #10b981; font-weight: 800; cursor: pointer; }
 .mini-fiber { color: var(--accent); font-weight: 800; font-size: 10px; }
 
 .mini-footer {
@@ -269,7 +305,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 
 .badge-status {
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 6px;
   font-size: 8.5px;
   font-weight: 900;
@@ -308,9 +344,15 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
     <div class="current-asset-meta">
       <span>FIBRA: <b id="baseFiber" style="color:var(--accent);">--</b></span>
-      <span class="current-asset-ip" id="baseIp">0.0.0.0</span>
+      <span class="current-asset-ip" id="baseIp" onclick="fillTestIp(this.innerText)">0.0.0.0</span>
       <span id="baseStatus" class="badge-status checking">CHECANDO</span>
     </div>
+  </div>
+
+  <!-- COMANDO E TESTE REAL DE IP -->
+  <div class="ping-tester-box">
+    <input type="text" id="manualIpInput" placeholder="Digite o IP para testar..." value="">
+    <button class="ping-tester-btn" onclick="executeManualPing()">⚡ TESTAR IP</button>
   </div>
 
   <!-- BARRA DE PESQUISA RÁPIDA -->
@@ -373,6 +415,70 @@ const STATE = {
 };
 
 const $ = id => document.getElementById(id);
+
+function fillTestIp(ip) {
+  if (!ip || ip === '0.0.0.0' || ip === 'SEM IP' || ip === 'N/A') return;
+  $('manualIpInput').value = ip.trim();
+}
+
+/* FUNÇÃO DE PING REAL COM MEDIÇÃO DE MS EM NAVEGADOR */
+function realPingHost(ip, timeoutMs = 1200) {
+  return new Promise((resolve) => {
+    if (!ip || ip === '0.0.0.0' || ip === 'N/A') {
+      return resolve({ status: 'offline', ms: 0 });
+    }
+
+    const cleanIp = ip.replace(/^https?:\/\//, '').trim();
+    const startTime = performance.now();
+    let finished = false;
+
+    const img = new Image();
+    const timer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        img.src = '';
+        resolve({ status: 'offline', ms: 0 });
+      }
+    }, timeoutMs);
+
+    img.onload = () => {
+      if (!finished) {
+        finished = true;
+        clearTimeout(timer);
+        const ms = Math.round(performance.now() - startTime);
+        resolve({ status: 'online', ms: ms });
+      }
+    };
+
+    img.onerror = () => {
+      if (!finished) {
+        finished = true;
+        clearTimeout(timer);
+        const ms = Math.round(performance.now() - startTime);
+        // Resposta com erro rápido (porta/recusa) indica que o ativo está ALCANÇÁVEL (ONLINE)
+        if (ms < timeoutMs - 50) {
+          resolve({ status: 'online', ms: ms });
+        } else {
+          resolve({ status: 'offline', ms: 0 });
+        }
+      }
+    };
+
+    img.src = `http://${cleanIp}:80/favicon.ico?_t=${Date.now()}`;
+  });
+}
+
+async function executeManualPing() {
+  const ip = $('manualIpInput').value.trim();
+  if (!ip) return alert('Por favor, informe um IP válido para testar!');
+  
+  STATE.pingCache[ip] = { status: 'checking', ms: 0 };
+  updateUIOnly();
+
+  const res = await realPingHost(ip, 1500);
+  STATE.pingCache[ip] = res;
+  updateUIOnly();
+}
 
 function parseKm(val) {
   if (val === null || val === undefined) return NaN;
@@ -491,20 +597,6 @@ function onSearchChange() {
   renderAssets();
 }
 
-async function pingIp(ip) {
-  if (!ip) return 'no-ip';
-  const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), 800);
-  try {
-    await fetch(ip.startsWith('http') ? ip : `http://${ip}`, { mode: 'no-cors', signal: ctrl.signal, cache: 'no-store' });
-    clearTimeout(id);
-    return 'online';
-  } catch (e) {
-    clearTimeout(id);
-    return (e.name === 'AbortError') ? 'offline' : 'online';
-  }
-}
-
 async function runPings(visibleList, absoluteNearest) {
   const targets = [];
   if (absoluteNearest && absoluteNearest.ip) targets.push(absoluteNearest);
@@ -514,7 +606,10 @@ async function runPings(visibleList, absoluteNearest) {
 
   for (const item of targets.slice(0, 5)) {
     if (!STATE.pingCache[item.ip]) {
-      STATE.pingCache[item.ip] = await pingIp(item.ip);
+      STATE.pingCache[item.ip] = { status: 'checking', ms: 0 };
+      updateUIOnly();
+      const res = await realPingHost(item.ip, 1200);
+      STATE.pingCache[item.ip] = res;
       updateUIOnly();
     }
   }
@@ -590,10 +685,10 @@ function updateUIOnly() {
     $('baseFiber').textContent = absoluteNearest.fibra || 'N/A';
     $('baseDist').textContent = `${distM}m de você`;
 
-    const st = STATE.pingCache[absoluteNearest.ip] || 'checking';
+    const res = STATE.pingCache[absoluteNearest.ip] || { status: 'checking', ms: 0 };
     const baseSt = $('baseStatus');
-    baseSt.className = `badge-status ${st}`;
-    baseSt.textContent = st === 'online' ? 'ONLINE' : st === 'offline' ? 'OFFLINE' : 'CHECANDO';
+    baseSt.className = `badge-status ${res.status}`;
+    baseSt.textContent = res.status === 'online' ? `ONLINE (${res.ms}ms)` : res.status === 'offline' ? 'OFFLINE' : 'CHECANDO';
   }
 
   const { list } = getDisplayList(absoluteNearest);
@@ -611,11 +706,10 @@ function updateUIOnly() {
     const diff = a.km - km;
     const distM = Math.abs(diff * 1000).toFixed(0);
     const dirTxt = diff < 0 ? 'atrás' : diff > 0 ? 'à frente' : 'ponto base';
-    const ping = STATE.pingCache[a.ip] || 'checking';
-
-    let badgeCls = 'checking', badgeTxt = 'CHECANDO';
-    if (ping === 'online') { badgeCls = 'online'; badgeTxt = 'ONLINE'; }
-    else if (ping === 'offline') { badgeCls = 'offline'; badgeTxt = 'OFFLINE'; }
+    
+    const pingObj = STATE.pingCache[a.ip] || { status: 'checking', ms: 0 };
+    let badgeCls = pingObj.status;
+    let badgeTxt = pingObj.status === 'online' ? `ONLINE (${pingObj.ms}ms)` : pingObj.status === 'offline' ? 'OFFLINE' : 'CHECANDO';
     if (!a.ip) { badgeCls = 'checking'; badgeTxt = 'SEM IP'; }
 
     html += `<div class="vagon-wrapper">`;
@@ -628,7 +722,7 @@ function updateUIOnly() {
 
       <div class="mini-body">
         <span>FIBRA: <b class="mini-fiber">${escapeH(a.fibra)}</b></span>
-        <span class="mini-ip">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
+        <span class="mini-ip" onclick="fillTestIp('${escapeH(a.ip)}')">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
       </div>
 
       <div class="mini-footer">
@@ -638,7 +732,6 @@ function updateUIOnly() {
       </div>
     </div>`;
 
-    // Linha limpa de conexão sem o rótulo de lançamento
     if (i < list.length - 1) {
       html += `<div class="clean-connector">
         <div class="clean-connector-line"></div>
