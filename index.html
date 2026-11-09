@@ -3,61 +3,132 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#000000">
-<title>INDEX - Monitor de Campo & Backbone</title>
+<meta name="theme-color" content="#030712">
+<title>INDEX PRO - Monitor de Campo & Backbone 2.0</title>
 <style>
 :root {
-  --bg: #000000;
-  --card: #0f141c;
-  --card-active: #182232;
+  --bg: #030712;
+  --card: #0b1329;
+  --card-border: rgba(30, 41, 59, 0.7);
   --accent: #ffd600;
+  --accent-glow: rgba(255, 214, 0, 0.3);
   --green: #10b981;
+  --green-glow: rgba(16, 185, 129, 0.4);
   --red: #ef4444;
-  --text: #ffffff;
+  --red-glow: rgba(239, 68, 68, 0.4);
+  --blue: #3b82f6;
+  --text: #f8fafc;
   --sub: #94a3b8;
-  --line: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.08);
   --sb: max(env(safe-area-inset-bottom), 16px);
   --st: env(safe-area-inset-top, 0px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; overflow: hidden; }
 
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: calc(8px + var(--st)) 10px var(--sb);
-  gap: 6px;
-  background: #000000;
+  padding: calc(6px + var(--st)) 10px var(--sb);
+  gap: 8px;
+  background: var(--bg);
 }
 
-/* HUD PRINCIPAL - VERDE COMPACTO */
+/* HEADER TELEMETRIA */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+.brand-title {
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.network-stats {
+  display: flex;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 10px;
+}
+.stat-tag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.stat-tag.on { color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.stat-tag.off { color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+/* HUD PRINCIPAL - VERDE COMPACTO DE ALTA PRECISÃO */
 .hud-card {
-  background: linear-gradient(135deg, #04392a, #011c15);
+  background: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
   border: 1.5px solid #059669;
   border-radius: 12px;
   padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.9), 0 0 10px rgba(5, 150, 105, 0.2);
   flex: none;
+  position: relative;
+  overflow: hidden;
 }
-.hud-top { font-size: 9px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
-.hud-km { font-size: 26px; font-weight: 900; color: #ffffff; line-height: 1.1; margin: 2px 0; }
+.hud-top { 
+  display: flex; 
+  justify-content: space-between; 
+  font-size: 9px; 
+  color: #6ee7b7; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+  letter-spacing: 0.8px; 
+}
+.hud-km { 
+  font-size: 28px; 
+  font-weight: 900; 
+  color: #ffffff; 
+  line-height: 1.1; 
+  margin: 2px 0; 
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.hud-km small { font-size: 12px; color: #a7f3d0; font-weight: 700; }
 .hud-meta { display: flex; justify-content: space-between; font-size: 9px; color: #a7f3d0; font-weight: 600; }
 
-/* JANELINHA DO ATIVO DE BASE (MOSTRANDO FIBRA) */
+/* ATIVO DE BASE (MAIS PRÓXIMO DA POSIÇÃO) */
 .current-asset-box {
-  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15), rgba(255, 214, 0, 0.03));
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.12), rgba(15, 23, 42, 0.6));
   border: 1.5px solid var(--accent);
   border-radius: 12px;
   padding: 8px 12px;
   flex: none;
-  box-shadow: 0 0 10px rgba(255, 214, 0, 0.15);
+  box-shadow: 0 0 12px rgba(255, 214, 0, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
-
 .current-asset-title {
   font-size: 9px;
   color: var(--accent);
@@ -67,15 +138,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   display: flex;
   justify-content: space-between;
 }
-
 .current-asset-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
-.current-asset-tag { font-size: 15px; font-weight: 900; color: #fff; }
-.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 11px; }
+.current-asset-tag { font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+.current-asset-km { background: rgba(255, 214, 0, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 12px; }
 
 .current-asset-meta {
   display: flex;
@@ -83,30 +152,34 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
   font-size: 10px;
   color: #cbd5e1;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 8px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 .current-asset-ip {
   font-family: monospace;
   font-size: 13px;
   color: #10b981;
   font-weight: 800;
   cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
 }
+.current-asset-ip:active { background: rgba(16, 185, 129, 0.3); }
 
-/* PAINEL DE TESTE DIRETO DE IP */
+/* DIAGNÓSTICO E PAINEL DE COMANDO MANUAL */
 .ping-tester-box {
-  background: #0f172a;
-  border: 1.5px solid #3b82f6;
+  background: #090d16;
+  border: 1.5px solid var(--blue);
   border-radius: 10px;
-  padding: 6px 10px;
+  padding: 6px;
   display: flex;
   gap: 6px;
   align-items: center;
   flex: none;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
 }
 .ping-tester-box input {
   flex: 1;
@@ -117,30 +190,42 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   font-family: monospace;
   font-size: 13px;
   font-weight: 800;
-  padding: 5px 8px;
+  padding: 6px 8px;
   outline: none;
 }
 .ping-tester-btn {
-  background: #2563eb;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.ping-tester-btn:active { transform: scale(0.95); }
+
+.scan-all-btn {
+  background: linear-gradient(135deg, #059669, #10b981);
   color: #fff;
   border: none;
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 900;
   cursor: pointer;
 }
-.ping-tester-btn:active { transform: scale(0.95); }
 
-/* BARRA DE PESQUISA RÁPIDA COMPACTA */
+/* BARRA DE PESQUISA RÁPIDA */
 .search-box {
   flex: none;
   display: flex;
   gap: 6px;
-  background: #0d1117;
+  background: #0b1329;
   border: 1.5px solid var(--line);
   border-radius: 10px;
-  padding: 5px 10px;
+  padding: 6px 10px;
   align-items: center;
 }
 .search-box input {
@@ -149,40 +234,39 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   border: none;
   outline: none;
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 .search-box input::placeholder { color: var(--sub); font-weight: 500; }
 
-/* CONTROLES E FILTROS COMPACTOS */
+/* FILTROS E CONTROLES */
 .big-buttons-section {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex: none;
 }
-
 .button-group-label {
   font-size: 8.5px;
   color: var(--sub);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
 }
-
 .grid-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
 }
-
 .btn-big {
-  background: #0d1117;
+  background: #0b1329;
   border: 1.5px solid var(--line);
   color: #fff;
   border-radius: 8px;
   padding: 6px 3px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   cursor: pointer;
   text-align: center;
@@ -190,18 +274,32 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
 }
-
 .btn-big:active { transform: scale(0.96); }
 .btn-big.active {
   background: var(--accent);
   color: #000;
   border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(255, 214, 0, 0.3);
+  box-shadow: 0 0 10px var(--accent-glow);
 }
 .btn-big small { font-size: 8px; opacity: 0.85; font-weight: 700; }
 
-/* MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO */
+/* SIMULADOR DE KM (MODO DE TESTE OFF-FIELD) */
+.simulation-bar {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px dashed rgba(255, 214, 0, 0.4);
+  border-radius: 8px;
+  padding: 4px 8px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+}
+.simulation-bar.active { display: flex; }
+.simulation-bar input[type=range] { flex: 1; accent-color: var(--accent); }
+
+/* MAPA DE BACKBONE SEQUENCIAL DE ALTO CONTRASTE */
 .assets-container {
   flex: 1;
   overflow-y: auto;
@@ -210,6 +308,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   position: relative;
   padding: 2px 0 10px 0;
   background: #000000;
+  scrollbar-width: thin;
 }
 
 .backbone-line {
@@ -226,35 +325,35 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: stretch;
 }
 
-/* LINHA CONECTORA DISCRETA E LIMPA */
 .clean-connector {
-  height: 12px;
+  height: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 .clean-connector-line {
   width: 2px;
   height: 100%;
-  background: rgba(16, 185, 129, 0.6);
-  box-shadow: 0 0 4px #10b981;
+  background: linear-gradient(to bottom, #10b981, #3b82f6);
+  box-shadow: 0 0 6px #10b981;
 }
 
-/* CARDS E ÍCONES MENORES E SEQUENCIAIS */
 .mini-asset-card {
-  background: #0b0f17;
+  background: #070a12;
   border: 1.5px solid var(--line);
   border-radius: 10px;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   position: relative;
+  transition: border-color 0.2s, background 0.2s;
 }
-
 .mini-asset-card.nearest {
   border: 1.5px solid var(--accent);
-  background: linear-gradient(135deg, #161b26, #0b0f17);
+  background: linear-gradient(135deg, #111827, #070a12);
+  box-shadow: 0 0 12px rgba(255, 214, 0, 0.1);
 }
 
 .mini-header {
@@ -262,16 +361,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   justify-content: space-between;
   align-items: center;
 }
-
 .mini-tag {
   font-size: 13px;
   font-weight: 900;
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
-
 .mini-km {
   background: rgba(255, 214, 0, 0.15);
   color: var(--accent);
@@ -287,12 +384,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
   align-items: center;
   font-size: 10px;
   color: #94a3b8;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 6px;
   border-radius: 6px;
 }
-
-.mini-ip { font-family: monospace; font-size: 12px; color: #10b981; font-weight: 800; cursor: pointer; }
+.mini-ip { 
+  font-family: monospace; 
+  font-size: 12px; 
+  color: #10b981; 
+  font-weight: 800; 
+  cursor: pointer;
+}
 .mini-fiber { color: var(--accent); font-weight: 800; font-size: 10px; }
 
 .mini-footer {
@@ -306,14 +408,31 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 .badge-status {
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: 5px;
   font-size: 8.5px;
   font-weight: 900;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 .badge-status.online { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
 .badge-status.offline { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
 .badge-status.checking { background: rgba(255, 214, 0, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+
+.copy-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #000;
+  font-weight: 900;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
 
 .empty-msg { text-align: center; color: var(--sub); margin: auto; font-size: 12px; padding: 20px; font-weight: 600; }
 </style>
@@ -322,14 +441,36 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 <div class="app-container">
 
+  <!-- HEADER TELEMETRIA -->
+  <div class="top-nav">
+    <div class="brand-title">
+      <div class="pulse-dot"></div>
+      <span>BACKBONE MONITOR PRO</span>
+    </div>
+    <div class="network-stats">
+      <span class="stat-tag on" id="statOnline">ON: 0</span>
+      <span class="stat-tag off" id="statOffline">OFF: 0</span>
+    </div>
+  </div>
+
   <!-- HUD DE KM E GPS -->
   <div class="hud-card">
-    <div class="hud-top" id="gpsStatusTitle">Localizando GPS em Tempo Real...</div>
-    <div class="hud-km" id="kmDisplay">KM ---</div>
+    <div class="hud-top">
+      <span id="gpsStatusTitle">Localizando GPS em Tempo Real...</span>
+      <span id="simModeToggle" style="cursor:pointer; text-decoration:underline;" onclick="toggleSimMode()">🕹️ Simular KM</span>
+    </div>
+    <div class="hud-km" id="kmDisplay">KM --- <small id="speedDisplay">0 km/h</small></div>
     <div class="hud-meta">
       <span id="gpsPrecision">Precisão: ...</span>
       <span id="gpsCoords">0.0000, 0.0000</span>
     </div>
+  </div>
+
+  <!-- BARRA DE SIMULAÇÃO OFF-FIELD -->
+  <div class="simulation-bar" id="simBar">
+    <span>Simular KM:</span>
+    <input type="range" id="simKmSlider" min="0" max="200" step="0.5" value="0" oninput="onSimSliderChange(this.value)">
+    <b id="simKmVal" style="color:var(--accent);">0.0</b>
   </div>
 
   <!-- JANELINHA DO ATIVO DE BASE COM DETALHE DA FIBRA -->
@@ -344,26 +485,29 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
     <div class="current-asset-meta">
       <span>FIBRA: <b id="baseFiber" style="color:var(--accent);">--</b></span>
-      <span class="current-asset-ip" id="baseIp" onclick="fillTestIp(this.innerText)">0.0.0.0</span>
+      <span class="current-asset-ip" id="baseIp" onclick="copyAndFillIp(this.innerText)">0.0.0.0</span>
       <span id="baseStatus" class="badge-status checking">CHECANDO</span>
     </div>
   </div>
 
-  <!-- COMANDO E TESTE REAL DE IP -->
+  <!-- DIAGNÓSTICO E COMANDO MANUAL DE IP -->
   <div class="ping-tester-box">
-    <input type="text" id="manualIpInput" placeholder="Digite o IP para testar..." value="">
+    <input type="text" id="manualIpInput" placeholder="IP para diagnosticar..." value="">
     <button class="ping-tester-btn" onclick="executeManualPing()">⚡ TESTAR IP</button>
+    <button class="scan-all-btn" onclick="scanAllVisiblePings()">🔄 VARRER</button>
   </div>
 
   <!-- BARRA DE PESQUISA RÁPIDA -->
   <div class="search-box">
     <span>🔍</span>
-    <input type="text" id="searchInput" placeholder="Buscar Tag, IP ou KM..." oninput="onSearchChange()">
+    <input type="text" id="searchInput" placeholder="Buscar Tag, IP, KM ou Equipamento..." oninput="onSearchChange()">
   </div>
 
   <!-- BOTÕES DE FILTRO -->
   <div class="big-buttons-section">
-    <div class="button-group-label">1. Sentido de Leitura:</div>
+    <div class="button-group-label">
+      <span>1. Sentido de Leitura da Rodovia:</span>
+    </div>
     <div class="grid-buttons" id="dirButtons">
       <button class="btn-big active" onclick="selectDir('all', this)">
         <span>↕️ TODOS</span>
@@ -379,7 +523,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
       </button>
     </div>
 
-    <div class="button-group-label" style="margin-top:1px;">2. Circuito de Fibra:</div>
+    <div class="button-group-label" style="margin-top:2px;">
+      <span>2. Par de Fibras do Circuito:</span>
+    </div>
     <div class="grid-buttons" id="fiberButtons">
       <button class="btn-big active" onclick="selectFiber('all', this)">
         <span>⚡ TODAS</span>
@@ -393,12 +539,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     </div>
   </div>
 
-  <!-- MAPA DE INTERCONEXÃO SEQUENCIAL COM FUNDO PRETO -->
+  <!-- MAPA DE BACKBONE SEQUENCIAL -->
   <div class="assets-container" id="assetsContainer">
     <div class="empty-msg">Iniciando GPS e alinhando mapa de fibras...</div>
   </div>
 
 </div>
+
+<div class="copy-toast" id="toast">Copiado!</div>
 
 <script>
 const STATE = {
@@ -409,19 +557,52 @@ const STATE = {
   lat: 0,
   lon: 0,
   acc: null,
+  speed: 0,
   dirFilter: 'all',
   fiberFilter: 'all',
-  searchQuery: ''
+  searchQuery: '',
+  simMode: false,
+  stats: { online: 0, offline: 0 }
 };
 
 const $ = id => document.getElementById(id);
 
-function fillTestIp(ip) {
-  if (!ip || ip === '0.0.0.0' || ip === 'SEM IP' || ip === 'N/A') return;
-  $('manualIpInput').value = ip.trim();
+function showToast(txt) {
+  const t = $('toast');
+  t.textContent = txt;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 1800);
 }
 
-/* FUNÇÃO DE PING REAL COM MEDIÇÃO DE MS EM NAVEGADOR */
+function copyAndFillIp(ip) {
+  if (!ip || ip === '0.0.0.0' || ip === 'SEM IP' || ip === 'N/A') return;
+  $('manualIpInput').value = ip.trim();
+  navigator.clipboard?.writeText(ip.trim());
+  showToast(`IP ${ip} copiado!`);
+}
+
+function toggleSimMode() {
+  STATE.simMode = !STATE.simMode;
+  $('simBar').classList.toggle('active', STATE.simMode);
+  if(STATE.simMode && STATE.assets.length) {
+    const minKm = STATE.assets[0].km;
+    const maxKm = STATE.assets[STATE.assets.length - 1].km;
+    $('simKmSlider').min = minKm;
+    $('simKmSlider').max = maxKm;
+    $('simKmSlider').value = STATE.currentKm || minKm;
+    onSimSliderChange($('simKmSlider').value);
+  }
+}
+
+function onSimSliderChange(val) {
+  if (!STATE.simMode) return;
+  STATE.currentKm = parseFloat(val);
+  $('simKmVal').textContent = STATE.currentKm.toFixed(2);
+  updateGpsUI();
+  renderAssets();
+}
+
+/* SISTEMA AVANÇADO DE PING REAL NO NAVEGADOR */
 function realPingHost(ip, timeoutMs = 1200) {
   return new Promise((resolve) => {
     if (!ip || ip === '0.0.0.0' || ip === 'N/A') {
@@ -455,7 +636,6 @@ function realPingHost(ip, timeoutMs = 1200) {
         finished = true;
         clearTimeout(timer);
         const ms = Math.round(performance.now() - startTime);
-        // Resposta com erro rápido (porta/recusa) indica que o ativo está ALCANÇÁVEL (ONLINE)
         if (ms < timeoutMs - 50) {
           resolve({ status: 'online', ms: ms });
         } else {
@@ -470,7 +650,7 @@ function realPingHost(ip, timeoutMs = 1200) {
 
 async function executeManualPing() {
   const ip = $('manualIpInput').value.trim();
-  if (!ip) return alert('Por favor, informe um IP válido para testar!');
+  if (!ip) return alert('Informe um IP válido para testar!');
   
   STATE.pingCache[ip] = { status: 'checking', ms: 0 };
   updateUIOnly();
@@ -478,6 +658,40 @@ async function executeManualPing() {
   const res = await realPingHost(ip, 1500);
   STATE.pingCache[ip] = res;
   updateUIOnly();
+  recalcNetworkStats();
+}
+
+async function scanAllVisiblePings() {
+  const km = STATE.currentKm;
+  if (!Number.isFinite(km)) return;
+  const absoluteNearest = getAbsoluteNearest(km);
+  const { list } = getDisplayList(absoluteNearest);
+
+  for (const item of list) {
+    if (item.ip) {
+      STATE.pingCache[item.ip] = { status: 'checking', ms: 0 };
+    }
+  }
+  updateUIOnly();
+
+  for (const item of list) {
+    if (item.ip) {
+      const res = await realPingHost(item.ip, 1200);
+      STATE.pingCache[item.ip] = res;
+      updateUIOnly();
+      recalcNetworkStats();
+    }
+  }
+}
+
+function recalcNetworkStats() {
+  let on = 0, off = 0;
+  Object.values(STATE.pingCache).forEach(v => {
+    if (v.status === 'online') on++;
+    if (v.status === 'offline') off++;
+  });
+  $('statOnline').textContent = `ON: ${on}`;
+  $('statOffline').textContent = `OFF: ${off}`;
 }
 
 function parseKm(val) {
@@ -611,6 +825,7 @@ async function runPings(visibleList, absoluteNearest) {
       const res = await realPingHost(item.ip, 1200);
       STATE.pingCache[item.ip] = res;
       updateUIOnly();
+      recalcNetworkStats();
     }
   }
 }
@@ -676,7 +891,6 @@ function updateUIOnly() {
 
   const absoluteNearest = getAbsoluteNearest(km);
 
-  // Atualiza Janelinha de Base (Com Fibra visível)
   if (absoluteNearest) {
     const distM = Math.abs((absoluteNearest.km - km) * 1000).toFixed(0);
     $('baseTag').textContent = absoluteNearest.tag;
@@ -722,7 +936,7 @@ function updateUIOnly() {
 
       <div class="mini-body">
         <span>FIBRA: <b class="mini-fiber">${escapeH(a.fibra)}</b></span>
-        <span class="mini-ip" onclick="fillTestIp('${escapeH(a.ip)}')">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
+        <span class="mini-ip" onclick="copyAndFillIp('${escapeH(a.ip)}')">${a.ip ? escapeH(a.ip) : 'N/A'}</span>
       </div>
 
       <div class="mini-footer">
@@ -755,14 +969,16 @@ function renderAssets() {
 }
 
 function updateGpsUI() {
-  $('kmDisplay').textContent = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')}` : 'KM ---';
-  $('gpsStatusTitle').textContent = 'KM Localizado em Tempo Real';
+  $('kmDisplay').childNodes[0].nodeValue = STATE.currentKm !== null ? `KM ${STATE.currentKm.toFixed(2).replace('.', ',')} ` : 'KM --- ';
+  $('speedDisplay').textContent = STATE.speed ? `${Math.round(STATE.speed * 3.6)} km/h` : '0 km/h';
+  $('gpsStatusTitle').textContent = STATE.simMode ? '🕹️ Simulação de Trajeto Ativa' : 'KM Localizado em Tempo Real';
   $('gpsPrecision').textContent = STATE.acc ? `GPS: ±${Math.round(STATE.acc)}m` : 'GPS Ativo';
   $('gpsCoords').textContent = `${STATE.lat.toFixed(4)}, ${STATE.lon.toFixed(4)}`;
 }
 
 let lastRefreshTime = 0;
 function refreshAll() {
+  if (STATE.simMode) return;
   if (!STATE.snv.length || !STATE.lat) return;
   
   const now = Date.now();
@@ -803,9 +1019,11 @@ loadFiles();
 
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(p => {
+    if (STATE.simMode) return;
     STATE.lat = p.coords.latitude;
     STATE.lon = p.coords.longitude;
     STATE.acc = p.coords.accuracy;
+    STATE.speed = p.coords.speed || 0;
     refreshAll();
   }, err => {
     $('gpsStatusTitle').textContent = 'Erro: Permita o acesso ao GPS do celular';
