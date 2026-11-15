@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report Enterprise Ultimate - Corrigido</title>
+<title>KM Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
@@ -25,12 +25,23 @@ button{border:0;background:none;cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
 
+/* Visibilidade controlada pelo Modo Avançado */
+.adv-only{display:none!important}
+body.adv-mode .adv-only{display:block!important}
+body.adv-mode .adv-only-flex{display:flex!important}
+body.adv-mode .adv-only-grid{display:grid!important}
+body.adv-mode .adv-only-inline{display:inline-block!important}
+.adv-only-flex,.adv-only-grid,.adv-only-inline{display:none!important}
+
 /* Start Screen */
 #start{align-items:center;justify-content:center;padding:calc(16px + var(--st)) 14px var(--sb);overflow-y:auto}
-.card{width:100%;max-width:480px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:22px 18px}
-.card h1{font-size:24px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between}
+.card{width:100%;max-width:460px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:22px 18px}
+.card h1{font-size:24px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .card p.sub{color:var(--mu);font-size:13px;line-height:1.4;margin-top:6px}
 .brand{display:inline-block;margin-left:5px;font-size:8.5px;font-weight:400;color:var(--mu);opacity:.55;vertical-align:baseline}
+.adv-toggle-discrete{font-size:11px;color:var(--mu);opacity:.45;padding:4px 8px;border-radius:8px;border:1px solid transparent;transition:all .2s}
+.adv-toggle-discrete:hover,.adv-toggle-discrete.on{opacity:1;color:var(--acc);border-color:rgba(255,214,0,.35);background:rgba(255,214,0,.08)}
+
 .fld{margin-top:14px}.fld label{display:block;font-size:12px;color:var(--mu);margin-bottom:4px;font-weight:600}
 .inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
 .btn{width:100%;min-height:46px;border-radius:14px;font-weight:800;font-size:14px;margin-top:10px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:8px}
@@ -103,7 +114,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 /* Modals & Enterprise Tabs */
 .modal{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:12px}
 .modal.on{display:flex}
-.modal .card{max-height:92vh;overflow-y:auto;padding:20px 16px;max-width:540px}
+.modal .card{max-height:92vh;overflow-y:auto;padding:20px 16px;max-width:520px}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:sticky;top:0;background:var(--s1);padding-bottom:8px;border-bottom:1px solid var(--line);z-index:2}
 .modal-head h2{font-size:17px}
 .tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;border-bottom:1px solid var(--line);scrollbar-width:none}
@@ -135,14 +146,19 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 
 <!-- TELA INICIAL -->
 <main id="start" class="screen on"><div class="card">
-  <h1>KM Report <span style="font-size:11px;background:var(--acc);color:#000;padding:2px 7px;border-radius:8px;font-weight:800">ULTIMATE CORRIGIDO</span><small class="brand">By CPS sistems</small></h1>
-  <p class="sub">Versão totalmente robusta e autônoma com base SNV embutida, sem dependência de fetch offline, com tratamento total de erros de câmera, GPS e PDF.</p>
+  <h1>
+    <span>KM Report <span class="adv-only-inline" style="font-size:10px;background:var(--acc);color:#000;padding:2px 6px;border-radius:7px;font-weight:800;vertical-align:middle">PRO</span><small class="brand">By CPS sistems</small></span>
+    <button type="button" class="adv-toggle-discrete" id="toggleAdvBtn" title="Alternar entre modo padrão e modo avançado">⚡ Modo Avançado</button>
+  </h1>
+  <p class="sub" id="startSub">Registro com KM em tempo real em foto, vídeo e PDF.</p>
   <p class="dir-hint" id="dirHint"></p>
-  <button class="btn" id="pick">✅ Escolha a pasta onde os arquivos serão armazenados</button>
-  <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Nenhuma pasta selecionada (usará Downloads)</span></p>
-  <p class="st"><span class="dot" id="dCsv"></span><span id="tCsv">Carregando base SNV embutida...</span></p>
-  <button class="btn pri" id="go">📷 Iniciar Câmera & Ferramentas</button>
-  <div class="start-grid">
+  <button class="btn" id="pick">Escolha a pasta onde os arquivos serão armazenados</button>
+  <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Nenhuma pasta selecionada</span></p>
+  <p class="st"><span class="dot" id="dCsv"></span><span id="tCsv">Carregando base SNV…</span></p>
+  <button class="btn pri" id="go">Abrir câmera</button>
+
+  <!-- Barra de ferramentas extras (visível apenas no Modo Avançado) -->
+  <div class="start-grid adv-only-grid">
     <button class="btn sm" id="openHistBtn">📋 Histórico (<span id="histCount">0</span>)</button>
     <button class="btn sm" id="openBookModalBtn">📚 Compilar Livro</button>
     <button class="btn sm" id="openStartSetBtn">⚙️ Ajustes</button>
@@ -159,7 +175,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <small id="locationTitle">KM atual</small>
     <b id="km">KM ---</b>
     <div class="acc" id="gps">Aguardando GPS…</div>
-    <div class="telemetry" id="telemetry" hidden>0 km/h · ---</div>
+    <div class="telemetry adv-only" id="telemetry" hidden>0 km/h · ---</div>
     <div class="address" id="address" hidden></div>
   </div>
 
@@ -167,7 +183,8 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <div class="pill rec" id="rec">Gravando</div>
     <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
     <button type="button" class="prog-pill" id="progBadge" title="Toque para desprogramar"><span id="progText"></span><span class="cancel" aria-hidden="true">✕</span></button>
-    <div class="quick-tools">
+    <!-- Ferramentas rápidas da câmera (visível apenas no Modo Avançado) -->
+    <div class="quick-tools adv-only-flex">
       <button type="button" class="qbtn" id="torchBtn" title="Lanterna" hidden>🔦</button>
       <button type="button" class="qbtn" id="gridBtn" title="Grade">⊞</button>
       <button type="button" class="qbtn" id="nightBtn" title="Modo Noturno">👁️</button>
@@ -178,7 +195,8 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 
   <div class="bar">
-    <div class="qtags" id="qtagsBar"></div>
+    <!-- Etiquetas rápidas (visível apenas no Modo Avançado) -->
+    <div class="qtags adv-only-flex" id="qtagsBar"></div>
     <div class="modes" role="group" aria-label="Modo">
       <button data-m="foto" aria-pressed="true">Foto</button>
       <button data-m="video" aria-pressed="false">Vídeo</button>
@@ -188,7 +206,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
       <button class="rb" id="gear" aria-label="Ajustes" title="Ajustes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg>
       </button>
-      <button class="rb" id="pauseBtn" aria-label="Pausar/Retomar" title="Pausar">⏸️</button>
+      <button class="rb adv-only" id="pauseBtn" aria-label="Pausar/Retomar" title="Pausar">⏸️</button>
       <button id="shut" aria-label="Capturar"><i></i></button>
       <button class="rb" id="snap" aria-label="Foto avulsa" title="Foto Avulsa">
         <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>
@@ -198,54 +216,76 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </section>
 
-<!-- MODAL DE AJUSTES & 150+ FERRAMENTAS -->
+<!-- MODAL DE AJUSTES (PADRÃO + ABAS DO MODO AVANÇADO) -->
 <div id="set" class="modal"><div class="card">
   <div class="modal-head">
-    <h2>⚙️ Ajustes & Ferramentas</h2>
-    <button class="pill" id="closeSet">Fechar</button>
+    <h2 id="setModalTitle">Ajustes</h2>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button type="button" class="adv-toggle-discrete" id="toggleAdvInModalBtn" title="Alternar modo">⚡ Avançado</button>
+      <button class="pill" id="closeSet">Fechar</button>
+    </div>
   </div>
   
-  <div class="tabs" id="setTabs">
-    <button class="tab on" data-t="t-auto">🤖 1. Automação</button>
-    <button class="tab" data-t="t-stamp">🏷️ 2. Marca d'Água</button>
-    <button class="tab" data-t="t-cam">📷 3. Câmera & PDF</button>
-    <button class="tab" data-t="t-diag">⚡ 4. Diagnósticos</button>
-    <button class="tab" data-t="t-book">📚 5. Livro & Capítulos</button>
-    <button class="tab" data-t="t-data">🛣️ 6. Dados & Backup</button>
+  <!-- Abas do Modo Avançado -->
+  <div class="tabs adv-only-flex" id="setTabs">
+    <button class="tab on" data-t="t-basic">📋 Geral</button>
+    <button class="tab" data-t="t-auto">🤖 Automação</button>
+    <button class="tab" data-t="t-stamp">🏷️ Carimbo</button>
+    <button class="tab" data-t="t-cam">📷 Câmera/PDF</button>
+    <button class="tab" data-t="t-diag">⚡ Diagnósticos</button>
+    <button class="tab" data-t="t-book">📚 Livro</button>
+    <button class="tab" data-t="t-data">🛣️ Dados</button>
   </div>
 
-  <div id="t-auto" class="tab-pane on">
-    <div class="checkgroup-title">Automação de KM Programado</div>
-    <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar relatório automático por trecho de KM</span></label>
+  <!-- ABA 0: GERAL (Sempre visível no modo normal e primeira aba no modo avançado) -->
+  <div id="t-basic" class="tab-pane on">
+    <div class="fld" style="margin-top:0"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
+    <div class="fld"><label for="label">Etiqueta padrão</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria"></div>
     <div class="grid2">
-      <div class="fld" style="margin-top:0"><label for="progStart">KM Inicial</label><input id="progStart" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 100"></div>
-      <div class="fld" style="margin-top:0"><label for="progEnd">KM Final</label><input id="progEnd" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 110"></div>
+      <div class="fld" style="margin-top:0"><label for="int">Intervalo PDF (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
+      <div class="fld" style="margin-top:0"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
     </div>
-    <label class="checkrow" for="progBeep"><input id="progBeep" type="checkbox" checked><span>Alerta sonoro (bip) e vibração inteligente</span></label>
-    <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada (TTS) em eventos</span></label>
+
     <div class="checkgroup">
-      <div class="checkgroup-title">Gatilhos</div>
-      <label class="checkrow" for="distTriggerOn"><input id="distTriggerOn" type="checkbox"><span>Capturar foto por metro deslocado (GPS)</span></label>
-      <div class="fld"><label for="distStep">Distância (Metros)</label><input id="distStep" class="inp" type="number" min="5" max="1000" step="5" value="50"></div>
-      <label class="checkrow" for="pauseStop"><input id="pauseStop" type="checkbox"><span>Pausar relatório se veículo parar (&lt; 3 km/h)</span></label>
-      <label class="checkrow" for="autoClean"><input id="autoClean" type="checkbox"><span>Ativar Tela Limpa automática após 4s</span></label>
+      <div class="checkgroup-title">Relatório automático por KM</div>
+      <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar relatório automático por trecho de KM</span></label>
+      <div class="grid2">
+        <div class="fld" style="margin-top:4px"><label for="progStart">KM Inicial</label><input id="progStart" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 100"></div>
+        <div class="fld" style="margin-top:4px"><label for="progEnd">KM Final</label><input id="progEnd" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 110"></div>
+      </div>
+      <label class="checkrow" for="progBeep"><input id="progBeep" type="checkbox" checked><span>Alerta sonoro (bip) ao iniciar/finalizar</span></label>
+    </div>
+
+    <div class="checkgroup">
+      <div class="checkgroup-title">Exibição</div>
+      <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Mostrar KM nas fotos e vídeos</span></label>
+      <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Mostrar data e hora</span></label>
+      <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Mostrar coordenadas GPS</span></label>
+      <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Mostrar etiqueta</span></label>
+      <label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar KM mesmo fora da rodovia (&gt; 300m)</span></label>
     </div>
   </div>
 
+  <!-- ABA 1: AUTOMAÇÃO AVANÇADA -->
+  <div id="t-auto" class="tab-pane">
+    <div class="checkgroup-title">Gatilhos Inteligentes de Captura</div>
+    <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada (TTS) em eventos</span></label>
+    <label class="checkrow" for="distTriggerOn"><input id="distTriggerOn" type="checkbox"><span>Capturar foto por metro deslocado (GPS)</span></label>
+    <div class="fld"><label for="distStep">Distância (Metros)</label><input id="distStep" class="inp" type="number" min="5" max="1000" step="5" value="50"></div>
+    <label class="checkrow" for="pauseStop"><input id="pauseStop" type="checkbox"><span>Pausar relatório se veículo parar (&lt; 3 km/h)</span></label>
+    <label class="checkrow" for="autoClean"><input id="autoClean" type="checkbox"><span>Ativar Tela Limpa automática após 4s gravando</span></label>
+  </div>
+
+  <!-- ABA 2: CARIMBO AVANÇADO -->
   <div id="t-stamp" class="tab-pane">
-    <div class="fld" style="margin-top:0"><label for="label">Etiqueta Padrão</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria"></div>
-    <div class="fld"><label for="inspector">Inspetor / Técnico</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva"></div>
+    <div class="fld" style="margin-top:0"><label for="inspector">Inspetor / Técnico</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva"></div>
     <div class="fld"><label for="highwayName">Rodovia</label><input id="highwayName" class="inp" maxlength="30" value="BR-116 (Via Dutra)"></div>
     <div class="fld"><label for="quickTagsCfg">Etiquetas Rápidas</label><input id="quickTagsCfg" class="inp" value="Lâmpada Apagada,Painel Aberto,Fibra Rompida,Poste Danificado,Normal"></div>
     <div class="checkgroup">
-      <div class="checkgroup-title">Elementos no Carimbo</div>
-      <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>KM atual</span></label>
+      <div class="checkgroup-title">Dados Adicionais no Carimbo</div>
       <label class="checkrow" for="showHighway"><input id="showHighway" type="checkbox" checked><span>Rodovia e Sentido</span></label>
-      <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Data e Hora</span></label>
-      <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Coordenadas GPS</span></label>
       <label class="checkrow" for="showSpeed"><input id="showSpeed" type="checkbox" checked><span>Velocidade e Bússola</span></label>
       <label class="checkrow" for="showAlt"><input id="showAlt" type="checkbox"><span>Altitude</span></label>
-      <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Etiqueta e Observação</span></label>
       <label class="checkrow" for="showHash"><input id="showHash" type="checkbox" checked><span>ID de Auditoria Único</span></label>
     </div>
     <div class="grid2">
@@ -254,18 +294,14 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
+  <!-- ABA 3: CÂMERA & PDF AVANÇADO -->
   <div id="t-cam" class="tab-pane">
-    <div class="fld" style="margin-top:0"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
     <div class="grid2">
-      <div class="fld"><label for="int">Intervalo PDF (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-      <div class="fld"><label for="lote">Fotos por Lote</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-    </div>
-    <div class="grid2">
-      <div class="fld"><label for="jpegQual">Qualidade</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve (65%)</option></select></div>
-      <div class="fld"><label for="pdfLayout">Layout</label><select id="pdfLayout" class="inp"><option value="1">1 por página</option><option value="2">2 por página</option></select></div>
+      <div class="fld" style="margin-top:0"><label for="jpegQual">Qualidade</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve (65%)</option></select></div>
+      <div class="fld" style="margin-top:0"><label for="pdfLayout">Layout PDF</label><select id="pdfLayout" class="inp"><option value="1">1 por página</option><option value="2">2 por página</option></select></div>
     </div>
     <div class="checkgroup">
-      <div class="checkgroup-title">Recursos</div>
+      <div class="checkgroup-title">Recursos Avançados</div>
       <label class="checkrow" for="pdfCover"><input id="pdfCover" type="checkbox" checked><span>Página de Capa Resumo no PDF</span></label>
       <label class="checkrow" for="nightBoost"><input id="nightBoost" type="checkbox"><span>Realce Noturno Digital</span></label>
       <label class="checkrow" for="showCrosshair"><input id="showCrosshair" type="checkbox"><span>Mira Central</span></label>
@@ -275,10 +311,11 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
+  <!-- ABA 4: DIAGNÓSTICOS -->
   <div id="t-diag" class="tab-pane">
-    <div class="checkgroup-title">Diagnósticos & Manutenção</div>
+    <div class="checkgroup-title">Diagnósticos & Manutenção de Campo</div>
     <div class="grid2">
-      <button type="button" class="btn sm" id="tool的光纤">🔍 Atenuação Fibra</button>
+      <button type="button" class="btn sm" id="toolFibra">🔍 Atenuação Fibra</button>
       <button type="button" class="btn sm" id="toolCircuito">⚡ Continuidade</button>
       <button type="button" class="btn sm" id="toolBateria">🔋 Banco Baterias</button>
       <button type="button" class="btn sm" id="toolSFP">🔌 SFP / Huawei</button>
@@ -293,8 +330,9 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
+  <!-- ABA 5: LIVRO TÉCNICO -->
   <div id="t-book" class="tab-pane">
-    <div class="checkgroup-title">Compilação de Livros</div>
+    <div class="checkgroup-title">Compilação de Livros Técnicos</div>
     <div class="fld" style="margin-top:0"><label for="bookTitle">Título do Livro</label><input id="bookTitle" class="inp" value="Livro de Inspeções Rodoviárias - BR-116"></div>
     <div class="fld"><label for="bookAuthor">Autor</label><input id="bookAuthor" class="inp" value="Equipe Técnica RioSP"></div>
     <div class="grid2">
@@ -303,12 +341,10 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
+  <!-- ABA 6: DADOS & BACKUP -->
   <div id="t-data" class="tab-pane">
     <div class="checkgroup-title">Dados & Backup</div>
-    <div class="checkgroup" style="margin-top:0">
-      <label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar KM fora da rodovia (&gt; 300m)</span></label>
-      <label class="checkrow" for="showTelemetryHud"><input id="showTelemetryHud" type="checkbox" checked><span>Exibir Telemetria na HUD</span></label>
-    </div>
+    <label class="checkrow" for="showTelemetryHud"><input id="showTelemetryHud" type="checkbox" checked><span>Exibir Telemetria na HUD</span></label>
     <div class="fld"><label for="kmOffset">Offset de KM</label><input id="kmOffset" class="inp" type="number" step="0.01" value="0"></div>
     <div class="fld"><label for="customCsv">Importar CSV de KMs</label><input id="customCsv" class="inp" type="file" accept=".csv,.txt"></div>
     <div class="grid2" style="margin-top:10px">
@@ -321,7 +357,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </div></div>
 
-<!-- MODAL DE LIVRO -->
+<!-- MODAIS AUXILIARES -->
 <div id="bookModal" class="modal"><div class="card">
   <div class="modal-head"><h2>📚 Compilador de Livros</h2><button class="pill" id="closeBookModal">Fechar</button></div>
   <p class="sub">Gere um volume técnico em PDF consolidando as inspeções.</p>
@@ -332,7 +368,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </div></div>
 
-<!-- MODAL DE NOTA -->
 <div id="noteModal" class="modal"><div class="card">
   <div class="modal-head"><h2>📝 Observação</h2><button class="pill" id="closeNote">OK</button></div>
   <p class="sub" style="margin-top:0">Texto gravado nas próximas fotos.</p>
@@ -343,7 +378,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </div></div>
 
-<!-- MODAL DE RESUMO -->
 <div id="summaryModal" class="modal"><div class="card">
   <div class="modal-head"><h2>✅ Relatório Finalizado</h2><button class="pill" id="closeSummary">Fechar</button></div>
   <div class="grid2">
@@ -355,7 +389,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   <button class="btn pri" id="okSummaryBtn">Concluir</button>
 </div></div>
 
-<!-- MODAL DE HISTÓRICO -->
 <div id="histModal" class="modal"><div class="card">
   <div class="modal-head"><h2>📋 Histórico</h2><button class="pill" id="closeHist">Fechar</button></div>
   <div id="histList" style="max-height:55vh;overflow-y:auto"></div>
@@ -370,7 +403,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 <script>
 const $=id=>document.getElementById(id);
 
-/* DADOS SNV EMBUTIDOS (NÃO DEPENDE DE FETCH EXTERNO - CORRIGE ERRO DE CORS / OFFLINE) */
+/* BASE SNV EMBUTIDA (FALLBACK OFFLINE GARANTIDO) */
 const EMBEDDED_SNV_CSV = `km,lat,lon
 0,-23.515,-46.382
 1,-23.518,-46.375
@@ -421,12 +454,44 @@ const S={
   buf:[],batch:1,queue:[],busy:false,saved:0,totalPhotosSession:0,sessionStartKm:null,sessionStartTime:0,
   timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0,
   progTriggered:false,progActiveSession:false,prevKm:null,directionText:'',lastCapLat:null,lastCapLon:null,
-  torchOn:false,cleanTimer:null
+  torchOn:false,cleanTimer:null,advMode:false
 };
 let currentNumericKm=null;
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
 const safe=(s='')=>String(s).replace(/[,/\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+
+/* Alternância entre Modo Padrão (Original) e Modo Avançado */
+function setAdvMode(on){
+  S.advMode=!!on;
+  document.body.classList.toggle('adv-mode',S.advMode);
+  $('toggleAdvBtn')?.classList.toggle('on',S.advMode);
+  $('toggleAdvInModalBtn')?.classList.toggle('on',S.advMode);
+  if($('toggleAdvBtn'))$('toggleAdvBtn').textContent=S.advMode?'⚡ Modo Padrão':'⚡ Modo Avançado';
+  if($('toggleAdvInModalBtn'))$('toggleAdvInModalBtn').textContent=S.advMode?'⚡ Padrão':'⚡ Avançado';
+  if($('setModalTitle'))$('setModalTitle').textContent=S.advMode?'⚙️ Ajustes & Ferramentas':'Ajustes';
+  if($('startSub'))$('startSub').textContent=S.advMode
+    ?'Suíte completa com diagnósticos, telemetria avançada e compilação de livros.'
+    :'Registro com KM em tempo real em foto, vídeo e PDF.';
+  if(!S.advMode){
+    document.querySelectorAll('#setTabs .tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('on'));
+    document.querySelector('#setTabs .tab[data-t="t-basic"]')?.classList.add('on');
+    $('t-basic')?.classList.add('on');
+    if(document.body.classList.contains('night-red'))document.body.classList.remove('night-red');
+  }
+  updateLocationUI();
+  persist();
+}
+
+$('toggleAdvBtn')?.addEventListener('click',()=>{
+  setAdvMode(!S.advMode);
+  toast(S.advMode?'Modo Avançado ativado':'Modo Padrão ativado');
+});
+$('toggleAdvInModalBtn')?.addEventListener('click',()=>{
+  setAdvMode(!S.advMode);
+  toast(S.advMode?'Modo Avançado ativado':'Modo Padrão ativado');
+});
 
 function beep(freq=880,dur=140){
   if(!$('progBeep')?.checked)return;
@@ -439,12 +504,12 @@ function beep(freq=880,dur=140){
   }catch(e){}
 }
 function speak(txt){
-  if(!$('progVoice')?.checked||!('speechSynthesis'in window))return;
+  if(!S.advMode||!$('progVoice')?.checked||!('speechSynthesis'in window))return;
   try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';u.rate=1.1;speechSynthesis.speak(u);}catch(e){}
 }
 function toast(m,err=false){const t=$('toast');if(!t)return;t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2400);}
 
-/* Persistência Completa */
+/* Persistência */
 const TEXT_KEYS=['label','inspector','highwayName','quickTagsCfg','int','lote','progStart','progEnd','distStep','jpegQual','pdfLayout','stampPos','stampSize','kmOffset','fieldNote','bookTitle','bookAuthor'];
 const BOOL_KEYS=['showKm','showHighway','showDate','showGps','showSpeed','showAlt','showLabel','showHash','showKmFar','showTelemetryHud','progEnabled','progBeep','progVoice','distTriggerOn','pauseStop','autoClean','pdfCover','nightBoost','showCrosshair','mirrorFront','shutterFlash','volShutter'];
 
@@ -455,14 +520,13 @@ function persist(){
     BOOL_KEYS.forEach(k=>{if($(k))data[k]=$(k).checked;});
     data.nightRed=document.body.classList.contains('night-red');
     data.gridOn=$('gridOverlay')?.classList.contains('on');
-    localStorage.setItem('kmr_enterprise_fixed',JSON.stringify(data));
+    localStorage.setItem('kmr_unified_v1',JSON.stringify(data));
   }catch(e){}
 }
 
-const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_enterprise_fixed')||localStorage.getItem('kmr_enterprise')||localStorage.getItem('kmr_pro')||'{}');}catch{return {};}})();
+const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_unified_v1')||localStorage.getItem('kmr_enterprise_fixed')||localStorage.getItem('kmr_pro')||'{}');}catch{return {};}})();
 TEXT_KEYS.forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null&&$(k))$(k).value=cfg[k];});
 BOOL_KEYS.forEach(k=>{if(typeof cfg[k]==='boolean'&&$(k))$(k).checked=cfg[k];});
-if(cfg.nightRed)document.body.classList.add('night-red');
 if(cfg.gridOn)$('gridOverlay')?.classList.add('on');
 if($('label')&&$('lbl'))$('lbl').value=$('label').value;
 
@@ -488,59 +552,17 @@ function renderQuickTags(){
 renderQuickTags();
 
 /* Diagnósticos */
-$('tool的光纤')?.addEventListener('click',()=>{
-  const loss=(Math.random()*1.2+0.3).toFixed(2);
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Fibra] Atenuação: ${loss} dB/km (OK).`;log.scrollTop=log.scrollHeight;}
-  toast('Cálculo de fibra concluído');
-});
-$('toolCircuito')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Elétrica] Continuidade: OK (< 0.5Ω).`;log.scrollTop=log.scrollHeight;}
-  toast('Continuidade verificada');
-});
-$('toolBateria')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Bateria] Tensão: 27.4V DC (94%).`;log.scrollTop=log.scrollHeight;}
-  toast('Baterias OK');
-});
-$('toolSFP')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[SFP] RX -18dBm / TX -4.5dBm (10Gbps).`;log.scrollTop=log.scrollHeight;}
-  toast('SFP verificado');
-});
-$('toolLOTO')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[LOTO] Bloqueio #104 aplicado.`;log.scrollTop=log.scrollHeight;}
-  toast('LOTO gerado');
-});
-$('toolLVCC')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[LVCC] Validação efetuada.`;log.scrollTop=log.scrollHeight;}
-  toast('LVCC validado');
-});
-$('toolAterramento')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Terra] Resistência: 4.8Ω.`;log.scrollTop=log.scrollHeight;}
-  toast('Aterramento medido');
-});
-$('toolSinalizacao')?.addEventListener('click',()=>{
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Sinalização] Conforme ABNT.`;log.scrollTop=log.scrollHeight;}
-  toast('Sinalização auditada');
-});
+$('toolFibra')?.addEventListener('click',()=>{const loss=(Math.random()*1.2+0.3).toFixed(2);const log=$('diagLogBox');if(log){log.value+=`\n[Fibra] Atenuação: ${loss} dB/km (OK).`;log.scrollTop=log.scrollHeight;}toast('Cálculo de fibra concluído');});
+$('toolCircuito')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[Elétrica] Continuidade: OK (< 0.5Ω).`;log.scrollTop=log.scrollHeight;}toast('Continuidade verificada');});
+$('toolBateria')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[Bateria] Tensão: 27.4V DC (94%).`;log.scrollTop=log.scrollHeight;}toast('Baterias OK');});
+$('toolSFP')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[SFP] RX -18dBm / TX -4.5dBm (10Gbps).`;log.scrollTop=log.scrollHeight;}toast('SFP verificado');});
+$('toolLOTO')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[LOTO] Bloqueio #104 aplicado.`;log.scrollTop=log.scrollHeight;}toast('LOTO gerado');});
+$('toolLVCC')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[LVCC] Validação efetuada.`;log.scrollTop=log.scrollHeight;}toast('LVCC validado');});
+$('toolAterramento')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[Terra] Resistência: 4.8Ω.`;log.scrollTop=log.scrollHeight;}toast('Aterramento medido');});
+$('toolSinalizacao')?.addEventListener('click',()=>{const log=$('diagLogBox');if(log){log.value+=`\n[Sinalização] Conforme ABNT.`;log.scrollTop=log.scrollHeight;}toast('Sinalização auditada');});
 
-$('diagBtn')?.addEventListener('click',e=>{
-  e.stopPropagation();
-  toast('Diagnóstico rápido executado com sucesso.');
-  const log=$('diagLogBox');
-  if(log){log.value+=`\n[Diag] GPS, SFP e Baterias operacionais.`;log.scrollTop=log.scrollHeight;}
-});
-$('voiceSimBtn')?.addEventListener('click',e=>{
-  e.stopPropagation();
-  speak('Sistema operando normalmente');
-  toast('Voz simulada');
-});
+$('diagBtn')?.addEventListener('click',e=>{e.stopPropagation();toast('Diagnóstico rápido executado.');const log=$('diagLogBox');if(log){log.value+=`\n[Diag] GPS, SFP e Baterias operacionais.`;log.scrollTop=log.scrollHeight;}});
+$('voiceSimBtn')?.addEventListener('click',e=>{e.stopPropagation();speak('Sistema operando normalmente');toast('Voz simulada');});
 
 $('gridBtn')?.addEventListener('click',e=>{e.stopPropagation();$('gridOverlay')?.classList.toggle('on');$('gridBtn')?.classList.toggle('on');persist();});
 $('nightBtn')?.addEventListener('click',e=>{e.stopPropagation();document.body.classList.toggle('night-red');$('nightBtn')?.classList.toggle('on');persist();toast(document.body.classList.contains('night-red')?'Modo Noturno Ativado':'Modo Padrão');});
@@ -589,13 +611,13 @@ BOOL_KEYS.forEach(k=>$(k)?.addEventListener('change',()=>{
 }));
 
 function applyVisualHelpers(){
-  $('crosshair')?.classList.toggle('on',$('showCrosshair')?.checked);
+  $('crosshair')?.classList.toggle('on',S.advMode&&$('showCrosshair')?.checked);
   const v=$('v');
   if(!v)return;
   const filters=[];
-  if($('nightBoost')?.checked)filters.push('brightness(1.45) contrast(1.25)');
+  if(S.advMode&&$('nightBoost')?.checked)filters.push('brightness(1.45) contrast(1.25)');
   v.style.filter=filters.join(' ');
-  v.style.transform=$('mirrorFront')?.checked?'scaleX(-1)':'none';
+  v.style.transform=(S.advMode&&$('mirrorFront')?.checked)?'scaleX(-1)':'none';
 }
 applyVisualHelpers();
 
@@ -646,7 +668,7 @@ function refreshNearest(){
   const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;
   S.dist=n?n.dist:null;
   if(n){
-    const offset=parseFloat($('kmOffset')?.value)||0;
+    const offset=S.advMode?(parseFloat($('kmOffset')?.value)||0):0;
     const adjustedKm=n.km+offset;
     if(S.prevKm!==null&&Math.abs(adjustedKm-S.prevKm)>0.015){
       S.directionText=adjustedKm>S.prevKm?'Crescente ↑':'Decrescente ↓';
@@ -708,11 +730,11 @@ function updateLocationUI(){
   const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar')?.checked;
   const kmIsShown=!outside||showFarKm;
   $('hud')?.classList.toggle('outside',outside&&!showFarKm);
-  if($('locationTitle'))$('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual ${S.directionText?'· '+S.directionText:''}`;
+  if($('locationTitle'))$('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual ${(S.advMode&&S.directionText)?'· '+S.directionText:''}`;
   if($('km'))$('km').textContent=outside&&!showFarKm?'Fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   if($('gps'))$('gps').textContent=S.acc===null?'Aguardando GPS…':`GPS ±${Math.round(S.acc)} m`;
 
-  const showTel=$('showTelemetryHud')?.checked&&S.acc!==null;
+  const showTel=S.advMode&&$('showTelemetryHud')?.checked&&S.acc!==null;
   if($('telemetry'))$('telemetry').hidden=!showTel;
   if(showTel&&$('telemetry')){
     const spd=S.speed!==null?`${Math.round(S.speed*3.6)} km/h`:'0 km/h';
@@ -726,24 +748,21 @@ function updateLocationUI(){
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-/* CARREGAMENTO DA BASE SNV (USA DADOS EMBUTIDOS COM FALLBACK SEGURO) */
+/* Base SNV (Carrega externa se existir; senão usa a embutida) */
 try{
   S.db=parseCsv(EMBEDDED_SNV_CSV);
   if($('dCsv'))$('dCsv').className=S.db.length?'dot ok':'dot warn';
-  if($('tCsv'))$('tCsv').textContent=S.db.length?`Base SNV embutida carregada (${S.db.length} marcos)`:'Base vazia';
+  if($('tCsv'))$('tCsv').textContent=S.db.length?`Base SNV pronta (${S.db.length} marcos)`:'Base vazia';
   refreshNearest();
-}catch(e){
-  if($('tCsv'))$('tCsv').textContent='Modo offline ativado';
-}
+}catch(e){}
 
-/* Tentativa de carregar arquivo externo se disponível, mantendo o embutido se falhar */
 fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
   if(t){
     const p=parseCsv(t);
     if(p.length){
       S.db=p;
       if($('dCsv'))$('dCsv').className='dot ok';
-      if($('tCsv'))$('tCsv').textContent=`Base SNV externa carregada (${S.db.length} marcos)`;
+      if($('tCsv'))$('tCsv').textContent=`Base SNV carregada (${S.db.length} marcos)`;
       refreshNearest();
     }
   }
@@ -851,7 +870,7 @@ function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize antes de trocar',1);S.mode=b.dataset.m;updateModeUI();});
 
 window.addEventListener('keydown',e=>{
-  if(!$('volShutter')?.checked||!$('cam')?.classList.contains('on'))return;
+  if(!S.advMode||!$('volShutter')?.checked||!$('cam')?.classList.contains('on'))return;
   if(['AudioVolumeUp','AudioVolumeDown','MediaPlayPause'].includes(e.key)){e.preventDefault();$('shut')?.click();}
 });
 
@@ -865,37 +884,37 @@ $('pauseBtn')?.addEventListener('click',e=>{
   toast(S.paused?'Pausado':'Retomado');
 });
 
-/* Canvas Frame */
+/* Canvas Frame (Adapta carimbo conforme Modo Padrão vs Modo Avançado) */
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
   cx.save();
-  if($('mirrorFront')?.checked){cx.translate(w,0);cx.scale(-1,1);}
-  if($('nightBoost')?.checked)cx.filter='brightness(1.4) contrast(1.2)';
+  if(S.advMode&&$('mirrorFront')?.checked){cx.translate(w,0);cx.scale(-1,1);}
+  if(S.advMode&&$('nightBoost')?.checked)cx.filter='brightness(1.4) contrast(1.2)';
   cx.drawImage(v,0,0,w,h);
   cx.restore();
 
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
-  const scale=parseFloat($('stampSize')?.value)||1;
-  const isTop=$('stampPos')?.value==='top';
+  const scale=S.advMode?(parseFloat($('stampSize')?.value)||1):1;
+  const isTop=S.advMode&&($('stampPos')?.value==='top');
 
   if($('showKm')?.checked&&kmIsShown&&S.km!=='---'&&(!outside||$('showKmFar')?.checked)){
-    const hwy=$('showHighway')?.checked&&$('highwayName')?.value.trim()?` · ${$('highwayName').value.trim()}`:'';
-    const dir=$('showHighway')?.checked&&S.directionText?` (${S.directionText})`:'';
+    const hwy=(S.advMode&&$('showHighway')?.checked&&$('highwayName')?.value.trim())?` · ${$('highwayName').value.trim()}`:'';
+    const dir=(S.advMode&&$('showHighway')?.checked&&S.directionText)?` (${S.directionText})`:'';
     lines.push({text:`KM ${S.km}${hwy}${dir}`,large:true});
   }
   if(outside&&$('showGps')?.checked&&S.address)lines.push({text:S.address});
   if($('showDate')?.checked){
-    const insp=$('inspector')?.value.trim()?` · Téc: ${$('inspector')?.value.trim()}`:'';
+    const insp=(S.advMode&&$('inspector')?.value.trim())?` · Téc: ${$('inspector')?.value.trim()}`:'';
     lines.push({text:new Date().toLocaleString('pt-BR')+insp});
   }
   if($('showGps')?.checked){
     const accTxt=S.acc!==null?`GPS ±${Math.round(S.acc)}m`:'Sem GPS';
-    const spdTxt=$('showSpeed')?.checked&&S.speed!==null?` · ${Math.round(S.speed*3.6)} km/h ${compassDir(S.heading)}`:'';
-    const altTxt=$('showAlt')?.checked&&S.alt!==null?` · Alt ${Math.round(S.alt)}m`:'';
-    const hashTxt=$('showHash')?.checked?` · ID:${Date.now().toString(36).slice(-5).toUpperCase()}`:'';
+    const spdTxt=(S.advMode&&$('showSpeed')?.checked&&S.speed!==null)?` · ${Math.round(S.speed*3.6)} km/h ${compassDir(S.heading)}`:'';
+    const altTxt=(S.advMode&&$('showAlt')?.checked&&S.alt!==null)?` · Alt ${Math.round(S.alt)}m`:'';
+    const hashTxt=(S.advMode&&$('showHash')?.checked)?` · ID:${Date.now().toString(36).slice(-5).toUpperCase()}`:'';
     lines.push({text:`${accTxt} · ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}${spdTxt}${altTxt}${hashTxt}`,small:true});
   }
-  const note=$('fieldNote')?.value.trim();
+  const note=S.advMode?$('fieldNote')?.value.trim():'';
   if(note&&$('showLabel')?.checked)lines.push({text:`OBS: ${note}`,accent:true});
 
   if(lines.length){
@@ -933,11 +952,11 @@ function frame(){
 }
 
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-function triggerFlash(){if(!$('shutterFlash')?.checked)return;const f=$('flash');if(!f)return;f.style.opacity='0.65';setTimeout(()=>f.style.opacity='0',90);}
+function triggerFlash(){if(S.advMode&&!$('shutterFlash')?.checked)return;const f=$('flash');if(!f)return;f.style.opacity='0.65';setTimeout(()=>f.style.opacity='0',90);}
 
 $('shut')?.addEventListener('click',()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();});
-async function photo(){if(!frame())return;triggerFlash();const b=await toBlob(parseFloat($('jpegQual')?.value)||.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
-$('snap')?.addEventListener('click',e=>{e.stopPropagation();if(!frame())return;triggerFlash();toBlob(parseFloat($('jpegQual')?.value)||.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));});
+async function photo(){if(!frame())return;triggerFlash();const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;const b=await toBlob(q);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
+$('snap')?.addEventListener('click',e=>{e.stopPropagation();if(!frame())return;triggerFlash();const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;toBlob(q).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));});
 
 /* Vídeo */
 let vidLoop=0;
@@ -961,9 +980,9 @@ function setRec(on,t){
   $('rec')?.classList.toggle('on',on);if(t&&$('rec'))$('rec').textContent=t;
   $('shut')?.classList.toggle('rec',on);
   $('snap')?.classList.toggle('on',on&&S.mode==='pdf');
-  $('pauseBtn')?.classList.toggle('on',on&&S.mode==='pdf');
+  $('pauseBtn')?.classList.toggle('on',on&&S.mode==='pdf'&&S.advMode);
   clearTimeout(S.cleanTimer);
-  if(on&&S.mode==='pdf'&&$('autoClean')?.checked){
+  if(on&&S.mode==='pdf'&&S.advMode&&$('autoClean')?.checked){
     S.cleanTimer=setTimeout(()=>document.body.classList.add('clean'),4000);
   }else if(!on){
     document.body.classList.remove('clean');
@@ -991,10 +1010,10 @@ function loop(){
   const start=performance.now();
   let shouldCapture=!S.paused;
 
-  if(shouldCapture&&$('pauseStop')?.checked&&S.speed!==null&&(S.speed*3.6)<3){
+  if(shouldCapture&&S.advMode&&$('pauseStop')?.checked&&S.speed!==null&&(S.speed*3.6)<3){
     shouldCapture=false;
   }
-  if(shouldCapture&&$('distTriggerOn')?.checked&&S.acc!==null){
+  if(shouldCapture&&S.advMode&&$('distTriggerOn')?.checked&&S.acc!==null){
     const stepM=Math.max(parseFloat($('distStep')?.value)||50,5);
     if(S.lastCapLat!==null){
       const moved=haversine(S.lastCapLat,S.lastCapLon,S.lat,S.lon);
@@ -1004,7 +1023,7 @@ function loop(){
 
   if(shouldCapture&&frame()){
     S.lastCapLat=S.lat;S.lastCapLon=S.lon;
-    const q=parseFloat($('jpegQual')?.value)||.82;
+    const q=S.advMode?(parseFloat($('jpegQual')?.value)||.82):.82;
     toBlob(q).then(async b=>{
       if(!S.cap||!b)return;
       S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km,ts:new Date().toLocaleTimeString('pt-BR')});
@@ -1033,11 +1052,15 @@ async function stopPdf(){
 
   if(S.totalPhotosSession>0){
     saveHistory({date:new Date().toLocaleString('pt-BR'),pdfs:S.saved,photos:S.totalPhotosSession,range:rangeStr,dur:durStr,label:$('label')?.value.trim()});
-    if($('sumPdfs'))$('sumPdfs').textContent=S.saved;
-    if($('sumPhotos'))$('sumPhotos').textContent=S.totalPhotosSession;
-    if($('sumKmRange'))$('sumKmRange').textContent=rangeStr;
-    if($('sumDuration'))$('sumDuration').textContent=durStr;
-    $('summaryModal')?.classList.add('on');
+    if(S.advMode){
+      if($('sumPdfs'))$('sumPdfs').textContent=S.saved;
+      if($('sumPhotos'))$('sumPhotos').textContent=S.totalPhotosSession;
+      if($('sumKmRange'))$('sumKmRange').textContent=rangeStr;
+      if($('sumDuration'))$('sumDuration').textContent=durStr;
+      $('summaryModal')?.classList.add('on');
+    }else{
+      toast(`Concluído! ${S.saved} PDF(s) salvo(s).`);
+    }
   }else{
     toast('Sessão encerrada sem fotos');
   }
@@ -1054,9 +1077,9 @@ async function makePdf({p,n}){
   const w=i0.width,h=i0.height;
   const orient=w>=h?'landscape':'portrait';
   const d=new jsPDF({orientation:orient,unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});
-  const cols=parseInt($('pdfLayout')?.value)||1;
+  const cols=S.advMode?(parseInt($('pdfLayout')?.value)||1):1;
 
-  if($('pdfCover')?.checked){
+  if(S.advMode&&$('pdfCover')?.checked){
     d.setFillColor(16,20,26);d.rect(0,0,w,h,'F');
     d.setTextColor(255,214,0);d.setFontSize(Math.round(h*0.055));
     d.text(`RELATÓRIO DE INSPEÇÃO - LOTE ${n}`,w*0.07,h*0.18);
@@ -1153,21 +1176,23 @@ $('exportHistCsv2')?.addEventListener('click',exportCsvLog);
 
 $('exportCfgBtn')?.addEventListener('click',()=>{
   persist();
-  const data=localStorage.getItem('kmr_enterprise_fixed')||'{}';
+  const data=localStorage.getItem('kmr_unified_v1')||'{}';
   save(new Blob([data],{type:'application/json'}),`Config_${stamp()}.json`);
 });
 $('importCfgBtn')?.addEventListener('click',()=>$('importCfgFile')?.click());
 $('importCfgFile')?.addEventListener('change',async e=>{
   const f=e.target.files?.[0];if(!f)return;
-  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_enterprise_fixed',txt);toast('Importado! Recarregando...');setTimeout(()=>location.reload(),900);}
+  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_unified_v1',txt);toast('Importado! Recarregando...');setTimeout(()=>location.reload(),900);}
   catch{toast('JSON inválido',1);}
 });
-$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_enterprise_fixed');toast('Restaurando...');setTimeout(()=>location.reload(),800);});
+$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_unified_v1');toast('Restaurando...');setTimeout(()=>location.reload(),800);});
 
-$('cam')?.addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
+$('cam')?.addEventListener('click',e=>{if(S.cap&&S.advMode&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
 window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
 
+/* Inicia sempre no Modo Padrão (Original) */
+setAdvMode(false);
 updateModeUI();
 updateLocationUI();
 updateProgUI();
