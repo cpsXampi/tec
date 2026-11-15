@@ -753,8 +753,8 @@ function initMap(lat, lon){
         <div style="font-weight:900;color:#3b82f6;text-transform:uppercase;margin-bottom:2px;">${cityName}</div>
         <div style="font-weight:800;color:#d1d5db;">Rodovia: ${kmStr}</div>
         <div style="font-weight:900;color:#34d399;margin-top:2px;">ID Perto: ${postIdStr}</div>
-        <div style="font-size:8px;color:#cbd5e1;font-weight:800;">Plaqueta: ${plaqueStr}</div>
-        <div style="font-size:7.5px;color:#94a3b8;">End: ${addressStr}</div>
+        <div style="font-size:8px;color:var(--warn);font-weight:900;">[SISTEMA] Plaqueta: ${plaqueStr}</div>
+        <div style="font-size:7.5px;color:var(--warn);font-weight:900;">[SISTEMA] End: ${addressStr}</div>
         <div style="font-size:7.5px;color:var(--muted);margin-top:1px;">dist.: ${distStr}</div>
         <button style="margin-top:6px;width:100%;background:#10b981;color:#fff;border:0;padding:4px;border-radius:3px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${escAttr(postIdStr)}', ${l.lat}, ${l.lng}, '${escAttr(plaqueStr)}', '${escAttr(addressStr)}', '${escAttr(postKm)}')">WhatsApp</button>
       </div>
@@ -855,8 +855,8 @@ async function searchManualCoord(){
       <div class="post-top">
         <div style="flex:1;">
           <p class="post-id">#${idx+1} - ID: ${item.id}</p>
-          <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${item.plaqueta || '---'}</p>
-          <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${item.endereco || '---'}</p>
+          <p class="post-dist" style="color:var(--warn);font-weight:900;text-transform:uppercase;">💛 Plaqueta (Sistema): ${item.plaqueta || '---'}</p>
+          <p class="post-dist" style="color:var(--warn);font-weight:900;font-size:7.5px;">💛 Endereço (Sistema): ${item.endereco || '---'}</p>
           <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${itemCity}</p>
           <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${itemKm}</p>
           <p class="post-dist" id="srch-coord-dist-${idx}">${dt}</p>
@@ -922,8 +922,8 @@ async function renderSearch(){
     <div class="post-top">
       <div style="flex:1;">
         <p class="post-id">ID: ${searchItem.id}</p>
-        <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${searchItem.plaqueta || '---'}</p>
-        <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${searchItem.endereco || '---'}</p>
+        <p class="post-dist" style="color:var(--warn);font-weight:900;text-transform:uppercase;">💛 Plaqueta (Sistema): ${searchItem.plaqueta || '---'}</p>
+        <p class="post-dist" style="color:var(--warn);font-weight:900;font-size:7.5px;">💛 Endereço (Sistema): ${searchItem.endereco || '---'}</p>
         <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
         <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${itemKm}</p>
         <p class="post-dist" id="srch-dist">${dt}</p>
@@ -1057,8 +1057,8 @@ async function renderSearchKm(label, bestPt){
       <div class="post-top">
         <div style="flex:1;">
           <p class="post-id">#${idx+1} - ID: ${item.id}</p>
-          <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${item.plaqueta || '---'}</p>
-          <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${item.endereco || '---'}</p>
+          <p class="post-dist" style="color:var(--warn);font-weight:900;text-transform:uppercase;">💛 Plaqueta (Sistema): ${item.plaqueta || '---'}</p>
+          <p class="post-dist" style="color:var(--warn);font-weight:900;font-size:7.5px;">💛 Endereço (Sistema): ${item.endereco || '---'}</p>
           <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
           <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${itemKm}</p>
           <p class="post-dist" id="srch-km-dist-${idx}">${dt}</p>
@@ -1079,9 +1079,9 @@ function sendWhatsApp(id, lat, lon, plaqueta='', endereco='', km=''){
   const kmInfo = km || findExactKmForCoords(lat, lon);
   let tx = `📍 *POSTE*\n` +
            `*ID:* ${id}\n` +
-           `*Plaqueta:* ${plaqueta || '---'}\n` +
+           `*Plaqueta (Sistema):* ${plaqueta || '---'}\n` +
            `*KM (Sistema):* ${kmInfo}\n` +
-           `*Endereço:* ${endereco || '---'}\n` +
+           `*Endereço (Sistema):* ${endereco || '---'}\n` +
            `*Coordenadas:* ${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}\n` +
            `https://maps.google.com/?q=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}`;
   window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
@@ -1120,8 +1120,8 @@ async function renderApoio(){
       <input type="checkbox" class="post-chk" value="${escAttr(o.id)}" data-lat="${o.lat}" data-lon="${o.lon}" data-plaqueta="${escAttr(o.plaqueta)}" data-endereco="${escAttr(o.endereco)}" checked>
       <div style="flex:1;">
         <p class="post-id">ID: ${o.id}</p>
-        <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${o.plaqueta || '---'}</p>
-        <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${o.endereco || '---'}</p>
+        <p class="post-dist" style="color:var(--warn);font-weight:900;text-transform:uppercase;">💛 Plaqueta (Sistema): ${o.plaqueta || '---'}</p>
+        <p class="post-dist" style="color:var(--warn);font-weight:900;font-size:7.5px;">💛 Endereço (Sistema): ${o.endereco || '---'}</p>
         <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
         <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${itemKm}</p>
         <p class="post-dist" id="dist-${i}">distância até o local: ${formatDist(o.d)}</p>
@@ -1159,9 +1159,9 @@ document.getElementById('btnSend').onclick=()=>{
   items.forEach((o,i)=>{
     const itemKm = findPostExactKm(o);
     tx+=`${i+1}. *ID:* ${o.id}\n` +
-        `   *Plaqueta:* ${o.plaqueta || '---'}\n` +
+        `   *Plaqueta (Sistema):* ${o.plaqueta || '---'}\n` +
         `   *KM (Sistema):* ${itemKm}\n` +
-        `   *Endereço:* ${o.endereco || '---'}\n`;
+        `   *Endereço (Sistema):* ${o.endereco || '---'}\n`;
     if(document.getElementById('chkMaps').checked) tx+=`   https://maps.google.com/?q=${o.lat.toFixed(5)},${o.lon.toFixed(5)}\n`;
     tx+='\n';
   });
