@@ -273,7 +273,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 .post-top{display:flex;align-items:flex-start;gap:10px;padding:12px;}
 .post-chk{margin-top:3px;width:15px;height:15px;accent-color:var(--accent);flex-shrink:0}
 
-/* Blocos de Separação Visual Otimizados (Preenchimento e Proporção Elegante) */
+/* Blocos de Separação Visual Otimizados */
 .system-data-box {
   background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.35);
@@ -447,7 +447,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
       <div class="card card-accent">
         <div class="search-row">
           <div class="search-wrap">
-            <input class="search-input" id="inputId" placeholder="BUSCAR ID, PLAQUETA OU ENDEREÇO" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
+            <input class="search-input" id="inputId" inputmode="numeric" placeholder="BUSCAR ID, PLAQUETA OU ENDEREÇO" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
           </div>
           <button class="btn-icon go" onclick="searchId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
           <button class="btn-icon clr" onclick="clearId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
@@ -598,6 +598,7 @@ function switchPane(type){
       pill.classList.toggle('active', isOpen);
       activePane = isOpen ? type : null;
       if(isOpen && type==='map' && mapInstance) setTimeout(()=>mapInstance.invalidateSize(), 50);
+      if(isOpen && type==='id') setTimeout(()=>document.getElementById('inputId').focus(), 50);
     } else {
       pane.classList.remove('show');
       pill.classList.remove('active');
