@@ -4,91 +4,432 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report</title>
+<title>KM Report Pro</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
-:root{--bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);--acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;--sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-button,input,select{font:inherit;color:inherit}button{border:0;background:none;cursor:pointer}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}.card h1{font-size:26px;letter-spacing:-.02em}.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}.brand{display:inline-block;margin-left:5px;font-size:8px;font-weight:400;color:var(--mu);opacity:.45;vertical-align:baseline}
-.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line)}.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}.btn:active{transform:scale(.98)}.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}.dir-hint{margin:20px 0 0;color:var(--acc);font-size:13px;font-weight:700;text-align:center}.dir-hint[hidden],#pick[hidden]{display:none}
-#cam{flex-direction:column;background:#000}video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.hud{position:absolute;z-index:5;max-width:min(75vw,360px);background:rgba(4,90,64,.82);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 14px;top:calc(14px + var(--st));left:12px}.hud small{display:block;font-size:11px;color:#bbf7d0}.hud b{display:block;font-size:25px;line-height:1.15;overflow-wrap:anywhere}.hud .acc{font-size:11px;color:#bbf7d0;margin-top:3px;line-height:1.35}.hud .address{font-size:12px;color:#fff;margin-top:4px;line-height:1.3}.hud .address a{color:#bbf7d0;font-size:9px}.hud.outside b{font-size:17px}
-.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}@keyframes blink{50%{opacity:.15}}.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.prog-pill{display:none;align-items:center;gap:8px;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.45);border-radius:20px;padding:6px 10px 6px 12px;font-size:11px;font-weight:700;color:var(--acc);max-width:215px;text-align:left;line-height:1.25}.prog-pill.on{display:flex}.prog-pill .cancel{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;display:grid;place-items:center;font-size:11px;flex:none}.prog-pill:active{transform:scale(.97)}
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}body.clean .bar,body.clean .lbl,body.clean .prog-pill{opacity:0;pointer-events:none}.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}.modes button[aria-pressed=true]{background:var(--acc);color:#000}.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}.rb svg{width:22px;height:22px}.camera-icon{width:24px;height:24px;display:block}#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}#snap{visibility:hidden}#snap.on{visibility:visible}
-#set{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}#set.on{display:flex}#set .card{max-height:88vh;overflow-y:auto}.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}.checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:2px}
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+:root{
+  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);
+  --acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;
+  --sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);
+  --hud-bg:rgba(4,90,64,.82);--hud-tx:#bbf7d0;--hud-border:rgba(255,255,255,.1)
+}
+body.night-red{
+  --bg:#0a0000;--s1:#160202;--s2:#220404;--line:rgba(255,60,60,.2);
+  --acc:#ff3b3b;--ok:#ff6b6b;--bad:#ff0000;--tx:#ffcccc;--mu:#b35959;
+  --hud-bg:rgba(60,4,4,.86);--hud-tx:#ff8080;--hud-border:rgba(255,60,60,.25)
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
+
+/* Start Screen */
+#start{align-items:center;justify-content:center;padding:calc(20px + var(--st)) 16px var(--sb);overflow-y:auto}
+.card{width:100%;max-width:440px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:24px 20px}
+.card h1{font-size:25px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between}
+.card p.sub{color:var(--mu);font-size:13.5px;line-height:1.45;margin-top:8px}
+.brand{display:inline-block;margin-left:5px;font-size:9px;font-weight:400;color:var(--mu);opacity:.55;vertical-align:baseline}
+.fld{margin-top:16px}.fld label{display:block;font-size:12.5px;color:var(--mu);margin-bottom:5px;font-weight:600}
+.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14.5px}
+.btn{width:100%;min-height:48px;border-radius:14px;font-weight:800;font-size:14.5px;margin-top:11px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
+.btn.sm{min-height:38px;font-size:13px;border-radius:10px;padding:0 12px}
+.btn:active{transform:scale(.98)}
+.st{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--mu);margin-top:12px}
+.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}.dot.warn{background:var(--acc)}
+.dir-hint{margin:14px 0 0;color:var(--acc);font-size:12.5px;font-weight:700;text-align:center}
+.dir-hint[hidden],#pick[hidden]{display:none}
+.start-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+
+/* Camera Screen */
+#cam{flex-direction:column;background:#000}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .2s}
+.hud{position:absolute;z-index:5;max-width:min(74vw,350px);background:var(--hud-bg);backdrop-filter:blur(14px);border:1px solid var(--hud-border);border-radius:14px;padding:8px 13px;top:calc(12px + var(--st));left:12px;transition:all .2s}
+.hud small{display:block;font-size:10.5px;color:var(--hud-tx)}
+.hud b{display:block;font-size:24px;line-height:1.15;overflow-wrap:anywhere}
+.hud .acc{font-size:10.5px;color:var(--hud-tx);margin-top:2px;line-height:1.3}
+.hud .telemetry{font-size:10.5px;color:#fff;opacity:.88;margin-top:3px;font-variant-numeric:tabular-nums}
+.hud .address{font-size:11.5px;color:#fff;margin-top:4px;line-height:1.25}
+.hud .address a{color:var(--hud-tx);font-size:9px}
+.hud.outside b{font-size:16.5px}
+
+/* Grid & Crosshair Overlays */
+#gridOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;display:none;background-image:linear-gradient(to right,rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.18) 1px,transparent 1px);background-size:33.33% 33.33%}
+#gridOverlay.on{display:block}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;z-index:2;pointer-events:none;display:none}
+#crosshair.on{display:block}
+#crosshair::before,#crosshair::after{content:"";position:absolute;background:rgba(255,214,0,.75)}
+#crosshair::before{top:17px;left:0;right:0;height:2px}
+#crosshair::after{left:17px;top:0;bottom:0;width:2px}
+
+/* Top Right Chips */
+.chip{position:absolute;z-index:5;top:calc(12px + var(--st));right:12px;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+.pill{background:rgba(0,0,0,.68);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700}
+.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
+.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}
+.pill.rec.paused::before{background:var(--acc);animation:none}
+@keyframes blink{50%{opacity:.15}}
+.lbl{width:172px;background:rgba(0,0,0,.68);border:1px solid rgba(255,214,0,.45);border-radius:12px;padding:7px 11px;font-size:12.5px}
+.prog-pill{display:none;align-items:center;gap:7px;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.5);border-radius:20px;padding:5px 9px 5px 11px;font-size:11px;font-weight:700;color:var(--acc);max-width:215px;text-align:left;line-height:1.2}
+.prog-pill.on{display:flex}
+.prog-pill .cancel{width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;font-size:10px;flex:none}
+.quick-tools{display:flex;gap:6px}
+.qbtn{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.68);border:1px solid var(--line);display:grid;place-items:center;font-size:14px;color:#fff}
+.qbtn.on{border-color:var(--acc);color:var(--acc);background:rgba(255,214,0,.15)}
+
+/* Quick Tag Bar */
+.qtags{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:2px 4px;scrollbar-width:none}
+.qtags::-webkit-scrollbar{display:none}
+.qtag{flex:none;background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:5px 11px;font-size:11.5px;font-weight:600;color:#fff;white-space:nowrap}
+.qtag.active{background:var(--acc);color:#000;border-color:var(--acc)}
+
+/* Bottom Controls */
+.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:22px 14px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.88));display:flex;flex-direction:column;gap:11px;align-items:center}
+body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{opacity:0;pointer-events:none}
+.modes{display:flex;background:rgba(0,0,0,.65);border:1px solid var(--line);border-radius:22px;padding:3px}
+.modes button{padding:7px 14px;border-radius:18px;font-size:12.5px;font-weight:700;color:var(--mu)}
+.modes button[aria-pressed=true]{background:var(--acc);color:#000}
+.row{display:flex;align-items:center;justify-content:center;gap:16px;width:100%}
+.rb{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.62);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+.rb svg{width:21px;height:21px}
+.camera-icon{width:22px;height:22px;display:block}
+#shut{width:74px;height:74px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
+#shut i{width:56px;height:56px;border-radius:50%;background:#fff;transition:all .15s}
+#shut.rec i{background:var(--bad);border-radius:14px;width:32px;height:32px}
+#snap,#pauseBtn{display:none}#snap.on,#pauseBtn.on{display:grid}
+
+/* Modals (Settings, Summary, History, Note) */
+.modal{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.modal .card{max-height:90vh;overflow-y:auto;padding:22px 18px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;position:sticky;top:0;background:var(--s1);padding-bottom:8px;border-bottom:1px solid var(--line);z-index:2}
+.modal-head h2{font-size:18px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:6px 12px;border-radius:14px;font-size:12px;font-weight:700;background:var(--s2);color:var(--mu);border:1px solid var(--line)}
+.tab.on{background:var(--acc);color:#000;border-color:var(--acc)}
+.tab-pane{display:none}.tab-pane.on{display:block}
+
+.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:13.5px;line-height:1.35;margin-top:13px}
+.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}
+.checkgroup{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.checkgroup-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--acc);margin-bottom:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.stat-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.stat-box b{display:block;font-size:20px;color:var(--acc)}
+.stat-box span{font-size:11.5px;color:var(--mu)}
+.log-item{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;font-size:12.5px}
+.log-item small{color:var(--mu);display:block;margin-top:2px}
+
+#toast{position:fixed;z-index:40;left:50%;top:calc(68px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-size:12.5px;font-weight:600;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 28px);overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.5)}
+#flash{position:fixed;inset:0;background:#fff;z-index:35;opacity:0;pointer-events:none;transition:opacity .12s}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div id="flash"></div>
+
+<!-- TELA INICIAL -->
 <main id="start" class="screen on"><div class="card">
-  <h1>        KM Report<small class="brand">By CPS sistems</small></h1>
-  <p class="sub">📸 Fotos, 🎥 vídeos e 📄 relatórios em PDF com registro automático de quilometragem, data, hora e coordenadas GPS diretamente nas imagens.</p>
+  <h1>KM Report <span style="font-size:12px;background:var(--acc);color:#000;padding:2px 8px;border-radius:10px;font-weight:800">PRO</span><small class="brand">By CPS sistems</small></h1>
+  <p class="sub">📸 Fotos, 🎥 vídeos e 📄 relatórios PDF com quilometragem SNV, telemetria GPS, automação por KM e auditoria em campo.</p>
   <p class="dir-hint" id="dirHint"></p>
   <button class="btn" id="pick">✅ Escolha a pasta onde os arquivos serão armazenados</button>
-  <p class="st"><span class="dot" id="dDir"></span><span id="tDir"></span></p>
+  <p class="st"><span class="dot" id="dDir"></span><span id="tDir">Nenhuma pasta selecionada (usará Downloads)</span></p>
+  <p class="st"><span class="dot" id="dCsv"></span><span id="tCsv">Carregando base de KMs (SNV)...</span></p>
   <button class="btn pri" id="go">📷 Iniciar câmera</button>
+  <div class="start-grid">
+    <button class="btn sm" id="openHistBtn">📋 Histórico (<span id="histCount">0</span>)</button>
+    <button class="btn sm" id="openStartSetBtn">⚙️ Configurações</button>
+  </div>
 </div></main>
+
+<!-- TELA DA CÂMERA -->
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
-  <div class="hud" id="hud"><small id="locationTitle">KM atual</small><b id="km">KM ---</b><div class="acc" id="gps">Aguardando GPS…</div><div class="address" id="address" hidden></div></div>
+  <div id="gridOverlay"></div>
+  <div id="crosshair"></div>
+
+  <div class="hud" id="hud">
+    <small id="locationTitle">KM atual</small>
+    <b id="km">KM ---</b>
+    <div class="acc" id="gps">Aguardando GPS…</div>
+    <div class="telemetry" id="telemetry" hidden>0 km/h · ---</div>
+    <div class="address" id="address" hidden></div>
+  </div>
+
   <div class="chip">
     <div class="pill rec" id="rec">Gravando</div>
     <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
     <button type="button" class="prog-pill" id="progBadge" title="Toque para desprogramar"><span id="progText"></span><span class="cancel" aria-hidden="true">✕</span></button>
-  </div>
-  <div class="bar"><div class="modes" role="group" aria-label="Modo"><button data-m="foto" aria-pressed="true">Foto</button><button data-m="video" aria-pressed="false">Vídeo</button><button data-m="pdf" aria-pressed="false">Relatório PDF</button></div>
-    <div class="row">
-      <button class="rb" id="gear" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg></button>
-      <button id="shut" aria-label="Capturar"><i></i></button>
-      <button class="rb" id="snap" aria-label="Tirar foto durante o relatório" title="Tirar foto"><svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
-    </div><button class="pill" id="back">Voltar</button>
-  </div>
-</section>
-<div id="set"><div class="card">
-  <h1 style="font-size:20px">Ajustes</h1>
-  <div class="fld"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
-  
-  <div class="checkgroup">
-    <div class="checkgroup-title">KM Programado (Disparo Automático)</div>
-    <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar relatório automático por KM</span></label>
-    <div style="display:flex;gap:10px;margin-top:10px">
-      <div class="fld" style="flex:1;margin-top:0"><label for="progStart">KM Inicial</label><input id="progStart" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 100"></div>
-      <div class="fld" style="flex:1;margin-top:0"><label for="progEnd">KM Final</label><input id="progEnd" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 110"></div>
+    <div class="quick-tools">
+      <button type="button" class="qbtn" id="torchBtn" title="Lanterna / Flash" hidden>🔦</button>
+      <button type="button" class="qbtn" id="gridBtn" title="Grade de alinhamento">⊞</button>
+      <button type="button" class="qbtn" id="nightBtn" title="Modo Visão Noturna (Vermelho)">👁️</button>
+      <button type="button" class="qbtn" id="noteBtn" title="Adicionar Observação Rápida">📝</button>
     </div>
   </div>
 
-  <div class="checkgroup"><div class="checkgroup-title">Informações na imagem e no vídeo</div>
-    <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM</span></label>
-    <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
-    <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir localização (GPS/endereço)</span></label>
-    <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta</span></label>
+  <div class="bar">
+    <div class="qtags" id="qtagsBar"></div>
+    <div class="modes" role="group" aria-label="Modo">
+      <button data-m="foto" aria-pressed="true">Foto</button>
+      <button data-m="video" aria-pressed="false">Vídeo</button>
+      <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
+    </div>
+    <div class="row">
+      <button class="rb" id="gear" aria-label="Ajustes" title="Ajustes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg>
+      </button>
+      <button class="rb" id="pauseBtn" aria-label="Pausar/Retomar" title="Pausar/Retomar Relatório">⏸️</button>
+      <button id="shut" aria-label="Capturar"><i></i></button>
+      <button class="rb" id="snap" aria-label="Tirar foto durante o relatório" title="Tirar foto avulsa">
+        <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      </button>
+    </div>
+    <button class="pill" id="back">Voltar</button>
   </div>
-  <div class="checkgroup"><div class="checkgroup-title">Exibição do KM</div><label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar o KM mais próximo mesmo fora da rodovia (&gt; 300 m)</span></label></div>
-  <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
-  <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-  <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
-  <button class="btn pri" id="closeSet">Fechar</button>
+</section>
+
+<!-- MODAL DE AJUSTES COMPLETOS (COM ABAS) -->
+<div id="set" class="modal"><div class="card">
+  <div class="modal-head">
+    <h2>⚙️ Ajustes & Opcionais</h2>
+    <button class="pill" id="closeSet">Fechar</button>
+  </div>
+  
+  <div class="tabs" id="setTabs">
+    <button class="tab on" data-t="tab-auto">🤖 Automação</button>
+    <button class="tab" data-t="tab-stamp">🏷️ Marca d'Água</button>
+    <button class="tab" data-t="tab-cam">📷 Câmera & PDF</button>
+    <button class="tab" data-t="tab-field">🛣️ Campo & Dados</button>
+  </div>
+
+  <!-- ABA 1: AUTOMAÇÃO E KM PROGRAMADO -->
+  <div id="tab-auto" class="tab-pane on">
+    <div class="checkgroup-title">1. KM Programado (Disparo Automático)</div>
+    <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar relatório automático por trecho de KM</span></label>
+    <div class="grid2">
+      <div class="fld" style="margin-top:0"><label for="progStart">KM Inicial</label><input id="progStart" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 100"></div>
+      <div class="fld" style="margin-top:0"><label for="progEnd">KM Final</label><input id="progEnd" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 110"></div>
+    </div>
+    <label class="checkrow" for="progBeep"><input id="progBeep" type="checkbox" checked><span>Alerta sonoro (bip) e vibração ao iniciar/finalizar</span></label>
+    <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada ("Iniciando relatório")</span></label>
+
+    <div class="checkgroup">
+      <div class="checkgroup-title">2. Gatilho por Distância Percorrida</div>
+      <label class="checkrow" for="distTriggerOn"><input id="distTriggerOn" type="checkbox"><span>Capturar foto do relatório por metro deslocado (em vez de tempo fixo)</span></label>
+      <div class="fld"><label for="distStep">Capturar a cada X metros percorridos</label><input id="distStep" class="inp" type="number" min="5" max="1000" step="5" value="50"></div>
+    </div>
+
+    <div class="checkgroup">
+      <div class="checkgroup-title">3. Economia e Segurança em Movimento</div>
+      <label class="checkrow" for="pauseStop"><input id="pauseStop" type="checkbox"><span>Pausar captura automaticamente se veículo parar (&lt; 3 km/h)</span></label>
+      <label class="checkrow" for="autoClean"><input id="autoClean" type="checkbox"><span>Ativar Tela Limpa automaticamente após 4s gravando</span></label>
+    </div>
+  </div>
+
+  <!-- ABA 2: MARCA D'ÁGUA E TELEMETRIA -->
+  <div id="tab-stamp" class="tab-pane">
+    <div class="fld" style="margin-top:0"><label for="label">Etiqueta Padrão</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção"></div>
+    <div class="fld"><label for="inspector">Nome do Técnico / Inspetor (opcional)</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva - Equipe Elétrica"></div>
+    <div class="fld"><label for="highwayName">Identificação da Rodovia / Prefixo</label><input id="highwayName" class="inp" maxlength="30" value="BR-116 (Via Dutra)"></div>
+    <div class="fld"><label for="quickTagsCfg">Botões de Etiquetas Rápidas (separadas por vírgula)</label><input id="quickTagsCfg" class="inp" value="Lâmpada Apagada,Painel Aberto,Fibra Rompida,Poste Danificado,OK / Normal"></div>
+
+    <div class="checkgroup">
+      <div class="checkgroup-title">Dados Gravados na Imagem</div>
+      <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM atual</span></label>
+      <label class="checkrow" for="showHighway"><input id="showHighway" type="checkbox" checked><span>Incluir nome da rodovia e sentido (Crescente/Decrescente)</span></label>
+      <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
+      <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir coordenadas GPS e precisão</span></label>
+      <label class="checkrow" for="showSpeed"><input id="showSpeed" type="checkbox" checked><span>Incluir velocidade (km/h) e bússola (azimute)</span></label>
+      <label class="checkrow" for="showAlt"><input id="showAlt" type="checkbox"><span>Incluir altitude (metros)</span></label>
+      <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta e observações</span></label>
+      <label class="checkrow" for="showHash"><input id="showHash" type="checkbox"><span>Incluir código verificador único (ID de auditoria)</span></label>
+    </div>
+
+    <div class="grid2">
+      <div class="fld"><label for="stampPos">Posição do Texto</label><select id="stampPos" class="inp"><option value="bottom">Rodapé (Padrão)</option><option value="top">Topo</option></select></div>
+      <div class="fld"><label for="stampSize">Tamanho da Fonte</label><select id="stampSize" class="inp"><option value="1">Normal</option><option value="1.25">Grande</option><option value="0.8">Compacta</option></select></div>
+    </div>
+  </div>
+
+  <!-- ABA 3: CÂMERA E PDF -->
+  <div id="tab-cam" class="tab-pane">
+    <div class="fld" style="margin-top:0"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
+    <div class="grid2">
+      <div class="fld"><label for="int">Intervalo PDF (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
+      <div class="fld"><label for="lote">Fotos por Lote PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
+    </div>
+    <div class="grid2">
+      <div class="fld"><label for="jpegQual">Qualidade Imagem</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve / Rápida (65%)</option></select></div>
+      <div class="fld"><label for="pdfLayout">Layout do PDF</label><select id="pdfLayout" class="inp"><option value="1">1 foto por página</option><option value="2">2 fotos por página (Grade)</option></select></div>
+    </div>
+    <div class="checkgroup">
+      <div class="checkgroup-title">Recursos Visuais & Auxiliares</div>
+      <label class="checkrow" for="pdfCover"><input id="pdfCover" type="checkbox" checked><span>Gerar página de capa resumo no início de cada PDF</span></label>
+      <label class="checkrow" for="nightBoost"><input id="nightBoost" type="checkbox"><span>Realce de brilho/contraste digital (Modo Noturno Vídeo)</span></label>
+      <label class="checkrow" for="showCrosshair"><input id="showCrosshair" type="checkbox"><span>Exibir mira central de precisão na tela</span></label>
+      <label class="checkrow" for="mirrorFront"><input id="mirrorFront" type="checkbox"><span>Espelhar imagem horizontalmente</span></label>
+      <label class="checkrow" for="shutterFlash"><input id="shutterFlash" type="checkbox" checked><span>Piscar tela ao bater foto avulsa</span></label>
+      <label class="checkrow" for="volShutter"><input id="volShutter" type="checkbox"><span>Usar teclas de volume / fone Bluetooth como disparador</span></label>
+    </div>
+  </div>
+
+  <!-- ABA 4: CAMPO E DADOS -->
+  <div id="tab-field" class="tab-pane">
+    <div class="checkgroup-title">Base de Quilometragem & GPS</div>
+    <label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar KM mais próximo mesmo fora da rodovia (&gt; 300m)</span></label>
+    <label class="checkrow" for="showTelemetryHud"><input id="showTelemetryHud" type="checkbox" checked><span>Exibir velocímetro e sentido na tela da câmera</span></label>
+    <div class="fld"><label for="kmOffset">Ajuste fino / Offset de KM (ex: +0.1 ou -0.2)</label><input id="kmOffset" class="inp" type="number" step="0.01" value="0"></div>
+    <div class="fld"><label for="customCsv">Importar CSV de KMs personalizado (colunas: km, lat, lon)</label><input id="customCsv" class="inp" type="file" accept=".csv,.txt"></div>
+
+    <div class="checkgroup">
+      <div class="checkgroup-title">Backup & Exportação de Configurações</div>
+      <div class="grid2">
+        <button type="button" class="btn sm" id="exportCfgBtn">📤 Exportar Ajustes</button>
+        <button type="button" class="btn sm" id="importCfgBtn">📥 Importar Ajustes</button>
+      </div>
+      <input type="file" id="importCfgFile" accept=".json" hidden>
+      <button type="button" class="btn sm" id="exportCsvLogBtn" style="margin-top:8px">📊 Exportar Log de Inspeções (CSV)</button>
+      <button type="button" class="btn sm" id="resetCfgBtn" style="margin-top:8px;color:#fca5a5">🔄 Restaurar Padrões de Fábrica</button>
+    </div>
+  </div>
 </div></div>
+
+<!-- MODAL DE NOTA RÁPIDA NA PISTA -->
+<div id="noteModal" class="modal"><div class="card">
+  <div class="modal-head"><h2>📝 Observação na Imagem</h2><button class="pill" id="closeNote">OK</button></div>
+  <p class="sub" style="margin-top:0">Este texto será gravado nas próximas fotos/relatórios até você limpar.</p>
+  <div class="fld"><textarea id="fieldNote" class="inp" rows="3" maxlength="140" placeholder="Ex.: Transformador 50kVA com disjuntor desarmado..."></textarea></div>
+  <div class="grid2">
+    <button class="btn sm" id="clearNoteBtn">Limpar Nota</button>
+    <button class="btn sm pri" id="saveNoteBtn">Aplicar Nota</button>
+  </div>
+</div></div>
+
+<!-- MODAL DE RESUMO DE SESSÃO -->
+<div id="summaryModal" class="modal"><div class="card">
+  <div class="modal-head"><h2>✅ Relatório Finalizado</h2><button class="pill" id="closeSummary">Fechar</button></div>
+  <div class="grid2">
+    <div class="stat-box"><b id="sumPdfs">0</b><span>PDFs Salvos</span></div>
+    <div class="stat-box"><b id="sumPhotos">0</b><span>Fotos Capturadas</span></div>
+    <div class="stat-box"><b id="sumKmRange">---</b><span>Trecho (KM)</span></div>
+    <div class="stat-box"><b id="sumDuration">00:00</b><span>Duração</span></div>
+  </div>
+  <button class="btn pri" id="okSummaryBtn">Concluir</button>
+</div></div>
+
+<!-- MODAL DE HISTÓRICO DE SESSÕES -->
+<div id="histModal" class="modal"><div class="card">
+  <div class="modal-head"><h2>📋 Histórico de Inspeções</h2><button class="pill" id="closeHist">Fechar</button></div>
+  <div id="histList" style="max-height:55vh;overflow-y:auto"></div>
+  <div class="grid2" style="margin-top:12px">
+    <button class="btn sm" id="exportHistCsv2">📊 Baixar CSV</button>
+    <button class="btn sm" id="clearHistBtn" style="color:#fca5a5">🗑️ Limpar</button>
+  </div>
+</div></div>
+
 <div id="toast" role="status"></div><canvas id="c" hidden></canvas>
+
 <script>
 const $=id=>document.getElementById(id);
-const S={db:[],km:'---',lat:0,lon:0,acc:null,dist:null,address:'',dir:null,stream:null,mode:'foto',cap:false,rec:null,buf:[],batch:1,queue:[],busy:false,saved:0,timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0,progTriggered:false,progActiveSession:false};
+const S={
+  db:[],km:'---',lat:0,lon:0,acc:null,dist:null,speed:null,heading:null,alt:null,
+  address:'',dir:null,stream:null,mode:'foto',cap:false,paused:false,rec:null,
+  buf:[],batch:1,queue:[],busy:false,saved:0,totalPhotosSession:0,sessionStartKm:null,sessionStartTime:0,
+  timer:null,lock:null,tt:0,lastGeoRequest:0,lastGeoPoint:null,geoTimer:null,geoCache:new Map(),geoSeq:0,
+  progTriggered:false,progActiveSession:false,prevKm:null,directionText:'',lastCapLat:null,lastCapLon:null,
+  torchOn:false,cleanTimer:null
+};
 let currentNumericKm=null;
-const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300,ROUTE_LABEL='';
-const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
+const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
+const safe=(s='')=>String(s).replace(/[,/\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
-function toast(m,err=false){const t=$('toast');t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2200);}
-function persist(){try{localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showDate:$('showDate').checked,showGps:$('showGps').checked,showLabel:$('showLabel').checked,showKmFar:$('showKmFar').checked,progEnabled:$('progEnabled').checked,progStart:$('progStart').value,progEnd:$('progEnd').value}));}catch(e){}}
-const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr')||'{}');}catch{return {};}})();
-['label','int','lote','progStart','progEnd'].forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null)$(k).value=cfg[k];});
-const oldMeta=typeof cfg.showMeta==='boolean'?cfg.showMeta:true;
-['showKm','showDate','showGps','showLabel'].forEach(k=>$(k).checked=typeof cfg[k]==='boolean'?cfg[k]:oldMeta);
-if(typeof cfg.showKmFar==='boolean')$('showKmFar').checked=cfg.showKmFar;
-if(typeof cfg.progEnabled==='boolean')$('progEnabled').checked=cfg.progEnabled;
-$('lbl').value=$('label').value;$('lbl').oninput=e=>{$('label').value=e.target.value;persist();};
 
+/* Áudio & Voz */
+function beep(freq=880,dur=140){
+  if(!$('progBeep').checked)return;
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type='sine';osc.frequency.value=freq;gain.gain.value=0.15;
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start();setTimeout(()=>{osc.stop();ctx.close();},dur);
+  }catch(e){}
+}
+function speak(txt){
+  if(!$('progVoice').checked||!('speechSynthesis'in window))return;
+  try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';u.rate=1.1;speechSynthesis.speak(u);}catch(e){}
+}
+function toast(m,err=false){const t=$('toast');t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2400);}
+
+/* Persistência Completa */
+const TEXT_KEYS=['label','inspector','highwayName','quickTagsCfg','int','lote','progStart','progEnd','distStep','jpegQual','pdfLayout','stampPos','stampSize','kmOffset','fieldNote'];
+const BOOL_KEYS=['showKm','showHighway','showDate','showGps','showSpeed','showAlt','showLabel','showHash','showKmFar','showTelemetryHud','progEnabled','progBeep','progVoice','distTriggerOn','pauseStop','autoClean','pdfCover','nightBoost','showCrosshair','mirrorFront','shutterFlash','volShutter'];
+
+function persist(){
+  try{
+    const data={};
+    TEXT_KEYS.forEach(k=>{if($(k))data[k]=$(k).value;});
+    BOOL_KEYS.forEach(k=>{if($(k))data[k]=$(k).checked;});
+    data.nightRed=document.body.classList.contains('night-red');
+    data.gridOn=$('gridOverlay').classList.contains('on');
+    localStorage.setItem('kmr_pro',JSON.stringify(data));
+  }catch(e){}
+}
+
+const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_pro')||localStorage.getItem('kmr')||'{}');}catch{return {};}})();
+TEXT_KEYS.forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null&&$(k))$(k).value=cfg[k];});
+BOOL_KEYS.forEach(k=>{if(typeof cfg[k]==='boolean'&&$(k))$(k).checked=cfg[k];});
+if(cfg.nightRed)document.body.classList.add('night-red');
+if(cfg.gridOn)$('gridOverlay').classList.add('on');
+$('lbl').value=$('label').value;
+
+/* Abas dos Ajustes */
+document.querySelectorAll('#setTabs .tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#setTabs .tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$(b.dataset.t).classList.add('on');
+});
+
+/* Etiquetas Rápidas */
+function renderQuickTags(){
+  const raw=$('quickTagsCfg').value||'';
+  const list=raw.split(',').map(s=>s.trim()).filter(Boolean);
+  const bar=$('qtagsBar');
+  bar.innerHTML=list.map(t=>`<button type="button" class="qtag ${$('lbl').value===t?'active':''}">${escapeHtml(t)}</button>`).join('');
+  bar.querySelectorAll('.qtag').forEach(btn=>btn.onclick=e=>{
+    e.stopPropagation();
+    const val=btn.textContent;
+    $('lbl').value=val;$('label').value=val;
+    persist();renderQuickTags();toast('Etiqueta: '+val);
+  });
+}
+renderQuickTags();
+
+/* Controles Rápidos na Tela da Câmera */
+$('gridBtn').onclick=e=>{e.stopPropagation();$('gridOverlay').classList.toggle('on');$('gridBtn').classList.toggle('on');persist();};
+$('nightBtn').onclick=e=>{e.stopPropagation();document.body.classList.toggle('night-red');$('nightBtn').classList.toggle('on');persist();toast(document.body.classList.contains('night-red')?'Modo Visão Noturna Ativado':'Modo Padrão Restaurado');};
+$('noteBtn').onclick=e=>{e.stopPropagation();$('noteModal').classList.add('on');};
+$('closeNote').onclick=()=>$('noteModal').classList.remove('on');
+$('saveNoteBtn').onclick=()=>{persist();$('noteModal').classList.remove('on');toast('Observação aplicada nas capturas');};
+$('clearNoteBtn').onclick=()=>{$('fieldNote').value='';persist();toast('Observação limpa');};
+
+$('torchBtn').onclick=async e=>{
+  e.stopPropagation();
+  const t=S.stream?.getVideoTracks?.()[0];
+  if(!t)return;
+  S.torchOn=!S.torchOn;
+  try{await t.applyConstraints({advanced:[{torch:S.torchOn}]});$('torchBtn').classList.toggle('on',S.torchOn);}
+  catch(err){S.torchOn=false;toast('Lanterna não suportada',1);}
+};
+
+/* KM Programado UI & Cancelamento */
 function updateProgUI(){
   const enabled=$('progEnabled').checked;
   const s=parseFloat($('progStart').value);
@@ -96,9 +437,7 @@ function updateProgUI(){
   const valid=enabled&&!isNaN(s)&&!isNaN(e);
   $('progBadge').classList.toggle('on',valid);
   if(valid){
-    const sFmt=String(s).replace('.',',');
-    const eFmt=String(e).replace('.',',');
-    $('progText').textContent=`Auto: KM ${sFmt} a ${eFmt}`;
+    $('progText').textContent=`Auto: KM ${String(s).replace('.',',')} a ${String(e).replace('.',',')}`;
   }
 }
 
@@ -106,33 +445,42 @@ $('progBadge').onclick=e=>{
   e.stopPropagation();
   $('progEnabled').checked=false;
   S.progTriggered=false;
-  persist();
-  updateProgUI();
+  persist();updateProgUI();
   if(S.progActiveSession&&S.cap){
-    S.progActiveSession=false;
-    stopPdf();
-    toast('Programação cancelada e relatório salvo');
+    S.progActiveSession=false;stopPdf();toast('Programação cancelada e relatório salvo');
   }else{
-    S.progActiveSession=false;
-    toast('KM programado desativado');
+    S.progActiveSession=false;toast('KM programado desativado');
   }
 };
 
-['label','int','lote','progStart','progEnd'].forEach(k=>$(k).addEventListener('input',()=>{persist();updateProgUI();}));
-['showKm','showDate','showGps','showLabel','showKmFar','progEnabled'].forEach(k=>$(k).addEventListener('change',()=>{
+$('lbl').oninput=e=>{$('label').value=e.target.value;persist();renderQuickTags();};
+TEXT_KEYS.forEach(k=>$(k)?.addEventListener('input',()=>{persist();updateProgUI();if(k==='quickTagsCfg')renderQuickTags();}));
+BOOL_KEYS.forEach(k=>$(k)?.addEventListener('change',()=>{
   if(k==='progEnabled'&&!$('progEnabled').checked){S.progTriggered=false;S.progActiveSession=false;}
-  persist();
-  updateLocationUI();
-  updateProgUI();
+  persist();updateLocationUI();updateProgUI();applyVisualHelpers();
 }));
 
-/* CSV: pontos com KM e coordenadas. */
+function applyVisualHelpers(){
+  $('crosshair').classList.toggle('on',$('showCrosshair').checked);
+  const v=$('v');
+  const filters=[];
+  if($('nightBoost').checked)filters.push('brightness(1.45) contrast(1.25)');
+  v.style.filter=filters.join(' ');
+  v.style.transform=$('mirrorFront').checked?'scaleX(-1)':'none';
+}
+applyVisualHelpers();
+
+/* CSV & Geolocalização */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
-function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
-function nearest(la,lo){const rad=Math.PI/180,R=6371000;let best=null,min=Infinity;for(const p of S.db){const dLat=(p.lat-la)*rad,dLon=(p.lon-lo)*rad,a=Math.sin(dLat/2)**2+Math.cos(la*rad)*Math.cos(p.lat*rad)*Math.sin(dLon/2)**2,dist=2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
+function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/
+?
+/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
+function haversine(la1,lo1,la2,lo2){const rad=Math.PI/180,R=6371000,dLat=(la2-la1)*rad,dLon=(lo2-lo1)*rad,a=Math.sin(dLat/2)**2+Math.cos(la1*rad)*Math.cos(la2*rad)*Math.sin(dLon/2)**2;return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function nearest(la,lo){let best=null,min=Infinity;for(const p of S.db){const dist=haversine(la,lo,p.lat,p.lon);if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
+function compassDir(deg){if(deg===null||isNaN(deg))return'';const dirs=['N','NE','L','SE','S','SO','O','NO'];return dirs[Math.round(deg/45)%8];}
 
-/* Reverse geocoding gratuito via Nominatim/OSM. */
+/* Geocoding Reverso */
 function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
 function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
 function requestAddress(){
@@ -153,7 +501,7 @@ function requestAddress(){
       const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';
       S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);
       if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}
-    }catch(err){console.warn('Falha ao consultar endereço:',err);if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}
+    }catch(err){if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}
   },wait);
 }
 
@@ -161,8 +509,14 @@ function refreshNearest(){
   const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;
   S.dist=n?n.dist:null;
   if(n){
-    currentNumericKm=n.km;
-    S.km=(Math.round(n.km*100)/100).toFixed(2).replace('.',',');
+    const offset=parseFloat($('kmOffset').value)||0;
+    const adjustedKm=n.km+offset;
+    if(S.prevKm!==null&&Math.abs(adjustedKm-S.prevKm)>0.015){
+      S.directionText=adjustedKm>S.prevKm?'Crescente ↑':'Decrescente ↓';
+    }
+    S.prevKm=adjustedKm;
+    currentNumericKm=adjustedKm;
+    S.km=(Math.round(adjustedKm*100)/100).toFixed(2).replace('.',',');
   }
   if(S.dist!==null&&S.dist<=OUTSIDE_LIMIT_M){clearTimeout(S.geoTimer);S.address='';S.geoSeq++;}
   updateLocationUI();
@@ -189,6 +543,9 @@ function checkProgrammedKm(kmVal){
       S.mode='pdf';
       updateModeUI();
       startPdf();
+      navigator.vibrate?.([100,50,100]);
+      beep(920,180);
+      speak('Iniciando relatório programado');
       toast('KM programado atingido: Relatório iniciado!');
     }
   }else{
@@ -197,6 +554,9 @@ function checkProgrammedKm(kmVal){
       if(passedEnd){
         S.progActiveSession=false;
         stopPdf();
+        navigator.vibrate?.([200,80,200]);
+        beep(640,240);
+        speak('Relatório programado finalizado');
         toast('KM final atingido: Relatório finalizado!');
       }
     }
@@ -211,83 +571,150 @@ function updateLocationUI(){
   const outside=S.dist!==null&&S.dist>OUTSIDE_LIMIT_M,showFarKm=$('showKmFar').checked;
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
-  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':'KM atual';
+  $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual ${S.directionText?'· '+S.directionText:''}`;
   $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
-  
-  let gpsText=S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
-  $('gps').textContent=gpsText;
+  $('gps').textContent=S.acc===null?'Aguardando GPS…':`GPS ±${Math.round(S.acc)} m`;
+
+  const showTel=$('showTelemetryHud').checked&&S.acc!==null;
+  $('telemetry').hidden=!showTel;
+  if(showTel){
+    const spd=S.speed!==null?`${Math.round(S.speed*3.6)} km/h`:'0 km/h';
+    const dir=S.heading!==null?` · ${compassDir(S.heading)} (${Math.round(S.heading)}°)`:'';
+    $('telemetry').textContent=spd+dir;
+  }
 
   $('address').hidden=!(outside&&S.address);
   if(outside&&S.address)$('address').innerHTML=`${escapeHtml(S.address)}<br><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">Endereço © OpenStreetMap</a>`;
   return{outside,kmIsShown};
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{S.db=parseCsv(t);refreshNearest();}).catch(()=>{});
-if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;refreshNearest();},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 
-/* Pasta */
+fetch('SNVBR116SPRJ.csv?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{
+  S.db=parseCsv(t);
+  $('dCsv').className=S.db.length?'dot ok':'dot warn';
+  $('tCsv').textContent=S.db.length?`Base SNV carregada (${S.db.length} marcos)`:'Base SNV não encontrada (importe CSV nos ajustes)';
+  refreshNearest();
+}).catch(()=>{$('tCsv').textContent='Modo offline sem CSV padrão';});
+
+$('customCsv').onchange=async e=>{
+  const f=e.target.files?.[0];if(!f)return;
+  const txt=await f.text();const parsed=parseCsv(txt);
+  if(parsed.length){S.db=parsed;$('dCsv').className='dot ok';$('tCsv').textContent=`CSV importado (${parsed.length} pontos)`;refreshNearest();toast(`CSV carregado: ${parsed.length} pontos`);}
+  else toast('CSV inválido. Use colunas: km, lat, lon',1);
+};
+
+if('geolocation'in navigator)navigator.geolocation.watchPosition(p=>{
+  S.lat=p.coords.latitude;S.lon=p.coords.longitude;S.acc=p.coords.accuracy;
+  S.speed=p.coords.speed;S.heading=p.coords.heading;S.alt=p.coords.altitude;
+  refreshNearest();
+},()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
+
+/* Pasta & Salvamento */
 if(!('showDirectoryPicker'in window))$('pick').hidden=true;
 $('pick').onclick=async()=>{if(!('showDirectoryPicker'in window)){toast('Navegador não suporta pasta de destino',1);return;}try{const d=await showDirectoryPicker({mode:'readwrite'});if(await d.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Permissão negada');S.dir=d;$('dDir').className='dot ok';$('tDir').textContent='Pasta: '+d.name;$('dirHint').hidden=true;$('pick').hidden=true;}catch(e){if(e.name!=='AbortError')toast(e.message||'Não foi possível acessar a pasta',1);}};
 async function save(blob,name){name=safe(name);if(S.dir){try{const w=await(await S.dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();toast('Salvo: '+name);return true;}catch(e){console.error(e);toast('Falha na pasta, baixando arquivo',1);}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Baixado: '+name);return true;}
 
 /* Câmera */
-async function openCam(id){S.stream?.getTracks().forEach(t=>t.stop());const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});$('v').srcObject=S.stream;const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'),cur=S.stream.getVideoTracks()[0]?.getSettings()?.deviceId;$('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';}
+async function openCam(id){
+  S.stream?.getTracks().forEach(t=>t.stop());S.torchOn=false;$('torchBtn').classList.remove('on');
+  const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};
+  S.stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});
+  $('v').srcObject=S.stream;
+  const track=S.stream.getVideoTracks()[0];
+  const caps=track?.getCapabilities?.()||{};
+  $('torchBtn').hidden=!caps.torch;
+  const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput'),cur=track?.getSettings()?.deviceId;
+  $('camSel').innerHTML=devs.map((d,i)=>`<option value="${d.deviceId}" ${d.deviceId===cur?'selected':''}>${d.label||'Câmera '+(i+1)}</option>`).join('');
+  if(!devs.length)$('camSel').innerHTML='<option value="">Câmera padrão</option>';
+}
 $('camSel').onchange=e=>openCam(e.target.value).catch(()=>toast('Erro ao trocar câmera',1));
 $('go').onclick=async()=>{try{await openCam();$('lbl').value=$('label').value;$('start').classList.remove('on');$('cam').classList.add('on');document.documentElement.requestFullscreen?.().catch(()=>{});pinchZoom();}catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}};
 function pinchZoom(){const v=$('v');let d0=0,z0=1;v.ontouchstart=e=>{if(e.touches.length===2){d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const t=S.stream?.getVideoTracks?.()[0];z0=t?.getSettings?.().zoom||1;}};v.ontouchmove=e=>{const t=S.stream?.getVideoTracks?.()[0],c=t?.getCapabilities?.()||{};if(e.touches.length===2&&d0&&c.zoom){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);t.applyConstraints({advanced:[{zoom:Math.min(c.zoom.max,Math.max(c.zoom.min,z0*d/d0))}]}).catch(()=>{});}};}
-$('gear').onclick=()=>$('set').classList.add('on');$('closeSet').onclick=()=>$('set').classList.remove('on');
+
+$('gear').onclick=()=>$('set').classList.add('on');
+$('openStartSetBtn').onclick=()=>$('set').classList.add('on');
+$('closeSet').onclick=()=>$('set').classList.remove('on');
 $('back').onclick=()=>{if(S.cap||S.rec||S.busy||S.queue.length)return toast('Finalize a captura antes de voltar',1);S.stream?.getTracks().forEach(t=>t.stop());$('cam').classList.remove('on');$('start').classList.add('on');document.fullscreenElement&&document.exitFullscreen();};
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize a captura antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
 
-/* Desenho do quadro e informações na imagem (Fotos e Relatórios) */
+/* Disparador por Teclas de Volume / Bluetooth */
+window.addEventListener('keydown',e=>{
+  if(!$('volShutter').checked||!$('cam').classList.contains('on'))return;
+  if(['AudioVolumeUp','AudioVolumeDown','MediaPlayPause'].includes(e.key)){e.preventDefault();$('shut').click();}
+});
+
+/* Pausa Manual no Relatório */
+$('pauseBtn').onclick=e=>{
+  e.stopPropagation();
+  if(!S.cap)return;
+  S.paused=!S.paused;
+  $('pauseBtn').textContent=S.paused?'▶️':'⏸️';
+  $('rec').classList.toggle('paused',S.paused);
+  upd();
+  toast(S.paused?'Relatório pausado':'Relatório retomado');
+};
+
+/* Desenho do Quadro (Canvas) */
 function frame(){
-  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;cx.drawImage(v,0,0,w,h);
+  const v=$('v');if(!v||!v.videoWidth)return null;const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
+  cx.save();
+  if($('mirrorFront').checked){cx.translate(w,0);cx.scale(-1,1);}
+  if($('nightBoost').checked)cx.filter='brightness(1.4) contrast(1.2)';
+  cx.drawImage(v,0,0,w,h);
+  cx.restore();
+
   const {outside,kmIsShown}=updateLocationUI(),lines=[];
-  
-  if($('showKm').checked&&kmIsShown&&S.km!=='---'&&!outside) {
-    lines.push({text:`KM ${S.km}`,large:true});
-  } else if($('showKm').checked&&kmIsShown&&S.km!=='---'&&outside&&$('showKmFar').checked) {
-    lines.push({text:`KM ${S.km}`,large:true});
+  const scale=parseFloat($('stampSize').value)||1;
+  const isTop=$('stampPos').value==='top';
+
+  if($('showKm').checked&&kmIsShown&&S.km!=='---'&&(!outside||$('showKmFar').checked)){
+    const hwy=$('showHighway').checked&&$('highwayName').value.trim()?` · ${$('highwayName').value.trim()}`:'';
+    const dir=$('showHighway').checked&&S.directionText?` (${S.directionText})`:'';
+    lines.push({text:`KM ${S.km}${hwy}${dir}`,large:true});
   }
-  
-  if(outside&&$('showGps').checked&&S.address) lines.push({text:S.address});
-  else if($('showDate').checked) lines.push({text:new Date().toLocaleString('pt-BR')});
-  
-  if($('showGps').checked) {
-    const accTxt = S.acc !== null ? `Precisão do GPS ±${Math.round(S.acc)} m` : 'Aguardando GPS…';
-    lines.push({text: `${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}`, small: true});
+  if(outside&&$('showGps').checked&&S.address)lines.push({text:S.address});
+  if($('showDate').checked){
+    const insp=$('inspector').value.trim()?` · Téc: ${$('inspector').value.trim()}`:'';
+    lines.push({text:new Date().toLocaleString('pt-BR')+insp});
   }
+  if($('showGps').checked){
+    const accTxt=S.acc!==null?`GPS ±${Math.round(S.acc)}m`:'Sem GPS';
+    const spdTxt=$('showSpeed').checked&&S.speed!==null?` · ${Math.round(S.speed*3.6)} km/h ${compassDir(S.heading)}`:'';
+    const altTxt=$('showAlt').checked&&S.alt!==null?` · Alt ${Math.round(S.alt)}m`:'';
+    const hashTxt=$('showHash').checked?` · ID:${Date.now().toString(36).slice(-5).toUpperCase()}`:'';
+    lines.push({text:`${accTxt} · ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}${spdTxt}${altTxt}${hashTxt}`,small:true});
+  }
+  const note=$('fieldNote').value.trim();
+  if(note&&$('showLabel').checked)lines.push({text:`OBS: ${note}`,accent:true});
 
   if(lines.length){
-    const bh=h*.20,g=cx.createLinearGradient(0,h-bh,0,h);
-    g.addColorStop(0,'rgba(0,0,0,0)');
-    g.addColorStop(.25,'rgba(0,0,0,.55)');
-    g.addColorStop(1,'rgba(0,0,0,.9)');
-    cx.fillStyle=g;cx.fillRect(0,h-bh,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
-    
-    let y=h-20;
-    for(let i=lines.length-1;i>=0;i--){
-      const line=lines[i];
-      cx.fillStyle=line.large?'#fff':(line.small?'rgba(255,255,255,.7)':'rgba(255,255,255,.88)');
-      
-      let fontSize = Math.round(bh*.15);
-      if(line.large) fontSize = Math.round(bh*.24);
-      if(line.small) fontSize = Math.round(bh*.12);
-      
-      cx.font=line.large?`bold ${fontSize}px Arial,sans-serif`:`${fontSize}px Arial,sans-serif`;
-      cx.fillText(line.text,20,y, w-40);
-      
-      y -= line.large ? Math.round(bh*.30) : (line.small ? Math.round(bh*.15) : Math.round(bh*.20));
+    const bh=h*(0.06+lines.length*0.042)*scale;
+    const y0=isTop?0:h-bh;
+    const g=cx.createLinearGradient(0,isTop?bh:y0,0,isTop?0:h);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.25,'rgba(0,0,0,.62)');g.addColorStop(1,'rgba(0,0,0,.92)');
+    cx.fillStyle=g;cx.fillRect(0,y0,w,bh);cx.textAlign='left';cx.textBaseline='alphabetic';
+
+    let y=isTop?Math.round(32*scale):h-18;
+    const stepMult=isTop?1:-1;
+    const iter=isTop?lines:[...lines].reverse();
+    for(const line of iter){
+      cx.fillStyle=line.accent?'#ffd600':(line.large?'#fff':(line.small?'rgba(255,255,255,.75)':'rgba(255,255,255,.9)'));
+      let fs=Math.round(h*.028*scale);
+      if(line.large)fs=Math.round(h*.046*scale);
+      if(line.small)fs=Math.round(h*.022*scale);
+      cx.font=(line.large||line.accent)?`bold ${fs}px Arial,sans-serif`:`${fs}px Arial,sans-serif`;
+      cx.fillText(line.text,20,y,w-40);
+      y+=stepMult*Math.round(fs*1.28);
     }
   }
 
   const lb=$('label').value.trim();
   if(lb&&$('showLabel').checked){
-    const fs=Math.round(h*.035);
+    const fs=Math.round(h*.033*scale);
     cx.font=`bold ${fs}px Arial,sans-serif`;
-    const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=30;
-    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();
+    const px=fs*.8,py=fs*.45,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-24,y=isTop?h-bh2-24:24;
+    cx.save();cx.globalAlpha=.85;cx.fillStyle='#ffd600';cx.beginPath();
     cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;
     cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';
     cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
@@ -296,24 +723,175 @@ function frame(){
 }
 
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
+function triggerFlash(){if(!$('shutterFlash').checked)return;const f=$('flash');f.style.opacity='0.65';setTimeout(()=>f.style.opacity='0',90);}
+
 $('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
-async function photo(){if(!frame())return;const b=await toBlob(.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;toBlob(.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
+async function photo(){if(!frame())return;triggerFlash();const b=await toBlob(parseFloat($('jpegQual').value)||.9);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
+$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;triggerFlash();toBlob(parseFloat($('jpegQual').value)||.9).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
 
-/* Gravação de vídeo */
+/* Vídeo */
 let vidLoop=0;
-function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada neste navegador',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada neste navegador',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
-function setRec(on,t){$('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;$('shut').classList.toggle('rec',on);$('snap').classList.toggle('on',on&&S.mode==='pdf');document.body.classList.toggle('clean',!!(on&&S.mode==='pdf'));if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});else{S.lock?.release?.();S.lock=null;}}
+function toggleVideo(){if(S.rec){S.rec.stop();return;}if(!frame())return;const cs=cv.captureStream?cv.captureStream(30):null;if(!cs)return toast('Gravação não suportada',1);const mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';let r;try{r=new MediaRecorder(cs,{mimeType:mt||undefined,videoBitsPerSecond:8e6});}catch(e){return toast('Gravação não suportada',1);}const ini=stamp(),km0=S.km,ch=[];r.ondataavailable=e=>e.data.size&&ch.push(e.data);r.onstop=async()=>{cancelAnimationFrame(vidLoop);S.rec=null;setRec(false);await save(new Blob(ch,{type:r.mimeType||'video/webm'}),`VIDEO_KM_${km0}_${ini}_a_${stamp()}.webm`);};r.start(1000);S.rec=r;setRec(true,'Gravando vídeo');(function d(){frame();vidLoop=requestAnimationFrame(d);})();}
 
-/* Relatório PDF em lotes otimizado */
-const lim=()=>Math.max(parseInt($('lote').value)||150,1),upd=()=>{if(S.cap)$('rec').textContent=`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
+function setRec(on,t){
+  $('rec').classList.toggle('on',on);if(t)$('rec').textContent=t;
+  $('shut').classList.toggle('rec',on);
+  $('snap').classList.toggle('on',on&&S.mode==='pdf');
+  $('pauseBtn').classList.toggle('on',on&&S.mode==='pdf');
+  clearTimeout(S.cleanTimer);
+  if(on&&S.mode==='pdf'&&$('autoClean').checked){
+    S.cleanTimer=setTimeout(()=>document.body.classList.add('clean'),4000);
+  }else if(!on){
+    document.body.classList.remove('clean');
+  }
+  if(on)navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});
+  else{S.lock?.release?.();S.lock=null;}
+}
+
+/* Relatório PDF em Lotes */
+const lim=()=>Math.max(parseInt($('lote').value)||150,1);
+const upd=()=>{if(S.cap)$('rec').textContent=S.paused?`PAUSADO · Lote ${S.batch}`:`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
+
 function togglePdf(){S.cap?stopPdf():startPdf();}
-function startPdf(){if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);S.cap=true;S.buf=[];S.queue=[];S.batch=1;S.saved=0;setRec(true);upd();loop();}
-function loop(){if(!S.cap)return;const start=performance.now();if(frame())toBlob(.82).then(async b=>{if(!S.cap||!b)return;S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km});if(S.buf.length>=lim())rotate(false);upd();}).catch(()=>{});clearTimeout(S.timer);S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));}
+function startPdf(){
+  if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);
+  S.cap=true;S.paused=false;$('pauseBtn').textContent='⏸️';$('rec').classList.remove('paused');
+  S.buf=[];S.queue=[];S.batch=1;S.saved=0;S.totalPhotosSession=0;
+  S.sessionStartKm=S.km;S.sessionStartTime=Date.now();
+  S.lastCapLat=null;S.lastCapLon=null;
+  setRec(true);upd();loop();
+}
+
+function loop(){
+  if(!S.cap)return;
+  const start=performance.now();
+  let shouldCapture=!S.paused;
+
+  if(shouldCapture&&$('pauseStop').checked&&S.speed!==null&&(S.speed*3.6)<3){
+    shouldCapture=false;
+  }
+  if(shouldCapture&&$('distTriggerOn').checked&&S.acc!==null){
+    const stepM=Math.max(parseFloat($('distStep').value)||50,5);
+    if(S.lastCapLat!==null){
+      const moved=haversine(S.lastCapLat,S.lastCapLon,S.lat,S.lon);
+      if(moved<stepM)shouldCapture=false;
+    }
+  }
+
+  if(shouldCapture&&frame()){
+    S.lastCapLat=S.lat;S.lastCapLon=S.lon;
+    const q=parseFloat($('jpegQual').value)||.82;
+    toBlob(q).then(async b=>{
+      if(!S.cap||!b)return;
+      S.buf.push({u8:new Uint8Array(await b.arrayBuffer()),km:S.km,ts:new Date().toLocaleTimeString('pt-BR')});
+      S.totalPhotosSession++;
+      if(S.buf.length>=lim())rotate(false);
+      upd();
+    }).catch(()=>{});
+  }
+  clearTimeout(S.timer);
+  S.timer=setTimeout(loop,Math.max(0,Math.max(parseInt($('int').value)||200,100)-(performance.now()-start)));
+}
+
 function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch});S.buf=[];S.batch++;runQueue();if(final&&!S.queue.length)return;}
-async function stopPdf(){if(!S.cap)return;S.cap=false;S.progActiveSession=false;clearTimeout(S.timer);$('shut').disabled=true;toast('Salvando lotes pendentes…');rotate(true);await runQueue();while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));setRec(false);$('shut').disabled=false;toast(`Sessão finalizada: ${S.saved} PDF(s)`);}
+
+async function stopPdf(){
+  if(!S.cap)return;
+  S.cap=false;S.paused=false;S.progActiveSession=false;clearTimeout(S.timer);
+  $('shut').disabled=true;toast('Salvando lotes pendentes…');
+  rotate(true);await runQueue();
+  while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));
+  setRec(false);$('shut').disabled=false;
+
+  const durSec=Math.round((Date.now()-S.sessionStartTime)/1000);
+  const durStr=`${pad(Math.floor(durSec/60))}:${pad(durSec%60)}`;
+  const rangeStr=`${S.sessionStartKm||'---'} a ${S.km}`;
+
+  if(S.totalPhotosSession>0){
+    saveHistory({date:new Date().toLocaleString('pt-BR'),pdfs:S.saved,photos:S.totalPhotosSession,range:rangeStr,dur:durStr,label:$('label').value.trim()});
+    $('sumPdfs').textContent=S.saved;
+    $('sumPhotos').textContent=S.totalPhotosSession;
+    $('sumKmRange').textContent=rangeStr;
+    $('sumDuration').textContent=durStr;
+    $('summaryModal').classList.add('on');
+  }else{
+    toast('Sessão encerrada sem fotos');
+  }
+}
+
+$('closeSummary').onclick=()=>$('summaryModal').classList.remove('on');
+$('okSummaryBtn').onclick=()=>$('summaryModal').classList.remove('on');
+
 async function runQueue(){if(S.busy)return;S.busy=true;try{while(S.queue.length){await makePdf(S.queue.shift());S.saved++;await new Promise(r=>setTimeout(r,0));}}catch(e){console.error(e);toast('Falha ao gerar PDF',1);}finally{S.busy=false;}}
-async function makePdf({p,n}){const {jsPDF}=window.jspdf,sz=u=>{const i=new jsPDF().getImageProperties(u);return[i.width,i.height];};const [w,h]=sz(p[0].u8),d=new jsPDF({orientation:w>=h?'landscape':'portrait',unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});p.forEach((it,i)=>{if(i)d.addPage([w,h],w>=h?'landscape':'portrait');d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);}
+
+async function makePdf({p,n}){
+  const {jsPDF}=window.jspdf;
+  const i0=new jsPDF().getImageProperties(p[0].u8);
+  const w=i0.width,h=i0.height;
+  const orient=w>=h?'landscape':'portrait';
+  const d=new jsPDF({orientation:orient,unit:'px',format:[w,h],compress:true,hotfixes:['px_scaling']});
+  const cols=parseInt($('pdfLayout').value)||1;
+
+  if($('pdfCover').checked){
+    d.setFillColor(16,20,26);d.rect(0,0,w,h,'F');
+    d.setTextColor(255,214,0);d.setFontSize(Math.round(h*0.055));
+    d.text(`RELATÓRIO DE INSPEÇÃO - LOTE ${n}`,w*0.07,h*0.18);
+    d.setTextColor(242,242,244);d.setFontSize(Math.round(h*0.032));
+    d.text(`Rodovia: ${$('highwayName').value||'BR-116'}`,w*0.07,h*0.28);
+    d.text(`Trecho: KM ${p[0].km} até KM ${p[p.length-1].km}`,w*0.07,h*0.35);
+    d.text(`Total de Registros neste Lote: ${p.length} fotos`,w*0.07,h*0.42);
+    d.text(`Data/Hora de Geração: ${new Date().toLocaleString('pt-BR')}`,w*0.07,h*0.49);
+    if($('inspector').value.trim())d.text(`Técnico: ${$('inspector').value.trim()}`,w*0.07,h*0.56);
+    if($('label').value.trim())d.text(`Etiqueta: ${$('label').value.trim()}`,w*0.07,h*0.63);
+    d.addPage([w,h],orient);
+  }
+
+  if(cols===2){
+    for(let i=0;i<p.length;i+=2){
+      if(i>0)d.addPage([w,h],orient);
+      d.addImage(p[i].u8,'JPEG',0,0,w/2,h,undefined,'FAST');p[i].u8=null;
+      if(p[i+1]){d.addImage(p[i+1].u8,'JPEG',w/2,0,w/2,h,undefined,'FAST');p[i+1].u8=null;}
+    }
+  }else{
+    p.forEach((it,i)=>{if(i)d.addPage([w,h],orient);d.addImage(it.u8,'JPEG',0,0,w,h,undefined,'FAST');it.u8=null;});
+  }
+  await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
+}
+
+/* Histórico & Exportações */
+function getHistory(){try{return JSON.parse(localStorage.getItem('kmr_hist')||'[]');}catch{return[];}}
+function saveHistory(entry){const h=getHistory();h.unshift(entry);if(h.length>100)h.pop();localStorage.setItem('kmr_hist',JSON.stringify(h));updateHistCount();}
+function updateHistCount(){$('histCount').textContent=getHistory().length;}
+updateHistCount();
+
+$('openHistBtn').onclick=()=>{
+  const h=getHistory();
+  $('histList').innerHTML=h.length?h.map(x=>`<div class="log-item"><b>KM ${escapeHtml(x.range)}</b> · ${x.pdfs} PDF(s) (${x.photos} fotos)<small>${escapeHtml(x.date)} · Duração: ${x.dur}${x.label?' · '+escapeHtml(x.label):''}</small></div>`).join(''):'<p class="sub">Nenhuma inspeção registrada ainda.</p>';
+  $('histModal').classList.add('on');
+};
+$('closeHist').onclick=()=>$('histModal').classList.remove('on');
+$('clearHistBtn').onclick=()=>{localStorage.removeItem('kmr_hist');updateHistCount();$('histModal').classList.remove('on');toast('Histórico limpo');};
+
+function exportCsvLog(){
+  const h=getHistory();if(!h.length)return toast('Sem histórico para exportar',1);
+  const csv='Data;Trecho KM;PDFs;Fotos;Duracao;Etiqueta\n'+h.map(x=>`"${x.date}";"${x.range}";${x.pdfs};${x.photos};"${x.dur}";"${x.label||''}"`).join('\n');
+  save(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),`Historico_Inspecoes_${stamp()}.csv`);
+}
+$('exportCsvLogBtn').onclick=exportCsvLog;$('exportHistCsv2').onclick=exportCsvLog;
+
+$('exportCfgBtn').onclick=()=>{
+  persist();
+  const data=localStorage.getItem('kmr_pro')||'{}';
+  save(new Blob([data],{type:'application/json'}),`KMReport_Config_${stamp()}.json`);
+};
+$('importCfgBtn').onclick=()=>$('importCfgFile').click();
+$('importCfgFile').onchange=async e=>{
+  const f=e.target.files?.[0];if(!f)return;
+  try{JSON.parse(await f.text());localStorage.setItem('kmr_pro',await f.text());toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
+  catch{toast('Arquivo JSON inválido',1);}
+};
+$('resetCfgBtn').onclick=()=>{localStorage.removeItem('kmr_pro');toast('Restaurando padrões...');setTimeout(()=>location.reload(),800);};
+
 $('cam').addEventListener('click',e=>{if(S.cap&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
 window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
