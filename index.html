@@ -346,18 +346,18 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 
   <div class="section-block">
     <div class="menu-pills-grid">
-      <button class="menu-pill" id="pillId" onclick="switchPane('id')">🔍 Pesquisa ID</button>
+      <button class="menu-pill" id="pillId" onclick="switchPane('id')">🔍 Pesquisa ID/Placa</button>
       <button class="menu-pill" id="pillKm" onclick="switchPane('km')">🛣️ Pesquisa KM</button>
       <button class="menu-pill" id="pillCoord" onclick="switchPane('coord')">📍 Coordenada</button>
       <button class="menu-pill" id="pillMap" onclick="switchPane('map')">🗺️ Mapa</button>
     </div>
 
-    <!-- PAINEL: ID -->
+    <!-- PAINEL: ID / PLAQUETA / ENDEREÇO -->
     <div class="collapsible-pane" id="paneId">
       <div class="card card-accent">
         <div class="search-row">
           <div class="search-wrap">
-            <input class="search-input" id="inputId" placeholder="ID (8 DÍGITOS)" inputmode="numeric" pattern="[0-9]*" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
+            <input class="search-input" id="inputId" placeholder="BUSCAR ID, PLAQUETA OU ENDEREÇO" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
           </div>
           <button class="btn-icon go" onclick="searchId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
           <button class="btn-icon clr" onclick="clearId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
@@ -606,10 +606,21 @@ async function loadSystemDataAsync(){
     if(t){
       let lines=t.split(/\r?\n/).filter(l=>l.trim());
       let h=lines.shift().split(';');
-      let iId=findCol(h,['id do nox','idnox','id']),iLat=findCol(h,['latitude','lat']),iLon=findCol(h,['longitude','lon','long']);
+      let iId=findCol(h,['id do nox','idnox','id']);
+      let iLat=findCol(h,['latitude','lat']);
+      let iLon=findCol(h,['longitude','lon','long']);
+      let iEnd=findCol(h,['endereco','end']);
+      let iPlq=findCol(h,['plaqueta','placa']);
+
       posts=lines.map(l=>{
         let r=l.split(';');
-        return {id:String(r[iId]||'').trim().toUpperCase(), lat:parsePt(r[iLat]), lon:parsePt(r[iLon])};
+        return {
+          id: String(r[iId]||'').trim().toUpperCase(),
+          lat: parsePt(r[iLat]),
+          lon: parsePt(r[iLon]),
+          endereco: String(r[iEnd]||'').trim(),
+          plaqueta: String(r[iPlq]||'').trim().toUpperCase()
+        };
       }).filter(p=>p.id&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
 
       postIndex.clear();
@@ -731,22 +742,26 @@ function initMap(lat, lon){
     }
 
     let postIdStr = nearestPost ? nearestPost.id : '---';
+    let plaqueStr = nearestPost ? (nearestPost.plaqueta || '---') : '---';
+    let addressStr = nearestPost ? (nearestPost.endereco || '---') : '---';
     let distStr = nearestPost ? formatDist(minPostDist) : '---';
 
     let popupContent = `
-      <div style="font-family:var(--font);color:#fff;padding:4px;min-width:150px;font-size:9px;line-height:1.4;">
+      <div style="font-family:var(--font);color:#fff;padding:4px;min-width:160px;font-size:9px;line-height:1.4;">
         <div style="font-weight:900;color:#3b82f6;text-transform:uppercase;margin-bottom:2px;">${cityName}</div>
         <div style="font-weight:800;color:#d1d5db;">Rodovia: ${kmStr}</div>
         <div style="font-weight:900;color:#34d399;margin-top:2px;">ID Perto: ${postIdStr}</div>
+        <div style="font-size:8px;color:#cbd5e1;font-weight:800;">Plaqueta: ${plaqueStr}</div>
+        <div style="font-size:7.5px;color:#94a3b8;">End: ${addressStr}</div>
         <div style="font-size:7.5px;color:var(--muted);margin-top:1px;">dist.: ${distStr}</div>
-        <button style="margin-top:6px;width:100%;background:#10b981;color:#fff;border:0;padding:4px;border-radius:3px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${postIdStr}', ${l.lat}, ${l.lng})">WhatsApp</button>
+        <button style="margin-top:6px;width:100%;background:#10b981;color:#fff;border:0;padding:4px;border-radius:3px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${postIdStr}', ${l.lat}, ${l.lng}, '${plaqueStr}', '${addressStr}')">WhatsApp</button>
       </div>
     `;
 
     if(popupInstance){
       mapInstance.removeLayer(popupInstance);
     }
-    popupInstance = L.popup({maxWidth:200, className:'custom-leaflet-popup'}).setLatLng([l.lat, l.lng]).setContent(popupContent).openOn(mapInstance);
+    popupInstance = L.popup({maxWidth:220, className:'custom-leaflet-popup'}).setLatLng([l.lat, l.lng]).setContent(popupContent).openOn(mapInstance);
   });
 }
 
@@ -819,7 +834,7 @@ async function searchManualCoord(){
           <p class="post-dist" style="color:var(--green2);font-weight:900;text-transform:uppercase;">KM APROXIMADO: ${exactKm}</p>
           <p class="post-coords">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('PONTO SELECIONADO', ${lat}, ${lon})">
+        <button class="post-wa" onclick="sendWhatsApp('PONTO SELECIONADO', ${lat}, ${lon}, '', '')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </button>
       </div>
@@ -837,12 +852,14 @@ async function searchManualCoord(){
       <div class="post-top">
         <div style="flex:1;">
           <p class="post-id">#${idx+1} - ID: ${item.id}</p>
+          <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${item.plaqueta || '---'}</p>
+          <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${item.endereco || '---'}</p>
           <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${itemCity}</p>
           <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(item)}</p>
           <p class="post-dist" id="srch-coord-dist-${idx}">${dt}</p>
           <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon})">
+        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon}, '${item.plaqueta}', '${item.endereco}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </button>
       </div>
@@ -859,17 +876,16 @@ async function searchId(){
   let msg = document.getElementById('searchMsg'), res = document.getElementById('searchResult');
   if(!raw){clearId();return;}
 
-  let digitsOnly = raw.replace(/\D/g, '');
-  if(digitsOnly.length !== 8){
-    searchItem=null;res.style.display='none';msg.style.display='none';return;
-  }
+  let query = norm(raw);
 
-  let found = postIndex.get(norm(raw));
-  if(!found){
-    for(let [k,v] of postIndex.entries()){
-      if(k.includes(norm(raw))){found=v;break;}
-    }
-  }
+  // Busca por ID, Plaqueta ou Endereço
+  let found = posts.find(p => 
+    norm(p.id) === query || 
+    norm(p.plaqueta) === query || 
+    norm(p.id).includes(query) || 
+    norm(p.plaqueta).includes(query) || 
+    norm(p.endereco).includes(query)
+  );
 
   if(!found){
     msg.style.display='flex';msg.textContent='Não encontrado';
@@ -902,12 +918,14 @@ async function renderSearch(){
     <div class="post-top">
       <div style="flex:1;">
         <p class="post-id">ID: ${searchItem.id}</p>
+        <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${searchItem.plaqueta || '---'}</p>
+        <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${searchItem.endereco || '---'}</p>
         <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
         <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(searchItem)}</p>
         <p class="post-dist" id="srch-dist">${dt}</p>
         <p class="post-coords">${searchItem.lat.toFixed(5)}, ${searchItem.lon.toFixed(5)}</p>
       </div>
-      <button class="post-wa" onclick="sendWhatsApp('${searchItem.id}', ${searchItem.lat}, ${searchItem.lon})">
+      <button class="post-wa" onclick="sendWhatsApp('${searchItem.id}', ${searchItem.lat}, ${searchItem.lon}, '${searchItem.plaqueta}', '${searchItem.endereco}')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
       </button>
     </div>
@@ -1034,12 +1052,14 @@ async function renderSearchKm(label, bestPt){
       <div class="post-top">
         <div style="flex:1;">
           <p class="post-id">#${idx+1} - ID: ${item.id}</p>
+          <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${item.plaqueta || '---'}</p>
+          <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${item.endereco || '---'}</p>
           <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
           <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(item)}</p>
           <p class="post-dist" id="srch-km-dist-${idx}">${dt}</p>
           <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon})">
+        <button class="post-wa" onclick="sendWhatsApp('${item.id}', ${item.lat}, ${item.lon}, '${item.plaqueta}', '${item.endereco}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </button>
       </div>
@@ -1050,8 +1070,8 @@ async function renderSearchKm(label, bestPt){
   res.innerHTML=html;
 }
 
-function sendWhatsApp(id, lat, lon){
-  let tx = `📍 *POSTE*\nID: ${id}\nCoords: ${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}\nhttps://maps.google.com/?q=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}`;
+function sendWhatsApp(id, lat, lon, plaqueta='', endereco=''){
+  let tx = `📍 *POSTE*\nID: ${id}\nPlaqueta: ${plaqueta || '---'}\nEndereço: ${endereco || '---'}\nCoords: ${Number(lat).toFixed(5)}, ${Number(lon).toFixed(5)}\nhttps://maps.google.com/?q=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}`;
   window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
 }
 
@@ -1060,7 +1080,7 @@ async function renderApoio(){
   let qty=Number(document.getElementById('qty').value||10);
   let items=posts.map(p=>{
     if(Math.abs(p.lat - pos.lat) > 0.3 || Math.abs(p.lon - pos.lon) > 0.3) return null;
-    return {id:p.id, lat:p.lat, lon:p.lon, d:hav(pos.lat,pos.lon,p.lat,p.lon)};
+    return {id:p.id, lat:p.lat, lon:p.lon, endereco:p.endereco, plaqueta:p.plaqueta, d:hav(pos.lat,pos.lon,p.lat,p.lon)};
   }).filter(Boolean).sort((a,b)=>a.d-b.d).slice(0,qty);
 
   let key=items.map(i=>i.id).join(',');
@@ -1084,14 +1104,16 @@ async function renderApoio(){
     let div=document.createElement('div');
     div.className='post'+(i===0?' near':'');
     div.innerHTML=`<div class="post-top">
-      <input type="checkbox" class="post-chk" value="${o.id}" data-lat="${o.lat}" data-lon="${o.lon}" checked>
+      <input type="checkbox" class="post-chk" value="${o.id}" data-lat="${o.lat}" data-lon="${o.lon}" data-plaqueta="${o.plaqueta||''}" data-endereco="${o.endereco||''}" checked>
       <div style="flex:1;">
         <p class="post-id">ID: ${o.id}</p>
+        <p class="post-dist" style="color:var(--text2);font-weight:800;text-transform:uppercase;">Plaqueta: ${o.plaqueta || '---'}</p>
+        <p class="post-dist" style="color:var(--text2);font-size:7.5px;">Endereço: ${o.endereco || '---'}</p>
         <p class="post-dist" style="color:var(--accent);font-weight:900;text-transform:uppercase;">${cityName}</p>
         <p class="post-dist" style="color:var(--green2);text-transform:uppercase;">KM: ${findPostExactKm(o)}</p>
         <p class="post-dist" id="dist-${i}">distância até o local: ${formatDist(o.d)}</p>
       </div>
-      <button class="post-wa" onclick="sendWhatsApp('${o.id}', ${o.lat}, ${o.lon})">
+      <button class="post-wa" onclick="sendWhatsApp('${o.id}', ${o.lat}, ${o.lon}, '${o.plaqueta}', '${o.endereco}')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
       </button>
     </div>
@@ -1109,14 +1131,20 @@ document.getElementById('btnSend').onclick=()=>{
   let chks=document.querySelectorAll('.post-chk:checked');
   let items=[];
   if(chks.length){
-    chks.forEach(c=>items.push({id:c.value,lat:parseFloat(c.dataset.lat),lon:parseFloat(c.dataset.lon)}));
+    chks.forEach(c=>items.push({
+      id: c.value,
+      lat: parseFloat(c.dataset.lat),
+      lon: parseFloat(c.dataset.lon),
+      plaqueta: c.dataset.plaqueta,
+      endereco: c.dataset.endereco
+    }));
   }else{
     let qty=Number(document.getElementById('qty').value||10);
     items=posts.map(p=>({...p,d:hav(pos.lat,pos.lon,p.lat,p.lon)})).sort((a,b)=>a.d-b.d).slice(0,qty);
   }
   let tx=`📍 *LISTA*\nData: ${nowBR()}\n\n`;
   items.forEach((o,i)=>{
-    tx+=`${i+1}. ID: ${o.id} (KM: ${findPostExactKm(o)})\n`;
+    tx+=`${i+1}. ID: ${o.id} | Placa: ${o.plaqueta||'---'} (KM: ${findPostExactKm(o)})\n   End: ${o.endereco||'---'}\n`;
     if(document.getElementById('chkMaps').checked) tx+=`   https://maps.google.com/?q=${o.lat.toFixed(5)},${o.lon.toFixed(5)}\n`;
   });
   window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank','noopener');
