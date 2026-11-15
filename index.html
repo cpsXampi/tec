@@ -4,152 +4,167 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report</title>
+<title>KM Report — O Mais Intuitivo do Brasil</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{
-  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.1);
-  --acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#8b8f98;
-  --sb:max(env(safe-area-inset-bottom),16px);--st:env(safe-area-inset-top,0px);
-  --hud-bg:rgba(4,90,64,.82);--hud-tx:#bbf7d0;--hud-border:rgba(255,255,255,.1)
+  --bg:#07090c;--s1:#10141a;--s2:#171c24;--line:rgba(255,255,255,.12);
+  --acc:#ffd600;--ok:#34d399;--bad:#ef4444;--tx:#f2f2f4;--mu:#9ca3af;
+  --sb:max(env(safe-area-inset-bottom),18px);--st:env(safe-area-inset-top,0px);
+  --hud-bg:rgba(4,120,87,.88);--hud-tx:#bbf7d0;--hud-border:rgba(255,255,255,.15)
 }
 body.night-red{
   --bg:#0a0000;--s1:#160202;--s2:#220404;--line:rgba(255,60,60,.2);
   --acc:#ff3b3b;--ok:#ff6b6b;--bad:#ff0000;--tx:#ffcccc;--mu:#b35959;
-  --hud-bg:rgba(60,4,4,.86);--hud-tx:#ff8080;--hud-border:rgba(255,60,60,.25)
+  --hud-bg:rgba(60,4,4,.9);--hud-tx:#ff8080;--hud-border:rgba(255,60,60,.3)
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{border:0;background:none;cursor:pointer}
-:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
 
-/* Visibilidade controlada pelo Modo Avançado */
+/* Visibilidade Modo Avançado */
 .adv-only{display:none!important}
 body.adv-mode .adv-only{display:block!important}
 body.adv-mode .adv-only-flex{display:flex!important}
 body.adv-mode .adv-only-grid{display:grid!important}
-body.adv-mode .adv-only-inline{display:inline-block!important}
-.adv-only-flex,.adv-only-grid,.adv-only-inline{display:none!important}
 
-/* Start Screen (Padrão idêntico ao index 73 com o botão discreto de Modo Avançado) */
-#start{align-items:center;justify-content:center;padding:calc(24px + var(--st)) 20px var(--sb);overflow-y:auto}
-.card{width:100%;max-width:420px;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:28px 22px}
-.card h1{font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
-.card p.sub{color:var(--mu);font-size:14px;line-height:1.5;margin-top:8px}
-.brand{display:inline-block;margin-left:5px;font-size:8px;font-weight:400;color:var(--mu);opacity:.45;vertical-align:baseline}
-.adv-toggle-discrete{font-size:11px;color:var(--mu);opacity:.5;padding:4px 8px;border-radius:8px;border:1px solid transparent;transition:all .2s}
-.adv-toggle-discrete:hover,.adv-toggle-discrete.on{opacity:1;color:var(--acc);border-color:rgba(255,214,0,.35);background:rgba(255,214,0,.08)}
+/* Tela Inicial Ultra Intuitiva */
+#start{align-items:center;justify-content:center;padding:calc(16px + var(--st)) 18px var(--sb);overflow-y:auto}
+.card{width:100%;max-width:440px;background:var(--s1);border:1px solid var(--line);border-radius:24px;padding:26px 20px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
+.card h1{font-size:24px;font-weight:900;letter-spacing:-.03em;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.brand{font-size:9px;font-weight:500;color:var(--mu);opacity:.6;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px}
+.adv-toggle-discrete{font-size:12px;font-weight:700;color:var(--mu);opacity:.6;padding:6px 10px;border-radius:10px;border:1px solid var(--line);transition:all .2s;background:var(--s2)}
+.adv-toggle-discrete:hover,.adv-toggle-discrete.on{opacity:1;color:var(--acc);border-color:rgba(255,214,0,.4);background:rgba(255,214,0,.1)}
 
-.fld{margin-top:20px}.fld label{display:block;font-size:13px;color:var(--mu);margin-bottom:6px}
-.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px}
-.btn{width:100%;min-height:50px;border-radius:14px;font-weight:800;font-size:15px;margin-top:12px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:8px}
+.hero-banner{background:linear-gradient(135deg,rgba(255,214,0,.15),rgba(52,211,153,.1));border:1px solid rgba(255,214,0,.3);border-radius:16px;padding:14px 16px;margin-top:14px;display:flex;gap:12px;align-items:center}
+.hero-banner span{font-size:28px;flex:none}
+.hero-banner div h3{font-size:14px;font-weight:800;color:var(--acc);margin-bottom:2px}
+.hero-banner div p{font-size:12px;color:var(--tx);opacity:.9;line-height:1.4}
+
+.fld{margin-top:16px}.fld label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin-bottom:6px}
+.inp{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:15px;font-weight:600}
+.btn{width:100%;min-height:54px;border-radius:16px;font-weight:900;font-size:16px;margin-top:12px;background:var(--s2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .btn.pri{background:var(--acc);color:#000;border-color:var(--acc)}
-.btn.sm{min-height:38px;font-size:13px;border-radius:10px;padding:0 12px}
+.btn.sm{min-height:42px;font-size:13px;border-radius:12px;padding:0 10px}
 .btn:active{transform:scale(.98)}
-.st{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mu);margin-top:14px}
-.dot{width:9px;height:9px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok)}
-.start-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.st{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:600;color:var(--mu);margin-top:16px;background:var(--bg);padding:10px 14px;border-radius:12px;border:1px solid var(--line)}
+.dot{width:10px;height:10px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.start-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
 
-/* Camera Screen */
+/* Tela de Câmera (Cockpit Rodoviário) */
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .2s}
-.hud{position:absolute;z-index:5;max-width:min(75vw,360px);background:rgba(4,90,64,.82);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:8px 14px;top:calc(14px + var(--st));left:12px}
-.hud small{display:block;font-size:11px;color:#bbf7d0}
-.hud b{display:block;font-size:25px;line-height:1.15;overflow-wrap:anywhere}
-.hud .acc{font-size:11px;color:#bbf7d0;margin-top:3px;line-height:1.35}
-.hud .telemetry{font-size:11px;color:#fff;opacity:.9;margin-top:3px;font-variant-numeric:tabular-nums}
-.hud .address{font-size:12px;color:#fff;margin-top:4px;line-height:1.3}
-.hud .address a{color:#bbf7d0;font-size:9px}
-.hud.outside b{font-size:17px}
+.hud{position:absolute;z-index:5;max-width:min(80vw,380px);background:var(--hud-bg);backdrop-filter:blur(16px);border:1px solid var(--hud-border);border-radius:16px;padding:10px 16px;top:calc(12px + var(--st));left:12px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.hud small{display:block;font-size:11px;font-weight:700;color:var(--hud-tx);text-transform:uppercase;letter-spacing:.05em}
+.hud b{display:block;font-size:26px;line-height:1.15;font-weight:900;color:#fff;overflow-wrap:anywhere}
+.hud .acc{font-size:11px;color:var(--hud-tx);margin-top:3px;font-weight:600}
+.hud .telemetry{font-size:11px;color:#fff;opacity:.95;margin-top:3px;font-variant-numeric:tabular-nums;font-weight:700}
+.hud .address{font-size:11px;color:#fff;margin-top:4px;line-height:1.3}
+.hud .address a{color:var(--hud-tx);font-size:9px}
+.hud.outside b{font-size:16px}
 
-/* Grid & Crosshair Overlays */
-#gridOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;display:none;background-image:linear-gradient(to right,rgba(255,255,255,.18) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.18) 1px,transparent 1px);background-size:33.33% 33.33%}
+/* Overlays */
+#gridOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;display:none;background-image:linear-gradient(to right,rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.2) 1px,transparent 1px);background-size:33.33% 33.33%}
 #gridOverlay.on{display:block}
-#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;z-index:2;pointer-events:none;display:none}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;z-index:2;pointer-events:none;display:none}
 #crosshair.on{display:block}
-#crosshair::before,#crosshair::after{content:"";position:absolute;background:rgba(255,214,0,.75)}
-#crosshair::before{top:17px;left:0;right:0;height:2px}
-#crosshair::after{left:17px;top:0;bottom:0;width:2px}
+#crosshair::before,#crosshair::after{content:"";position:absolute;background:rgba(255,214,0,.85)}
+#crosshair::before{top:19px;left:0;right:0;height:2px}
+#crosshair::after{left:19px;top:0;bottom:0;width:2px}
 
-/* Top Right Chips */
-.chip{position:absolute;z-index:5;top:calc(14px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-.pill{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:700}
-.pill.rec{display:none;color:#fff;align-items:center;gap:7px}.pill.rec.on{display:flex}
-.pill.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}
+/* Chips Superiores Direita */
+.chip{position:absolute;z-index:5;top:calc(12px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.pill{background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:8px 14px;font-size:12px;font-weight:800;color:#fff}
+.pill.rec{display:none;align-items:center;gap:8px}.pill.rec.on{display:flex}
+.pill.rec::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--bad);animation:blink 1s infinite}
 .pill.rec.paused::before{background:var(--acc);animation:none}
-@keyframes blink{50%{opacity:.15}}
-.lbl{width:170px;background:rgba(0,0,0,.65);border:1px solid rgba(255,214,0,.4);border-radius:12px;padding:8px 12px;font-size:13px}
-.prog-pill{display:none;align-items:center;gap:7px;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.5);border-radius:20px;padding:5px 9px 5px 11px;font-size:11px;font-weight:700;color:var(--acc);max-width:215px;text-align:left;line-height:1.2}
+@keyframes blink{50%{opacity:.2}}
+.lbl{width:180px;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.5);border-radius:14px;padding:9px 14px;font-size:13px;font-weight:700;color:#fff}
+.lbl::placeholder{color:rgba(255,255,255,.5)}
+.prog-pill{display:none;align-items:center;gap:8px;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,214,0,.6);border-radius:20px;padding:6px 10px 6px 12px;font-size:11.5px;font-weight:800;color:var(--acc);max-width:230px;text-align:left;line-height:1.2}
 .prog-pill.on{display:flex}
-.prog-pill .cancel{width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;font-size:10px;flex:none}
-.quick-tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:220px}
-.qbtn{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.65);border:1px solid var(--line);display:grid;place-items:center;font-size:14px;color:#fff}
-.qbtn.on{border-color:var(--acc);color:var(--acc);background:rgba(255,214,0,.15)}
+.prog-pill .cancel{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;display:grid;place-items:center;font-size:10px;flex:none}
+.quick-tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:230px}
+.qbtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:1px solid var(--line);display:grid;place-items:center;font-size:15px;color:#fff}
+.qbtn.on{border-color:var(--acc);color:var(--acc);background:rgba(255,214,0,.2)}
 
-/* Quick Tag Bar */
+/* Barra de Etiquetas Rápidas */
 .qtags{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:2px 4px;scrollbar-width:none}
 .qtags::-webkit-scrollbar{display:none}
-.qtag{flex:none;background:rgba(0,0,0,.68);border:1px solid rgba(255,255,255,.22);border-radius:16px;padding:5px 11px;font-size:11.5px;font-weight:600;color:#fff;white-space:nowrap}
+.qtag{flex:none;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
 .qtag.active{background:var(--acc);color:#000;border-color:var(--acc)}
 
-/* Bottom Controls */
-.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:30px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:14px;align-items:center}
+/* Barra Inferior Cockpit */
+.bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:26px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.9));display:flex;flex-direction:column;gap:12px;align-items:center}
 body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{opacity:0;pointer-events:none}
-.modes{display:flex;background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:22px;padding:3px}
-.modes button{padding:8px 16px;border-radius:18px;font-size:13px;font-weight:700;color:var(--mu)}
+.modes{display:flex;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:24px;padding:4px}
+.modes button{padding:9px 18px;border-radius:20px;font-size:13.5px;font-weight:800;color:var(--mu)}
 .modes button[aria-pressed=true]{background:var(--acc);color:#000}
-.row{display:flex;align-items:center;justify-content:center;gap:22px;width:100%}
-.rb{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);display:grid;place-items:center}
+.row{display:flex;align-items:center;justify-content:center;gap:24px;width:100%}
+.rb{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);display:grid;place-items:center}
 .rb svg{width:22px;height:22px}
 .camera-icon{width:24px;height:24px;display:block}
-#shut{width:76px;height:76px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center}
-#shut i{width:58px;height:58px;border-radius:50%;background:#fff;transition:all .15s}
-#shut.rec i{background:var(--bad);border-radius:14px;width:34px;height:34px}
+#shut{width:80px;height:80px;border-radius:50%;border:4px solid #fff;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#shut i{width:62px;height:62px;border-radius:50%;background:#fff;transition:all .15s}
+#shut.rec i{background:var(--bad);border-radius:16px;width:38px;height:38px}
 #snap,#pauseBtn{display:none}#snap.on,#pauseBtn.on{display:grid}
 
-/* Modals & Enterprise Tabs */
-.modal{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:20px}
+/* Modais e Abas */
+.modal{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px}
 .modal.on{display:flex}
-.modal .card{max-height:88vh;overflow-y:auto}
+.modal .card{max-height:90vh;overflow-y:auto}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:sticky;top:0;background:var(--s1);padding-bottom:10px;border-bottom:1px solid var(--line);z-index:2}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;border-bottom:1px solid var(--line);scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;padding:7px 12px;border-radius:12px;font-size:12px;font-weight:700;background:var(--s2);color:var(--mu);border:1px solid var(--line)}
+.tab{flex:none;padding:8px 14px;border-radius:12px;font-size:12.5px;font-weight:800;background:var(--s2);color:var(--mu);border:1px solid var(--line)}
 .tab.on{background:var(--acc);color:#000;border-color:var(--acc)}
 .tab-pane{display:none}.tab-pane.on{display:block}
 
-.checkrow{display:flex;align-items:flex-start;gap:10px;color:var(--tx);font-size:14px;line-height:1.4;margin-top:16px}
-.checkrow input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin-top:1px}
+.checkrow{display:flex;align-items:flex-start;gap:12px;color:var(--tx);font-size:14px;font-weight:600;line-height:1.4;margin-top:16px}
+.checkrow input{width:20px;height:20px;accent-color:var(--acc);flex:none;margin-top:1px}
 .checkgroup{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
-.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.checkgroup-title{font-size:13px;color:var(--mu);margin-bottom:8px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.stat-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-.stat-box b{display:block;font-size:20px;color:var(--acc)}
-.stat-box span{font-size:12px;color:var(--mu)}
-.log-item{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;font-size:13px}
-.log-item small{color:var(--mu);display:block;margin-top:3px}
+.stat-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat-box b{display:block;font-size:22px;font-weight:900;color:var(--acc)}
+.stat-box span{font-size:12px;font-weight:700;color:var(--mu)}
+.log-item{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:8px;font-size:13px}
+.log-item small{color:var(--mu);display:block;margin-top:4px;font-weight:600}
 
-#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:13px;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis}
+#toast{position:fixed;z-index:30;left:50%;top:calc(70px + var(--st));transform:translate(-50%,-10px);background:var(--s1);border:1px solid rgba(255,214,0,.4);border-radius:14px;padding:12px 20px;font-size:14px;font-weight:700;opacity:0;transition:all .2s ease;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 #toast.show{opacity:1;transform:translate(-50%,0)}
-#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+#toast.err{color:#fca5a5;border-color:rgba(239,68,68,.5)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<!-- TELA INICIAL (Padrão idêntico ao Index 73, com opção discreta de Modo Avançado) -->
+<!-- TELA INICIAL (Super Intuitiva) -->
 <main id="start" class="screen on"><div class="card">
   <h1>
-    <span>KM Report<small class="brand">By CPS sistems</small></span>
-    <button type="button" class="adv-toggle-discrete" id="toggleAdvBtn" title="Alternar Modo Avançado">⚡ Avançado</button>
+    <span>KM Report <small class="brand">Enterprise</small></span>
+    <button type="button" class="adv-toggle-discrete" id="toggleAdvBtn" title="Modo Avançado">⚡ Avançado</button>
   </h1>
-  <p class="sub">📸 Fotos, 🎥 vídeos e 📄 relatórios em PDF com registro automático de quilometragem, data, hora e coordenadas GPS diretamente nas imagens.</p>
-  <p class="st"><span class="dot ok"></span><span>Salvamento automático: Galeria / Documentos</span></p>
-  <button class="btn pri" id="go">📷 Iniciar câmera</button>
+  
+  <div class="hero-banner">
+    <span>🛣️</span>
+    <div>
+      <h3>Pronto para Inspeção</h3>
+      <p>GPS ativo, base SNV Dutra carregada e salvamento automático direto em Documentos / Galeria.</p>
+    </div>
+  </div>
 
-  <!-- Atalhos avançados (visíveis apenas no Modo Avançado) -->
+  <p class="st"><span class="dot ok" id="startGpsDot"></span><span id="startGpsText">GPS calibrando e base SNV pronta…</span></p>
+  
+  <button class="btn pri" id="go">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+    Iniciar Câmera e Vistoria
+  </button>
+
+  <!-- Atalhos (visíveis no Modo Avançado) -->
   <div class="start-grid adv-only-grid">
     <button class="btn sm" id="openHistBtn">📋 Histórico (<span id="histCount">0</span>)</button>
     <button class="btn sm" id="openBookModalBtn">📚 Compilar Livro</button>
@@ -173,10 +188,10 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 
   <div class="chip">
     <div class="pill rec" id="rec">Gravando</div>
-    <input id="lbl" class="lbl" placeholder="Etiqueta" maxlength="80">
+    <input id="lbl" class="lbl" placeholder="Etiqueta / Ocorrência" maxlength="80">
     <button type="button" class="prog-pill" id="progBadge" title="Toque para desprogramar"><span id="progText"></span><span class="cancel" aria-hidden="true">✕</span></button>
     
-    <!-- Ferramentas rápidas (visível apenas no Modo Avançado) -->
+    <!-- Ferramentas rápidas (visível no Modo Avançado) -->
     <div class="quick-tools adv-only-flex">
       <button type="button" class="qbtn" id="torchBtn" title="Lanterna" hidden>🔦</button>
       <button type="button" class="qbtn" id="gridBtn" title="Grade">⊞</button>
@@ -188,38 +203,39 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 
   <div class="bar">
-    <!-- Etiquetas rápidas (visível apenas no Modo Avançado) -->
+    <!-- Etiquetas Rápidas (Visíveis no Modo Avançado) -->
     <div class="qtags adv-only-flex" id="qtagsBar"></div>
+    
     <div class="modes" role="group" aria-label="Modo">
-      <button data-m="foto" aria-pressed="true">Foto</button>
+      <button data-m="foto" aria-pressed="true">Foto Única</button>
       <button data-m="video" aria-pressed="false">Vídeo</button>
       <button data-m="pdf" aria-pressed="false">Relatório PDF</button>
     </div>
+    
     <div class="row">
       <button class="rb" id="gear" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="3"/><circle cx="8" cy="17" r="3"/></svg>
       </button>
       <button class="rb adv-only" id="pauseBtn" aria-label="Pausar/Retomar" title="Pausar">⏸️</button>
       <button id="shut" aria-label="Capturar"><i></i></button>
-      <button class="rb" id="snap" aria-label="Tirar foto durante o relatório" title="Tirar foto">
-        <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <button class="rb" id="snap" aria-label="Tirar foto extra" title="Tirar foto extra durante relatório">
+        <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3.5"/></svg>
       </button>
     </div>
-    <button class="pill" id="back">Voltar</button>
+    <button class="pill" id="back">Voltar ao Menu</button>
   </div>
 </section>
 
-<!-- MODAL DE AJUSTES (Padrão no modo normal / Abas completas no Modo Avançado) -->
+<!-- MODAL DE AJUSTES -->
 <div id="set" class="modal"><div class="card">
   <div class="modal-head">
-    <h1 style="font-size:20px" id="setModalTitle">Ajustes</h1>
+    <h1 style="font-size:20px" id="setModalTitle">Ajustes & Configurações</h1>
     <div style="display:flex;gap:8px;align-items:center">
       <button type="button" class="adv-toggle-discrete" id="toggleAdvInModalBtn" title="Alternar modo">⚡ Avançado</button>
       <button class="btn sm" id="closeSet">Fechar</button>
     </div>
   </div>
 
-  <!-- Abas do Modo Avançado -->
   <div class="tabs adv-only-flex" id="setTabs">
     <button class="tab on" data-t="t-basic">📋 Geral</button>
     <button class="tab" data-t="t-auto">🤖 Automação</button>
@@ -230,53 +246,52 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <button class="tab" data-t="t-data">🛣️ Dados</button>
   </div>
 
-  <!-- ABA 0: GERAL (Idêntico aos ajustes do Index 73) -->
+  <!-- ABA GERAL -->
   <div id="t-basic" class="tab-pane on">
-    <div class="fld" style="margin-top:0"><label for="label">Etiqueta (opcional)</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria, Manutenção" autocomplete="off"></div>
-    <div class="checkgroup" style="margin-top:14px;padding-top:10px">
-      <div class="checkgroup-title">Informações na imagem e no vídeo</div>
-      <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM</span></label>
+    <div class="fld" style="margin-top:0"><label for="label">Etiqueta Padrão</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria Iluminação" autocomplete="off"></div>
+    <div class="checkgroup" style="margin-top:14px">
+      <div class="checkgroup-title">Informações gravadas na imagem</div>
+      <label class="checkrow" for="showKm"><input id="showKm" type="checkbox" checked><span>Incluir KM rodoviário exato</span></label>
       <label class="checkrow" for="showDate"><input id="showDate" type="checkbox" checked><span>Incluir data e hora</span></label>
-      <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir localização (GPS/endereço)</span></label>
-      <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta</span></label>
+      <label class="checkrow" for="showGps"><input id="showGps" type="checkbox" checked><span>Incluir coordenadas GPS / Endereço</span></label>
+      <label class="checkrow" for="showLabel"><input id="showLabel" type="checkbox" checked><span>Incluir etiqueta visual</span></label>
     </div>
     <div class="checkgroup">
       <div class="checkgroup-title">Exibição do KM</div>
-      <label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar o KM mais próximo mesmo fora da rodovia (&gt; 300 m)</span></label>
+      <label class="checkrow" for="showKmFar"><input id="showKmFar" type="checkbox"><span>Mostrar KM mais próximo mesmo fora da rodovia (&gt; 300 m)</span></label>
     </div>
-    <div class="fld"><label for="camSel">Câmera</label><select id="camSel" class="inp"></select></div>
+    <div class="fld"><label for="camSel">Câmera Ativa</label><select id="camSel" class="inp"></select></div>
     <div class="fld"><label for="int">Intervalo entre fotos do relatório (ms)</label><input id="int" class="inp" type="number" min="100" step="50" value="200"></div>
-    <div class="fld"><label for="lote">Fotos por PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
+    <div class="fld"><label for="lote">Fotos por arquivo PDF</label><input id="lote" class="inp" type="number" min="1" max="500" value="150"></div>
 
-    <!-- Seção de Relatório Automático por KM (também no padrão) -->
     <div class="checkgroup">
-      <div class="checkgroup-title">Relatório automático por KM</div>
-      <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar relatório automático por trecho de KM</span></label>
+      <div class="checkgroup-title">Relatório automático por trecho de KM</div>
+      <label class="checkrow" for="progEnabled"><input id="progEnabled" type="checkbox"><span>Ativar disparo automático por trecho</span></label>
       <div class="grid2">
         <div class="fld" style="margin-top:4px"><label for="progStart">KM Inicial</label><input id="progStart" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 100"></div>
         <div class="fld" style="margin-top:4px"><label for="progEnd">KM Final</label><input id="progEnd" class="inp" type="number" step="0.1" inputmode="decimal" placeholder="Ex: 110"></div>
       </div>
-      <label class="checkrow" for="progBeep"><input id="progBeep" type="checkbox" checked><span>Alerta sonoro (bip) ao iniciar/finalizar</span></label>
+      <label class="checkrow" for="progBeep"><input id="progBeep" type="checkbox" checked><span>Alerta sonoro (bip) ao iniciar/parar</span></label>
     </div>
   </div>
 
-  <!-- ABA 1: AUTOMAÇÃO AVANÇADA -->
+  <!-- ABA AUTOMAÇÃO -->
   <div id="t-auto" class="tab-pane">
-    <div class="checkgroup-title">Gatilhos Inteligentes de Captura</div>
-    <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada (TTS) em eventos</span></label>
+    <div class="checkgroup-title">Gatilhos Inteligentes</div>
+    <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada (TTS)</span></label>
     <label class="checkrow" for="distTriggerOn"><input id="distTriggerOn" type="checkbox"><span>Capturar foto por metro deslocado (GPS)</span></label>
     <div class="fld"><label for="distStep">Distância (Metros)</label><input id="distStep" class="inp" type="number" min="5" max="1000" step="5" value="50"></div>
     <label class="checkrow" for="pauseStop"><input id="pauseStop" type="checkbox"><span>Pausar relatório se veículo parar (&lt; 3 km/h)</span></label>
     <label class="checkrow" for="autoClean"><input id="autoClean" type="checkbox"><span>Ativar Tela Limpa automática após 4s gravando</span></label>
   </div>
 
-  <!-- ABA 2: CARIMBO AVANÇADO -->
+  <!-- ABA CARIMBO -->
   <div id="t-stamp" class="tab-pane">
-    <div class="fld" style="margin-top:0"><label for="inspector">Inspetor / Técnico</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva"></div>
+    <div class="fld" style="margin-top:0"><label for="inspector">Inspetor / Técnico Responsável</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva"></div>
     <div class="fld"><label for="highwayName">Rodovia</label><input id="highwayName" class="inp" maxlength="30" value="BR-116 (Via Dutra)"></div>
     <div class="fld"><label for="quickTagsCfg">Etiquetas Rápidas</label><input id="quickTagsCfg" class="inp" value="Lâmpada Apagada,Painel Aberto,Fibra Rompida,Poste Danificado,Normal"></div>
     <div class="checkgroup">
-      <div class="checkgroup-title">Dados Adicionais no Carimbo</div>
+      <div class="checkgroup-title">Dados no Carimbo</div>
       <label class="checkrow" for="showHighway"><input id="showHighway" type="checkbox" checked><span>Rodovia e Sentido</span></label>
       <label class="checkrow" for="showSpeed"><input id="showSpeed" type="checkbox" checked><span>Velocidade e Bússola</span></label>
       <label class="checkrow" for="showAlt"><input id="showAlt" type="checkbox"><span>Altitude</span></label>
@@ -288,14 +303,14 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA 3: CÂMERA & PDF AVANÇADO -->
+  <!-- ABA CÂMERA & PDF -->
   <div id="t-cam" class="tab-pane">
     <div class="grid2">
-      <div class="fld" style="margin-top:0"><label for="jpegQual">Qualidade</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve (65%)</option></select></div>
+      <div class="fld" style="margin-top:0"><label for="jpegQual">Qualidade JPG</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve (65%)</option></select></div>
       <div class="fld" style="margin-top:0"><label for="pdfLayout">Layout PDF</label><select id="pdfLayout" class="inp"><option value="1">1 por página</option><option value="2">2 por página</option></select></div>
     </div>
     <div class="checkgroup">
-      <div class="checkgroup-title">Recursos Avançados</div>
+      <div class="checkgroup-title">Recursos de Câmera</div>
       <label class="checkrow" for="pdfCover"><input id="pdfCover" type="checkbox" checked><span>Página de Capa Resumo no PDF</span></label>
       <label class="checkrow" for="nightBoost"><input id="nightBoost" type="checkbox"><span>Realce Noturno Digital</span></label>
       <label class="checkrow" for="showCrosshair"><input id="showCrosshair" type="checkbox"><span>Mira Central</span></label>
@@ -305,7 +320,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA 4: DIAGNÓSTICOS -->
+  <!-- ABA DIAGNÓSTICOS -->
   <div id="t-diag" class="tab-pane">
     <div class="checkgroup-title">Diagnósticos & Manutenção de Campo</div>
     <div class="grid2">
@@ -324,18 +339,18 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA 5: LIVRO TÉCNICO -->
+  <!-- ABA LIVRO TÉCNICO -->
   <div id="t-book" class="tab-pane">
-    <div class="checkgroup-title">Compilação de Livros Técnicos</div>
-    <div class="fld" style="margin-top:0"><label for="bookTitle">Título do Livro</label><input id="bookTitle" class="inp" value="Livro de Inspeções Rodoviárias - BR-116"></div>
-    <div class="fld"><label for="bookAuthor">Autor</label><input id="bookAuthor" class="inp" value="Equipe Técnica RioSP"></div>
+    <div class="checkgroup-title">Compilação de Livro de Inspeção</div>
+    <div class="fld" style="margin-top:0"><label for="bookTitle">Título do Volume</label><input id="bookTitle" class="inp" value="Livro de Inspeções Rodoviárias - BR-116"></div>
+    <div class="fld"><label for="bookAuthor">Responsável</label><input id="bookAuthor" class="inp" value="Equipe Técnica RioSP"></div>
     <div class="grid2" style="margin-top:12px">
       <button type="button" class="btn sm pri" id="buildBookPdfBtn">📖 Compilar Livro PDF</button>
       <button type="button" class="btn sm" id="clearBookHistory">Limpar Cache</button>
     </div>
   </div>
 
-  <!-- ABA 6: DADOS & BACKUP -->
+  <!-- ABA DADOS -->
   <div id="t-data" class="tab-pane">
     <div class="checkgroup-title">Dados & Backup</div>
     <label class="checkrow" for="showTelemetryHud"><input id="showTelemetryHud" type="checkbox" checked><span>Exibir Telemetria na HUD</span></label>
@@ -455,7 +470,7 @@ const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
 const safe=(s='')=>String(s).replace(/[,/\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 
-/* Alternância entre Modo Padrão (Index 73) e Modo Avançado */
+/* Alternância Modo Padrão / Avançado */
 function setAdvMode(on){
   S.advMode=!!on;
   document.body.classList.toggle('adv-mode',S.advMode);
@@ -463,7 +478,6 @@ function setAdvMode(on){
   $('toggleAdvInModalBtn')?.classList.toggle('on',S.advMode);
   if($('toggleAdvBtn'))$('toggleAdvBtn').textContent=S.advMode?'⚡ Padrão':'⚡ Avançado';
   if($('toggleAdvInModalBtn'))$('toggleAdvInModalBtn').textContent=S.advMode?'⚡ Padrão':'⚡ Avançado';
-  if($('setModalTitle'))$('setModalTitle').textContent=S.advMode?'⚙️ Ajustes & Ferramentas':'Ajustes';
   if(!S.advMode){
     document.querySelectorAll('#setTabs .tab').forEach(x=>x.classList.remove('on'));
     document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('on'));
@@ -477,7 +491,7 @@ function setAdvMode(on){
 
 $('toggleAdvBtn')?.addEventListener('click',()=>{
   setAdvMode(!S.advMode);
-  toast(S.advMode?'Modo Avançado ativado':'Modo Padrão ativado');
+  toast(S.advMode?'Modo Avançado ativado (Ferramentas completas)':'Modo Padrão ativado (Foco total e simplicidade)');
 });
 $('toggleAdvInModalBtn')?.addEventListener('click',()=>{
   setAdvMode(!S.advMode);
@@ -498,9 +512,9 @@ function speak(txt){
   if(!S.advMode||!$('progVoice')?.checked||!('speechSynthesis'in window))return;
   try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';u.rate=1.1;speechSynthesis.speak(u);}catch(e){}
 }
-function toast(m,err=false){const t=$('toast');if(!t)return;t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2000);}
+function toast(m,err=false){const t=$('toast');if(!t)return;t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2200);}
 
-/* Persistência unificada idêntica ao index 73 + avançado */
+/* Persistência Unificada */
 const TEXT_KEYS=['label','inspector','highwayName','quickTagsCfg','int','lote','progStart','progEnd','distStep','jpegQual','pdfLayout','stampPos','stampSize','kmOffset','fieldNote','bookTitle','bookAuthor'];
 const BOOL_KEYS=['showKm','showDate','showGps','showLabel','showKmFar','showHighway','showSpeed','showAlt','showHash','showTelemetryHud','progEnabled','progBeep','progVoice','distTriggerOn','pauseStop','autoClean','pdfCover','nightBoost','showCrosshair','mirrorFront','shutterFlash','volShutter'];
 
@@ -511,12 +525,11 @@ function persist(){
     BOOL_KEYS.forEach(k=>{if($(k))data[k]=$(k).checked;});
     data.nightRed=document.body.classList.contains('night-red');
     data.gridOn=$('gridOverlay')?.classList.contains('on');
-    localStorage.setItem('kmr_unified_v2',JSON.stringify(data));
-    localStorage.setItem('kmr',JSON.stringify({label:$('label').value,int:$('int').value,lote:$('lote').value,showKm:$('showKm').checked,showDate:$('showDate').checked,showGps:$('showGps').checked,showLabel:$('showLabel').checked,showKmFar:$('showKmFar').checked}));
+    localStorage.setItem('kmr_unified_v3',JSON.stringify(data));
   }catch(e){}
 }
 
-const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_unified_v2')||localStorage.getItem('kmr')||'{}');}catch{return {};}})();
+const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_unified_v3')||localStorage.getItem('kmr_unified_v2')||localStorage.getItem('kmr')||'{}');}catch{return {};}})();
 TEXT_KEYS.forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null&&$(k))$(k).value=cfg[k];});
 BOOL_KEYS.forEach(k=>{if(typeof cfg[k]==='boolean'&&$(k))$(k).checked=cfg[k];});
 if(cfg.gridOn)$('gridOverlay')?.classList.add('on');
@@ -613,7 +626,7 @@ function applyVisualHelpers(){
 }
 applyVisualHelpers();
 
-/* Parse CSV e geolocalização exatos do Index 73 */
+/* Parse CSV e Geolocalização */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
 function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
@@ -712,10 +725,13 @@ function updateLocationUI(){
   const kmIsShown=!outside||showFarKm;
   $('hud').classList.toggle('outside',outside&&!showFarKm);
   $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual ${(S.advMode&&S.directionText)?'· '+S.directionText:''}`;
-  $('km').textContent=outside&&!showFarKm?'Você está fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
+  $('km').textContent=outside&&!showFarKm?'Fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   
   let gpsText=S.acc===null?'Aguardando GPS…':`Precisão do GPS ±${Math.round(S.acc)} m`;
   $('gps').textContent=gpsText;
+
+  if($('startGpsText'))$('startGpsText').textContent=S.acc===null?'Buscando satélites GPS e base SNV…':`GPS pronto (Precisão ±${Math.round(S.acc)}m) · Base SNV ativa`;
+  if($('startGpsDot'))$('startGpsDot').className=S.acc===null?'dot':'dot ok';
 
   const showTel=S.advMode&&$('showTelemetryHud')?.checked&&S.acc!==null;
   if($('telemetry'))$('telemetry').hidden=!showTel;
@@ -756,7 +772,7 @@ if('geolocation'in navigator){
   },()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 }
 
-/* Salvamento automático (Zero interação: Galeria / Downloads / Documentos) */
+/* Salvamento automático */
 async function save(blob,name){
   name=safe(name);
   const url=URL.createObjectURL(blob);
@@ -769,7 +785,7 @@ async function save(blob,name){
   a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),10000);
   const isMedia=/\.(jpg|jpeg|png|webm|mp4)$/i.test(name);
-  toast(isMedia?'Salvo na Galeria / Downloads: '+name:'Relatório salvo em Documentos / Downloads: '+name);
+  toast(isMedia?'Salvo na Galeria / Downloads: '+name:'Salvo em Documentos / Downloads: '+name);
   return true;
 }
 
@@ -795,6 +811,7 @@ $('go').onclick=async()=>{
     $('cam').classList.add('on');
     document.documentElement.requestFullscreen?.().catch(()=>{});
     pinchZoom();
+    toast('Câmera pronta! Toque no botão branco para capturar.');
   }catch(e){toast('Não foi possível acessar a câmera: '+(e?.message||e),1);}
 };
 function pinchZoom(){
@@ -813,7 +830,7 @@ $('back').onclick=()=>{
   document.fullscreenElement&&document.exitFullscreen?.();
 };
 function updateModeUI(){document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===S.mode)));}
-document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();});
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{if(S.cap||S.rec)return toast('Finalize antes de trocar o modo',1);S.mode=b.dataset.m;updateModeUI();toast('Modo: '+b.textContent);});
 
 window.addEventListener('keydown',e=>{
   if(!S.advMode||!$('volShutter')?.checked||!$('cam')?.classList.contains('on'))return;
@@ -827,10 +844,10 @@ $('pauseBtn')?.addEventListener('click',e=>{
   if($('pauseBtn'))$('pauseBtn').textContent=S.paused?'▶️':'⏸️';
   $('rec')?.classList.toggle('paused',S.paused);
   upd();
-  toast(S.paused?'Pausado':'Retomado');
+  toast(S.paused?'Relatório Pausado':'Relatório Retomado');
 });
 
-/* Desenho do quadro idêntico ao Index 73 no modo normal, adaptável no avançado */
+/* Desenho do Quadro */
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;
   const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
@@ -857,11 +874,11 @@ function frame(){
   }
   
   if($('showGps').checked) {
-    const accTxt=S.acc!==null?`Precisão do GPS ±${Math.round(S.acc)} m`:'Aguardando GPS…';
+    const accTxt=S.acc!==null?`GPS ±${Math.round(S.acc)}m`:'GPS…';
     const spdTxt=(S.advMode&&$('showSpeed')?.checked&&S.speed!==null)?` · ${Math.round(S.speed*3.6)} km/h ${compassDir(S.heading)}`:'';
     const altTxt=(S.advMode&&$('showAlt')?.checked&&S.alt!==null)?` · Alt ${Math.round(S.alt)}m`:'';
     const hashTxt=(S.advMode&&$('showHash')?.checked)?` · ID:${Date.now().toString(36).slice(-5).toUpperCase()}`:'';
-    lines.push({text:`${accTxt} · Coord: ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}${spdTxt}${altTxt}${hashTxt}`,small:true});
+    lines.push({text:`${accTxt} · ${S.lat.toFixed(6)}, ${S.lon.toFixed(6)}${spdTxt}${altTxt}${hashTxt}`,small:true});
   }
 
   const note=S.advMode?$('fieldNote')?.value.trim():'';
@@ -896,7 +913,7 @@ function frame(){
     const fs=Math.round(h*.035);
     cx.font=`bold ${fs}px Arial,sans-serif`;
     const px=fs*.8,py=fs*.5,bw=cx.measureText(lb).width+px*2,bh2=fs+py*2,x=w-bw-30,y=isTop?h-bh2-30:30;
-    cx.save();cx.globalAlpha=.78;cx.fillStyle='#ffd600';cx.beginPath();
+    cx.save();cx.globalAlpha=.82;cx.fillStyle='#ffd600';cx.beginPath();
     cx.roundRect(x,y,bw,bh2,10);cx.fill();cx.globalAlpha=1;
     cx.fillStyle='#000';cx.textAlign='center';cx.textBaseline='middle';
     cx.fillText(lb,x+bw/2,y+bh2/2+1);cx.restore();
@@ -905,13 +922,12 @@ function frame(){
 }
 
 const toBlob=q=>new Promise(r=>cv.toBlob(r,'image/jpeg',q));
-function triggerFlash(){if(S.advMode&&!$('shutterFlash')?.checked)return;const f=$('flash');if(!f)return;f.style.opacity='0.65';setTimeout(()=>f.style.opacity='0',90);}
 
-$('shut').onclick=()=>{navigator.vibrate?.(20);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
-async function photo(){if(!frame())return;triggerFlash();const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;const b=await toBlob(q);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
-$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;triggerFlash();const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;toBlob(q).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
+$('shut').onclick=()=>{navigator.vibrate?.(25);({foto:photo,video:toggleVideo,pdf:togglePdf})[S.mode]?.();};
+async function photo(){if(!frame())return;const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;const b=await toBlob(q);if(b)save(b,`FOTO_KM_${S.km}_${stamp()}.jpg`);}
+$('snap').onclick=e=>{e.stopPropagation();if(!frame())return;const q=S.advMode?(parseFloat($('jpegQual')?.value)||.9):.9;toBlob(q).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}_${stamp()}.jpg`));};
 
-/* Gravação de vídeo */
+/* Gravação de Vídeo */
 let vidLoop=0;
 function toggleVideo(){
   if(S.rec){S.rec.stop();return;}
@@ -944,18 +960,18 @@ function setRec(on,t){
   else{S.lock?.release?.();S.lock=null;}
 }
 
-/* Relatório PDF em lotes otimizado */
+/* Relatório PDF em Lotes */
 const lim=()=>Math.max(parseInt($('lote').value)||150,1);
 const upd=()=>{if(S.cap)$('rec').textContent=S.paused?`PAUSADO · Lote ${S.batch}`:`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
 
 function togglePdf(){S.cap?stopPdf():startPdf();}
 function startPdf(){
-  if(!window.jspdf)return toast('jsPDF ainda carregando, tente de novo',1);
+  if(!window.jspdf)return toast('jsPDF carregando, aguarde 1 segundo',1);
   S.cap=true;S.paused=false;if($('pauseBtn'))$('pauseBtn').textContent='⏸️';$('rec')?.classList.remove('paused');
   S.buf=[];S.queue=[];S.batch=1;S.saved=0;S.totalPhotosSession=0;
   S.sessionStartKm=S.km;S.sessionStartTime=Date.now();
   S.lastCapLat=null;S.lastCapLon=null;
-  setRec(true);upd();loop();
+  setRec(true);upd();loop();toast('Relatório em PDF iniciado!');
 }
 
 function loop(){
@@ -994,7 +1010,7 @@ function rotate(final){if(!S.buf.length)return;S.queue.push({p:S.buf,n:S.batch})
 async function stopPdf(){
   if(!S.cap)return;
   S.cap=false;S.paused=false;S.progActiveSession=false;clearTimeout(S.timer);
-  if($('shut'))$('shut').disabled=true;toast('Salvando lotes pendentes…');
+  if($('shut'))$('shut').disabled=true;toast('Gerando PDFs finais…');
   rotate(true);await runQueue();
   while(S.busy||S.queue.length)await new Promise(r=>setTimeout(r,100));
   setRec(false);if($('shut'))$('shut').disabled=false;
@@ -1012,7 +1028,7 @@ async function stopPdf(){
       if($('sumDuration'))$('sumDuration').textContent=durStr;
       $('summaryModal')?.classList.add('on');
     }else{
-      toast(`Sessão finalizada: ${S.saved} PDF(s)`);
+      toast(`Relatório concluído com sucesso: ${S.saved} PDF(s) gerados!`);
     }
   }else{
     toast('Sessão encerrada sem fotos');
@@ -1056,7 +1072,7 @@ async function makePdf({p,n}){
   await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
 }
 
-/* Compilação de Livro e Histórico */
+/* Histórico e Compilação de Livro */
 $('openBookModalBtn')?.addEventListener('click',()=>$('bookModal')?.classList.add('on'));
 $('closeBookModal')?.addEventListener('click',()=>$('bookModal')?.classList.remove('on'));
 $('buildBookPdfBtn')?.addEventListener('click',()=>$('bookModal')?.classList.add('on'));
@@ -1074,7 +1090,7 @@ $('execCompileBook')?.addEventListener('click',async()=>{
   d.setTextColor(242,242,244);d.setFontSize(13);
   d.text('Compilação Técnica Executiva · KM Report Enterprise',20,70);
   d.setFontSize(11);
-  d.text(`Autor: ${author}`,20,90);
+  d.text(`Responsável: ${author}`,20,90);
   d.text(`Data: ${new Date().toLocaleString('pt-BR')}`,20,100);
   d.text(`Rodovia: ${$('highwayName')?.value||'BR-116'}`,20,110);
 
@@ -1096,7 +1112,7 @@ $('execCompileBook')?.addEventListener('click',async()=>{
 
   await save(d.output('blob'),`Livro_Tecnico_${stamp()}.pdf`);
   $('bookModal')?.classList.remove('on');
-  toast('Livro técnico gerado com sucesso!');
+  toast('Livro técnico compilado com sucesso!');
 });
 
 $('clearBookHistory')?.addEventListener('click',()=>{toast('Cache limpo');});
@@ -1109,14 +1125,14 @@ updateHistCount();
 
 $('openHistBtn')?.addEventListener('click',()=>{
   const h=getHistory();
-  if($('histList'))$('histList').innerHTML=h.length?h.map(x=>`<div class="log-item"><b>KM ${escapeHtml(x.range)}</b> · ${x.pdfs} PDF(s) (${x.photos} fotos)<small>${escapeHtml(x.date)} · ${x.dur}${x.label?' · '+escapeHtml(x.label):''}</small></div>`).join(''):'<p class="sub">Nenhum registro.</p>';
+  if($('histList'))$('histList').innerHTML=h.length?h.map(x=>`<div class="log-item"><b>KM ${escapeHtml(x.range)}</b> · ${x.pdfs} PDF(s) (${x.photos} fotos)<small>${escapeHtml(x.date)} · ${x.dur}${x.label?' · '+escapeHtml(x.label):''}</small></div>`).join(''):'<p class="sub">Nenhum registro no histórico.</p>';
   $('histModal')?.classList.add('on');
 });
 $('closeHist')?.addEventListener('click',()=>$('histModal')?.classList.remove('on'));
 $('clearHistBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_hist');updateHistCount();$('histModal')?.classList.remove('on');toast('Histórico limpo');});
 
 function exportCsvLog(){
-  const h=getHistory();if(!h.length)return toast('Sem histórico',1);
+  const h=getHistory();if(!h.length)return toast('Sem histórico para exportar',1);
   const csv='Data;Trecho KM;PDFs;Fotos;Duracao;Etiqueta\n'+h.map(x=>`"${x.date}";"${x.range}";${x.pdfs};${x.photos};"${x.dur}";"${x.label||''}"`).join('\n');
   save(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),`Historico_${stamp()}.csv`);
 }
@@ -1125,23 +1141,23 @@ $('exportHistCsv2')?.addEventListener('click',exportCsvLog);
 
 $('exportCfgBtn')?.addEventListener('click',()=>{
   persist();
-  const data=localStorage.getItem('kmr_unified_v2')||'{}';
+  const data=localStorage.getItem('kmr_unified_v3')||'{}';
   save(new Blob([data],{type:'application/json'}),`Config_${stamp()}.json`);
 });
 $('importCfgBtn')?.addEventListener('click',()=>$('importCfgFile')?.click());
 $('importCfgFile')?.addEventListener('change',async e=>{
   const f=e.target.files?.[0];if(!f)return;
-  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_unified_v2',txt);toast('Importado! Recarregando...');setTimeout(()=>location.reload(),900);}
-  catch{toast('JSON inválido',1);}
+  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_unified_v3',txt);toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
+  catch{toast('Arquivo JSON inválido',1);}
 });
-$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_unified_v2');localStorage.removeItem('kmr');toast('Restaurando...');setTimeout(()=>location.reload(),800);});
+$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_unified_v3');localStorage.removeItem('kmr_unified_v2');localStorage.removeItem('kmr');toast('Restaurando padrões...');setTimeout(()=>location.reload(),800);});
 
 $('cam').addEventListener('click',e=>{if(S.cap&&S.advMode&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
 window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
 
-/* Inicia sempre no Modo Padrão (Idêntico ao Index 73) */
-setAdvMode(value=false);
+/* Início sempre limpo e intuitivo no Modo Padrão */
+setAdvMode(false);
 updateModeUI();
 updateLocationUI();
 </script>
