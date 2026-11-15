@@ -348,7 +348,7 @@ const S={
 };
 let currentNumericKm=null;
 const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
-const safe=(s='')=>String(s).replace(/[,/\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
+const safe=(s='')=>String(s).replace(/[,/\\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 
 /* Áudio & Voz */
@@ -473,9 +473,7 @@ applyVisualHelpers();
 /* CSV & Geolocalização */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
-function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/
-?
-/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
+function parseCsv(t){if(!t)return[];if(t.charCodeAt(0)===0xFEFF)t=t.slice(1);const L=t.split(/\r?\n/).filter(l=>l.trim());if(!L.length)return[];const sep=L[0].includes(';')?';':',',h=L.shift().split(sep);const a=col(h,['km']),b=col(h,['lat','latitude']),c=col(h,['lon','long','longitude']);if(a<0||b<0||c<0)return[];return L.map(l=>{const r=l.split(sep);return{km:num(r[a]),lat:num(r[b]),lon:num(r[c])};}).filter(p=>[p.km,p.lat,p.lon].every(Number.isFinite));}
 function haversine(la1,lo1,la2,lo2){const rad=Math.PI/180,R=6371000,dLat=(la2-la1)*rad,dLon=(lo2-lo1)*rad,a=Math.sin(dLat/2)**2+Math.cos(la1*rad)*Math.cos(la2*rad)*Math.sin(dLon/2)**2;return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function nearest(la,lo){let best=null,min=Infinity;for(const p of S.db){const dist=haversine(la,lo,p.lat,p.lon);if(dist<min){min=dist;best=p;}}return best?{km:best.km,dist:min}:null;}
 function compassDir(deg){if(deg===null||isNaN(deg))return'';const dirs=['N','NE','L','SE','S','SO','O','NO'];return dirs[Math.round(deg/45)%8];}
@@ -887,7 +885,7 @@ $('exportCfgBtn').onclick=()=>{
 $('importCfgBtn').onclick=()=>$('importCfgFile').click();
 $('importCfgFile').onchange=async e=>{
   const f=e.target.files?.[0];if(!f)return;
-  try{JSON.parse(await f.text());localStorage.setItem('kmr_pro',await f.text());toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
+  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_pro',txt);toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
   catch{toast('Arquivo JSON inválido',1);}
 };
 $('resetCfgBtn').onclick=()=>{localStorage.removeItem('kmr_pro');toast('Restaurando padrões...');setTimeout(()=>location.reload(),800);};
