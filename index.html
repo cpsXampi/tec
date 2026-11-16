@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#070913">
-<title>Apoio Técnico</title>
+<title>KM Report - Apoio Técnico</title>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -86,16 +86,16 @@ input,select{font-family:var(--font);outline:none}
 }
 
 .menu-pills-grid{
-  display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;
+  display:grid;grid-template-columns:repeat(5, 1fr);gap:5px;
 }
 @media(max-width:600px){
-  .menu-pills-grid{grid-template-columns:1fr 1fr;}
+  .menu-pills-grid{grid-template-columns:repeat(3, 1fr);}
 }
 .menu-pill{
-  width:100%;padding:8px;border-radius:var(--r-xs);
+  width:100%;padding:8px 4px;border-radius:var(--r-xs);
   background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
-  font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
-  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:7.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;
+  display:flex;align-items:center;justify-content:center;gap:3px;
   transition:all .2s ease;cursor:pointer;text-align:center;
 }
 .menu-pill.active{
@@ -270,83 +270,110 @@ body.fs-active .fs-close-btn {display:inline-flex;}
   background:linear-gradient(145deg,rgba(59,130,246,.1),rgba(11,17,36,.95));
   box-shadow:0 0 12px var(--accent-glow);
 }
-.post-top{display:flex;align-items:flex-start;gap:8px;padding:10px}
-.post-chk{margin-top:2px;width:14px;height:14px;accent-color:var(--accent);flex-shrink:0}
+.post-top{display:flex;align-items:flex-start;gap:10px;padding:12px;}
+.post-chk{margin-top:3px;width:15px;height:15px;accent-color:var(--accent);flex-shrink:0}
 
-/* Blocos de Separação Visual */
+/* Blocos de Separação Visual Otimizados */
 .system-data-box {
   background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.35);
   border-radius: var(--r-xs);
-  padding: 6px 8px;
-  margin-top: 6px;
+  padding: 8px 10px;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  width: 100%;
 }
 .system-data-header {
-  font-size: 7px;
+  font-size: 7.5px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   color: var(--warn);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
-  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  padding-bottom: 3px;
 }
 .system-data-content {
-  font-size: 8.5px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 900;
   color: var(--text);
   text-transform: uppercase;
+  letter-spacing: .02em;
 }
 .system-data-sub {
-  font-size: 7.5px;
+  font-size: 8.5px;
   font-weight: 700;
   color: var(--text2);
+  line-height: 1.3;
 }
 
 .dynamic-data-box {
-  background: rgba(59, 130, 246, 0.06);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.35);
   border-radius: var(--r-xs);
-  padding: 6px 8px;
+  padding: 8px 10px;
   margin-top: 6px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  width: 100%;
 }
 .dynamic-data-header {
-  font-size: 7px;
+  font-size: 7.5px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   color: var(--accent);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.25);
+  padding-bottom: 3px;
 }
 .dynamic-data-content {
-  font-size: 8px;
-  font-weight: 800;
+  font-size: 9.5px;
+  font-weight: 900;
   color: var(--green2);
   text-transform: uppercase;
 }
 .dynamic-data-sub {
-  font-size: 7.5px;
-  font-weight: 700;
+  font-size: 8.5px;
+  font-weight: 800;
   color: var(--muted);
+  line-height: 1.3;
 }
 
-.post-id{font-size:10px;font-weight:900;text-transform:uppercase;color:var(--accent);letter-spacing:.05em}
-.post-coords{font-size:7.5px;color:var(--dim);font-weight:600;margin-top:4px}
+.post-id{
+  font-size: 11.5px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--accent);
+  letter-spacing: .08em;
+}
+.post-coords{
+  font-size: 8px;
+  color: var(--dim);
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: .04em;
+}
 
 .post-wa{
-  width:28px;height:28px;border-radius:var(--r-xs);
-  background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);
-  color:var(--green2);display:grid;place-items:center;flex-shrink:0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-xs);
+  background: rgba(16,185,129,.15);
+  border: 1px solid rgba(16,185,129,.35);
+  color: var(--green2);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all .2s ease;
 }
-.post-wa svg{width:13px;height:13px}
+.post-wa:active {
+  background: rgba(16,185,129,.3);
+}
+.post-wa svg{width:14px;height:14px}
 
-.post-map{height:120px;width:100%;border:0;filter:grayscale(15%) contrast(1.05)}
+.post-map{height:130px;width:100%;border:0;filter:grayscale(15%) contrast(1.05)}
 
 .ctrl-send{
   width:auto;min-width:130px;padding:6px 12px;border-radius:var(--r-xs);
@@ -400,7 +427,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 
 <header class="hdr">
   <div class="hdr-in">
-    <div class="hdr-title">Apoio Técnico</div>
+    <div class="hdr-title">Apoio Técnico - KM Report</div>
     <div style="font-size:9px;font-weight:900;color:var(--accent);" id="topKmLive">—</div>
   </div>
 </header>
@@ -409,24 +436,40 @@ body.fs-active .fs-close-btn {display:inline-flex;}
 
   <div class="section-block">
     <div class="menu-pills-grid">
-      <button class="menu-pill" id="pillId" onclick="switchPane('id')">🔍 Pesquisa ID/Placa</button>
-      <button class="menu-pill" id="pillKm" onclick="switchPane('km')">🛣️ Pesquisa KM</button>
-      <button class="menu-pill" id="pillCoord" onclick="switchPane('coord')">📍 Coordenada</button>
-      <button class="menu-pill" id="pillMap" onclick="switchPane('map')">🗺️ Mapa</button>
+      <button class="menu-pill" id="pillId" onclick="switchPane('id')">ID</button>
+      <button class="menu-pill" id="pillPlaqueta" onclick="switchPane('plaqueta')">Plaqueta</button>
+      <button class="menu-pill" id="pillKm" onclick="switchPane('km')">KM</button>
+      <button class="menu-pill" id="pillCoord" onclick="switchPane('coord')">Coordenada</button>
+      <button class="menu-pill" id="pillMap" onclick="switchPane('map')">Mapa</button>
     </div>
 
-    <!-- PAINEL: ID / PLAQUETA / ENDEREÇO -->
+    <!-- PAINEL: ID (Teclado Numérico) -->
     <div class="collapsible-pane" id="paneId">
       <div class="card card-accent">
         <div class="search-row">
           <div class="search-wrap">
-            <input class="search-input" id="inputId" placeholder="BUSCAR ID, PLAQUETA OU ENDEREÇO" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
+            <input class="search-input" id="inputId" inputmode="numeric" placeholder="BUSCAR ID (NÚMERO)" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchId()">
           </div>
           <button class="btn-icon go" onclick="searchId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
           <button class="btn-icon clr" onclick="clearId()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
-        <div id="searchMsg" class="search-msg" style="display:none"></div>
-        <div id="searchResult" style="display:none;margin-top:6px"></div>
+        <div id="searchMsgId" class="search-msg" style="display:none"></div>
+        <div id="searchResultId" style="display:none;margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- PAINEL: PLAQUETA (Teclado Alfanumérico) -->
+    <div class="collapsible-pane" id="panePlaqueta">
+      <div class="card card-accent">
+        <div class="search-row">
+          <div class="search-wrap">
+            <input class="search-input" id="inputPlaqueta" placeholder="BUSCAR PLAQUETA (CÓDIGO/LETRAS)" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchPlaqueta()">
+          </div>
+          <button class="btn-icon go" onclick="searchPlaqueta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
+          <button class="btn-icon clr" onclick="clearPlaqueta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div id="searchMsgPlaqueta" class="search-msg" style="display:none"></div>
+        <div id="searchResultPlaqueta" style="display:none;margin-top:6px"></div>
       </div>
     </div>
 
@@ -485,7 +528,7 @@ body.fs-active .fs-close-btn {display:inline-flex;}
     </div>
   </div>
 
-  <button class="fs-close-btn" onclick="toggleFullscreen()">✕ Sair do Full Screen</button>
+  <button class="fs-close-btn" onclick="toggleFullscreen()">Sair do Full Screen</button>
 
   <div class="section-block">
     <div class="km-hero-compact">
@@ -524,6 +567,17 @@ body.fs-active .fs-close-btn {display:inline-flex;}
       </div>
     </div>
 
+    <!-- RELATÓRIO OPCIONAL / REGISTRO DE ATIVOS -->
+    <div class="card" style="margin-top:4px;">
+      <div style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+        <span>Relatório Opcional (Itens Registrados)</span>
+        <button class="ctrl-select" style="padding:2px 6px;font-size:7px;cursor:pointer;" onclick="clearRelatorioOpcional()">Limpar</button>
+      </div>
+      <div id="relatorioOpcionalList" style="font-size:8.5px;color:var(--text2);display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto;">
+        <div style="color:var(--muted);font-style:italic;">Nenhum item adicionado ao relatório opcional.</div>
+      </div>
+    </div>
+
     <div id="postList" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
 
@@ -550,8 +604,10 @@ const nowBR=()=>new Date().toLocaleString('pt-BR').toUpperCase();
 function findCol(h,cs){const m=h.map(norm);for(const c of cs){const i=m.indexOf(norm(c));if(i>=0)return i}return-1}
 
 let posts=[], postIndex=new Map();
+let ativosData=[];
 let kmDB_SP=[], kmDB_RJ=[];
-let pos=null, searchItem=null, searchKmItems=[], searchCoordItems=[], renderedKey='';
+let pos=null, searchItemId=null, searchItemPlaqueta=null, searchKmItems=[], searchCoordItems=[], renderedKey='';
+let relatorioOpcionalItems = [];
 let mapInstance=null, mapMarker=null, mapLayerObj=null, popupInstance=null;
 let activePane = null;
 let cityCache = new Map();
@@ -563,7 +619,7 @@ function showToast(msg,type='ok'){
 }
 
 function switchPane(type){
-  ['Id','Km','Coord','Map'].forEach(p=>{
+  ['Id','Plaqueta','Km','Coord','Map'].forEach(p=>{
     let pane = document.getElementById('pane'+p);
     let pill = document.getElementById('pill'+p);
     if(p.toLowerCase() === type){
@@ -571,6 +627,8 @@ function switchPane(type){
       pill.classList.toggle('active', isOpen);
       activePane = isOpen ? type : null;
       if(isOpen && type==='map' && mapInstance) setTimeout(()=>mapInstance.invalidateSize(), 50);
+      if(isOpen && type==='id') setTimeout(()=>document.getElementById('inputId').focus(), 50);
+      if(isOpen && type==='plaqueta') setTimeout(()=>document.getElementById('inputPlaqueta').focus(), 50);
     } else {
       pane.classList.remove('show');
       pill.classList.remove('active');
@@ -666,6 +724,7 @@ function startAutoGps(){
 
 async function loadSystemDataAsync(){
   try{
+    // Carrega dados principais de postes / nós
     let t=await fetchCSV(['dados.csv','Dados_Completos_Grupo_2_all.csv']);
     if(t){
       let lines=t.split(/\r?\n/).filter(l=>l.trim());
@@ -689,6 +748,24 @@ async function loadSystemDataAsync(){
 
       postIndex.clear();
       posts.forEach(p=>postIndex.set(p.id, p));
+    }
+
+    // Carrega ativos 116 (ativos116.csv)
+    let tAtivos = await fetchCSV(['ativos116.csv','ativos 116.csv']);
+    if(tAtivos){
+      let lines=tAtivos.split(/\r?\n/).filter(l=>l.trim());
+      let h=lines.shift().split(';');
+      let iId=findCol(h,['id','ativo','codigo']);
+      let iDesc=findCol(h,['descricao','desc','equipamento']);
+      let iStatus=findCol(h,['status','estado']);
+      ativosData = lines.map(l=>{
+        let r=l.split(';');
+        return {
+          id: String(r[iId]||'').trim().toUpperCase(),
+          descricao: String(r[iDesc]||'').trim().toUpperCase(),
+          status: String(r[iStatus]||'').trim().toUpperCase()
+        };
+      }).filter(a=>a.id);
     }
 
     let [tSP, tRJ] = await Promise.all([
@@ -771,6 +848,34 @@ function findPostExactKm(post){
   return '---';
 }
 
+function registrarRelatorioOpcional(id, info){
+  relatorioOpcionalItems.push({id, info, time: nowBR()});
+  renderRelatorioOpcional();
+  showToast('Registrado no Relatório Opcional');
+}
+
+function clearRelatorioOpcional(){
+  relatorioOpcionalItems = [];
+  renderRelatorioOpcional();
+  showToast('Relatório Opcional limpo');
+}
+
+function renderRelatorioOpcional(){
+  let container = document.getElementById('relatorioOpcionalList');
+  if(!relatorioOpcionalItems.length){
+    container.innerHTML = `<div style="color:var(--muted);font-style:italic;">Nenhum item adicionado ao relatório opcional.</div>`;
+    return;
+  }
+  let html = '';
+  relatorioOpcionalItems.forEach((item, idx)=>{
+    html += `<div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:4px 8px;display:flex;justify-content:space-between;align-items:center;">
+      <div><strong>#${idx+1} ID: ${item.id}</strong> - ${item.info} <span style="font-size:7px;color:var(--muted);">[${item.time}]</span></div>
+      <button style="color:var(--red);font-weight:900;font-size:8px;cursor:pointer;" onclick="relatorioOpcionalItems.splice(${idx},1);renderRelatorioOpcional();">X</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
 function initMap(lat, lon){
   if(mapInstance) return;
   mapInstance = L.map('leafletMap', {zoomControl:false, attributionControl:false}).setView([lat, lon], 14);
@@ -811,31 +916,39 @@ function initMap(lat, lon){
     let distStr = nearestPost ? formatDist(minPostDist) : '---';
     let postKm = nearestPost ? findPostExactKm(nearestPost) : findExactKmForCoords(l.lat, l.lng);
 
+    // Checa ativos 116 para este ID
+    let ativoMatch = ativosData.find(a => a.id === postIdStr);
+    let ativoInfo = ativoMatch ? `Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]` : 'Sem ativo vinculado';
+
     let popupContent = `
-      <div style="font-family:var(--font);color:#fff;padding:4px;min-width:180px;font-size:9px;line-height:1.4;">
-        <div style="font-weight:900;color:#3b82f6;text-transform:uppercase;margin-bottom:4px;">ID: ${postIdStr}</div>
+      <div style="font-family:var(--font);color:#fff;padding:6px;min-width:200px;font-size:9.5px;line-height:1.4;">
+        <div style="font-weight:900;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;font-size:11px;">ID: ${postIdStr}</div>
         
-        <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.4);border-radius:3px;padding:4px;margin-bottom:4px;">
-          <div style="font-size:6.5px;font-weight:900;color:var(--warn);text-transform:uppercase;margin-bottom:1px;">CADASTRO DO SISTEMA</div>
-          <div style="font-size:8px;font-weight:900;">Plaqueta: ${plaqueStr}</div>
-          <div style="font-size:7.5px;font-weight:700;color:#cbd5e1;">Endereço: ${addressStr}</div>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:4px;padding:6px 8px;margin-bottom:6px;">
+          <div style="font-size:7px;font-weight:900;color:var(--warn);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;">CADASTRO DO SISTEMA</div>
+          <div style="font-size:9.5px;font-weight:900;">Plaqueta: ${plaqueStr}</div>
+          <div style="font-size:8.5px;font-weight:700;color:#cbd5e1;">Endereço: ${addressStr}</div>
+          <div style="font-size:8px;font-weight:800;color:var(--green2);margin-top:2px;">${ativoInfo}</div>
         </div>
 
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:3px;padding:4px;margin-bottom:6px;">
-          <div style="font-size:6.5px;font-weight:900;color:var(--accent);text-transform:uppercase;margin-bottom:1px;">DADOS DE LOCALIZAÇÃO</div>
-          <div style="font-size:8px;font-weight:900;color:var(--green2);">KM (SNV DNIT): ${postKm}</div>
-          <div style="font-size:7.5px;font-weight:800;color:#94a3b8;">Município: ${cityName}</div>
-          <div style="font-size:7.5px;color:var(--muted);">Distância: ${distStr}</div>
+        <div style="background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.3);border-radius:4px;padding:6px 8px;margin-bottom:8px;">
+          <div style="font-size:7px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;">DADOS DE LOCALIZAÇÃO</div>
+          <div style="font-size:9px;font-weight:900;color:var(--green2);">KM (SNV DNIT): ${postKm}</div>
+          <div style="font-size:8.5px;font-weight:800;color:#94a3b8;">Município: ${cityName}</div>
+          <div style="font-size:8px;color:var(--muted);">Distância: ${distStr}</div>
         </div>
 
-        <button style="width:100%;background:#10b981;color:#fff;border:0;padding:4px;border-radius:3px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${escAttr(postIdStr)}', ${l.lat}, ${l.lng}, '${escAttr(plaqueStr)}', '${escAttr(addressStr)}', '${escAttr(postKm)}')">WhatsApp</button>
+        <div style="display:flex;gap:4px;">
+          <button style="flex:1;background:#10b981;color:#fff;border:0;padding:6px;border-radius:4px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="sendWhatsApp('${escAttr(postIdStr)}', ${l.lat}, ${l.lng}, '${escAttr(plaqueStr)}', '${escAttr(addressStr)}', '${escAttr(postKm)}')">WhatsApp</button>
+          <button style="flex:1;background:var(--accent);color:#fff;border:0;padding:6px;border-radius:4px;font-size:8px;font-weight:900;text-transform:uppercase;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(postIdStr)}', 'Plaqueta: ${escAttr(plaqueStr)}')">Reg. Opcional</button>
+        </div>
       </div>
     `;
 
     if(popupInstance){
       mapInstance.removeLayer(popupInstance);
     }
-    popupInstance = L.popup({maxWidth:220, className:'custom-leaflet-popup'}).setLatLng([l.lat, l.lng]).setContent(popupContent).openOn(mapInstance);
+    popupInstance = L.popup({maxWidth:240, className:'custom-leaflet-popup'}).setLatLng([l.lat, l.lng]).setContent(popupContent).openOn(mapInstance);
   });
 }
 
@@ -900,10 +1013,10 @@ async function searchManualCoord(){
   const exactKm = findExactKmForCoords(lat, lon);
 
   let html = `
-    <div class="post card-accent" style="margin-bottom:6px;">
+    <div class="post card-accent" style="margin-bottom:8px;">
       <div class="post-top">
         <div style="flex:1;">
-          <p class="post-id" style="color:var(--text);font-size:9.5px;">📍 Ponto Selecionado</p>
+          <p class="post-id" style="color:var(--text);font-size:10.5px;">Ponto Selecionado</p>
           <div class="dynamic-data-box">
             <div class="dynamic-data-header">Dados de Localização</div>
             <div class="dynamic-data-content">KM (SNV DNIT): ${exactKm}</div>
@@ -911,14 +1024,16 @@ async function searchManualCoord(){
           </div>
           <p class="post-coords">${lat.toFixed(5)}, ${lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('PONTO SELECIONADO', ${lat}, ${lon}, '---', '${escAttr(cityName)}', '${escAttr(exactKm)}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </button>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <button class="post-wa" onclick="sendWhatsApp('PONTO SELECIONADO', ${lat}, ${lon}, '---', '${escAttr(cityName)}', '${escAttr(exactKm)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </button>
+        </div>
       </div>
-      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${lat},${lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+      <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${lat},${lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
     </div>
-    <div style="font-size:7.5px;font-weight:900;text-transform:uppercase;color:var(--muted);margin:6px 0 2px 2px;">10 Postes Mais Próximos:</div>
-    <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:8px;font-weight:900;text-transform:uppercase;color:var(--muted);margin:8px 0 4px 2px;letter-spacing:.05em;">10 Postes Mais Próximos:</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
   `;
 
   for(let idx = 0; idx < searchCoordItems.length; idx++){
@@ -926,6 +1041,9 @@ async function searchManualCoord(){
     let dt='distância até o local: '+formatDist(item.d);
     const itemCity = await fetchCityName(item.lat, item.lon);
     const itemKm = findPostExactKm(item);
+    let ativoMatch = ativosData.find(a => a.id === item.id);
+    let ativoInfo = ativoMatch ? `<div class="system-data-sub" style="color:var(--green2)">Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]</div>` : '';
+
     html+=`<div class="post searched">
       <div class="post-top">
         <div style="flex:1;">
@@ -935,22 +1053,26 @@ async function searchManualCoord(){
             <div class="system-data-header">Cadastro do Sistema</div>
             <div class="system-data-content">Plaqueta: ${item.plaqueta || '---'}</div>
             <div class="system-data-sub">Endereço: ${item.endereco || '---'}</div>
+            ${ativoInfo}
           </div>
 
           <div class="dynamic-data-box">
             <div class="dynamic-data-header">Dados de Localização</div>
             <div class="dynamic-data-content">KM (SNV DNIT): ${itemKm}</div>
             <div class="dynamic-data-sub">Município: ${itemCity}</div>
-            <div class="dynamic-data-sub" id="srch-coord-dist-${idx}">${dt}</div>
+            <div class="dynamic-data-sub">${dt}</div>
           </div>
 
           <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('${escAttr(item.id)}', ${item.lat}, ${item.lon}, '${escAttr(item.plaqueta)}', '${escAttr(item.endereco)}', '${escAttr(itemKm)}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </button>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <button class="post-wa" onclick="sendWhatsApp('${escAttr(item.id)}', ${item.lat}, ${item.lon}, '${escAttr(item.plaqueta)}', '${escAttr(item.endereco)}', '${escAttr(itemKm)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </button>
+          <button class="ctrl-select" style="font-size:7px;padding:3px;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(item.id)}', 'Plq: ${escAttr(item.plaqueta)}')">+Opc</button>
+        </div>
       </div>
-      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+      <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
     </div>`;
   }
   html+='</div>';
@@ -960,72 +1082,141 @@ async function searchManualCoord(){
 
 async function searchId(){
   let raw = document.getElementById('inputId').value.trim();
-  let msg = document.getElementById('searchMsg'), res = document.getElementById('searchResult');
+  let msg = document.getElementById('searchMsgId'), res = document.getElementById('searchResultId');
   if(!raw){clearId();return;}
 
   let query = norm(raw);
-
-  let found = posts.find(p => 
-    norm(p.id) === query || 
-    norm(p.plaqueta) === query || 
-    norm(p.id).includes(query) || 
-    norm(p.plaqueta).includes(query) || 
-    norm(p.endereco).includes(query)
-  );
+  let found = posts.find(p => norm(p.id) === query || norm(p.id).includes(query));
 
   if(!found){
-    msg.style.display='flex';msg.textContent='Não encontrado';
-    searchItem=null;res.style.display='none';return;
+    msg.style.display='flex';msg.textContent='ID não encontrado';
+    searchItemId=null;res.style.display='none';return;
   }
 
-  searchItem=found;
+  searchItemId=found;
   msg.style.display='none';
-  await renderSearch();
-  showToast('Encontrado');
+  await renderSearchId();
+  showToast('ID encontrado');
 }
 
 function clearId(){
   document.getElementById('inputId').value='';
-  document.getElementById('searchMsg').style.display='none';
-  document.getElementById('searchResult').style.display='none';
-  searchItem=null;
+  document.getElementById('searchMsgId').style.display='none';
+  document.getElementById('searchResultId').style.display='none';
+  searchItemId=null;
 }
 
-async function renderSearch(){
-  if(!searchItem)return;
-  let res=document.getElementById('searchResult');
+async function renderSearchId(){
+  if(!searchItemId)return;
+  let res=document.getElementById('searchResultId');
   let dt='Aguardando GPS...';
-  if(pos) dt='distância até o local: '+formatDist(hav(pos.lat,pos.lon,searchItem.lat,searchItem.lon));
+  if(pos) dt='distância até o local: '+formatDist(hav(pos.lat,pos.lon,searchItemId.lat,searchItemId.lon));
   
-  const cityName = await fetchCityName(searchItem.lat, searchItem.lon);
-  const itemKm = findPostExactKm(searchItem);
+  const cityName = await fetchCityName(searchItemId.lat, searchItemId.lon);
+  const itemKm = findPostExactKm(searchItemId);
+  let ativoMatch = ativosData.find(a => a.id === searchItemId.id);
+  let ativoInfo = ativoMatch ? `<div class="system-data-sub" style="color:var(--green2)">Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]</div>` : '';
 
   res.style.display='block';
   res.innerHTML=`<div class="post searched">
     <div class="post-top">
       <div style="flex:1;">
-        <p class="post-id">ID: ${searchItem.id}</p>
+        <p class="post-id">ID: ${searchItemId.id}</p>
 
         <div class="system-data-box">
           <div class="system-data-header">Cadastro do Sistema</div>
-          <div class="system-data-content">Plaqueta: ${searchItem.plaqueta || '---'}</div>
-          <div class="system-data-sub">Endereço: ${searchItem.endereco || '---'}</div>
+          <div class="system-data-content">Plaqueta: ${searchItemId.plaqueta || '---'}</div>
+          <div class="system-data-sub">Endereço: ${searchItemId.endereco || '---'}</div>
+          ${ativoInfo}
         </div>
 
         <div class="dynamic-data-box">
           <div class="dynamic-data-header">Dados de Localização</div>
           <div class="dynamic-data-content">KM (SNV DNIT): ${itemKm}</div>
           <div class="dynamic-data-sub">Município: ${cityName}</div>
-          <div class="dynamic-data-sub" id="srch-dist">${dt}</div>
+          <div class="dynamic-data-sub" id="srch-id-dist">${dt}</div>
         </div>
 
-        <p class="post-coords">${searchItem.lat.toFixed(5)}, ${searchItem.lon.toFixed(5)}</p>
+        <p class="post-coords">${searchItemId.lat.toFixed(5)}, ${searchItemId.lon.toFixed(5)}</p>
       </div>
-      <button class="post-wa" onclick="sendWhatsApp('${escAttr(searchItem.id)}', ${searchItem.lat}, ${searchItem.lon}, '${escAttr(searchItem.plaqueta)}', '${escAttr(searchItem.endereco)}', '${escAttr(itemKm)}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </button>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <button class="post-wa" onclick="sendWhatsApp('${escAttr(searchItemId.id)}', ${searchItemId.lat}, ${searchItemId.lon}, '${escAttr(searchItemId.plaqueta)}', '${escAttr(searchItemId.endereco)}', '${escAttr(itemKm)}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+        <button class="ctrl-select" style="font-size:7px;padding:3px;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(searchItemId.id)}', 'Plq: ${escAttr(searchItemId.plaqueta)}')">+Opc</button>
+      </div>
     </div>
-    <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${searchItem.lat},${searchItem.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+    <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${searchItemId.lat},${searchItemId.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+  </div>`;
+}
+
+async function searchPlaqueta(){
+  let raw = document.getElementById('inputPlaqueta').value.trim();
+  let msg = document.getElementById('searchMsgPlaqueta'), res = document.getElementById('searchResultPlaqueta');
+  if(!raw){clearPlaqueta();return;}
+
+  let query = norm(raw);
+  let found = posts.find(p => norm(p.plaqueta) === query || norm(p.plaqueta).includes(query));
+
+  if(!found){
+    msg.style.display='flex';msg.textContent='Plaqueta não encontrada';
+    searchItemPlaqueta=null;res.style.display='none';return;
+  }
+
+  searchItemPlaqueta=found;
+  msg.style.display='none';
+  await renderSearchPlaqueta();
+  showToast('Plaqueta encontrada');
+}
+
+function clearPlaqueta(){
+  document.getElementById('inputPlaqueta').value='';
+  document.getElementById('searchMsgPlaqueta').style.display='none';
+  document.getElementById('searchResultPlaqueta').style.display='none';
+  searchItemPlaqueta=null;
+}
+
+async function renderSearchPlaqueta(){
+  if(!searchItemPlaqueta)return;
+  let res=document.getElementById('searchResultPlaqueta');
+  let dt='Aguardando GPS...';
+  if(pos) dt='distância até o local: '+formatDist(hav(pos.lat,pos.lon,searchItemPlaqueta.lat,searchItemPlaqueta.lon));
+  
+  const cityName = await fetchCityName(searchItemPlaqueta.lat, searchItemPlaqueta.lon);
+  const itemKm = findPostExactKm(searchItemPlaqueta);
+  let ativoMatch = ativosData.find(a => a.id === searchItemPlaqueta.id);
+  let ativoInfo = ativoMatch ? `<div class="system-data-sub" style="color:var(--green2)">Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]</div>` : '';
+
+  res.style.display='block';
+  res.innerHTML=`<div class="post searched">
+    <div class="post-top">
+      <div style="flex:1;">
+        <p class="post-id">ID: ${searchItemPlaqueta.id}</p>
+
+        <div class="system-data-box">
+          <div class="system-data-header">Cadastro do Sistema</div>
+          <div class="system-data-content">Plaqueta: ${searchItemPlaqueta.plaqueta || '---'}</div>
+          <div class="system-data-sub">Endereço: ${searchItemPlaqueta.endereco || '---'}</div>
+          ${ativoInfo}
+        </div>
+
+        <div class="dynamic-data-box">
+          <div class="dynamic-data-header">Dados de Localização</div>
+          <div class="dynamic-data-content">KM (SNV DNIT): ${itemKm}</div>
+          <div class="dynamic-data-sub">Município: ${cityName}</div>
+          <div class="dynamic-data-sub" id="srch-plq-dist">${dt}</div>
+        </div>
+
+        <p class="post-coords">${searchItemPlaqueta.lat.toFixed(5)}, ${searchItemPlaqueta.lon.toFixed(5)}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <button class="post-wa" onclick="sendWhatsApp('${escAttr(searchItemPlaqueta.id)}', ${searchItemPlaqueta.lat}, ${searchItemPlaqueta.lon}, '${escAttr(searchItemPlaqueta.plaqueta)}', '${escAttr(searchItemPlaqueta.endereco)}', '${escAttr(itemKm)}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+        <button class="ctrl-select" style="font-size:7px;padding:3px;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(searchItemPlaqueta.id)}', 'Plq: ${escAttr(searchItemPlaqueta.plaqueta)}')">+Opc</button>
+      </div>
+    </div>
+    <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${searchItemPlaqueta.lat},${searchItemPlaqueta.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
   </div>`;
 }
 
@@ -1135,16 +1326,19 @@ async function renderSearchKm(label, bestPt){
   let res=document.getElementById('searchKmResult');
   res.style.display='block';
   
-  let html=`<div style="font-size:7.5px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:4px;display:flex;align-items:center;justify-content:between;">
+  let html=`<div style="font-size:7.5px;font-weight:900;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
     <span>Base Selecionada: ${label}</span>
-    <button style="color:var(--dim);text-decoration:underline;cursor:pointer;font-size:7px;" onclick="searchKm()">Trocar Base</button>
-  </div><div style="display:flex;flex-direction:column;gap:6px">`;
+    <button style="color:var(--dim);text-decoration:underline;cursor:pointer;font-size:7.5px;font-weight:700;" onclick="searchKm()">Trocar Base</button>
+  </div><div style="display:flex;flex-direction:column;gap:8px">`;
 
   for(let idx = 0; idx < searchKmItems.length; idx++){
     let item = searchKmItems[idx];
     let dt=pos?'distância até o local: '+formatDist(hav(pos.lat,pos.lon,item.lat,item.lon)):'--';
     const cityName = await fetchCityName(item.lat, item.lon);
     const itemKm = findPostExactKm(item);
+    let ativoMatch = ativosData.find(a => a.id === item.id);
+    let ativoInfo = ativoMatch ? `<div class="system-data-sub" style="color:var(--green2)">Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]</div>` : '';
+
     html+=`<div class="post searched">
       <div class="post-top">
         <div style="flex:1;">
@@ -1154,22 +1348,26 @@ async function renderSearchKm(label, bestPt){
             <div class="system-data-header">Cadastro do Sistema</div>
             <div class="system-data-content">Plaqueta: ${item.plaqueta || '---'}</div>
             <div class="system-data-sub">Endereço: ${item.endereco || '---'}</div>
+            ${ativoInfo}
           </div>
 
           <div class="dynamic-data-box">
             <div class="dynamic-data-header">Dados de Localização</div>
             <div class="dynamic-data-content">KM (SNV DNIT): ${itemKm}</div>
             <div class="dynamic-data-sub">Município: ${cityName}</div>
-            <div class="dynamic-data-sub" id="srch-km-dist-${idx}">${dt}</div>
+            <div class="dynamic-data-sub">${dt}</div>
           </div>
 
           <p class="post-coords">${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}</p>
         </div>
-        <button class="post-wa" onclick="sendWhatsApp('${escAttr(item.id)}', ${item.lat}, ${item.lon}, '${escAttr(item.plaqueta)}', '${escAttr(item.endereco)}', '${escAttr(itemKm)}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        </button>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <button class="post-wa" onclick="sendWhatsApp('${escAttr(item.id)}', ${item.lat}, ${item.lon}, '${escAttr(item.plaqueta)}', '${escAttr(item.endereco)}', '${escAttr(itemKm)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          </button>
+          <button class="ctrl-select" style="font-size:7px;padding:3px;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(item.id)}', 'Plq: ${escAttr(item.plaqueta)}')">+Opc</button>
+        </div>
       </div>
-      <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
+      <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${item.lat},${item.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>
     </div>`;
   }
   html+='</div>';
@@ -1218,6 +1416,9 @@ async function renderApoio(){
     let o = items[i];
     const cityName = await fetchCityName(o.lat, o.lon);
     const itemKm = findPostExactKm(o);
+    let ativoMatch = ativosData.find(a => a.id === o.id);
+    let ativoInfo = ativoMatch ? `<div class="system-data-sub" style="color:var(--green2)">Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]</div>` : '';
+
     let div=document.createElement('div');
     div.className='post'+(i===0?' near':'');
     div.innerHTML=`<div class="post-top">
@@ -1229,6 +1430,7 @@ async function renderApoio(){
           <div class="system-data-header">Cadastro do Sistema</div>
           <div class="system-data-content">Plaqueta: ${o.plaqueta || '---'}</div>
           <div class="system-data-sub">Endereço: ${o.endereco || '---'}</div>
+          ${ativoInfo}
         </div>
 
         <div class="dynamic-data-box">
@@ -1240,11 +1442,14 @@ async function renderApoio(){
 
         <p class="post-coords">${o.lat.toFixed(5)}, ${o.lon.toFixed(5)}</p>
       </div>
-      <button class="post-wa" onclick="sendWhatsApp('${escAttr(o.id)}', ${o.lat}, ${o.lon}, '${escAttr(o.plaqueta)}', '${escAttr(o.endereco)}', '${escAttr(itemKm)}')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </button>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <button class="post-wa" onclick="sendWhatsApp('${escAttr(o.id)}', ${o.lat}, ${o.lon}, '${escAttr(o.plaqueta)}', '${escAttr(o.endereco)}', '${escAttr(itemKm)}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </button>
+        <button class="ctrl-select" style="font-size:7px;padding:3px;cursor:pointer;" onclick="registrarRelatorioOpcional('${escAttr(o.id)}', 'Plq: ${escAttr(o.plaqueta)}')">+Opc</button>
+      </div>
     </div>
-    <div style="padding:0 6px 6px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${o.lat},${o.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>`;
+    <div style="padding:0 8px 8px;"><iframe class="post-map" src="https://maps.google.com/maps?q=${o.lat},${o.lon}&t=k&z=19&output=embed" loading="lazy"></iframe></div>`;
     frag.appendChild(div);
   }
 
@@ -1274,17 +1479,29 @@ document.getElementById('btnSend').onclick=()=>{
            `------------------------------------\n\n`;
   items.forEach((o,i)=>{
     const itemKm = findPostExactKm(o);
+    let ativoMatch = ativosData.find(a => a.id === o.id);
+    let ativoStr = ativoMatch ? `   - Ativo: ${ativoMatch.descricao} [${ativoMatch.status}]\n` : '';
     tx+=`${i+1}. *ID:* ${o.id}\n` +
         `   [CADASTRO DO SISTEMA]\n` +
         `   - Plaqueta: ${o.plaqueta || '---'}\n` +
         `   - Endereço: ${o.endereco || '---'}\n` +
+        ativoStr +
         `   [DADOS DE LOCALIZAÇÃO]\n` +
         `   - KM (Base SNV DNIT): ${itemKm}\n`;
     if(document.getElementById('chkMaps').checked) tx+=`   - Link: https://maps.google.com/?q=${o.lat.toFixed(5)},${o.lon.toFixed(5)}\n`;
     tx+='\n';
   });
+
+  // Se houver itens no relatório opcional, anexa ao envio ou gera log
+  if(relatorioOpcionalItems.length > 0){
+    tx += `------------------------------------\n*RELATÓRIO OPCIONAL REGISTRADO:*\n`;
+    relatorioOpcionalItems.forEach((op, idx)=>{
+      tx += `${idx+1}. ID: ${op.id} - ${op.info} [${op.time}]\n`;
+    });
+  }
+
   window.open('https://wa.me/?text='+encodeURIComponent(tx.trim()),'_blank','noopener');
-  showToast('Enviado');
+  showToast('Enviado com Relatório Opcional');
 };
 
 document.getElementById('qty').onchange=()=>{renderedKey='';renderApoio()};
