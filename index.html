@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>KM Report — Com Detecção Automática de IDs</title>
+<title>KM Report Enterprise — Estável & Otimizado</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{
@@ -25,13 +25,11 @@ button{border:0;background:none;cursor:pointer}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
 
-/* Visibilidade Modo Avançado */
 .adv-only{display:none!important}
 body.adv-mode .adv-only{display:block!important}
 body.adv-mode .adv-only-flex{display:flex!important}
 body.adv-mode .adv-only-grid{display:grid!important}
 
-/* Tela Inicial */
 #start{align-items:center;justify-content:center;padding:calc(16px + var(--st)) 18px var(--sb);overflow-y:auto}
 .card{width:100%;max-width:440px;background:var(--s1);border:1px solid var(--line);border-radius:24px;padding:26px 20px;box-shadow:0 12px 32px rgba(0,0,0,.5)}
 .card h1{font-size:24px;font-weight:900;letter-spacing:-.03em;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
@@ -54,19 +52,17 @@ body.adv-mode .adv-only-grid{display:grid!important}
 .dot{width:10px;height:10px;border-radius:50%;background:#555;flex:none}.dot.ok{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .start-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
 
-/* Tela de Câmera */
 #cam{flex-direction:column;background:#000}
 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .2s}
 .hud{position:absolute;z-index:5;max-width:min(85vw,400px);background:var(--hud-bg);backdrop-filter:blur(16px);border:1px solid var(--hud-border);border-radius:16px;padding:10px 16px;top:calc(12px + var(--st));left:12px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .hud small{display:block;font-size:11px;font-weight:700;color:var(--hud-tx);text-transform:uppercase;letter-spacing:.05em}
 .hud b{display:block;font-size:24px;line-height:1.15;font-weight:900;color:#fff;overflow-wrap:anywhere}
-.hud .id-highlight{font-size:13px;font-weight:900;color:var(--acc);margin-top:3px;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:6px;display:inline-block}
+.hud .id-highlight{font-size:13px;font-weight:900;color:var(--acc);margin-top:3px;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:6px;display:inline-block}
 .hud .acc{font-size:11px;color:var(--hud-tx);margin-top:3px;font-weight:600}
 .hud .telemetry{font-size:11px;color:#fff;opacity:.95;margin-top:3px;font-variant-numeric:tabular-nums;font-weight:700}
 .hud .address{font-size:11px;color:#fff;margin-top:4px;line-height:1.3}
 .hud .address a{color:var(--hud-tx);font-size:9px}
 
-/* Overlays */
 #gridOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;display:none;background-image:linear-gradient(to right,rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.2) 1px,transparent 1px);background-size:33.33% 33.33%}
 #gridOverlay.on{display:block}
 #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;z-index:2;pointer-events:none;display:none}
@@ -75,7 +71,6 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transiti
 #crosshair::before{top:19px;left:0;right:0;height:2px}
 #crosshair::after{left:19px;top:0;bottom:0;width:2px}
 
-/* Chips Superiores Direita */
 .chip{position:absolute;z-index:5;top:calc(12px + var(--st));right:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 .pill{background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:22px;padding:8px 14px;font-size:12px;font-weight:800;color:#fff}
 .pill.rec{display:none;align-items:center;gap:8px}.pill.rec.on{display:flex}
@@ -91,13 +86,11 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transiti
 .qbtn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);border:1px solid var(--line);display:grid;place-items:center;font-size:15px;color:#fff}
 .qbtn.on{border-color:var(--acc);color:var(--acc);background:rgba(255,214,0,.2)}
 
-/* Barra de Etiquetas Rápidas */
 .qtags{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:2px 4px;scrollbar-width:none}
 .qtags::-webkit-scrollbar{display:none}
 .qtag{flex:none;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
 .qtag.active{background:var(--acc);color:#000;border-color:var(--acc)}
 
-/* Barra Inferior Cockpit */
 .bar{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:26px 16px var(--sb);background:linear-gradient(transparent,rgba(0,0,0,.9));display:flex;flex-direction:column;gap:12px;align-items:center}
 body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{opacity:0;pointer-events:none}
 .modes{display:flex;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:24px;padding:4px}
@@ -112,7 +105,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 #shut.rec i{background:var(--bad);border-radius:16px;width:38px;height:38px}
 #snap,#pauseBtn{display:none}#snap.on,#pauseBtn.on{display:grid}
 
-/* Modais e Abas */
 .modal{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px}
 .modal.on{display:flex}
 .modal .card{max-height:90vh;overflow-y:auto}
@@ -142,10 +134,9 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 </head>
 <body>
 
-<!-- TELA INICIAL -->
 <main id="start" class="screen on"><div class="card">
   <h1>
-    <span>KM Report <small class="brand">Enterprise + IDs</small></span>
+    <span>KM Report <small class="brand">Enterprise + IDs (Estável)</small></span>
     <button type="button" class="adv-toggle-discrete" id="toggleAdvBtn" title="Modo Avançado">⚡ Avançado</button>
   </h1>
   
@@ -153,7 +144,7 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <span>🛣️</span>
     <div>
       <h3>Detecção Automática de IDs</h3>
-      <p>GPS ativo, bases SNV e Cadastro de Postes/Ativos integrados para carimbo automático nas fotos e relatórios.</p>
+      <p>GPS com proteção contra travamentos, bases SNV e Cadastro de Postes integrados e seguros para campo.</p>
     </div>
   </div>
 
@@ -171,7 +162,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </div></main>
 
-<!-- TELA DA CÂMERA -->
 <section id="cam" class="screen">
   <video id="v" autoplay playsinline muted></video>
   <div id="gridOverlay"></div>
@@ -224,7 +214,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </section>
 
-<!-- MODAL DE AJUSTES -->
 <div id="set" class="modal"><div class="card">
   <div class="modal-head">
     <h1 style="font-size:20px" id="setModalTitle">Ajustes & Configurações</h1>
@@ -244,7 +233,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <button class="tab" data-t="t-data">🛣️ Dados</button>
   </div>
 
-  <!-- ABA GERAL -->
   <div id="t-basic" class="tab-pane on">
     <div class="fld" style="margin-top:0"><label for="label">Etiqueta Padrão</label><input id="label" class="inp" maxlength="80" placeholder="Ex.: Vistoria Iluminação" autocomplete="off"></div>
     <div class="checkgroup" style="margin-top:14px">
@@ -274,7 +262,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA AUTOMAÇÃO -->
   <div id="t-auto" class="tab-pane">
     <div class="checkgroup-title">Gatilhos Inteligentes</div>
     <label class="checkrow" for="progVoice"><input id="progVoice" type="checkbox"><span>Aviso por voz sintetizada (TTS)</span></label>
@@ -284,7 +271,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     <label class="checkrow" for="autoClean"><input id="autoClean" type="checkbox"><span>Ativar Tela Limpa automática após 4s gravando</span></label>
   </div>
 
-  <!-- ABA CARIMBO -->
   <div id="t-stamp" class="tab-pane">
     <div class="fld" style="margin-top:0"><label for="inspector">Inspetor / Técnico Responsável</label><input id="inspector" class="inp" maxlength="50" placeholder="Ex.: João Silva"></div>
     <div class="fld"><label for="highwayName">Rodovia</label><input id="highwayName" class="inp" maxlength="30" value="BR-116 (Via Dutra)"></div>
@@ -302,7 +288,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA CÂMERA & PDF -->
   <div id="t-cam" class="tab-pane">
     <div class="grid2">
       <div class="fld" style="margin-top:0"><label for="jpegQual">Qualidade JPG</label><select id="jpegQual" class="inp"><option value="0.92">Alta (92%)</option><option value="0.82" selected>Equilibrada (82%)</option><option value="0.65">Leve (65%)</option></select></div>
@@ -319,7 +304,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA DIAGNÓSTICOS -->
   <div id="t-diag" class="tab-pane">
     <div class="checkgroup-title">Diagnósticos & Manutenção de Campo</div>
     <div class="grid2">
@@ -334,11 +318,10 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
     <div class="fld" style="margin-top:10px">
       <label for="diagLogBox">Console Telemetria</label>
-      <textarea id="diagLogBox" class="inp" rows="4" readonly style="font-size:11px;font-family:monospace;background:#05070a">Sistema pronto. Base SNV e IDs carregados.</textarea>
+      <textarea id="diagLogBox" class="inp" rows="4" readonly style="font-size:11px;font-family:monospace;background:#05070a">Sistema estável e pronto. Base SNV e IDs carregados.</textarea>
     </div>
   </div>
 
-  <!-- ABA LIVRO TÉCNICO -->
   <div id="t-book" class="tab-pane">
     <div class="checkgroup-title">Compilação de Livro de Inspeção</div>
     <div class="fld" style="margin-top:0"><label for="bookTitle">Título do Volume</label><input id="bookTitle" class="inp" value="Livro de Inspeções Rodoviárias - BR-116"></div>
@@ -349,7 +332,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
     </div>
   </div>
 
-  <!-- ABA DADOS -->
   <div id="t-data" class="tab-pane">
     <div class="checkgroup-title">Dados & Backup</div>
     <label class="checkrow" for="showTelemetryHud"><input id="showTelemetryHud" type="checkbox" checked><span>Exibir Telemetria na HUD</span></label>
@@ -366,7 +348,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
   </div>
 </div></div>
 
-<!-- MODAIS AUXILIARES -->
 <div id="bookModal" class="modal"><div class="card">
   <div class="modal-head"><h1>📚 Compilador de Livros</h1><button class="btn sm" id="closeBookModal">Fechar</button></div>
   <p class="sub">Gere um volume técnico em PDF consolidando as inspeções e IDs percorridos.</p>
@@ -412,7 +393,6 @@ body.clean .bar,body.clean .lbl,body.clean .prog-pill,body.clean .quick-tools{op
 <script>
 const $=id=>document.getElementById(id);
 
-/* BASES EMBUTIDAS (SNV + POSTES/IDS) */
 const EMBEDDED_SNV_CSV = `km,lat,lon
 0,-23.515,-46.382
 1,-23.518,-46.375
@@ -458,7 +438,7 @@ P-020,-23.590,-46.200,Km 20 - Jacarei Sul,PLQ-020
 P-025,-23.610,-46.150,Km 25 - Jacarei Centro,PLQ-025
 P-030,-23.630,-46.100,Km 30 - Sao Jose dos Campos,PLQ-030
 P-035,-23.650,-46.050,Km 35 - SJC Tecnopolis,PLQ-035
-P-040,-23.670,-46.000,Km 40 - Cacacapava,PLQ-040
+P-040,-23.670,-46.000,Km 40 - Cacapava,PLQ-040
 P-045,-23.690,-45.950,Km 45 - Taubate Oeste,PLQ-045
 P-050,-23.710,-45.900,Km 50 - Taubate Centro,PLQ-050
 P-060,-23.730,-45.800,Km 60 - Pindamonhangaba,PLQ-060
@@ -481,7 +461,6 @@ const cv=$('c'),cx=cv.getContext('2d',{alpha:false}),OUTSIDE_LIMIT_M=300;
 const safe=(s='')=>String(s).replace(/[,/\:]/g,'_'),pad=n=>String(n).padStart(2,'0');
 const stamp=(d=new Date())=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 
-/* Alternância Modo Padrão / Avançado */
 function setAdvMode(on){
   S.advMode=!!on;
   document.body.classList.toggle('adv-mode',S.advMode);
@@ -525,7 +504,6 @@ function speak(txt){
 }
 function toast(m,err=false){const t=$('toast');if(!t)return;t.textContent=m;t.className=err?'err show':'show';clearTimeout(S.tt);S.tt=setTimeout(()=>t.className='',2200);}
 
-/* Persistência Unificada */
 const TEXT_KEYS=['label','inspector','highwayName','quickTagsCfg','int','lote','progStart','progEnd','distStep','jpegQual','pdfLayout','stampPos','stampSize','kmOffset','fieldNote','bookTitle','bookAuthor'];
 const BOOL_KEYS=['showKm','showIdBadge','showDate','showGps','showLabel','showKmFar','showHighway','showSpeed','showAlt','showHash','showTelemetryHud','progEnabled','progBeep','progVoice','distTriggerOn','pauseStop','autoClean','pdfCover','nightBoost','showCrosshair','mirrorFront','shutterFlash','volShutter'];
 
@@ -536,11 +514,11 @@ function persist(){
     BOOL_KEYS.forEach(k=>{if($(k))data[k]=$(k).checked;});
     data.nightRed=document.body.classList.contains('night-red');
     data.gridOn=$('gridOverlay')?.classList.contains('on');
-    localStorage.setItem('kmr_unified_v4',JSON.stringify(data));
+    localStorage.setItem('kmr_unified_v5',JSON.stringify(data));
   }catch(e){}
 }
 
-const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_unified_v4')||localStorage.getItem('kmr_unified_v3')||localStorage.getItem('kmr')||'{}');}catch{return {};}})();
+const cfg=(()=>{try{return JSON.parse(localStorage.getItem('kmr_unified_v5')||localStorage.getItem('kmr_unified_v4')||'{}');}catch{return {};}})();
 TEXT_KEYS.forEach(k=>{if(cfg[k]!==undefined&&cfg[k]!==null&&$(k))$(k).value=cfg[k];});
 BOOL_KEYS.forEach(k=>{if(typeof cfg[k]==='boolean'&&$(k))$(k).checked=cfg[k];});
 if(cfg.gridOn)$('gridOverlay')?.classList.add('on');
@@ -637,7 +615,6 @@ function applyVisualHelpers(){
 }
 applyVisualHelpers();
 
-/* Parse CSV e Proximidade de Postes/IDs */
 const num=v=>{const s=String(v??'').trim();if(!s)return NaN;return /,\d+$/.test(s)?Number(s.replace(/\./g,'').replace(',','.')):Number(s);};
 const col=(h,c)=>{const m=h.map(s=>String(s).trim().toLowerCase());for(const x of c){const i=m.indexOf(x);if(i>=0)return i;}return -1;};
 
@@ -705,6 +682,7 @@ function compassDir(deg){if(deg===null||isNaN(deg))return'';const dirs=['N','NE'
 function addressFromResult(data){const a=data?.address||{},street=a.road||a.pedestrian||a.residential||a.footway||a.path||a.highway;const number=a.house_number;const area=a.suburb||a.neighbourhood||a.city_district;const city=a.city||a.town||a.village||a.municipality;const state=a.state;const parts=[];if(street)parts.push(`${street}${number?' '+number:''}`);if(area&&area!==street)parts.push(area);if(city&&city!==area)parts.push(city);if(state)parts.push(state);return parts.join(', ')||data?.display_name||'';}
 function geoCacheKey(lat,lon){return `${lat.toFixed(3)},${lon.toFixed(3)}`;}
 
+/* BLINDAGEM DE REDE CONTRA TRAVAMENTO (TIMEOUT DE 3s) */
 function requestAddress(){
   if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M||S.acc===null)return;
   const key=geoCacheKey(S.lat,S.lon),cached=S.geoCache.get(key);
@@ -716,19 +694,26 @@ function requestAddress(){
     if(S.dist===null||S.dist<=OUTSIDE_LIMIT_M)return;
     const lat=S.lat,lon=S.lon,requestKey=geoCacheKey(lat,lon),seq=++S.geoSeq;
     S.lastGeoRequest=Date.now();S.lastGeoPoint={lat,lon};
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
     try{
       const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1&accept-language=pt-BR`;
-      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store'});
+      const res=await fetch(url,{headers:{Accept:'application/json'},cache:'no-store',signal:controller.signal});
+      clearTimeout(timeoutId);
       if(!res.ok)throw new Error(`HTTP ${res.status}`);
-      const data=await res.json(),address=addressFromResult(data)||'Endereço não encontrado';
+      const data=await res.json(),address=addressFromResult(data)||'Endereço indisponível';
       S.geoCache.set(requestKey,address);if(S.geoCache.size>100)S.geoCache.delete(S.geoCache.keys().next().value);
       if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address=address;updateLocationUI();}
-    }catch(err){if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Endereço indisponível';updateLocationUI();}}
+    }catch(err){
+      clearTimeout(timeoutId);
+      if(seq===S.geoSeq&&S.dist>OUTSIDE_LIMIT_M){S.address='Modo Offline (SNV Ativo)';updateLocationUI();}
+    }
   },wait);
 }
 
 function refreshNearest(){
-  // KM SNV
   const n=S.db.length&&S.acc!==null?nearest(S.lat,S.lon):null;
   S.dist=n?n.dist:null;
   if(n){
@@ -742,12 +727,10 @@ function refreshNearest(){
     S.km=(Math.round(adjustedKm*100)/100).toFixed(2).replace('.',',');
   }
 
-  // Postes e IDs
   const np=S.posts.length&&S.acc!==null?nearestPost(S.lat,S.lon):null;
-  if(np&&np.dist<=120){ // Se estiver a menos de 120m de um poste/ativo
+  if(np&&np.dist<=120){
     S.currentPost=np.post;
     S.currentPostDist=np.dist;
-    // Registra no conjunto de IDs passados na sessão
     if(S.cap||S.rec){
       S.passedIdsSession.add(np.post.id);
     }
@@ -812,7 +795,6 @@ function updateLocationUI(){
   $('locationTitle').textContent=outside&&!showFarKm?'Localização atual':`KM atual ${(S.advMode&&S.directionText)?'· '+S.directionText:''}`;
   $('km').textContent=outside&&!showFarKm?'Fora da rodovia':(S.km==='---'?'KM ---':`KM ${S.km}`);
   
-  // Atualiza Badge de ID na HUD
   const idBadge=$('hudIdBadge');
   if(S.currentPost){
     idBadge.style.display='inline-block';
@@ -840,7 +822,6 @@ function updateLocationUI(){
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-/* Carregamento de Dados (SNV + Posts) */
 try{
   S.db=parseCsv(EMBEDDED_SNV_CSV);
   S.posts=parsePostsCsv(EMBEDDED_POSTS_CSV);
@@ -879,7 +860,6 @@ if('geolocation'in navigator){
   },()=>{$('gps').textContent='GPS indisponível';},{enableHighAccuracy:true,maximumAge:1000,timeout:20000});
 }
 
-/* Salvamento automático */
 async function save(blob,name){
   name=safe(name);
   const url=URL.createObjectURL(blob);
@@ -896,7 +876,6 @@ async function save(blob,name){
   return true;
 }
 
-/* Câmera */
 async function openCam(id){
   S.stream?.getTracks().forEach(t=>t.stop());S.torchOn=false;$('torchBtn')?.classList.remove('on');
   const constraints=id?{deviceId:{exact:id}}:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}};
@@ -954,7 +933,6 @@ $('pauseBtn')?.addEventListener('click',e=>{
   toast(S.paused?'Relatório Pausado':'Relatório Retomado');
 });
 
-/* Desenho do Quadro (com Carimbo de ID e Plaqueta) */
 function frame(){
   const v=$('v');if(!v||!v.videoWidth)return null;
   const w=cv.width=v.videoWidth,h=cv.height=v.videoHeight;
@@ -974,7 +952,6 @@ function frame(){
     lines.push({text:`KM ${S.km}${hwy}${dir}`,large:true});
   }
 
-  // Linha de ID e Plaqueta se estiver próximo de um poste/ativo
   if($('showIdBadge')?.checked&&S.currentPost&&S.currentPostDist<=100){
     const plqText=S.currentPost.plaqueta?` · Plq: ${S.currentPost.plaqueta}`:'';
     const endText=S.currentPost.endereco?` (${S.currentPost.endereco})`:'';
@@ -1053,7 +1030,6 @@ $('snap').onclick=e=>{
   toBlob(q).then(b=>b&&save(b,`FOTO_EXTRA_KM_${S.km}${postId}_${stamp()}.jpg`));
 };
 
-/* Gravação de Vídeo */
 let vidLoop=0;
 function toggleVideo(){
   if(S.rec){S.rec.stop();return;}
@@ -1086,7 +1062,6 @@ function setRec(on,t){
   else{S.lock?.release?.();S.lock=null;}
 }
 
-/* Relatório PDF em Lotes */
 const lim=()=>Math.max(parseInt($('lote').value)||150,1);
 const upd=()=>{if(S.cap)$('rec').textContent=S.paused?`PAUSADO · Lote ${S.batch}`:`Lote ${S.batch} · ${S.buf.length}/${lim()}`;};
 
@@ -1194,7 +1169,6 @@ async function makePdf({p,n}){
     d.text(`Trecho: KM ${p[0].km} até KM ${p[p.length-1].km}`,w*0.07,h*0.31);
     d.text(`Total de Registros: ${p.length} fotos`,w*0.07,h*0.38);
     
-    // IDs detectados neste lote
     const loteIds=Array.from(new Set(p.map(x=>x.postId).filter(Boolean)));
     d.text(`IDs Detectados no Lote (${loteIds.length}): ${loteIds.join(', ')||(S.currentPost?S.currentPost.id:'Nenhum ID próximo')}`,w*0.07,h*0.45,{maxWidth:w*0.85});
 
@@ -1214,7 +1188,6 @@ async function makePdf({p,n}){
   await save(d.output('blob'),`Relatorio_Lote_${n}_KM_${p[0].km}_a_${p[p.length-1].km}.pdf`);
 }
 
-/* Histórico e Compilação de Livro Técnico */
 $('openBookModalBtn')?.addEventListener('click',()=>$('bookModal')?.classList.add('on'));
 $('closeBookModal')?.addEventListener('click',()=>$('bookModal')?.classList.remove('on'));
 $('buildBookPdfBtn')?.addEventListener('click',()=>$('bookModal')?.classList.add('on'));
@@ -1260,8 +1233,8 @@ $('execCompileBook')?.addEventListener('click',async()=>{
 $('clearBookHistory')?.addEventListener('click',()=>{toast('Cache limpo');});
 $('clearBookHistory2')?.addEventListener('click',()=>{toast('Cache limpo');});
 
-function getHistory(){try{return JSON.parse(localStorage.getItem('kmr_hist_v4')||'[]');}catch{return[];}}
-function saveHistory(entry){const h=getHistory();h.unshift(entry);if(h.length>100)h.pop();localStorage.setItem('kmr_hist_v4',JSON.stringify(h));updateHistCount();}
+function getHistory(){try{return JSON.parse(localStorage.getItem('kmr_hist_v5')||'[]');}catch{return[];}}
+function saveHistory(entry){const h=getHistory();h.unshift(entry);if(h.length>100)h.pop();localStorage.setItem('kmr_hist_v5',JSON.stringify(h));updateHistCount();}
 function updateHistCount(){if($('histCount'))$('histCount').textContent=getHistory().length;}
 updateHistCount();
 
@@ -1271,7 +1244,7 @@ $('openHistBtn')?.addEventListener('click',()=>{
   $('histModal')?.classList.add('on');
 });
 $('closeHist')?.addEventListener('click',()=>$('histModal')?.classList.remove('on'));
-$('clearHistBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_hist_v4');updateHistCount();$('histModal')?.classList.remove('on');toast('Histórico limpo');});
+$('clearHistBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_hist_v5');updateHistCount();$('histModal')?.classList.remove('on');toast('Histórico limpo');});
 
 function exportCsvLog(){
   const h=getHistory();if(!h.length)return toast('Sem histórico para exportar',1);
@@ -1283,22 +1256,21 @@ $('exportHistCsv2')?.addEventListener('click',exportCsvLog);
 
 $('exportCfgBtn')?.addEventListener('click',()=>{
   persist();
-  const data=localStorage.getItem('kmr_unified_v4')||'{}';
+  const data=localStorage.getItem('kmr_unified_v5')||'{}';
   save(new Blob([data],{type:'application/json'}),`Config_${stamp()}.json`);
 });
 $('importCfgBtn')?.addEventListener('click',()=>$('importCfgFile')?.click());
 $('importCfgFile')?.addEventListener('change',async e=>{
   const f=e.target.files?.[0];if(!f)return;
-  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_unified_v4',txt);toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
+  try{const txt=await f.text();JSON.parse(txt);localStorage.setItem('kmr_unified_v5',txt);toast('Configurações importadas! Recarregando...');setTimeout(()=>location.reload(),900);}
   catch{toast('Arquivo JSON inválido',1);}
 });
-$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_unified_v4');localStorage.removeItem('kmr_unified_v3');localStorage.removeItem('kmr');toast('Restaurando padrões...');setTimeout(()=>location.reload(),800);});
+$('resetCfgBtn')?.addEventListener('click',()=>{localStorage.removeItem('kmr_unified_v5');localStorage.removeItem('kmr_unified_v4');localStorage.removeItem('kmr');toast('Restaurando padrões...');setTimeout(()=>location.reload(),800);});
 
 $('cam').addEventListener('click',e=>{if(S.cap&&S.advMode&&!e.target.closest('button,input,select'))document.body.classList.toggle('clean');});
 window.addEventListener('beforeunload',e=>{if(S.cap||S.rec||S.busy||S.queue.length){e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(S.cap||S.rec))navigator.wakeLock?.request('screen').then(l=>S.lock=l).catch(()=>{});});
 
-/* Início sempre limpo e intuitivo no Modo Padrão */
 setAdvMode(false);
 updateModeUI();
 updateLocationUI();
